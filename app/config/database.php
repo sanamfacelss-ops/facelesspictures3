@@ -14,12 +14,12 @@ class Database
     public static function getConnection(): PDO
     {
         if (self::$instance === null) {
-            $host = $_ENV['DB_HOST'] ?? 'localhost';
-            $port = $_ENV['DB_PORT'] ?? '3306';
-            $db   = $_ENV['DB_DATABASE'] ?? 'facelesspictures3';
-            $user = $_ENV['DB_USERNAME'] ?? 'root';
-            $pass = $_ENV['DB_PASSWORD'] ?? '';
-            $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+            $host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
+            $port = $_ENV['DB_PORT'] ?? getenv('DB_PORT') ?: '3306';
+            $db   = $_ENV['DB_DATABASE'] ?? $_ENV['DB_NAME'] ?? getenv('DB_DATABASE') ?: getenv('DB_NAME') ?: 'facelesspictures3';
+            $user = $_ENV['DB_USERNAME'] ?? $_ENV['DB_USER'] ?? getenv('DB_USERNAME') ?: getenv('DB_USER') ?: 'root';
+            $pass = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?: '';
+            $charset = $_ENV['DB_CHARSET'] ?? getenv('DB_CHARSET') ?: 'utf8mb4';
 
             $dsn = "mysql:host={$host};port={$port};dbname={$db};charset={$charset}";
             $options = [
