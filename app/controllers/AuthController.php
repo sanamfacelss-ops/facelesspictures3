@@ -10,20 +10,34 @@ use PDO;
 
 class AuthController
 {
-    private User $userModel;
-    private PDO $db;
+    private ?User $userModel = null;
+    private ?PDO $db = null;
+    private ?string $dbError = null;
 
     public function __construct()
     {
-        $this->userModel = new User();
-        $this->db = Database::getConnection();
+        try {
+            $this->db = Database::getConnection();
+            $this->userModel = new User();
+        } catch (\Exception $e) {
+            $this->dbError = $e->getMessage();
+        }
     }
 
     public function register(): void
     {
+        header('Content-Type: application/json');
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
+
+        // Check database connection
+        if ($this->dbError || !$this->userModel) {
+            http_response_code(503);
+            echo json_encode(['error' => 'Database connection failed. Please try again later.']);
             return;
         }
 
@@ -35,7 +49,7 @@ class AuthController
 
         if (!verify_csrf($csrf)) {
             http_response_code(403);
-            echo json_encode(['error' => 'Invalid CSRF token']);
+            echo json_encode(['error' => 'Invalid CSRF token. Please refresh and try again.']);
             return;
         }
 
@@ -44,7 +58,10 @@ class AuthController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Valid email is required.';
         if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters.';
         if (!in_array($role, ['actor', 'director', 'writer'])) $errors[] = 'Select a valid role.';
-        if ($this->userModel->findByEmail($email)) $errors[] = 'Email already registered.';
+        
+        if (empty($errors) && $this->userModel->findByEmail($email)) {
+            $errors[] = 'Email already registered.';
+        }
 
         if (!empty($errors)) {
             http_response_code(422);
@@ -52,23 +69,37 @@ class AuthController
             return;
         }
 
-        $userId = $this->userModel->create([
-            'name' => $name,
-            'email' => $email,
-            'password' => $password,
-            'role' => $role,
-        ]);
+        try {
+            $userId = $this->userModel->create([
+                'name' => $name,
+                'email' => $email,
+                'password' => $password,
+                'role' => $role,
+            ]);
 
-        $_SESSION['user_id'] = $userId;
-        flash('success', 'Account created successfully.');
-        echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+            $_SESSION['user_id'] = $userId;
+            flash('success', 'Account created successfully.');
+            echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Registration failed. Please try again.']);
+        }
     }
 
     public function login(): void
     {
+        header('Content-Type: application/json');
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
+
+        // Check database connection
+        if ($this->dbError || !$this->userModel) {
+            http_response_code(503);
+            echo json_encode(['error' => 'Database connection failed. Please try again later.']);
             return;
         }
 
@@ -78,20 +109,25 @@ class AuthController
 
         if (!verify_csrf($csrf)) {
             http_response_code(403);
-            echo json_encode(['error' => 'Invalid CSRF token']);
+            echo json_encode(['error' => 'Invalid CSRF token. Please refresh and try again.']);
             return;
         }
 
-        $user = $this->userModel->findByEmail($email);
-        if (!$user || !password_verify($password, $user['password'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Invalid email or password.']);
-            return;
-        }
+        try {
+            $user = $this->userModel->findByEmail($email);
+            if (!$user || !password_verify($password, $user['password'])) {
+                http_response_code(401);
+                echo json_encode(['error' => 'Invalid email or password.']);
+                return;
+            }
 
-        $_SESSION['user_id'] = $user['id'];
-        flash('success', 'Welcome back, ' . $user['name'] . '!');
-        echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+            $_SESSION['user_id'] = $user['id'];
+            flash('success', 'Welcome back, ' . $user['name'] . '!');
+            echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Login failed. Please try again.']);
+        }
     }
 
     public function logout(): void
