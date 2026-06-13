@@ -135,7 +135,7 @@ class AuthController
             debug_log("User created with ID: $userId", 'REGISTER');
             $_SESSION['user_id'] = $userId;
             flash('success', 'Account created successfully.');
-            echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+            echo json_encode(['success' => true, 'redirect' => '/creator/dashboard']);
         } catch (\Exception $e) {
             log_exception($e, 'REGISTER');
             http_response_code(500);
@@ -211,7 +211,7 @@ class AuthController
             $_SESSION['user_id'] = $user['id'];
             debug_log('SUCCESS: User logged in, session user_id = ' . $user['id'], 'LOGIN');
             flash('success', 'Welcome back, ' . $user['name'] . '!');
-            echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+            echo json_encode(['success' => true, 'redirect' => '/creator/dashboard']);
         } catch (\Exception $e) {
             debug_log('EXCEPTION: ' . $e->getMessage(), 'LOGIN');
             log_exception($e, 'LOGIN');

@@ -10,6 +10,7 @@ use App\Controllers\AuthController;
 use App\Controllers\UploadController;
 use App\Controllers\ModerationController;
 use App\Controllers\LeaderboardController;
+use App\Controllers\AIController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
@@ -70,6 +71,12 @@ $routes = [
     // Leaderboard API
     'api/leaderboard' => [LeaderboardController::class, 'index', 'GET'],
     'api/seasons' => [LeaderboardController::class, 'seasons', 'GET'],
+
+    // AI Quality Check API
+    'api/ai/webhook' => [AIController::class, 'webhook', 'POST'],
+    'api/ai/process/{id}' => [AIController::class, 'process', 'POST'],
+    'api/ai/queue' => [AIController::class, 'processQueue', 'GET'],
+    'api/ai/status/{id}' => [AIController::class, 'status', 'GET'],
 ];
 
 $matched = false;
@@ -116,6 +123,10 @@ $pageRoutes = [
     'dashboard' => 'dashboard.php',
     'upload' => 'upload.php',
     'leaderboard' => 'leaderboard.php',
+    // Creator studio routes
+    'creator/dashboard' => 'creator/dashboard.php',
+    'creator/record' => 'creator/record.php',
+    'creator/videos' => 'creator/videos.php',
 ];
 
 if (isset($pageRoutes[$uri])) {

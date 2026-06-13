@@ -108,17 +108,32 @@ class UploadController
             return;
         }
 
+        // Get optional fields
+        $recordingMode = trim($_POST['recording_mode'] ?? 'freeform');
+        $scriptContent = trim($_POST['script_content'] ?? '');
+        
+        // Validate recording mode
+        if (!in_array($recordingMode, ['script', 'freeform'])) {
+            $recordingMode = 'freeform';
+        }
+
         $videoId = $this->videoModel->create([
             'user_id' => (int) $user['id'],
             'season_id' => $seasonId,
             'title' => $title,
             'content_type' => $contentType,
             'file_path' => $filename,
+            'recording_mode' => $recordingMode,
+            'script_content' => $scriptContent ?: null,
         ]);
 
-        log_message('info', "Video uploaded ID {$videoId} by user {$user['id']} (type: {$contentType})");
-        flash('success', 'Video uploaded successfully and is pending moderation.');
-        echo json_encode(['success' => true, 'redirect' => '/dashboard']);
+        log_message('info', "Video uploaded ID {$videoId} by user {$user['id']} (type: {$contentType}, mode: {$recordingMode})");
+        flash('success', 'Video uploaded successfully! AI review in progress.');
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Video uploaded! AI quality check in progress...',
+            'redirect' => '/creator/dashboard'
+        ]);
     }
 
     private function parseSize(string $size): int

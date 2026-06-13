@@ -5,6 +5,7 @@ if (!is_admin()) redirect('/dashboard');
 
 $videoModel = new App\Models\Video();
 $pending = $videoModel->pending();
+$flagged = $videoModel->needsManualReview();
 $title = 'Admin Dashboard — ' . APP_NAME;
 
 // Handle debug toggle (secure - admin only, POST with CSRF)
@@ -174,6 +175,57 @@ if (file_exists($errorLogFile)) {
 
         <!-- MODERATION TAB -->
         <div x-show="activeTab === 'moderation'" x-cloak>
+            <!-- AI Flagged Videos (needs manual review) -->
+            <?php if (!empty($flagged)): ?>
+            <div class="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden mb-6">
+                <div class="px-6 py-4 border-b border-amber-200 flex items-center justify-between">
+                    <h2 class="font-semibold text-amber-800 flex items-center gap-2">
+                        🚩 AI Flagged - Manual Review Required
+                        <span class="bg-amber-500 text-white text-[11px] px-2 py-0.5 rounded-full"><?= count($flagged) ?></span>
+                    </h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-[13px]">
+                        <thead class="bg-amber-100/50 text-amber-800">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-medium">ID</th>
+                                <th class="px-6 py-3 text-left font-medium">Title</th>
+                                <th class="px-6 py-3 text-left font-medium">User</th>
+                                <th class="px-6 py-3 text-left font-medium">AI Score</th>
+                                <th class="px-6 py-3 text-left font-medium">Reason</th>
+                                <th class="px-6 py-3 text-left font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-amber-100">
+                            <?php foreach ($flagged as $v): 
+                                $aiFeedback = is_string($v['ai_feedback'] ?? '') ? json_decode($v['ai_feedback'], true) : ($v['ai_feedback'] ?? []);
+                            ?>
+                            <tr class="bg-white hover:bg-amber-50 transition">
+                                <td class="px-6 py-4 text-dark/50"><?= $v['id'] ?></td>
+                                <td class="px-6 py-4 font-medium text-dark"><?= e($v['title']) ?></td>
+                                <td class="px-6 py-4 text-dark/70"><?= e($v['user_name']) ?></td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                                        <?= ($v['ai_score'] ?? 0) >= 60 ? 'bg-emerald-100 text-emerald-700' : (($v['ai_score'] ?? 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700') ?>">
+                                        <?= $v['ai_score'] ?? 'N/A' ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-dark/70 max-w-xs truncate" title="<?= e($aiFeedback['summary'] ?? 'Flagged by AI') ?>">
+                                    <?= e($aiFeedback['summary'] ?? 'Flagged by AI') ?>
+                                </td>
+                                <td class="px-6 py-4 space-x-2">
+                                    <button @click="approve(<?= $v['id'] ?>)" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-[12px] font-medium hover:bg-green-700 transition">Approve</button>
+                                    <button @click="reject(<?= $v['id'] ?>)" class="bg-crimson text-white px-3 py-1.5 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Regular Pending Videos -->
             <div class="bg-white rounded-2xl shadow-sm border border-dark/5 overflow-hidden">
                 <div class="px-6 py-4 border-b border-dark/5 flex items-center justify-between">
                     <h2 class="font-semibold text-dark">Pending Videos</h2>
