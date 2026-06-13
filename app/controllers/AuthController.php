@@ -227,6 +227,57 @@ class AuthController
     }
 
     /**
+     * Delete user account
+     */
+    public function deleteAccount(): void
+    {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
+
+        $csrf = $_POST['csrf_token'] ?? '';
+        if (!verify_csrf($csrf)) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Invalid request']);
+            return;
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Not logged in']);
+            return;
+        }
+
+        try {
+            $userId = (int)$_SESSION['user_id'];
+            
+            // Delete user's videos first (cascade should handle this, but be explicit)
+            $stmt = $this->db->prepare("DELETE FROM videos WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            
+            // Delete the user
+            $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            
+            // Destroy session
+            session_destroy();
+            
+            debug_log("User account deleted: ID $userId", 'DELETE_ACCOUNT');
+            
+            echo json_encode(['success' => true, 'message' => 'Account deleted']);
+            
+        } catch (\Exception $e) {
+            log_exception($e, 'DELETE_ACCOUNT');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete account']);
+        }
+    }
+
+    /**
      * Request password reset - sends OTP to email
      */
     public function forgotPassword(): void

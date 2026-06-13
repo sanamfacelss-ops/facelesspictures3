@@ -125,6 +125,10 @@ try {
                             <?= strtoupper(substr($user['name'], 0, 1)) ?>
                         </div>
                         <span class="text-sm font-medium text-gray-700 hidden sm:block"><?= e(explode(' ', $user['name'])[0]) ?></span>
+                        <a href="#" onclick="event.preventDefault(); if(confirm('Delete your account? This cannot be undone.')) { fetch('/api/delete-account', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'csrf_token=<?= csrf_token() ?>'}).then(r=>r.json()).then(d=>{if(d.success)window.location.href='/login';else alert(d.error||'Failed');}); }" 
+                           class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Delete Account">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </a>
                         <a href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST'}).then(() => window.location.href='/login');" 
                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Logout">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>

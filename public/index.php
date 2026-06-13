@@ -56,6 +56,7 @@ $routes = [
     'api/register' => [AuthController::class, 'register', 'POST'],
     'api/login' => [AuthController::class, 'login', 'POST'],
     'api/logout' => [AuthController::class, 'logout', 'POST'],
+    'api/delete-account' => [AuthController::class, 'deleteAccount', 'POST'],
     'api/forgot-password' => [AuthController::class, 'forgotPassword', 'POST'],
     'api/verify-otp' => [AuthController::class, 'verifyOTP', 'POST'],
     'api/reset-password' => [AuthController::class, 'resetPassword', 'POST'],
