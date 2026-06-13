@@ -222,8 +222,9 @@ class AuthController
 
     public function logout(): void
     {
+        header('Content-Type: application/json');
         session_destroy();
-        redirect('/login');
+        echo json_encode(['success' => true]);
     }
 
     /**

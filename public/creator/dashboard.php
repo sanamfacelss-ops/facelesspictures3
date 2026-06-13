@@ -90,7 +90,7 @@ try {
         ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen" x-data="{ mobileMenu: false, loading: false }">
+<body class="bg-gray-50 min-h-screen" x-data="dashboardApp()">
 
     <!-- Top Navigation -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -125,14 +125,14 @@ try {
                             <?= strtoupper(substr($user['name'], 0, 1)) ?>
                         </div>
                         <span class="text-sm font-medium text-gray-700 hidden sm:block"><?= e(explode(' ', $user['name'])[0]) ?></span>
-                        <a href="#" onclick="event.preventDefault(); if(confirm('Delete your account? This cannot be undone.')) { fetch('/api/delete-account', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'csrf_token=<?= csrf_token() ?>'}).then(r=>r.json()).then(d=>{if(d.success)window.location.href='/login';else alert(d.error||'Failed');}); }" 
+                        <button @click="showDeleteModal = true" 
                            class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Delete Account">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </a>
-                        <a href="#" onclick="event.preventDefault(); fetch('/api/logout', {method:'POST'}).then(() => window.location.href='/login');" 
+                        </button>
+                        <button @click="logout()" 
                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Logout">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        </a>
+                        </button>
                     </div>
                     
                     <!-- Mobile menu button -->
@@ -370,5 +370,105 @@ try {
     </nav>
     
     <div class="h-20 md:hidden"></div>
+
+    <!-- Delete Account Modal -->
+    <div x-show="showDeleteModal" x-cloak 
+         class="fixed inset-0 z-[100] overflow-y-auto" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showDeleteModal = false"></div>
+            
+            <!-- Modal -->
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 mx-4"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Account?</h3>
+                    <p class="text-gray-500 mb-6">This action cannot be undone. All your videos and data will be permanently removed.</p>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button @click="showDeleteModal = false" 
+                            class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition">
+                        Cancel
+                    </button>
+                    <button @click="deleteAccount()" 
+                            :disabled="deleting"
+                            class="flex-1 px-4 py-3 bg-rose-600 text-white rounded-xl font-medium hover:bg-rose-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                        <svg x-show="deleting" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span x-text="deleting ? 'Deleting...' : 'Delete Account'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function dashboardApp() {
+            return {
+                mobileMenu: false,
+                showDeleteModal: false,
+                deleting: false,
+                
+                async logout() {
+                    try {
+                        const formData = new FormData();
+                        formData.append('csrf_token', '<?= csrf_token() ?>');
+                        
+                        await fetch('/api/logout', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        window.location.href = '/login';
+                    } catch (e) {
+                        window.location.href = '/login';
+                    }
+                },
+                
+                async deleteAccount() {
+                    this.deleting = true;
+                    try {
+                        const formData = new FormData();
+                        formData.append('csrf_token', '<?= csrf_token() ?>');
+                        
+                        const res = await fetch('/api/delete-account', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await res.json();
+                        
+                        if (data.success) {
+                            window.location.href = '/login';
+                        } else {
+                            alert(data.error || 'Failed to delete account');
+                            this.deleting = false;
+                        }
+                    } catch (e) {
+                        alert('Network error. Please try again.');
+                        this.deleting = false;
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
