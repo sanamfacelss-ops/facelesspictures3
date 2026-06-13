@@ -37,7 +37,34 @@ if ($uri === 'api/debug') {
         if ($status['users_table'] === 'exists') {
             $stmt = $db->query("SELECT COUNT(*) as cnt FROM users");
             $status['user_count'] = $stmt->fetch()['cnt'];
+            
+            // Check if content_categories column exists
+            $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'content_categories'");
+            $status['content_categories_column'] = $stmt->rowCount() > 0 ? 'exists' : 'MISSING - run migration 002!';
+            
+            // Show last user's categories
+            $stmt = $db->query("SELECT id, name, email, role, content_categories FROM users ORDER BY id DESC LIMIT 1");
+            $lastUser = $stmt->fetch();
+            if ($lastUser) {
+                $status['last_user'] = [
+                    'id' => $lastUser['id'],
+                    'name' => $lastUser['name'],
+                    'role' => $lastUser['role'],
+                    'content_categories_raw' => $lastUser['content_categories'],
+                    'content_categories_decoded' => json_decode($lastUser['content_categories'] ?? '[]', true),
+                ];
+            }
         }
+        
+        // Check scripts table
+        $stmt = $db->query("SHOW TABLES LIKE 'scripts'");
+        $status['scripts_table'] = $stmt->rowCount() > 0 ? 'exists' : 'MISSING - run migration 003!';
+        
+        if ($status['scripts_table'] === 'exists') {
+            $stmt = $db->query("SELECT category, COUNT(*) as count FROM scripts WHERE is_active = 1 GROUP BY category");
+            $status['scripts_by_category'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        
     } catch (\Exception $e) {
         $status['database'] = 'error: ' . $e->getMessage();
     }

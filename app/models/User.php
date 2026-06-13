@@ -29,8 +29,15 @@ class User
         $stmt = $this->db->prepare("SELECT id, name, email, role, content_categories, is_admin, created_at FROM users WHERE id = ? LIMIT 1");
         $stmt->execute([$id]);
         $result = $stmt->fetch();
-        if ($result && isset($result['content_categories'])) {
-            $result['content_categories'] = json_decode($result['content_categories'], true) ?? [$result['role']];
+        if ($result) {
+            // Parse content_categories - handle NULL, empty string, or valid JSON
+            if (!empty($result['content_categories'])) {
+                $decoded = json_decode($result['content_categories'], true);
+                $result['content_categories'] = is_array($decoded) && !empty($decoded) ? $decoded : [$result['role']];
+            } else {
+                // Fallback to role if content_categories is empty/null
+                $result['content_categories'] = [$result['role']];
+            }
         }
         return $result ?: null;
     }
