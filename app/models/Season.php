@@ -33,6 +33,17 @@ class Season
         return $result ?: null;
     }
 
+    public function getActive(): ?array
+    {
+        // Alias for active() - also returns first active season if none match current date
+        $result = $this->active();
+        if (!$result) {
+            $stmt = $this->db->query("SELECT * FROM seasons WHERE status = 'active' ORDER BY start_date DESC LIMIT 1");
+            $result = $stmt->fetch();
+        }
+        return $result ?: null;
+    }
+
     public function all(): array
     {
         $stmt = $this->db->query("SELECT * FROM seasons ORDER BY start_date DESC");

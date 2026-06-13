@@ -20,10 +20,18 @@ try {
 }
 
 $categoryInfo = [
-    'actor' => ['icon' => '🎭', 'label' => 'Acting', 'color' => '#E11D48', 'bg' => '#FFF1F2'],
-    'director' => ['icon' => '🎬', 'label' => 'Directing', 'color' => '#D97706', 'bg' => '#FFFBEB'],
-    'writer' => ['icon' => '✍️', 'label' => 'Writing', 'color' => '#2563EB', 'bg' => '#EFF6FF'],
+    'actor' => ['icon' => '🎭', 'label' => 'Acting', 'color' => '#E11D48', 'bg' => '#FFF1F2', 'desc' => 'Perform scripts on camera'],
+    'director' => ['icon' => '🎬', 'label' => 'Directing', 'color' => '#D97706', 'bg' => '#FFFBEB', 'desc' => 'Direct and explain scenes'],
+    'writer' => ['icon' => '✍️', 'label' => 'Writing', 'color' => '#2563EB', 'bg' => '#EFF6FF', 'desc' => 'Continue stories creatively'],
 ];
+
+// Get script counts for each category
+$scriptModel = new App\Models\Script();
+$scriptCounts = [];
+foreach ($userCategories as $cat) {
+    $scripts = $scriptModel->byCategory($cat);
+    $scriptCounts[$cat] = count($scripts);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -217,25 +225,31 @@ $categoryInfo = [
         <div class="grid lg:grid-cols-3 gap-6">
             <!-- Content Categories -->
             <div class="lg:col-span-1">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Categories</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Modes</h3>
                 <div class="space-y-3">
                     <?php foreach ($userCategories as $cat): 
-                        $info = $categoryInfo[$cat] ?? ['icon' => '📹', 'label' => ucfirst($cat), 'color' => '#6B7280', 'bg' => '#F3F4F6'];
+                        $info = $categoryInfo[$cat] ?? ['icon' => '📹', 'label' => ucfirst($cat), 'color' => '#6B7280', 'bg' => '#F3F4F6', 'desc' => ''];
                         $catVideos = array_filter($userVideos, fn($v) => ($v['content_type'] ?? '') === $cat);
+                        $availableScripts = $scriptCounts[$cat] ?? 0;
                     ?>
-                    <a href="/creator/record?category=<?= e($cat) ?>" class="block bg-white rounded-xl p-4 border border-gray-100 shadow-sm card">
+                    <a href="/creator/record?tab=<?= e($cat) ?>" class="block bg-white rounded-xl p-4 border border-gray-100 shadow-sm card">
                         <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-lg flex items-center justify-center text-xl" style="background: <?= $info['bg'] ?>">
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style="background: <?= $info['bg'] ?>">
                                 <?= $info['icon'] ?>
                             </div>
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0">
                                 <h4 class="font-medium text-gray-900"><?= $info['label'] ?></h4>
-                                <p class="text-sm text-gray-500"><?= count($catVideos) ?> video<?= count($catVideos) !== 1 ? 's' : '' ?></p>
+                                <p class="text-xs text-gray-500 truncate"><?= $info['desc'] ?? '' ?></p>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-xs text-gray-400"><?= count($catVideos) ?> video<?= count($catVideos) !== 1 ? 's' : '' ?></span>
+                                    <span class="text-xs" style="color: <?= $info['color'] ?>"><?= $availableScripts ?> script<?= $availableScripts !== 1 ? 's' : '' ?> available</span>
+                                </div>
                             </div>
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </a>
                     <?php endforeach; ?>
+                </div>
                 </div>
                 
                 <!-- Quick Tips -->

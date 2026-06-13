@@ -13,22 +13,57 @@ if (is_string($userCategories)) {
     $userCategories = json_decode($userCategories, true) ?? [$user['role']];
 }
 
-$selectedCategory = $_GET['category'] ?? $userCategories[0] ?? 'actor';
-if (!in_array($selectedCategory, $userCategories)) {
-    $selectedCategory = $userCategories[0];
-}
-
-$scripts = [];
+// Get scripts/prompts for each category
+$contentByCategory = [];
 foreach ($userCategories as $cat) {
-    $scripts[$cat] = $scriptModel->byCategory($cat);
+    $contentByCategory[$cat] = $scriptModel->byCategory($cat);
 }
 
-$seasons = $seasonModel->all();
+$activeSeason = $seasonModel->getActive();
 
 $categoryInfo = [
-    'actor' => ['icon' => '🎭', 'label' => 'Acting', 'color' => '#E11D48', 'bg' => '#FFF1F2'],
-    'director' => ['icon' => '🎬', 'label' => 'Directing', 'color' => '#D97706', 'bg' => '#FFFBEB'],
-    'writer' => ['icon' => '✍️', 'label' => 'Writing', 'color' => '#2563EB', 'bg' => '#EFF6FF'],
+    'actor' => [
+        'icon' => '🎭', 
+        'label' => 'Acting', 
+        'color' => '#E11D48', 
+        'bg' => '#FFF1F2',
+        'description' => 'Perform the script on camera',
+        'instructions' => [
+            'Read the script carefully before recording',
+            'Show emotion and bring the character to life',
+            'Keep your video under 3 minutes',
+            'Good lighting and clear audio are essential',
+        ],
+        'contentLabel' => 'Script to Perform',
+    ],
+    'director' => [
+        'icon' => '🎬', 
+        'label' => 'Directing', 
+        'color' => '#D97706', 
+        'bg' => '#FFFBEB',
+        'description' => 'Explain how you would direct this scene',
+        'instructions' => [
+            'Describe your vision for the scene',
+            'Explain camera angles, lighting, mood',
+            'Talk about how you would direct the actors',
+            'Share your creative interpretation',
+        ],
+        'contentLabel' => 'Scene to Direct',
+    ],
+    'writer' => [
+        'icon' => '✍️', 
+        'label' => 'Writing', 
+        'color' => '#2563EB', 
+        'bg' => '#EFF6FF',
+        'description' => 'Continue the story in your own words',
+        'instructions' => [
+            'Read the story opening carefully',
+            'Continue the narrative in your own style',
+            'Be creative - take the story anywhere',
+            'Present your continuation on camera',
+        ],
+        'contentLabel' => 'Story to Continue',
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -44,191 +79,152 @@ $categoryInfo = [
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: 'Inter', system-ui, sans-serif; }
+        .tab-active { border-bottom: 3px solid currentColor; }
         .card { transition: all 0.2s ease; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1); }
+        .script-card.selected { ring: 2px; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen" x-data="recordPage()">
 
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
             <a href="/creator/dashboard" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span class="hidden sm:inline font-medium">Back</span>
+                <span class="hidden sm:inline font-medium">Back to Dashboard</span>
             </a>
             <h1 class="font-semibold text-gray-900">Create Video</h1>
-            <div class="w-16"></div>
+            <div class="w-20"></div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 py-8">
-        <!-- Progress Steps -->
-        <div class="mb-8">
-            <div class="flex items-center justify-center">
-                <template x-for="(label, i) in ['Category', 'Mode', 'Script', 'Upload']" :key="i">
-                    <div class="flex items-center">
-                        <div class="flex flex-col items-center">
-                            <div :class="step > i ? 'bg-emerald-500 text-white' : step === i ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-500'"
-                                 class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all">
-                                <span x-show="step <= i" x-text="i + 1"></span>
-                                <svg x-show="step > i" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                            <span class="text-xs mt-1.5 font-medium" :class="step >= i ? 'text-gray-900' : 'text-gray-400'" x-text="label"></span>
-                        </div>
-                        <div x-show="i < 3" class="w-12 sm:w-20 h-0.5 mx-2 -mt-4" :class="step > i ? 'bg-emerald-500' : 'bg-gray-200'"></div>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Step 1: Category -->
-        <div x-show="step === 0" x-cloak>
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">What are you creating?</h2>
-                <p class="text-gray-500">Select your content category</p>
-            </div>
-            <div class="grid gap-4 max-w-lg mx-auto">
-                <?php foreach ($userCategories as $cat): 
-                    $info = $categoryInfo[$cat] ?? ['icon' => '📹', 'label' => ucfirst($cat), 'color' => '#6B7280', 'bg' => '#F3F4F6'];
+    <main class="max-w-5xl mx-auto px-4 py-6">
+        
+        <?php if (count($userCategories) > 1): ?>
+        <!-- Category Tabs -->
+        <div class="bg-white rounded-xl border border-gray-200 mb-6 overflow-hidden">
+            <div class="flex border-b border-gray-200">
+                <?php foreach ($userCategories as $index => $cat): 
+                    $info = $categoryInfo[$cat] ?? ['icon' => '📹', 'label' => ucfirst($cat), 'color' => '#6B7280'];
                 ?>
-                <button @click="category = '<?= e($cat) ?>'; step = 1" 
-                        class="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition text-left card">
-                    <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl" style="background: <?= $info['bg'] ?>">
-                        <?= $info['icon'] ?>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-gray-900"><?= $info['label'] ?></h3>
-                        <p class="text-sm text-gray-500">
-                            <?php if ($cat === 'actor'): ?>Showcase your acting skills
-                            <?php elseif ($cat === 'director'): ?>Present your directorial vision
-                            <?php else: ?>Bring your writing to life<?php endif; ?>
-                        </p>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <button 
+                    @click="activeTab = '<?= e($cat) ?>'; selectedScript = null"
+                    :class="activeTab === '<?= e($cat) ?>' ? 'border-b-2 bg-gray-50' : 'hover:bg-gray-50'"
+                    class="flex-1 px-4 py-4 flex items-center justify-center gap-2 transition font-medium"
+                    :style="activeTab === '<?= e($cat) ?>' ? 'border-color: <?= $info['color'] ?>; color: <?= $info['color'] ?>' : ''"
+                >
+                    <span class="text-xl"><?= $info['icon'] ?></span>
+                    <span class="hidden sm:inline"><?= $info['label'] ?></span>
                 </button>
                 <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
 
-        <!-- Step 2: Mode Selection -->
-        <div x-show="step === 1" x-cloak>
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Choose your style</h2>
-                <p class="text-gray-500">How do you want to create?</p>
-            </div>
-            <div class="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                <button @click="mode = 'script'; step = 2" 
-                        class="p-6 bg-white rounded-xl border border-gray-200 hover:border-rose-300 hover:shadow-md transition text-left card group">
-                    <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">📝</div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Use a Script</h3>
-                    <p class="text-sm text-gray-500 mb-4">Choose from curated scripts designed to showcase your talent</p>
-                    <span class="text-sm font-medium text-rose-600">Browse scripts →</span>
-                </button>
-                <button @click="mode = 'freeform'; step = 2" 
-                        class="p-6 bg-white rounded-xl border border-gray-200 hover:border-violet-300 hover:shadow-md transition text-left card group">
-                    <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">✨</div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Go Freeform</h3>
-                    <p class="text-sm text-gray-500 mb-4">Write your own or improvise with complete creative freedom</p>
-                    <span class="text-sm font-medium text-violet-600">Start creating →</span>
-                </button>
-            </div>
-            <div class="text-center mt-6">
-                <button @click="step = 0" class="text-sm text-gray-500 hover:text-gray-700">← Back to categories</button>
-            </div>
-        </div>
-
-        <!-- Step 3: Script Selection / Freeform -->
-        <div x-show="step === 2" x-cloak>
-            <!-- Script Mode -->
-            <template x-if="mode === 'script'">
-                <div>
-                    <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Pick your script</h2>
-                        <p class="text-gray-500">Select one that resonates with you</p>
+        <!-- Content for Each Category -->
+        <?php foreach ($userCategories as $cat): 
+            $info = $categoryInfo[$cat] ?? ['icon' => '📹', 'label' => ucfirst($cat), 'color' => '#6B7280', 'bg' => '#F3F4F6', 'description' => '', 'instructions' => [], 'contentLabel' => 'Content'];
+            $scripts = $contentByCategory[$cat] ?? [];
+        ?>
+        <div x-show="activeTab === '<?= e($cat) ?>'" x-cloak class="space-y-6">
+            
+            <!-- Mode Header -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background: <?= $info['bg'] ?>">
+                        <?= $info['icon'] ?>
                     </div>
-                    <div class="grid sm:grid-cols-2 gap-4 mb-6">
-                        <?php foreach ($userCategories as $cat): ?>
-                            <?php foreach ($scripts[$cat] ?? [] as $script): ?>
-                            <div x-show="category === '<?= e($cat) ?>'" 
-                                 @click="selectedScript = <?= htmlspecialchars(json_encode($script), ENT_QUOTES) ?>; scriptContent = <?= htmlspecialchars(json_encode($script['content']), ENT_QUOTES) ?>"
-                                 :class="selectedScript?.id === <?= $script['id'] ?> ? 'border-rose-500 bg-rose-50' : 'border-gray-200 hover:border-gray-300'"
-                                 class="p-5 bg-white rounded-xl border cursor-pointer transition card">
-                                <div class="flex items-start justify-between mb-2">
-                                    <h4 class="font-semibold text-gray-900"><?= e($script['title']) ?></h4>
-                                    <span class="px-2 py-0.5 rounded text-xs font-medium 
-                                        <?= $script['difficulty'] === 'beginner' ? 'bg-emerald-100 text-emerald-700' : 
-                                           ($script['difficulty'] === 'intermediate' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700') ?>">
-                                        <?= ucfirst($script['difficulty']) ?>
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 line-clamp-3 mb-3"><?= e($script['content']) ?></p>
-                                <?php if ($script['duration_hint']): ?>
-                                <p class="text-xs text-gray-400 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <?= e($script['duration_hint']) ?>
-                                </p>
-                                <?php endif; ?>
-                            </div>
-                            <?php endforeach; ?>
+                    <div class="flex-1">
+                        <h2 class="text-xl font-bold text-gray-900 mb-1"><?= $info['label'] ?> Mode</h2>
+                        <p class="text-gray-600"><?= $info['description'] ?></p>
+                    </div>
+                </div>
+                
+                <!-- Instructions -->
+                <div class="mt-4 p-4 rounded-lg" style="background: <?= $info['bg'] ?>">
+                    <h4 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        How it works
+                    </h4>
+                    <ul class="space-y-1">
+                        <?php foreach ($info['instructions'] as $instruction): ?>
+                        <li class="text-sm text-gray-700 flex items-start gap-2">
+                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0" style="color: <?= $info['color'] ?>" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            <?= e($instruction) ?>
+                        </li>
                         <?php endforeach; ?>
-                    </div>
+                    </ul>
                 </div>
-            </template>
-
-            <!-- Freeform Mode -->
-            <template x-if="mode === 'freeform'">
-                <div>
-                    <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Your script</h2>
-                        <p class="text-gray-500">Write notes or leave blank to improvise</p>
-                    </div>
-                    <div class="max-w-2xl mx-auto">
-                        <textarea x-model="scriptContent" rows="8" placeholder="Write your script, notes, or topic ideas here...
-
-Tips:
-• Keep it under 3 minutes
-• Be authentic
-• Show your personality"
-                            class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:border-gray-400 focus:ring-0 outline-none resize-none text-gray-900 placeholder-gray-400"></textarea>
-                        <p class="text-sm text-gray-400 mt-2 text-right" x-text="scriptContent.length + ' characters'"></p>
-                    </div>
-                </div>
-            </template>
-
-            <div class="flex items-center justify-between mt-8 max-w-2xl mx-auto">
-                <button @click="step = 1; selectedScript = null" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition">← Back</button>
-                <button @click="step = 3" 
-                        :disabled="mode === 'script' && !selectedScript"
-                        :class="(mode === 'script' && !selectedScript) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-gray-800'"
-                        class="px-6 py-2.5 rounded-lg font-medium transition">
-                    Continue →
-                </button>
-            </div>
-        </div>
-
-        <!-- Step 4: Upload -->
-        <div x-show="step === 3" x-cloak>
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Upload your video</h2>
-                <p class="text-gray-500">Almost there! Add your video file</p>
             </div>
 
-            <div class="max-w-2xl mx-auto">
-                <!-- Script Reference -->
-                <div x-show="scriptContent" class="mb-6">
-                    <button @click="showScript = !showScript" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl text-left hover:bg-gray-50 transition">
-                        <span class="flex items-center gap-2 font-medium text-gray-900">
-                            <span>📝</span> Your Script Reference
-                        </span>
-                        <svg class="w-5 h-5 text-gray-400 transition-transform" :class="showScript && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div x-show="showScript" x-collapse class="mt-2 p-4 bg-gray-100 rounded-xl">
-                        <p class="text-sm text-gray-700 whitespace-pre-wrap" x-text="scriptContent"></p>
+            <!-- Scripts/Content Selection -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 class="font-semibold text-gray-900 mb-4"><?= $info['contentLabel'] ?></h3>
+                
+                <?php if (empty($scripts)): ?>
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
+                    <p class="text-gray-500 mb-2">No <?= strtolower($info['contentLabel']) ?>s available yet</p>
+                    <p class="text-sm text-gray-400">Check back soon for new content!</p>
+                </div>
+                <?php else: ?>
+                <div class="grid gap-4">
+                    <?php foreach ($scripts as $script): ?>
+                    <div 
+                        @click="selectScript(<?= htmlspecialchars(json_encode($script), ENT_QUOTES) ?>, '<?= e($cat) ?>')"
+                        :class="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>' ? 'ring-2 ring-offset-2' : 'hover:border-gray-300'"
+                        class="p-5 bg-white rounded-xl border border-gray-200 cursor-pointer transition card"
+                        :style="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>' ? 'ring-color: <?= $info['color'] ?>' : ''"
+                    >
+                        <div class="flex items-start justify-between mb-3">
+                            <h4 class="font-semibold text-gray-900"><?= e($script['title']) ?></h4>
+                            <div class="flex items-center gap-2">
+                                <?php if ($script['duration_hint']): ?>
+                                <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">
+                                    <?= e($script['duration_hint']) ?>
+                                </span>
+                                <?php endif; ?>
+                                <span class="px-2 py-0.5 rounded text-xs font-medium 
+                                    <?= $script['difficulty'] === 'beginner' ? 'bg-emerald-100 text-emerald-700' : 
+                                       ($script['difficulty'] === 'intermediate' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700') ?>">
+                                    <?= ucfirst($script['difficulty']) ?>
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap"><?= e($script['content']) ?></p>
+                        
+                        <div x-show="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>'" class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="text-sm font-medium flex items-center gap-1" style="color: <?= $info['color'] ?>">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                Selected - Ready to record
+                            </span>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Upload Section (shown when script selected) -->
+            <div x-show="selectedScript && activeTab === '<?= e($cat) ?>'" x-cloak class="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Upload Your Video</h3>
+                
+                <!-- Selected Script Reference -->
+                <div class="mb-6 p-4 rounded-lg border-l-4" style="background: <?= $info['bg'] ?>; border-color: <?= $info['color'] ?>">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Your <?= strtolower($info['contentLabel']) ?>:</span>
+                        <button @click="showFullScript = !showFullScript" class="text-sm" style="color: <?= $info['color'] ?>">
+                            <span x-text="showFullScript ? 'Hide' : 'Show full'"></span>
+                        </button>
+                    </div>
+                    <h4 class="font-semibold text-gray-900" x-text="selectedScript?.title"></h4>
+                    <p x-show="showFullScript" class="text-sm text-gray-600 mt-2 whitespace-pre-wrap" x-text="selectedScript?.content"></p>
                 </div>
 
-                <form @submit.prevent="submitUpload" class="space-y-5">
+                <form @submit.prevent="submitUpload('<?= e($cat) ?>')" class="space-y-5">
                     <!-- Title -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Video Title</label>
@@ -237,33 +233,21 @@ Tips:
                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-gray-400 focus:ring-0 outline-none">
                     </div>
 
-                    <!-- Season -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Season</label>
-                        <select x-model="formData.season_id" required
-                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-gray-400 focus:ring-0 outline-none appearance-none">
-                            <option value="">Select season</option>
-                            <?php foreach ($seasons as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= e($s['title']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
                     <!-- Upload Area -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Video File</label>
                         <div @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop($event)"
-                             @click="$refs.fileInput.click()"
+                             @click="$refs.fileInput_<?= $cat ?>.click()"
                              :class="dragOver ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'"
                              class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition">
-                            <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" accept="video/*" class="hidden">
+                            <input type="file" x-ref="fileInput_<?= $cat ?>" @change="handleFileSelect($event)" accept="video/*" class="hidden">
                             <template x-if="!selectedFile">
                                 <div>
                                     <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                                         <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                                     </div>
                                     <p class="text-gray-600 mb-1">Drop your video here or click to browse</p>
-                                    <p class="text-sm text-gray-400">MP4, MOV, WebM • Max <?= e(UPLOAD_MAX_SIZE) ?></p>
+                                    <p class="text-sm text-gray-400">MP4, MOV, WebM • Max 500MB</p>
                                 </div>
                             </template>
                             <template x-if="selectedFile">
@@ -309,31 +293,28 @@ Tips:
                         </p>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="flex items-center justify-between pt-4">
-                        <button type="button" @click="step = 2" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition">← Back</button>
-                        <button type="submit" :disabled="loading || !selectedFile"
-                                :class="(loading || !selectedFile) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-gray-800'"
-                                class="px-6 py-2.5 rounded-lg font-medium transition flex items-center gap-2">
-                            <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span x-text="loading ? 'Uploading...' : 'Upload Video'"></span>
-                        </button>
-                    </div>
+                    <!-- Submit -->
+                    <button type="submit" :disabled="loading || !selectedFile"
+                            :class="(loading || !selectedFile) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'hover:opacity-90'"
+                            class="w-full py-3 rounded-xl font-semibold text-white transition flex items-center justify-center gap-2"
+                            style="background: <?= $info['color'] ?>">
+                        <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="loading ? 'Uploading...' : 'Submit Video'"></span>
+                    </button>
                 </form>
             </div>
         </div>
+        <?php endforeach; ?>
+
     </main>
 
     <script>
         function recordPage() {
             return {
-                step: 0,
-                category: '<?= e($selectedCategory) ?>',
-                mode: null,
+                activeTab: '<?= e($userCategories[0] ?? 'actor') ?>',
                 selectedScript: null,
-                scriptContent: '',
-                showScript: false,
-                formData: { title: '', season_id: '' },
+                showFullScript: false,
+                formData: { title: '' },
                 selectedFile: null,
                 dragOver: false,
                 uploading: false,
@@ -342,6 +323,12 @@ Tips:
                 errors: [],
                 success: '',
 
+                selectScript(script, category) {
+                    if (this.activeTab === category) {
+                        this.selectedScript = script;
+                        this.formData.title = script.title + ' - My Performance';
+                    }
+                },
                 handleFileSelect(e) {
                     if (e.target.files[0]) this.selectedFile = e.target.files[0];
                 },
@@ -350,18 +337,16 @@ Tips:
                     const file = e.dataTransfer.files[0];
                     if (file?.type.startsWith('video/')) {
                         this.selectedFile = file;
-                        this.$refs.fileInput.files = e.dataTransfer.files;
                     }
                 },
                 clearFile() {
                     this.selectedFile = null;
-                    this.$refs.fileInput.value = '';
                 },
                 formatFileSize(bytes) {
                     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
                     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
                 },
-                async submitUpload() {
+                async submitUpload(category) {
                     this.loading = true;
                     this.uploading = true;
                     this.errors = [];
@@ -371,10 +356,10 @@ Tips:
                     const formData = new FormData();
                     formData.append('csrf_token', '<?= csrf_token() ?>');
                     formData.append('title', this.formData.title);
-                    formData.append('season_id', this.formData.season_id);
-                    formData.append('content_type', this.category);
-                    formData.append('recording_mode', this.mode);
-                    formData.append('script_content', this.scriptContent);
+                    formData.append('season_id', '<?= $activeSeason['id'] ?? 1 ?>');
+                    formData.append('content_type', category);
+                    formData.append('script_id', this.selectedScript?.id || '');
+                    formData.append('script_content', this.selectedScript?.content || '');
                     formData.append('video', this.selectedFile);
 
                     const xhr = new XMLHttpRequest();
@@ -387,7 +372,7 @@ Tips:
                         try {
                             const res = JSON.parse(xhr.responseText);
                             if (xhr.status >= 200 && xhr.status < 300) {
-                                this.success = res.message || 'Video uploaded! Processing...';
+                                this.success = res.message || 'Video uploaded! Redirecting...';
                                 setTimeout(() => window.location.href = '/creator/dashboard', 2000);
                             } else {
                                 this.errors = res.errors || [res.error || 'Upload failed'];
