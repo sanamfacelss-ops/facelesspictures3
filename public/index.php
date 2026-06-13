@@ -16,6 +16,37 @@ $uri = str_replace(dirname($_SERVER['SCRIPT_NAME']), '', $uri);
 $uri = trim($uri, '/');
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Debug endpoint - check system status (remove in production)
+if ($uri === 'api/debug') {
+    header('Content-Type: application/json');
+    $status = ['timestamp' => date('Y-m-d H:i:s'), 'php' => PHP_VERSION];
+    
+    // Test database
+    try {
+        $db = \App\Config\Database::getConnection();
+        $status['database'] = 'connected';
+        
+        // Check if users table exists
+        $stmt = $db->query("SHOW TABLES LIKE 'users'");
+        $status['users_table'] = $stmt->rowCount() > 0 ? 'exists' : 'missing';
+        
+        // Count users
+        if ($status['users_table'] === 'exists') {
+            $stmt = $db->query("SELECT COUNT(*) as cnt FROM users");
+            $status['user_count'] = $stmt->fetch()['cnt'];
+        }
+    } catch (\Exception $e) {
+        $status['database'] = 'error: ' . $e->getMessage();
+    }
+    
+    // Check session
+    $status['session'] = session_status() === PHP_SESSION_ACTIVE ? 'active' : 'inactive';
+    $status['csrf_set'] = isset($_SESSION[CSRF_TOKEN_NAME]);
+    
+    echo json_encode($status, JSON_PRETTY_PRINT);
+    exit;
+}
+
 // API routes
 $routes = [
     // Auth API
