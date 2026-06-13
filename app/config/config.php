@@ -24,6 +24,9 @@ define('APP_URL', $_ENV['APP_URL'] ?? getenv('APP_URL') ?: 'http://localhost');
 define('UPLOAD_MAX_SIZE', $_ENV['UPLOAD_MAX_SIZE'] ?? getenv('UPLOAD_MAX_SIZE') ?: '500M');
 define('CSRF_TOKEN_NAME', $_ENV['CSRF_TOKEN_NAME'] ?? getenv('CSRF_TOKEN_NAME') ?: 'fp3_csrf_token');
 
+// Debug mode - set FP3_DEBUG=true in .env to enable
+define('FP3_DEBUG', filter_var($_ENV['FP3_DEBUG'] ?? getenv('FP3_DEBUG') ?: false, FILTER_VALIDATE_BOOLEAN));
+
 // Paths
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/../../'));

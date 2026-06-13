@@ -76,3 +76,51 @@ function log_message(string $level, string $message): void
     $line = sprintf("[%s] [%s] %s" . PHP_EOL, date('Y-m-d H:i:s'), strtoupper($level), $message);
     error_log($line, 3, $file);
 }
+
+/**
+ * Debug log - like WP_DEBUG_LOG
+ * Only logs when FP3_DEBUG is true
+ */
+function debug_log($data, string $label = ''): void
+{
+    if (!defined('FP3_DEBUG') || !FP3_DEBUG) {
+        return;
+    }
+    
+    $file = LOG_PATH . '/debug.log';
+    $timestamp = date('Y-m-d H:i:s');
+    
+    if (is_array($data) || is_object($data)) {
+        $output = print_r($data, true);
+    } else {
+        $output = (string) $data;
+    }
+    
+    $label = $label ? "[$label] " : '';
+    $line = "[$timestamp] {$label}{$output}" . PHP_EOL;
+    
+    error_log($line, 3, $file);
+}
+
+/**
+ * Log exception with full stack trace
+ */
+function log_exception(\Throwable $e, string $context = ''): void
+{
+    $file = LOG_PATH . '/error.log';
+    $timestamp = date('Y-m-d H:i:s');
+    
+    $line = "[$timestamp] ";
+    if ($context) $line .= "[$context] ";
+    $line .= get_class($e) . ": " . $e->getMessage() . PHP_EOL;
+    $line .= "File: " . $e->getFile() . ":" . $e->getLine() . PHP_EOL;
+    $line .= "Stack trace:" . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
+    $line .= str_repeat('-', 80) . PHP_EOL;
+    
+    error_log($line, 3, $file);
+    
+    // Also log to debug if enabled
+    if (defined('FP3_DEBUG') && FP3_DEBUG) {
+        debug_log($e->getMessage(), $context ?: 'EXCEPTION');
+    }
+}
