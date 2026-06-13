@@ -1,4 +1,8 @@
 <?php
+/**
+ * Faceless Pitcher 3 - Main Router
+ * Routes API requests to controllers and page requests to views
+ */
 
 require_once __DIR__ . '/../app/config/config.php';
 
@@ -12,7 +16,7 @@ $uri = str_replace(dirname($_SERVER['SCRIPT_NAME']), '', $uri);
 $uri = trim($uri, '/');
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Simple router
+// API routes
 $routes = [
     // Auth API
     'api/register' => [AuthController::class, 'register', 'POST'],
