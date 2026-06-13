@@ -27,10 +27,20 @@ function auth_user(): ?array
 {
     if (!empty($_SESSION['user_id'])) {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT id, name, email, role, is_admin FROM users WHERE id = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, name, email, role, content_categories, is_admin FROM users WHERE id = ? LIMIT 1");
         $stmt->execute([$_SESSION['user_id']]);
         $user = $stmt->fetch();
-        return $user ?: null;
+        if ($user) {
+            // Parse content_categories JSON
+            if (!empty($user['content_categories'])) {
+                $decoded = json_decode($user['content_categories'], true);
+                $user['content_categories'] = is_array($decoded) && !empty($decoded) ? $decoded : [$user['role']];
+            } else {
+                $user['content_categories'] = [$user['role']];
+            }
+            return $user;
+        }
+        return null;
     }
     return null;
 }
