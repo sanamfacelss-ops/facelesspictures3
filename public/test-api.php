@@ -10,26 +10,42 @@ $result = [
     'request_uri' => $_SERVER['REQUEST_URI'] ?? 'unknown'
 ];
 
-// Test database
+// Test database - direct connection without our wrapper
 try {
     require_once __DIR__ . '/../app/config/config.php';
     
     // Show what env vars we're reading
+    $host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
+    $db = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'facelesspictures3';
+    $user = $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'root';
+    $pass = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?: '';
+    
     $result['env_vars'] = [
-        'DB_HOST' => $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: '(not set)',
-        'DB_NAME' => $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: '(not set)',
-        'DB_DATABASE' => $_ENV['DB_DATABASE'] ?? getenv('DB_DATABASE') ?: '(not set)',
-        'DB_USER' => $_ENV['DB_USER'] ?? getenv('DB_USER') ?: '(not set)',
-        'DB_USERNAME' => $_ENV['DB_USERNAME'] ?? getenv('DB_USERNAME') ?: '(not set)',
-        'DB_PASSWORD' => !empty($_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD')) ? '(set - hidden)' : '(NOT SET!)',
+        'DB_HOST' => $host,
+        'DB_NAME' => $db,
+        'DB_USER' => $user,
+        'DB_PASSWORD' => !empty($pass) ? '(set - hidden)' : '(NOT SET!)',
     ];
     
-    $db = \App\Config\Database::getConnection();
+    // Try direct PDO connection
+    $dsn = "mysql:host={$host};port=3306;dbname={$db};charset=utf8mb4";
+    $result['dsn'] = $dsn;
+    
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_TIMEOUT => 5
+    ]);
+    
     $result['database'] = 'connected';
     
     // Check tables
-    $stmt = $db->query("SHOW TABLES");
-    $result['tables'] = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    $stmt = $pdo->query("SHOW TABLES");
+    $result['tables'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    // Count users
+    $stmt = $pdo->query("SELECT COUNT(*) as cnt FROM users");
+    $row = $stmt->fetch();
+    $result['user_count'] = $row['cnt'] ?? 0;
     
 } catch (PDOException $e) {
     $result['database'] = 'error';
