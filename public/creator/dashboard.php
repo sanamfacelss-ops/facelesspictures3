@@ -1,14 +1,37 @@
 <?php
 require_once __DIR__ . '/../../app/config/config.php';
 
-if (!is_authenticated()) redirect('/login');
-$user = auth_user();
-$title = 'Creator Studio - ' . APP_NAME;
+// Wrap everything in try-catch to capture errors
+try {
+    debug_log('Creator dashboard loading...', 'CREATOR_DASH');
+    
+    if (!is_authenticated()) {
+        debug_log('User not authenticated, redirecting to login', 'CREATOR_DASH');
+        redirect('/login');
+    }
+    
+    $user = auth_user();
+    debug_log('User authenticated: ' . ($user['email'] ?? 'unknown'), 'CREATOR_DASH');
+    
+    $title = 'Creator Studio - ' . APP_NAME;
 
-// Get user data
-$videoModel = new App\Models\Video();
-$userVideos = $videoModel->byUser((int)$user['id']);
-$stats = $videoModel->getUserStats((int)$user['id']);
+    // Get user data
+    debug_log('Loading Video model...', 'CREATOR_DASH');
+    $videoModel = new App\Models\Video();
+    
+    debug_log('Fetching user videos...', 'CREATOR_DASH');
+    $userVideos = $videoModel->byUser((int)$user['id']);
+    debug_log('Found ' . count($userVideos) . ' videos', 'CREATOR_DASH');
+    
+    debug_log('Fetching user stats...', 'CREATOR_DASH');
+    $stats = $videoModel->getUserStats((int)$user['id']);
+    debug_log('Stats loaded', 'CREATOR_DASH');
+} catch (Exception $e) {
+    debug_log('CREATOR DASHBOARD ERROR: ' . $e->getMessage(), 'CREATOR_DASH');
+    debug_log('Stack trace: ' . $e->getTraceAsString(), 'CREATOR_DASH');
+    log_exception($e, 'CREATOR_DASH');
+    die('Dashboard error: ' . ($e->getMessage()));
+}
 
 // Get user's content categories
 $userCategories = $user['content_categories'] ?? [$user['role']];
