@@ -26,22 +26,26 @@ class User
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->db->prepare("SELECT id, name, email, role, is_admin, created_at FROM users WHERE id = ? LIMIT 1");
+        $stmt = $this->db->prepare("SELECT id, name, email, role, content_categories, is_admin, created_at FROM users WHERE id = ? LIMIT 1");
         $stmt->execute([$id]);
         $result = $stmt->fetch();
+        if ($result && isset($result['content_categories'])) {
+            $result['content_categories'] = json_decode($result['content_categories'], true) ?? [$result['role']];
+        }
         return $result ?: null;
     }
 
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)"
+            "INSERT INTO users (name, email, password, role, content_categories) VALUES (?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $data['name'],
             $data['email'],
             password_hash($data['password'], PASSWORD_BCRYPT),
             $data['role'],
+            json_encode($data['content_categories'] ?? [$data['role']]),
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -57,7 +61,18 @@ class User
 
     public function all(): array
     {
-        $stmt = $this->db->query("SELECT id, name, email, role, is_admin, created_at FROM users ORDER BY created_at DESC");
-        return $stmt->fetchAll();
+        $stmt = $this->db->query("SELECT id, name, email, role, content_categories, is_admin, created_at FROM users ORDER BY created_at DESC");
+        $results = $stmt->fetchAll();
+        
+        // Parse content_categories JSON for each user
+        foreach ($results as &$user) {
+            if (isset($user['content_categories'])) {
+                $user['content_categories'] = json_decode($user['content_categories'], true) ?? [$user['role']];
+            } else {
+                $user['content_categories'] = [$user['role']];
+            }
+        }
+        
+        return $results;
     }
 }

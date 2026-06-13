@@ -57,9 +57,24 @@ class AuthController
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $role = $_POST['role'] ?? '';
+        $contentCategories = $_POST['content_categories'] ?? '';
         $csrf = $_POST['csrf_token'] ?? '';
 
-        debug_log("Name: $name, Email: $email, Role: $role", 'REGISTER');
+        debug_log("Name: $name, Email: $email, Role: $role, Categories: $contentCategories", 'REGISTER');
+
+        // Parse content categories from JSON
+        $categories = [];
+        if (!empty($contentCategories)) {
+            $categories = json_decode($contentCategories, true);
+            if (!is_array($categories)) {
+                $categories = [];
+            }
+        }
+        
+        // If no categories but role is set, use role as single category (backward compatibility)
+        if (empty($categories) && !empty($role)) {
+            $categories = [$role];
+        }
 
         if (!verify_csrf($csrf)) {
             debug_log('CSRF validation failed', 'REGISTER');
@@ -74,7 +89,27 @@ class AuthController
         if (strlen($name) < 2) $errors[] = 'Name is required.';
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Valid email is required.';
         if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters.';
-        if (!in_array($role, ['actor', 'director', 'writer'])) $errors[] = 'Select a valid role.';
+        
+        // Validate categories
+        $validCategories = ['actor', 'director', 'writer'];
+        if (empty($categories)) {
+            $errors[] = 'Please select at least one content type.';
+        } else {
+            foreach ($categories as $cat) {
+                if (!in_array($cat, $validCategories)) {
+                    $errors[] = 'Invalid content type selected.';
+                    break;
+                }
+            }
+        }
+        
+        // Set role from first category for backward compatibility
+        if (!empty($categories) && empty($role)) {
+            $role = $categories[0];
+        }
+        if (!in_array($role, $validCategories)) {
+            $role = $categories[0] ?? 'actor';
+        }
         
         if (empty($errors) && $this->userModel->findByEmail($email)) {
             $errors[] = 'Email already registered.';
@@ -94,6 +129,7 @@ class AuthController
                 'email' => $email,
                 'password' => $password,
                 'role' => $role,
+                'content_categories' => $categories,
             ]);
 
             debug_log("User created with ID: $userId", 'REGISTER');

@@ -33,12 +33,13 @@ class Video
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO videos (user_id, season_id, title, file_path, status) VALUES (?, ?, ?, ?, 'pending')"
+            "INSERT INTO videos (user_id, season_id, title, content_type, file_path, status) VALUES (?, ?, ?, ?, ?, 'pending')"
         );
         $stmt->execute([
             $data['user_id'],
             $data['season_id'],
             $data['title'],
+            $data['content_type'] ?? null,
             $data['file_path'],
         ]);
         return (int) $this->db->lastInsertId();
@@ -97,6 +98,18 @@ class Video
         );
         $stmt->execute([$userId]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Check if user has already submitted a specific content type for a season
+     */
+    public function existsForSeasonAndType(int $userId, int $seasonId, string $contentType): bool
+    {
+        $stmt = $this->db->prepare(
+            "SELECT 1 FROM videos WHERE user_id = ? AND season_id = ? AND content_type = ? LIMIT 1"
+        );
+        $stmt->execute([$userId, $seasonId, $contentType]);
+        return (bool) $stmt->fetch();
     }
 
     public function allApproved(): array

@@ -191,41 +191,60 @@ $preselectedRole = $_GET['role'] ?? '';
                 <form @submit.prevent="submitRegister" x-ref="registerForm">
                     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                     
-                    <!-- Role Selection -->
+                    <!-- Content Type Selection (Multiple) -->
                     <div class="mb-5">
-                        <label class="block text-[12px] font-semibold text-dark/70 mb-3 tracking-wide uppercase">Choose Your Role</label>
+                        <label class="block text-[12px] font-semibold text-dark/70 mb-2 tracking-wide uppercase">What do you want to create?</label>
+                        <p class="text-[11px] text-dark/40 mb-3">Select one or more content types. You'll only see upload options for what you select.</p>
                         <div class="grid grid-cols-3 gap-3">
                             <!-- Actor -->
-                            <label class="role-card cursor-pointer">
-                                <input type="radio" name="role" value="actor" x-model="formData.role" class="hidden">
-                                <div class="border-2 rounded-xl p-3 text-center transition-all"
-                                     :class="formData.role === 'actor' ? 'border-crimson bg-crimson/5 selected' : 'border-dark/10 bg-white hover:border-crimson/30'">
+                            <div class="role-card cursor-pointer" @click="toggleCategory('actor')">
+                                <input type="hidden" name="categories[]" value="actor" x-bind:disabled="!hasCategory('actor')">
+                                <div class="border-2 rounded-xl p-3 text-center transition-all relative"
+                                     :class="hasCategory('actor') ? 'border-crimson bg-crimson/5 selected' : 'border-dark/10 bg-white hover:border-crimson/30'">
+                                    <div x-show="hasCategory('actor')" class="absolute top-2 right-2">
+                                        <svg class="w-4 h-4 text-crimson" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
                                     <span class="text-2xl block mb-1">🎭</span>
-                                    <span class="font-display text-[18px] block" :class="formData.role === 'actor' ? 'text-crimson' : 'text-dark'">ACTOR</span>
-                                    <span class="text-[10px] text-dark/40">Perform</span>
+                                    <span class="font-display text-[18px] block" :class="hasCategory('actor') ? 'text-crimson' : 'text-dark'">ACTOR</span>
+                                    <span class="text-[10px] text-dark/40">Perform on camera</span>
                                 </div>
-                            </label>
+                            </div>
                             <!-- Director -->
-                            <label class="role-card cursor-pointer">
-                                <input type="radio" name="role" value="director" x-model="formData.role" class="hidden">
-                                <div class="border-2 rounded-xl p-3 text-center transition-all"
-                                     :class="formData.role === 'director' ? 'border-gold bg-gold/5 selected' : 'border-dark/10 bg-white hover:border-gold/30'">
+                            <div class="role-card cursor-pointer" @click="toggleCategory('director')">
+                                <input type="hidden" name="categories[]" value="director" x-bind:disabled="!hasCategory('director')">
+                                <div class="border-2 rounded-xl p-3 text-center transition-all relative"
+                                     :class="hasCategory('director') ? 'border-gold bg-gold/5 selected' : 'border-dark/10 bg-white hover:border-gold/30'">
+                                    <div x-show="hasCategory('director')" class="absolute top-2 right-2">
+                                        <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
                                     <span class="text-2xl block mb-1">🎬</span>
-                                    <span class="font-display text-[18px] block" :class="formData.role === 'director' ? 'text-gold' : 'text-dark'">DIRECTOR</span>
-                                    <span class="text-[10px] text-dark/40">Direct</span>
+                                    <span class="font-display text-[18px] block" :class="hasCategory('director') ? 'text-gold' : 'text-dark'">DIRECTOR</span>
+                                    <span class="text-[10px] text-dark/40">Direct videos</span>
                                 </div>
-                            </label>
+                            </div>
                             <!-- Writer -->
-                            <label class="role-card cursor-pointer">
-                                <input type="radio" name="role" value="writer" x-model="formData.role" class="hidden">
-                                <div class="border-2 rounded-xl p-3 text-center transition-all"
-                                     :class="formData.role === 'writer' ? 'border-blue bg-blue/5 selected' : 'border-dark/10 bg-white hover:border-blue/30'">
+                            <div class="role-card cursor-pointer" @click="toggleCategory('writer')">
+                                <input type="hidden" name="categories[]" value="writer" x-bind:disabled="!hasCategory('writer')">
+                                <div class="border-2 rounded-xl p-3 text-center transition-all relative"
+                                     :class="hasCategory('writer') ? 'border-blue bg-blue/5 selected' : 'border-dark/10 bg-white hover:border-blue/30'">
+                                    <div x-show="hasCategory('writer')" class="absolute top-2 right-2">
+                                        <svg class="w-4 h-4 text-blue" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
                                     <span class="text-2xl block mb-1">✍️</span>
-                                    <span class="font-display text-[18px] block" :class="formData.role === 'writer' ? 'text-blue' : 'text-dark'">WRITER</span>
-                                    <span class="text-[10px] text-dark/40">Write</span>
+                                    <span class="font-display text-[18px] block" :class="hasCategory('writer') ? 'text-blue' : 'text-dark'">WRITER</span>
+                                    <span class="text-[10px] text-dark/40">Write scripts</span>
                                 </div>
-                            </label>
+                            </div>
                         </div>
+                        <p class="text-[11px] text-dark/50 mt-2" x-show="formData.categories.length > 0">
+                            Selected: <span class="font-semibold text-dark/70" x-text="formData.categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(', ')"></span>
+                        </p>
                     </div>
 
                     <!-- Full Name -->
@@ -321,7 +340,7 @@ $preselectedRole = $_GET['role'] ?? '';
                     <!-- Submit Button -->
                     <button 
                         type="submit" 
-                        :disabled="loading || !formData.role || !formData.terms"
+                        :disabled="loading || formData.categories.length === 0 || !formData.terms"
                         class="btn-primary w-full bg-crimson text-white font-semibold text-[15px] py-4 rounded-xl hover:bg-crimson/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         <span x-show="!loading">Create Account & Join Season 3</span>
@@ -380,19 +399,35 @@ $preselectedRole = $_GET['role'] ?? '';
                     email: '',
                     password: '',
                     role: preselectedRole || '',
+                    categories: preselectedRole ? [preselectedRole] : [],
                     terms: false
                 },
                 errors: [],
                 loading: false,
                 showPassword: false,
                 
+                toggleCategory(category) {
+                    const index = this.formData.categories.indexOf(category);
+                    if (index > -1) {
+                        this.formData.categories.splice(index, 1);
+                    } else {
+                        this.formData.categories.push(category);
+                    }
+                    // Set primary role to first selected category for backward compatibility
+                    this.formData.role = this.formData.categories[0] || '';
+                },
+                
+                hasCategory(category) {
+                    return this.formData.categories.includes(category);
+                },
+                
                 async submitRegister() {
                     this.loading = true;
                     this.errors = [];
                     
                     // Client-side validation
-                    if (!this.formData.role) {
-                        this.errors.push('Please select a role.');
+                    if (this.formData.categories.length === 0) {
+                        this.errors.push('Please select at least one content type.');
                         this.loading = false;
                         return;
                     }
@@ -406,6 +441,11 @@ $preselectedRole = $_GET['role'] ?? '';
                     try {
                         const form = this.$refs.registerForm;
                         const formData = new FormData(form);
+                        
+                        // Add categories as JSON
+                        formData.set('content_categories', JSON.stringify(this.formData.categories));
+                        // Set primary role for backward compatibility
+                        formData.set('role', this.formData.role);
                         
                         const response = await fetch('/api/register', {
                             method: 'POST',
