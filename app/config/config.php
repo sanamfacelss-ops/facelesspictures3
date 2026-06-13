@@ -2,28 +2,27 @@
 
 declare(strict_types=1);
 
-if (!file_exists(__DIR__ . '/../../.env')) {
-    die('.env file not found. Please copy .env.example to .env and configure it.');
-}
-
-$lines = file(__DIR__ . '/../../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-foreach ($lines as $line) {
-    if (str_starts_with(trim($line), '#')) continue;
-    if (strpos($line, '=') === false) continue;
-    list($key, $value) = explode('=', $line, 2);
-    $key = trim($key);
-    $value = trim($value, " \t\n\r\0\x0B\"'");
-    if (!array_key_exists($key, $_ENV)) {
-        $_ENV[$key] = $value;
-        putenv("$key=$value");
+// Load .env file if it exists (local development), otherwise use system env vars (production)
+if (file_exists(__DIR__ . '/../../.env')) {
+    $lines = file(__DIR__ . '/../../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (str_starts_with(trim($line), '#')) continue;
+        if (strpos($line, '=') === false) continue;
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value, " \t\n\r\0\x0B\"'");
+        if (!array_key_exists($key, $_ENV)) {
+            $_ENV[$key] = $value;
+            putenv("$key=$value");
+        }
     }
 }
 
-define('APP_NAME', $_ENV['APP_NAME'] ?? 'Faceless Pictures 3');
-define('APP_ENV', $_ENV['APP_ENV'] ?? 'development');
-define('APP_URL', $_ENV['APP_URL'] ?? 'http://localhost');
-define('UPLOAD_MAX_SIZE', $_ENV['UPLOAD_MAX_SIZE'] ?? '500M');
-define('CSRF_TOKEN_NAME', $_ENV['CSRF_TOKEN_NAME'] ?? 'fp3_csrf_token');
+define('APP_NAME', $_ENV['APP_NAME'] ?? getenv('APP_NAME') ?: 'Faceless Pictures 3');
+define('APP_ENV', $_ENV['APP_ENV'] ?? getenv('APP_ENV') ?: 'development');
+define('APP_URL', $_ENV['APP_URL'] ?? getenv('APP_URL') ?: 'http://localhost');
+define('UPLOAD_MAX_SIZE', $_ENV['UPLOAD_MAX_SIZE'] ?? getenv('UPLOAD_MAX_SIZE') ?: '500M');
+define('CSRF_TOKEN_NAME', $_ENV['CSRF_TOKEN_NAME'] ?? getenv('CSRF_TOKEN_NAME') ?: 'fp3_csrf_token');
 
 // Paths
 if (!defined('BASE_PATH')) {
@@ -34,7 +33,7 @@ define('LOG_PATH', BASE_PATH . '/logs');
 
 // Session settings
 if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.gc_maxlifetime', (int)(($_ENV['SESSION_LIFETIME'] ?? 120) * 60));
+    ini_set('session.gc_maxlifetime', (int)(($_ENV['SESSION_LIFETIME'] ?? getenv('SESSION_LIFETIME') ?: 120) * 60));
     session_start();
 }
 
