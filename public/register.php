@@ -58,8 +58,8 @@ $preselectedRole = $_GET['role'] ?? '';
     </style>
 </head>
 
-<body class="min-h-screen bg-cream" x-data="registerForm('<?= e($preselectedRole) ?>')">
-    <div class="min-h-screen flex">
+<body class="min-h-screen bg-cream">
+    <div class="min-h-screen flex" x-data="registerForm('<?= e($preselectedRole) ?>')"">
         
         <!-- LEFT SIDE — Season 3 Info Panel -->
         <div class="hidden lg:flex lg:w-1/2 bg-charcoal relative overflow-hidden">
@@ -188,7 +188,7 @@ $preselectedRole = $_GET['role'] ?? '';
                     </div>
                 </template>
                 
-                <form @submit.prevent="submitRegister">
+                <form @submit.prevent="submitRegister" x-ref="registerForm">
                     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                     
                     <!-- Role Selection -->
@@ -404,7 +404,7 @@ $preselectedRole = $_GET['role'] ?? '';
                     }
                     
                     try {
-                        const form = this.$el.querySelector('form');
+                        const form = this.$refs.registerForm;
                         const formData = new FormData(form);
                         
                         const response = await fetch('/api/register', {

@@ -68,8 +68,8 @@ $title = 'Login — Faceless Pitcher 3';
     </style>
 </head>
 
-<body class="min-h-screen bg-cream" x-data="loginForm()">
-    <div class="min-h-screen flex">
+<body class="min-h-screen bg-cream">
+    <div class="min-h-screen flex" x-data="loginForm()">
         
         <!-- LEFT SIDE — Season 3 Info Panel -->
         <div class="hidden lg:flex lg:w-1/2 bg-charcoal relative overflow-hidden">
@@ -185,7 +185,7 @@ $title = 'Login — Faceless Pitcher 3';
                     </div>
                 </template>
                 
-                <form @submit.prevent="submitLogin">
+                <form @submit.prevent="submitLogin" x-ref="loginForm">
                     <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                     
                     <div class="mb-5">
@@ -307,7 +307,7 @@ $title = 'Login — Faceless Pitcher 3';
                     this.errors = [];
                     
                     try {
-                        const form = this.$el.querySelector('form');
+                        const form = this.$refs.loginForm;
                         const formData = new FormData(form);
                         
                         console.log('Submitting to /api/login...');
