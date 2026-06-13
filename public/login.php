@@ -310,12 +310,31 @@ $title = 'Login — Faceless Pitcher 3';
                         const form = this.$el.querySelector('form');
                         const formData = new FormData(form);
                         
+                        console.log('Submitting to /api/login...');
+                        console.log('Form data:', Object.fromEntries(formData));
+                        
                         const response = await fetch('/api/login', {
                             method: 'POST',
-                            body: formData
+                            body: formData,
+                            credentials: 'same-origin'
                         });
                         
-                        const data = await response.json();
+                        console.log('Response status:', response.status);
+                        console.log('Response headers:', response.headers.get('content-type'));
+                        
+                        const text = await response.text();
+                        console.log('Response text (first 200 chars):', text.substring(0, 200));
+                        
+                        // Try to parse as JSON
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.error('Failed to parse JSON:', e);
+                            console.log('Full response:', text);
+                            this.errors = ['Server returned invalid response. Check console for details.'];
+                            return;
+                        }
                         
                         if (!response.ok) {
                             this.errors = data.errors || [data.error || 'Invalid email or password.'];
@@ -323,6 +342,7 @@ $title = 'Login — Faceless Pitcher 3';
                             window.location.href = data.redirect;
                         }
                     } catch (err) {
+                        console.error('Fetch error:', err);
                         this.errors = ['Network error. Please try again.'];
                     } finally {
                         this.loading = false;
