@@ -47,6 +47,26 @@ try {
     $row = $stmt->fetch();
     $result['user_count'] = $row['cnt'] ?? 0;
     
+    // Show admin user details (without password)
+    $stmt = $pdo->query("SELECT id, name, email, role, is_admin FROM users LIMIT 5");
+    $result['users'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Test password verification
+    $testEmail = 'sanamfacelss@gmail.com';
+    $testPassword = 'FP3@dmin2024!';
+    $stmt = $pdo->prepare("SELECT password FROM users WHERE email = ?");
+    $stmt->execute([$testEmail]);
+    $userData = $stmt->fetch();
+    if ($userData) {
+        $result['password_test'] = [
+            'user_found' => true,
+            'stored_hash' => substr($userData['password'], 0, 20) . '...',
+            'password_verify' => password_verify($testPassword, $userData['password']) ? 'MATCH' : 'NO MATCH'
+        ];
+    } else {
+        $result['password_test'] = ['user_found' => false];
+    }
+    
 } catch (PDOException $e) {
     $result['database'] = 'error';
     $result['db_error'] = $e->getMessage();
