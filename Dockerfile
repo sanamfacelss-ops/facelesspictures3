@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 RUN a2enmod rewrite
 
 # Install Python packages for AI moderation
-RUN pip3 install --no-cache-dir \
+RUN pip3 install --no-cache-dir --break-system-packages \
     nudenet \
     openai-whisper \
     numpy \
