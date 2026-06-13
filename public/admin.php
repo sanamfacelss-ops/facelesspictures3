@@ -16,6 +16,20 @@ $allSeasons = $seasonModel->all();
 $allScripts = $scriptModel->all();
 $activeSeason = $seasonModel->getActive();
 
+// Load guides (with fallbacks if table doesn't exist yet)
+$guides = ['actor' => '', 'director' => '', 'writer' => ''];
+try {
+    $settingsModel = new App\Models\Settings();
+    $guides = array_merge($guides, $settingsModel->getGuides());
+} catch (\Exception $e) {
+    // Table might not exist yet - use defaults
+    $guides = [
+        'actor' => "As an actor, you'll perform dramatic monologues, character scenes, and emotional pieces.\n\n**Tips:**\n• Find a quiet space with good lighting\n• Practice your script before recording\n• Focus on emotion and delivery",
+        'director' => "As a director, you'll pitch your creative vision for scenes and explain how you'd bring stories to life.\n\n**Tips:**\n• Be specific about your creative vision\n• Explain your choices with confidence\n• Keep pitches under 2 minutes",
+        'writer' => "As a writer, you'll present original work, pitch story concepts, or perform script readings.\n\n**Tips:**\n• Read your work with conviction\n• Vary your pacing to maintain interest\n• Let your unique voice come through"
+    ];
+}
+
 // Get all videos for video management tab
 $db = App\Config\Database::getConnection();
 $stmt = $db->query(
@@ -33,6 +47,7 @@ $pendingCount = count($pending);
 $flaggedCount = count($flagged);
 
 $title = 'Admin Dashboard — ' . APP_NAME;
+
 
 // Handle debug toggle
 $debugMessage = '';
@@ -709,6 +724,48 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== SCRIPTS TAB ==================== -->
                 <div x-show="activeTab === 'scripts'" x-cloak>
+                    <!-- Guide Editor Section -->
+                    <div class="bg-white rounded-xl border border-dark/5 p-5 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-dark flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                Role Guides (Shown on Create Screen)
+                            </h3>
+                            <div class="flex gap-2">
+                                <button @click="guideTab = 'actor'" :class="guideTab === 'actor' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">🎭 Actor</button>
+                                <button @click="guideTab = 'director'" :class="guideTab === 'director' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">🎬 Director</button>
+                                <button @click="guideTab = 'writer'" :class="guideTab === 'writer' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">✍️ Writer</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Actor Guide -->
+                        <div x-show="guideTab === 'actor'" x-cloak>
+                            <textarea x-model="guides.actor" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for actors..."></textarea>
+                            <div class="flex items-center justify-between mt-3">
+                                <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
+                                <button @click="saveGuide('actor')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Save Actor Guide</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Director Guide -->
+                        <div x-show="guideTab === 'director'" x-cloak>
+                            <textarea x-model="guides.director" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for directors..."></textarea>
+                            <div class="flex items-center justify-between mt-3">
+                                <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
+                                <button @click="saveGuide('director')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Save Director Guide</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Writer Guide -->
+                        <div x-show="guideTab === 'writer'" x-cloak>
+                            <textarea x-model="guides.writer" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for writers..."></textarea>
+                            <div class="flex items-center justify-between mt-3">
+                                <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
+                                <button @click="saveGuide('writer')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Save Writer Guide</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid lg:grid-cols-3 gap-6">
                         <!-- Create Script Form -->
                         <div class="bg-white rounded-xl border border-dark/5 p-5">
@@ -781,7 +838,7 @@ if (file_exists($errorLogFile)) {
                                                 </div>
                                                 <div class="flex items-center gap-2 flex-shrink-0">
                                                     <button @click="editScript(sc)" class="text-[11px] text-dark/50 hover:text-crimson">Edit</button>
-                                                    <button @click="deleteScript(sc.id, sc.title)" class="text-[11px] text-crimson hover:underline">Delete</button>
+                                                    <button @click="openDeleteModal('script', sc.id, sc.title)" class="text-[11px] text-crimson hover:underline">Delete</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -831,7 +888,7 @@ if (file_exists($errorLogFile)) {
                                 </p>
                             </div>
                             
-                            <form method="POST" onsubmit="return confirm('Clear all log files?')">
+                            <form method="POST" @submit.prevent="openConfirmModal('logs', null, 'Clear all log files?')">
                                 <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                 <input type="hidden" name="clear_logs" value="1">
                                 <button type="submit" class="w-full bg-crimson/10 text-crimson font-medium py-2 rounded-xl hover:bg-crimson/20 transition text-[12px]">
@@ -951,6 +1008,61 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
+    <!-- Generic Confirm Modal (replaces browser confirm) -->
+    <div x-show="confirmModalOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="confirmModalOpen = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" @click.stop>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-crimson/10 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-dark text-[15px]">Confirm Action</h3>
+                    <p class="text-[12px] text-dark/50" x-text="confirmMessage"></p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button @click="confirmModalOpen = false" class="px-4 py-2 text-[12px] text-dark/50 hover:text-dark transition rounded-lg">Cancel</button>
+                <button @click="executeConfirm()" class="px-5 py-2 text-[12px] bg-crimson text-white rounded-xl hover:bg-crimson/90 transition font-medium">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div x-show="deleteModalOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="deleteModalOpen = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" @click.stop>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-dark text-[15px]">Delete <span x-text="deleteType"></span></h3>
+                    <p class="text-[12px] text-dark/50">This action cannot be undone.</p>
+                </div>
+            </div>
+            <p class="text-[13px] text-dark/70 mb-4 bg-cream rounded-lg p-3" x-text="deleteName"></p>
+            <div class="flex justify-end gap-3">
+                <button @click="deleteModalOpen = false" class="px-4 py-2 text-[12px] text-dark/50 hover:text-dark transition rounded-lg">Cancel</button>
+                <button @click="executeDelete()" class="px-5 py-2 text-[12px] bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="toastShow" x-cloak 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         class="fixed bottom-24 md:bottom-6 right-6 z-50">
+        <div class="bg-dark text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3">
+            <svg x-show="toastType === 'success'" class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <svg x-show="toastType === 'error'" class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <span class="text-[13px]" x-text="toastMessage"></span>
+        </div>
+    </div>
+
     <!-- Modal for Season Edit -->
     <div x-show="seasonModalOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="seasonModalOpen = false">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop>
@@ -1038,12 +1150,73 @@ if (file_exists($errorLogFile)) {
             scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '' },
             editingScript: null,
             
+            // Guides
+            guides: <?= json_encode($guides) ?>,
+            guideTab: 'actor',
+            
+            // Delete modal
+            deleteModalOpen: false,
+            deleteType: '',
+            deleteId: null,
+            deleteName: '',
+            
+            // Confirm modal
+            confirmModalOpen: false,
+            confirmMessage: '',
+            confirmCallback: null,
+            
+            // Toast
+            toastShow: false,
+            toastMessage: '',
+            toastType: 'success',
+            
             csrf: '<?= csrf_token() ?>',
             
             init() {
                 window.addEventListener('resize', () => {
                     this.sidebarCollapsed = window.innerWidth < 1024;
                 });
+            },
+            
+            // Toast notification
+            showToast(message, type = 'success') {
+                this.toastMessage = message;
+                this.toastType = type;
+                this.toastShow = true;
+                setTimeout(() => { this.toastShow = false; }, 3000);
+            },
+            
+            // Open delete modal
+            openDeleteModal(type, id, name) {
+                this.deleteType = type;
+                this.deleteId = id;
+                this.deleteName = name;
+                this.deleteModalOpen = true;
+            },
+            
+            // Execute delete
+            async executeDelete() {
+                if (this.deleteType === 'script') {
+                    await this.doDeleteScript();
+                } else if (this.deleteType === 'user') {
+                    await this.doDeleteUser();
+                }
+                this.deleteModalOpen = false;
+            },
+            
+            // Open confirm modal
+            openConfirmModal(action, id, message) {
+                this.confirmMessage = message;
+                this.confirmCallback = { action, id };
+                this.confirmModalOpen = true;
+            },
+            
+            // Execute confirm action
+            executeConfirm() {
+                if (this.confirmCallback?.action === 'logs') {
+                    document.querySelector('form[method="POST"] input[name="clear_logs"]')?.closest('form')?.submit();
+                }
+                this.confirmModalOpen = false;
             },
             
             // Computed: filtered videos
@@ -1100,20 +1273,24 @@ if (file_exists($errorLogFile)) {
             },
             
             // User actions
-            async deleteUser(id, name) {
-                if (!confirm(`Delete user "${name}"? This will also delete all their videos.`)) return;
+            deleteUser(id, name) {
+                this.openDeleteModal('user', id, `Delete user "${name}"? This will also delete all their videos.`);
+            },
+            
+            async doDeleteUser() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
                 try {
-                    const res = await fetch('/api/admin/users/delete/' + id, { method: 'POST', body: formData });
+                    const res = await fetch('/api/admin/users/delete/' + this.deleteId, { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        this.users = this.users.filter(u => u.id !== id);
+                        this.users = this.users.filter(u => u.id !== this.deleteId);
+                        this.showToast('User deleted successfully');
                     } else {
-                        alert(data.error || 'Failed to delete user');
+                        this.showToast(data.error || 'Failed to delete user', 'error');
                     }
                 } catch (e) {
-                    alert('Failed to delete user');
+                    this.showToast('Failed to delete user', 'error');
                 }
             },
             
@@ -1131,12 +1308,13 @@ if (file_exists($errorLogFile)) {
                     const res = await fetch('/api/admin/seasons/create', { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        location.reload();
+                        this.showToast('Season created successfully');
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert(data.errors?.join(', ') || data.error || 'Failed');
+                        this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
                 } catch (e) {
-                    alert('Failed to create season');
+                    this.showToast('Failed to create season', 'error');
                 }
             },
             
@@ -1150,12 +1328,14 @@ if (file_exists($errorLogFile)) {
                     const res = await fetch('/api/admin/seasons/update/' + this.editSeasonForm.id, { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        location.reload();
+                        this.seasonModalOpen = false;
+                        this.showToast('Season updated successfully');
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert(data.errors?.join(', ') || data.error || 'Failed');
+                        this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
                 } catch (e) {
-                    alert('Failed to update season');
+                    this.showToast('Failed to update season', 'error');
                 }
             },
 
@@ -1184,12 +1364,13 @@ if (file_exists($errorLogFile)) {
                     const res = await fetch('/api/admin/scripts/create', { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        location.reload();
+                        this.showToast('Script created successfully');
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert(data.errors?.join(', ') || data.error || 'Failed');
+                        this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
                 } catch (e) {
-                    alert('Failed to create script');
+                    this.showToast('Failed to create script', 'error');
                 }
             },
             
@@ -1201,29 +1382,49 @@ if (file_exists($errorLogFile)) {
                     const res = await fetch('/api/admin/scripts/update/' + this.editingScript, { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        location.reload();
+                        this.showToast('Script updated successfully');
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert(data.errors?.join(', ') || data.error || 'Failed');
+                        this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
                 } catch (e) {
-                    alert('Failed to update script');
+                    this.showToast('Failed to update script', 'error');
                 }
             },
             
-            async deleteScript(id, title) {
-                if (!confirm(`Delete script "${title}"?`)) return;
+            async doDeleteScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
                 try {
-                    const res = await fetch('/api/admin/scripts/delete/' + id, { method: 'POST', body: formData });
+                    const res = await fetch('/api/admin/scripts/delete/' + this.deleteId, { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        this.scripts = this.scripts.filter(s => s.id !== id);
+                        this.scripts = this.scripts.filter(s => s.id !== this.deleteId);
+                        this.showToast('Script deleted successfully');
                     } else {
-                        alert(data.error || 'Failed');
+                        this.showToast(data.error || 'Failed', 'error');
                     }
                 } catch (e) {
-                    alert('Failed to delete script');
+                    this.showToast('Failed to delete script', 'error');
+                }
+            },
+            
+            // Guide actions
+            async saveGuide(role) {
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('role', role);
+                formData.append('content', this.guides[role]);
+                try {
+                    const res = await fetch('/api/admin/guides/update', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(`${role.charAt(0).toUpperCase() + role.slice(1)} guide saved!`);
+                    } else {
+                        this.showToast(data.error || 'Failed to save guide', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to save guide', 'error');
                 }
             }
         };

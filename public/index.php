@@ -115,6 +115,7 @@ $routes = [
     'api/admin/seasons/update/{id}' => [AdminController::class, 'updateSeason', 'POST'],
     'api/admin/users/delete/{id}' => [AdminController::class, 'deleteUser', 'POST'],
     'api/admin/videos' => [AdminController::class, 'allVideos', 'GET'],
+    'api/admin/guides/update' => [AdminController::class, 'updateGuide', 'POST'],
 ];
 
 $matched = false;

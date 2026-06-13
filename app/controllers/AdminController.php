@@ -322,4 +322,43 @@ class AdminController
             echo json_encode(['error' => 'Failed to fetch videos']);
         }
     }
+
+    // ==================== GUIDES ====================
+
+    /**
+     * Update a guide text for a role
+     */
+    public function updateGuide(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $role = trim($_POST['role'] ?? '');
+        $content = trim($_POST['content'] ?? '');
+
+        if (!in_array($role, ['actor', 'director', 'writer'])) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Invalid role']);
+            return;
+        }
+
+        if (strlen($content) < 10) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Guide content must be at least 10 characters']);
+            return;
+        }
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $settingsModel->updateGuide($role, $content);
+            
+            debug_log("Admin updated guide for role: $role", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Guide updated successfully']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_UPDATE_GUIDE');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update guide']);
+        }
+    }
 }
