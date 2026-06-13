@@ -135,7 +135,7 @@ class AuthController
             debug_log("User created with ID: $userId", 'REGISTER');
             $_SESSION['user_id'] = $userId;
             flash('success', 'Account created successfully.');
-            echo json_encode(['success' => true, 'redirect' => '/creator/dashboard']);
+            echo json_encode(['success' => true, 'redirect' => '/onboarding']);
         } catch (\Exception $e) {
             log_exception($e, 'REGISTER');
             http_response_code(500);

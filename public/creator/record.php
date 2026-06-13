@@ -171,35 +171,36 @@ $categoryInfo = [
                     <p class="text-sm text-gray-400">Check back soon for new content!</p>
                 </div>
                 <?php else: ?>
-                <div class="grid gap-4">
+                <div class="grid grid-cols-3 gap-3 lg:grid-cols-1 lg:gap-4">
                     <?php foreach ($scripts as $script): ?>
                     <div 
                         @click="selectScript(<?= htmlspecialchars(json_encode($script), ENT_QUOTES) ?>, '<?= e($cat) ?>')"
                         :class="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>' ? 'ring-2 ring-offset-2' : 'hover:border-gray-300'"
-                        class="p-5 bg-white rounded-xl border border-gray-200 cursor-pointer transition card"
+                        class="p-3 lg:p-5 bg-white rounded-xl border border-gray-200 cursor-pointer transition card"
                         :style="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>' ? 'ring-color: <?= $info['color'] ?>' : ''"
                     >
-                        <div class="flex items-start justify-between mb-3">
-                            <h4 class="font-semibold text-gray-900"><?= e($script['title']) ?></h4>
-                            <div class="flex items-center gap-2">
+                        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-2 lg:mb-3">
+                            <h4 class="font-semibold text-gray-900 text-sm lg:text-base mb-2 lg:mb-0"><?= e($script['title']) ?></h4>
+                            <div class="flex items-center gap-1 lg:gap-2 flex-wrap">
                                 <?php if ($script['duration_hint']): ?>
-                                <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">
+                                <span class="px-1.5 lg:px-2 py-0.5 rounded text-[10px] lg:text-xs bg-gray-100 text-gray-600">
                                     <?= e($script['duration_hint']) ?>
                                 </span>
                                 <?php endif; ?>
-                                <span class="px-2 py-0.5 rounded text-xs font-medium 
+                                <span class="px-1.5 lg:px-2 py-0.5 rounded text-[10px] lg:text-xs font-medium 
                                     <?= $script['difficulty'] === 'beginner' ? 'bg-emerald-100 text-emerald-700' : 
                                        ($script['difficulty'] === 'intermediate' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700') ?>">
                                     <?= ucfirst($script['difficulty']) ?>
                                 </span>
                             </div>
                         </div>
-                        <p class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap"><?= e($script['content']) ?></p>
+                        <p class="text-gray-600 text-xs lg:text-sm leading-relaxed whitespace-pre-wrap line-clamp-4 lg:line-clamp-none"><?= e($script['content']) ?></p>
                         
-                        <div x-show="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>'" class="mt-4 pt-4 border-t border-gray-100">
-                            <span class="text-sm font-medium flex items-center gap-1" style="color: <?= $info['color'] ?>">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                Selected - Ready to record
+                        <div x-show="selectedScript?.id === <?= $script['id'] ?> && activeTab === '<?= e($cat) ?>'" class="mt-3 lg:mt-4 pt-3 lg:pt-4 border-t border-gray-100">
+                            <span class="text-xs lg:text-sm font-medium flex items-center gap-1" style="color: <?= $info['color'] ?>">
+                                <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span class="hidden lg:inline">Selected - Ready to record</span>
+                                <span class="lg:hidden">Selected</span>
                             </span>
                         </div>
                     </div>

@@ -11,6 +11,7 @@ use App\Controllers\UploadController;
 use App\Controllers\ModerationController;
 use App\Controllers\LeaderboardController;
 use App\Controllers\AIController;
+use App\Controllers\AdminController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
@@ -105,6 +106,15 @@ $routes = [
     'api/ai/process/{id}' => [AIController::class, 'process', 'POST'],
     'api/ai/queue' => [AIController::class, 'processQueue', 'GET'],
     'api/ai/status/{id}' => [AIController::class, 'status', 'GET'],
+
+    // Admin API
+    'api/admin/scripts/create' => [AdminController::class, 'createScript', 'POST'],
+    'api/admin/scripts/update/{id}' => [AdminController::class, 'updateScript', 'POST'],
+    'api/admin/scripts/delete/{id}' => [AdminController::class, 'deleteScript', 'POST'],
+    'api/admin/seasons/create' => [AdminController::class, 'createSeason', 'POST'],
+    'api/admin/seasons/update/{id}' => [AdminController::class, 'updateSeason', 'POST'],
+    'api/admin/users/delete/{id}' => [AdminController::class, 'deleteUser', 'POST'],
+    'api/admin/videos' => [AdminController::class, 'allVideos', 'GET'],
 ];
 
 $matched = false;
@@ -155,6 +165,8 @@ $pageRoutes = [
     'creator/dashboard' => 'creator/dashboard.php',
     'creator/record' => 'creator/record.php',
     'creator/videos' => 'creator/videos.php',
+    // Onboarding
+    'onboarding' => 'onboarding.php',
 ];
 
 if (isset($pageRoutes[$uri])) {
