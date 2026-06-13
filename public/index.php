@@ -22,6 +22,9 @@ $routes = [
     'api/register' => [AuthController::class, 'register', 'POST'],
     'api/login' => [AuthController::class, 'login', 'POST'],
     'api/logout' => [AuthController::class, 'logout', 'POST'],
+    'api/forgot-password' => [AuthController::class, 'forgotPassword', 'POST'],
+    'api/verify-otp' => [AuthController::class, 'verifyOTP', 'POST'],
+    'api/reset-password' => [AuthController::class, 'resetPassword', 'POST'],
 
     // Upload API
     'api/upload' => [UploadController::class, 'store', 'POST'],
@@ -69,6 +72,8 @@ $pageRoutes = [
     'home' => 'home.php',
     'login' => 'login.php',
     'register' => 'register.php',
+    'forgot-password' => 'forgot-password.php',
+    'reset-password' => 'reset-password.php',
     'dashboard' => 'dashboard.php',
     'upload' => 'upload.php',
     'leaderboard' => 'leaderboard.php',

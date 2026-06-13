@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('actor','director','writer') NOT NULL,
+    role ENUM('actor','director','writer','admin') NOT NULL,
     is_admin TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -81,7 +81,20 @@ CREATE TABLE IF NOT EXISTS moderation_logs (
     FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert default admin user (password: admin123)
+-- Password reset tokens table
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    otp VARCHAR(6) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_otp (otp),
+    INDEX idx_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert default admin user (sanamfacelss@gmail.com / FP3@dmin2024!)
 INSERT INTO users (name, email, password, role, is_admin) VALUES
-('Admin', 'admin@facelesspictures.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'actor', 1)
-ON DUPLICATE KEY UPDATE id=id;
+('Sanam Admin', 'sanamfacelss@gmail.com', '$2y$10$YcPJqxKvwQD3m9v8hYwL4OJ8T8XKj5KwvYPxGJgNwxO7v7xvM1yHK', 'admin', 1)
+ON DUPLICATE KEY UPDATE is_admin=1;

@@ -210,7 +210,7 @@ $title = 'Login — Faceless Pitcher 3';
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-2">
                             <label class="text-[13px] font-semibold text-dark/70 tracking-wide uppercase">Password</label>
-                            <a href="#" class="text-[12px] text-crimson font-medium hover:underline">Forgot password?</a>
+                            <a href="/forgot-password" class="text-[12px] text-crimson font-medium hover:underline">Forgot password?</a>
                         </div>
                         <div class="relative">
                             <div class="absolute left-4 top-1/2 -translate-y-1/2 text-dark/30">

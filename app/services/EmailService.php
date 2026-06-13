@@ -93,6 +93,57 @@ class EmailService
         return str_starts_with($response, '250');
     }
 
+    public function sendPasswordResetOTP(string $to, string $otp): bool
+    {
+        $subject = 'Password Reset OTP - Faceless Pitcher';
+        
+        $body = "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; background: #F8F5F0; padding: 40px 20px; }
+                .container { max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                .header { background: #141414; padding: 30px; text-align: center; }
+                .header h1 { color: white; font-size: 24px; margin: 0; letter-spacing: 2px; }
+                .header span { background: #D92B3A; color: white; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+                .content { padding: 40px 30px; text-align: center; }
+                .otp-box { background: #F8F5F0; border: 2px dashed #D92B3A; border-radius: 12px; padding: 25px; margin: 25px 0; }
+                .otp-code { font-size: 36px; font-weight: bold; color: #D92B3A; letter-spacing: 8px; }
+                .expires { color: #666; font-size: 13px; margin-top: 10px; }
+                .footer { background: #F8F5F0; padding: 20px; text-align: center; font-size: 12px; color: #999; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>FACELESS PITCHER <span>S3</span></h1>
+                </div>
+                <div class='content'>
+                    <h2 style='color: #0D0D0D; margin-bottom: 10px;'>Password Reset</h2>
+                    <p style='color: #666; font-size: 14px;'>Use this OTP to reset your password:</p>
+                    <div class='otp-box'>
+                        <div class='otp-code'>{$otp}</div>
+                        <p class='expires'>Expires in 10 minutes</p>
+                    </div>
+                    <p style='color: #999; font-size: 13px;'>If you didn't request this, please ignore this email.</p>
+                </div>
+                <div class='footer'>
+                    &copy; " . date('Y') . " Faceless Pitcher. All rights reserved.
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+        
+        // Try SMTP first, fallback to mail()
+        if (!empty($this->username) && !empty($this->password)) {
+            return $this->sendSmtp($to, $subject, $body, true);
+        }
+        
+        return $this->send($to, $subject, $body, true);
+    }
+
     private function smtpCommand($smtp, string $command): string
     {
         if (!empty($command)) {
