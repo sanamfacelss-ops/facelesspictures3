@@ -12,9 +12,11 @@ use App\Controllers\ModerationController;
 use App\Controllers\LeaderboardController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = str_replace(dirname($_SERVER['SCRIPT_NAME']), '', $uri);
 $uri = trim($uri, '/');
 $method = $_SERVER['REQUEST_METHOD'];
+
+// Debug routing - log every request
+debug_log("=== ROUTER: URI='$uri' METHOD='$method' ===", 'ROUTER');
 
 // Debug endpoint - check system status (remove in production)
 if ($uri === 'api/debug') {
@@ -76,8 +78,11 @@ $params = [];
 foreach ($routes as $pattern => $handler) {
     $regex = '#^' . preg_replace('/\{[^}]+\}/', '([^/]+)', $pattern) . '$#';
     if (preg_match($regex, $uri, $matches)) {
+        debug_log("ROUTER: Matched pattern '$pattern'", 'ROUTER');
         if ($method !== $handler[2]) {
+            debug_log("ROUTER: Method mismatch - expected {$handler[2]}, got $method", 'ROUTER');
             http_response_code(405);
+            header('Content-Type: application/json');
             echo json_encode(['error' => 'Method not allowed']);
             exit;
         }
@@ -85,6 +90,7 @@ foreach ($routes as $pattern => $handler) {
         $params = $matches;
         $matched = true;
 
+        debug_log("ROUTER: Calling {$handler[0]}::{$handler[1]}", 'ROUTER');
         $controller = new $handler[0]();
         $action = $handler[1];
 
@@ -96,6 +102,8 @@ foreach ($routes as $pattern => $handler) {
         exit;
     }
 }
+
+debug_log("ROUTER: No API route matched for '$uri'", 'ROUTER');
 
 // Page routes (render HTML)
 $pageRoutes = [
