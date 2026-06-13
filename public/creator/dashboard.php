@@ -26,11 +26,18 @@ $categoryInfo = [
 ];
 
 // Get script counts for each category
-$scriptModel = new App\Models\Script();
 $scriptCounts = [];
-foreach ($userCategories as $cat) {
-    $scripts = $scriptModel->byCategory($cat);
-    $scriptCounts[$cat] = count($scripts);
+try {
+    $scriptModel = new App\Models\Script();
+    foreach ($userCategories as $cat) {
+        $scripts = $scriptModel->byCategory($cat);
+        $scriptCounts[$cat] = count($scripts);
+    }
+} catch (Exception $e) {
+    // Scripts table may not exist yet
+    foreach ($userCategories as $cat) {
+        $scriptCounts[$cat] = 0;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -249,7 +256,6 @@ foreach ($userCategories as $cat) {
                         </div>
                     </a>
                     <?php endforeach; ?>
-                </div>
                 </div>
                 
                 <!-- Quick Tips -->
