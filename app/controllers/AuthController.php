@@ -31,10 +31,14 @@ class AuthController
     {
         header('Content-Type: application/json');
         
-        debug_log('Register request received', 'REGISTER');
-        debug_log($_POST, 'REGISTER_POST');
+        debug_log('========== REGISTER REQUEST ==========', 'REGISTER');
+        debug_log('Method: ' . $_SERVER['REQUEST_METHOD'], 'REGISTER');
+        debug_log('Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'not set'), 'REGISTER');
+        debug_log('POST data: ' . json_encode($_POST), 'REGISTER');
+        debug_log('Raw input: ' . file_get_contents('php://input'), 'REGISTER');
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            debug_log('ERROR: Method not POST', 'REGISTER');
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
             return;
@@ -42,11 +46,12 @@ class AuthController
 
         // Check database connection
         if ($this->dbError || !$this->userModel) {
-            debug_log('Database error: ' . $this->dbError, 'REGISTER');
+            debug_log('ERROR: Database connection failed: ' . $this->dbError, 'REGISTER');
             http_response_code(503);
             echo json_encode(['error' => 'Database connection failed. Please try again later.', 'debug' => FP3_DEBUG ? $this->dbError : null]);
             return;
         }
+        debug_log('Database connection OK', 'REGISTER');
 
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -106,7 +111,14 @@ class AuthController
     {
         header('Content-Type: application/json');
         
+        debug_log('========== LOGIN REQUEST ==========', 'LOGIN');
+        debug_log('Method: ' . $_SERVER['REQUEST_METHOD'], 'LOGIN');
+        debug_log('Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'not set'), 'LOGIN');
+        debug_log('POST data: ' . json_encode($_POST), 'LOGIN');
+        debug_log('Raw input: ' . file_get_contents('php://input'), 'LOGIN');
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            debug_log('ERROR: Method not POST', 'LOGIN');
             http_response_code(405);
             echo json_encode(['error' => 'Method not allowed']);
             return;
@@ -114,33 +126,59 @@ class AuthController
 
         // Check database connection
         if ($this->dbError || !$this->userModel) {
+            debug_log('ERROR: Database connection failed: ' . $this->dbError, 'LOGIN');
             http_response_code(503);
             echo json_encode(['error' => 'Database connection failed. Please try again later.']);
             return;
         }
+        debug_log('Database connection OK', 'LOGIN');
 
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $csrf = $_POST['csrf_token'] ?? '';
+        
+        debug_log("Email: $email", 'LOGIN');
+        debug_log("Password length: " . strlen($password), 'LOGIN');
+        debug_log("CSRF token received: " . substr($csrf, 0, 20) . '...', 'LOGIN');
+        debug_log("CSRF token in session: " . substr($_SESSION[CSRF_TOKEN_NAME] ?? 'NOT SET', 0, 20) . '...', 'LOGIN');
 
         if (!verify_csrf($csrf)) {
+            debug_log('ERROR: CSRF validation failed', 'LOGIN');
             http_response_code(403);
             echo json_encode(['error' => 'Invalid CSRF token. Please refresh and try again.']);
             return;
         }
+        debug_log('CSRF validation OK', 'LOGIN');
 
         try {
+            debug_log('Looking up user by email...', 'LOGIN');
             $user = $this->userModel->findByEmail($email);
-            if (!$user || !password_verify($password, $user['password'])) {
+            
+            if (!$user) {
+                debug_log('ERROR: User not found', 'LOGIN');
+                http_response_code(401);
+                echo json_encode(['error' => 'Invalid email or password.']);
+                return;
+            }
+            debug_log('User found: ' . json_encode(['id' => $user['id'], 'name' => $user['name'], 'role' => $user['role']]), 'LOGIN');
+            
+            $passwordMatch = password_verify($password, $user['password']);
+            debug_log('Password verify result: ' . ($passwordMatch ? 'MATCH' : 'NO MATCH'), 'LOGIN');
+            
+            if (!$passwordMatch) {
+                debug_log('ERROR: Password does not match', 'LOGIN');
                 http_response_code(401);
                 echo json_encode(['error' => 'Invalid email or password.']);
                 return;
             }
 
             $_SESSION['user_id'] = $user['id'];
+            debug_log('SUCCESS: User logged in, session user_id = ' . $user['id'], 'LOGIN');
             flash('success', 'Welcome back, ' . $user['name'] . '!');
             echo json_encode(['success' => true, 'redirect' => '/dashboard']);
         } catch (\Exception $e) {
+            debug_log('EXCEPTION: ' . $e->getMessage(), 'LOGIN');
+            log_exception($e, 'LOGIN');
             http_response_code(500);
             echo json_encode(['error' => 'Login failed. Please try again.']);
         }
