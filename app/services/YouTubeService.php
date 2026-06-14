@@ -28,34 +28,35 @@ class YouTubeService
         $this->leaderboardModel = new Leaderboard();
     }
 
-    public function uploadVideo(int $videoId): ?string
+    public function uploadVideo(int $videoId): array|string|null
     {
         $video = $this->videoModel->findById($videoId);
         
         // Only upload videos that are fully approved (both admin and AI)
         if (!$video) {
             log_message('warning', "Upload skipped: Video {$videoId} not found");
-            return null;
+            return ['error' => 'Video not found'];
         }
         
         if ($video['status'] !== 'approved') {
             log_message('info', "Upload skipped: Video {$videoId} status is '{$video['status']}' (not approved)");
-            return null;
+            return ['error' => "Video status is '{$video['status']}', must be 'approved'"];
         }
         
         if (($video['ai_status'] ?? '') !== 'approved') {
-            log_message('info', "Upload skipped: Video {$videoId} AI status is '" . ($video['ai_status'] ?? 'pending') . "' (not approved)");
-            return null;
+            $aiStatus = $video['ai_status'] ?? 'pending';
+            log_message('info', "Upload skipped: Video {$videoId} AI status is '{$aiStatus}' (not approved)");
+            return ['error' => "AI status is '{$aiStatus}', must be 'approved'. Re-approve the video."];
         }
         
         if (!empty($video['youtube_id'])) {
             log_message('info', "Upload skipped: Video {$videoId} already published to YouTube");
-            return null;
+            return $video['youtube_id']; // Already published, return the ID
         }
         
         if (($video['needs_manual_review'] ?? 0) == 1) {
             log_message('info', "Upload skipped: Video {$videoId} still needs manual review");
-            return null;
+            return ['error' => 'Video still needs manual review'];
         }
 
         // Update YouTube status to uploading

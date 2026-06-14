@@ -902,9 +902,18 @@ class AdminController
             }
 
             $youtubeService = new \App\Services\YouTubeService();
+            
+            // Log video state before upload
+            debug_log("Attempting YouTube publish for video {$videoId}: status={$video['status']}, ai_status=" . ($video['ai_status'] ?? 'null') . ", needs_review=" . ($video['needs_manual_review'] ?? 'null'), 'ADMIN');
+            
             $youtubeId = $youtubeService->uploadVideo($videoId);
 
             if ($youtubeId) {
+                if (is_array($youtubeId) && isset($youtubeId['error'])) {
+                    // YouTubeService returned an error
+                    echo json_encode(['error' => $youtubeId['error']]);
+                    return;
+                }
                 debug_log("Admin published video {$videoId} to YouTube: {$youtubeId}", 'ADMIN');
                 echo json_encode([
                     'success' => true, 
