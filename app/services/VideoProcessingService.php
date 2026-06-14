@@ -27,8 +27,8 @@ class VideoProcessingService
     private string $uploadPath;
 
     // Thresholds
-    private const MIN_DURATION = 10;      // seconds
-    private const MAX_DURATION = 180;     // seconds (3 min)
+    private const MIN_DURATION = 0;       // seconds (0 = no minimum, set higher for production)
+    private const MAX_DURATION = 300;     // seconds (5 min)
     private const NSFW_REJECT_THRESHOLD = 0.7;
     private const NSFW_FLAG_THRESHOLD = 0.4;
     private const PROFANITY_REJECT_THRESHOLD = 0.7;
