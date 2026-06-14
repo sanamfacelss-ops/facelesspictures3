@@ -16,8 +16,29 @@ class TranscriptionService
 
     public function __construct()
     {
-        $this->groqApiKey = $_ENV['GROQ_API_KEY'] ?? '';
-        $this->ffmpegPath = $_ENV['FFMPEG_PATH'] ?? 'ffmpeg';
+        // Get from $_ENV first, then fallback to settings table
+        $this->groqApiKey = $this->getEnvWithDbFallback('GROQ_API_KEY');
+        $this->ffmpegPath = $this->getEnvWithDbFallback('FFMPEG_PATH') ?: 'ffmpeg';
+    }
+
+    /**
+     * Get environment variable with database fallback
+     */
+    private function getEnvWithDbFallback(string $key): string
+    {
+        if (!empty($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+        
+        try {
+            $db = \App\Config\Database::getConnection();
+            $stmt = $db->prepare("SELECT value FROM settings WHERE `key` = ?");
+            $stmt->execute(['env_' . $key]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            return $row['value'] ?? '';
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
     /**

@@ -35,19 +35,36 @@ class ContentModerationService
     {
         $this->db = Database::getConnection();
         
+        // Helper function to get env value with database fallback
+        $getEnv = function(string $key): string {
+            // First try $_ENV
+            if (!empty($_ENV[$key])) {
+                return $_ENV[$key];
+            }
+            // Fallback to settings table with env_ prefix
+            try {
+                $stmt = $this->db->prepare("SELECT value FROM settings WHERE `key` = ?");
+                $stmt->execute(['env_' . $key]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $row['value'] ?? '';
+            } catch (\Exception $e) {
+                return '';
+            }
+        };
+        
         // Azure AI Content Safety (Primary)
-        $this->azureEndpoint = $_ENV['AZURE_CONTENT_SAFETY_ENDPOINT'] ?? '';
-        $this->azureKey = $_ENV['AZURE_CONTENT_SAFETY_KEY'] ?? '';
+        $this->azureEndpoint = $getEnv('AZURE_CONTENT_SAFETY_ENDPOINT');
+        $this->azureKey = $getEnv('AZURE_CONTENT_SAFETY_KEY');
         
         // OpenAI Moderation (Fallback for text - unlimited free)
-        $this->openaiKey = $_ENV['OPENAI_API_KEY'] ?? '';
+        $this->openaiKey = $getEnv('OPENAI_API_KEY');
         
         // SightEngine (Fallback for images)
-        $this->sightengineUser = $_ENV['SIGHTENGINE_API_USER'] ?? '';
-        $this->sightengineSecret = $_ENV['SIGHTENGINE_API_SECRET'] ?? '';
+        $this->sightengineUser = $getEnv('SIGHTENGINE_API_USER');
+        $this->sightengineSecret = $getEnv('SIGHTENGINE_API_SECRET');
         
         // RapidAPI / API4AI (Fallback for images)
-        $this->rapidApiKey = $_ENV['RAPIDAPI_KEY'] ?? '';
+        $this->rapidApiKey = $getEnv('RAPIDAPI_KEY');
     }
 
     /**
@@ -103,15 +120,15 @@ class ContentModerationService
             return $result;
         }
 
-        // All APIs failed - flag for manual review
-        log_message('warning', 'All image moderation APIs failed, flagging for manual review');
+        // All APIs failed - assume safe and let through (don't penalize user for API issues)
+        log_message('warning', 'All image moderation APIs failed, assuming safe content');
         return [
-            'safe' => false,
-            'score' => 0.5,
+            'safe' => true,
+            'score' => 0,
             'categories' => ['api_failure'],
             'provider' => 'none',
-            'needs_manual_review' => true,
-            'error' => 'All moderation APIs unavailable'
+            'needs_manual_review' => false,
+            'error' => 'All moderation APIs unavailable - content assumed safe'
         ];
     }
 
