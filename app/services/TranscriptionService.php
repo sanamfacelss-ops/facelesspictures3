@@ -150,15 +150,18 @@ class TranscriptionService
             'temperature' => 0,
         ];
 
-        // Add language hint if provided
-        // For Indian content, we'll try Hindi first if no language specified
+        // Default to Hindi for Indian content platform
+        // This significantly improves Hindi/Hinglish detection
+        if (empty($language) && $retryCount === 0) {
+            $language = 'hi'; // Default to Hindi
+        }
+        
         if (!empty($language)) {
             $postFields['language'] = $language;
         }
         
-        // Add prompt to help with Hindi/Hinglish detection
-        // This helps Whisper understand the context
-        $postFields['prompt'] = 'This audio may contain Hindi, Hinglish (Hindi-English mix), or English. Transcribe all words accurately including any profanity or slang.';
+        // Add prompt to help with Hindi/Hinglish detection and profanity
+        $postFields['prompt'] = 'This audio contains Hindi, Hinglish (Hindi-English mix), or English. Transcribe exactly what is said including any gaali, profanity or slang like madarchod, bhenchod, chutiya. Do not censor.';
 
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
@@ -167,7 +170,7 @@ class TranscriptionService
                 'Authorization: Bearer ' . $this->groqApiKey,
             ],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 300, // 5 min timeout for long videos
+            CURLOPT_TIMEOUT => 300,
         ]);
 
         $response = curl_exec($ch);
@@ -176,7 +179,6 @@ class TranscriptionService
         curl_close($ch);
 
         if ($httpCode === 429) {
-            // Rate limited - wait and retry once
             log_message('info', 'Groq rate limited, waiting 2 seconds...');
             sleep(2);
             return $this->callGroqWhisper($audioPath, $language, $retryCount);
@@ -193,19 +195,32 @@ class TranscriptionService
         }
         
         $detectedLanguage = $data['language'] ?? 'unknown';
-        $transcribedText = $data['text'];
+        $transcribedText = trim($data['text']);
         
-        log_message('info', "Groq transcription: language={$detectedLanguage}, text=" . substr($transcribedText, 0, 100));
+        log_message('info', "Groq transcription (lang={$language}): detected={$detectedLanguage}, text=" . substr($transcribedText, 0, 200));
         
-        // If detected as English but text looks suspicious (very short, repetitive), 
-        // retry with Hindi language hint
-        if ($retryCount === 0 && empty($language) && $detectedLanguage === 'english') {
+        // If result looks like garbage (too short, repetitive patterns, no real words), retry with English
+        if ($retryCount === 0 && $language === 'hi') {
             $wordCount = str_word_count($transcribedText);
-            $hasRepetition = preg_match('/(\b\w+\b)(\s+\1){2,}/i', $transcribedText); // Repeated words
+            // Check for repetitive patterns like "tons of the tons of the"
+            $words = preg_split('/\s+/', strtolower($transcribedText));
+            $uniqueWords = array_unique($words);
+            $repetitionRatio = count($words) > 0 ? count($uniqueWords) / count($words) : 1;
             
-            if ($wordCount < 10 || $hasRepetition) {
-                log_message('info', "Suspicious transcription (words={$wordCount}, repetition={$hasRepetition}), retrying with Hindi hint");
-                return $this->callGroqWhisper($audioPath, 'hi', $retryCount + 1);
+            // If very few unique words (high repetition) or very short, try English
+            if ($wordCount < 5 || $repetitionRatio < 0.5) {
+                log_message('info', "Suspicious Hindi transcription (words={$wordCount}, uniqueRatio={$repetitionRatio}), retrying with English");
+                $englishResult = $this->callGroqWhisper($audioPath, 'en', $retryCount + 1);
+                
+                // Return whichever has more unique content
+                $englishWords = preg_split('/\s+/', strtolower($englishResult['text']));
+                $englishUnique = count(array_unique($englishWords));
+                $hindiUnique = count($uniqueWords);
+                
+                if ($englishUnique > $hindiUnique) {
+                    log_message('info', "English transcription better (unique: {$englishUnique} vs {$hindiUnique})");
+                    return $englishResult;
+                }
             }
         }
 
