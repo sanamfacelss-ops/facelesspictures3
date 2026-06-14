@@ -2143,35 +2143,26 @@ if (file_exists($errorLogFile)) {
                     </template>
                     
                     <!-- NSFW Analysis (if available) -->
-                    <template x-if="videoDetail.feedback?.nsfw_result">
+                    <template x-if="videoDetail.feedback?.nsfw_result && Object.keys(videoDetail.feedback.nsfw_result).length > 0">
                         <div class="mt-4 pt-4 border-t border-dark/10">
                             <span class="text-[11px] text-dark/40 uppercase">Content Safety Analysis:</span>
                             <div class="mt-2 grid grid-cols-2 gap-2 text-[11px]">
-                                <template x-if="videoDetail.feedback.nsfw_result.nudity !== undefined">
+                                <template x-for="(value, key) in videoDetail.feedback.nsfw_result" :key="key">
                                     <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
-                                        <span class="text-dark/50">Nudity:</span>
-                                        <span :class="videoDetail.feedback.nsfw_result.nudity > 0.5 ? 'text-red-600 font-medium' : 'text-green-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.nudity * 100) + '%'"></span>
-                                    </div>
-                                </template>
-                                <template x-if="videoDetail.feedback.nsfw_result.violence !== undefined">
-                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
-                                        <span class="text-dark/50">Violence:</span>
-                                        <span :class="videoDetail.feedback.nsfw_result.violence > 0.5 ? 'text-red-600 font-medium' : 'text-green-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.violence * 100) + '%'"></span>
-                                    </div>
-                                </template>
-                                <template x-if="videoDetail.feedback.nsfw_result.suggestive !== undefined">
-                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
-                                        <span class="text-dark/50">Suggestive:</span>
-                                        <span :class="videoDetail.feedback.nsfw_result.suggestive > 0.5 ? 'text-amber-600 font-medium' : 'text-green-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.suggestive * 100) + '%'"></span>
-                                    </div>
-                                </template>
-                                <template x-if="videoDetail.feedback.nsfw_result.safe !== undefined">
-                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
-                                        <span class="text-dark/50">Safe:</span>
-                                        <span :class="videoDetail.feedback.nsfw_result.safe > 0.7 ? 'text-green-600 font-medium' : 'text-amber-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.safe * 100) + '%'"></span>
+                                        <span class="text-dark/50 capitalize" x-text="key.replace(/_/g, ' ')"></span>
+                                        <span :class="(typeof value === 'number' && value > 0.5) ? 'text-red-600 font-medium' : 'text-green-600'" 
+                                              x-text="typeof value === 'number' ? Math.round(value * 100) + '%' : value"></span>
                                     </div>
                                 </template>
                             </div>
+                        </div>
+                    </template>
+                    
+                    <!-- Show raw feedback data for debugging if no structured data -->
+                    <template x-if="!videoDetail.feedback?.nsfw_result && !videoDetail.feedback?.transcript && videoDetail.feedback?.score === undefined">
+                        <div class="mt-4 pt-4 border-t border-dark/10">
+                            <span class="text-[11px] text-dark/40 uppercase">Raw AI Data:</span>
+                            <pre class="text-[10px] text-dark/50 mt-1 bg-dark/5 p-2 rounded overflow-auto max-h-32" x-text="JSON.stringify(videoDetail.feedback, null, 2)"></pre>
                         </div>
                     </template>
                     
