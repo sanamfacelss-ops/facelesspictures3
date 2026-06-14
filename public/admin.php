@@ -2158,8 +2158,8 @@ if (file_exists($errorLogFile)) {
                                 <template x-for="(value, key) in videoDetail.feedback.nsfw_result" :key="key">
                                     <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
                                         <span class="text-dark/50 capitalize" x-text="key.replace(/_/g, ' ')"></span>
-                                        <span :class="(typeof value === 'number' && value > 0.5) ? 'text-red-600 font-medium' : 'text-green-600'" 
-                                              x-text="typeof value === 'number' ? Math.round(value * 100) + '%' : value"></span>
+                                        <span :class="(typeof value === 'number' && value > 0.5 && key !== 'frames_checked') ? 'text-red-600 font-medium' : 'text-green-600'" 
+                                              x-text="typeof value === 'number' ? (key === 'frames_checked' ? value : (value <= 1 ? Math.round(value * 100) + '%' : value)) : value"></span>
                                     </div>
                                 </template>
                             </div>
