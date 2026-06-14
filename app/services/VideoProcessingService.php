@@ -193,12 +193,11 @@ class VideoProcessingService
 
             // Step 5: Check transcript for profanity/hate speech
             // Different logic for English vs Non-English
-            $hindiProfanityFound = false;
             
             if (!empty($transcript)) {
                 $textResult = $this->moderationService->moderateText($transcript);
                 
-                // For English: trust the moderation result
+                // For English: trust the moderation result fully
                 if (!$isNonEnglish && !$transcriptUnreliable) {
                     if (!$textResult['safe'] && $textResult['score'] >= $this->profanityRejectThreshold) {
                         return $this->reject($videoId,
@@ -213,21 +212,29 @@ class VideoProcessingService
                     }
                 } else {
                     // For Non-English OR Unreliable transcript:
-                    // Check for Hindi/Indian profanity patterns - ANY hint = manual review
+                    // Check for Hindi/Indian profanity patterns - ONLY flag if profanity found
                     $hindiProfanityFound = $this->checkHindiProfanity($transcript);
                     
                     if ($hindiProfanityFound) {
+                        // Profanity detected in Hindi content - flag for manual review
                         $score -= 40;
-                        $flags[] = 'hindi_profanity_suspected';
-                        $feedback[] = "⚠️ Possible Hindi/Indian profanity detected - MANUAL REVIEW REQUIRED";
-                        log_message('warning', "Video {$videoId}: Hindi profanity pattern found in transcript");
-                    } else if ($transcriptUnreliable) {
-                        // Transcript is garbage but no profanity found - still flag for safety
-                        $score -= 20;
-                        $flags[] = 'audio_unclear';
-                        $feedback[] = "Audio transcription unclear - manual review recommended";
+                        $flags[] = 'hindi_profanity_detected';
+                        $feedback[] = "⚠️ Hindi/Indian profanity detected - MANUAL REVIEW REQUIRED";
+                        log_message('warning', "Video {$videoId}: Hindi profanity found in transcript");
+                    } else if ($transcriptUnreliable && $isNonEnglish) {
+                        // Transcript is garbage AND non-English - be cautious but don't block
+                        // Only add a minor note, don't deduct score heavily
+                        $feedback[] = "Note: Non-English audio, transcript may be incomplete";
+                        log_message('info', "Video {$videoId}: Non-English with unclear transcript, but no profanity detected - allowing");
                     }
-                    // If non-English but transcript looks OK and no profanity → allow auto-approve
+                    // If non-English but clean transcript and no profanity → auto-approve (no flag)
+                    
+                    // Also check Azure/OpenAI result for any flags
+                    if (!$textResult['safe'] && $textResult['score'] >= $this->profanityFlagThreshold) {
+                        $score -= 20;
+                        $flags[] = 'content_warning';
+                        $feedback[] = "Content flagged by AI: " . implode(', ', $textResult['categories']);
+                    }
                 }
             }
 
