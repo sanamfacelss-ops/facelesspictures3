@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 /**
- * Transcription Service using Groq Whisper API
+ * Transcription Service using multiple providers
+ * 
+ * Primary: Groq Whisper API (free, unlimited with 30 RPM rate limit)
+ * Fallback: HuggingFace IndicWhisper Space (free, better for Hindi)
+ * 
  * Supports Hindi, Hinglish, English, and 50+ other languages
- * Free tier: Unlimited with 30 RPM rate limit
  */
 class TranscriptionService
 {
@@ -66,13 +69,35 @@ class TranscriptionService
         }
 
         try {
+            // Try Groq Whisper first
             $result = $this->callGroqWhisper($audioPath, $language);
+            
+            // If Groq result looks like garbage, try IndicWhisper as fallback
+            if ($result['success'] && ($result['unreliable'] ?? false)) {
+                log_message('info', "Groq produced unreliable transcript, trying IndicWhisper fallback");
+                
+                $indicResult = $this->callIndicWhisper($audioPath);
+                if ($indicResult['success'] && !empty($indicResult['text'])) {
+                    // Check if IndicWhisper result is better (not garbage)
+                    if (!$this->isGarbageTranscription($indicResult['text'])) {
+                        log_message('info', "IndicWhisper produced better result: " . substr($indicResult['text'], 0, 100));
+                        $indicResult['provider'] = 'indicwhisper';
+                        
+                        // Cleanup temp audio file
+                        if ($audioPath !== $filePath && file_exists($audioPath)) {
+                            @unlink($audioPath);
+                        }
+                        return $indicResult;
+                    }
+                }
+            }
             
             // Cleanup temp audio file
             if ($audioPath !== $filePath && file_exists($audioPath)) {
                 @unlink($audioPath);
             }
             
+            $result['provider'] = 'groq';
             return $result;
         } catch (\Exception $e) {
             // Cleanup on error
@@ -222,15 +247,115 @@ class TranscriptionService
         
         // Final check: if still garbage after retries, mark it as unreliable
         $isGarbage = $this->isGarbageTranscription($transcribedText);
+        
+        // Detect language from actual text content (more reliable than Whisper's detection)
+        $actualLanguage = $this->detectLanguageFromText($transcribedText, $detectedLanguage);
 
         return [
             'success' => true,
             'text' => $transcribedText,
-            'language' => $this->normalizeLanguageName($detectedLanguage),
+            'language' => $actualLanguage,
+            'whisper_language' => $this->normalizeLanguageName($detectedLanguage),  // Keep original for debugging
             'duration' => $data['duration'] ?? null,
             'segments' => $data['segments'] ?? [],
             'unreliable' => $isGarbage,  // Flag for garbage transcription
         ];
+    }
+    
+    /**
+     * Detect language from actual text content
+     * More reliable than trusting Whisper's detection
+     */
+    private function detectLanguageFromText(string $text, string $whisperLanguage): string
+    {
+        $text = trim($text);
+        
+        if (empty($text)) {
+            return 'Unknown';
+        }
+        
+        // Check for Indic scripts (Devanagari, Gurmukhi, etc.)
+        // If text has these scripts, it's likely Hindi/Indian language
+        if (preg_match('/[\x{0900}-\x{097F}]/u', $text)) {
+            return 'Hindi (Devanagari)';
+        }
+        if (preg_match('/[\x{0A00}-\x{0A7F}]/u', $text)) {
+            return 'Punjabi (Gurmukhi)';
+        }
+        if (preg_match('/[\x{0B80}-\x{0BFF}]/u', $text)) {
+            return 'Tamil';
+        }
+        if (preg_match('/[\x{0C00}-\x{0C7F}]/u', $text)) {
+            return 'Telugu';
+        }
+        if (preg_match('/[\x{0980}-\x{09FF}]/u', $text)) {
+            return 'Bengali';
+        }
+        if (preg_match('/[\x{0600}-\x{06FF}]/u', $text)) {
+            return 'Urdu/Arabic';
+        }
+        
+        // Text is in Latin script - could be English or Romanized Hindi (Hinglish)
+        $lower = strtolower($text);
+        
+        // Check for common Hindi words written in Roman script (Hinglish indicators)
+        $hindiIndicators = [
+            'kya', 'hai', 'hain', 'nahi', 'nahin', 'aur', 'mein', 'main', 'tum', 'aap',
+            'kaise', 'kaisa', 'kaisi', 'kyun', 'kyon', 'kab', 'kahan', 'kahaan',
+            'accha', 'achha', 'theek', 'thik', 'bahut', 'bohot', 'bhai', 'yaar',
+            'abhi', 'phir', 'lekin', 'matlab', 'samajh', 'dekh', 'dekho', 'suno',
+            'chalo', 'chal', 'karo', 'kar', 'bolo', 'bol', 'jao', 'aao',
+            'pakad', 'pakdo', 'ruk', 'ruko', 'haan', 'ji', 'are', 'arre',
+            // Profanity indicators (if these appear, it's likely Hindi)
+            'madarchod', 'bhenchod', 'chutiya', 'gaand', 'lund', 'randi', 'bhosdike',
+            'madar', 'behen', 'chod', 'gandu', 'harami', 'kamina', 'saala', 'sala'
+        ];
+        
+        $hindiWordCount = 0;
+        $words = preg_split('/\s+/', $lower);
+        $totalWords = count($words);
+        
+        foreach ($hindiIndicators as $indicator) {
+            if (str_contains($lower, $indicator)) {
+                $hindiWordCount++;
+            }
+        }
+        
+        // If more than 20% Hindi indicators, classify as Hinglish
+        if ($totalWords > 0 && ($hindiWordCount / $totalWords) > 0.1) {
+            return 'Hinglish (Hindi-English)';
+        }
+        
+        // Check if it looks like garbage (hallucination) - mark as Unknown
+        if ($this->isGarbageTranscription($text)) {
+            return 'Unknown (transcription unreliable)';
+        }
+        
+        // Default to Whisper's detection for English text, but validate it
+        $normalizedWhisper = $this->normalizeLanguageName($whisperLanguage);
+        
+        // If Whisper says Hindi/Punjabi but text is all English letters with no Hindi words,
+        // it's probably actually English
+        if (in_array($normalizedWhisper, ['Hindi', 'Punjabi', 'Panjabi', 'Urdu']) && $hindiWordCount === 0) {
+            // Check if text looks like proper English
+            $englishWords = ['the', 'is', 'are', 'was', 'were', 'have', 'has', 'had', 'will', 'would', 
+                           'could', 'should', 'can', 'may', 'might', 'must', 'this', 'that', 'these',
+                           'those', 'what', 'which', 'who', 'how', 'why', 'when', 'where', 'i', 'you',
+                           'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our'];
+            
+            $englishCount = 0;
+            foreach ($englishWords as $word) {
+                if (preg_match('/\b' . $word . '\b/i', $text)) {
+                    $englishCount++;
+                }
+            }
+            
+            if ($englishCount >= 3) {
+                return 'English';
+            }
+        }
+        
+        return $normalizedWhisper;
     }
     
     /**
@@ -338,6 +463,82 @@ class TranscriptionService
         
         $lower = strtolower($code);
         return $languages[$lower] ?? ucfirst($code);
+    }
+    
+    /**
+     * Call HuggingFace IndicWhisper Space as fallback for Hindi
+     * This is FREE and better at Hindi transcription
+     */
+    private function callIndicWhisper(string $audioPath): array
+    {
+        try {
+            // Use HuggingFace Spaces API for IndicWhisper
+            // Spaces use Gradio API which can be called via HTTP
+            $spaceUrl = 'https://akpande2-ai4bharat-indicwhisper.hf.space/api/predict';
+            
+            // Read audio file and encode as base64
+            $audioData = file_get_contents($audioPath);
+            if ($audioData === false) {
+                return ['success' => false, 'text' => '', 'error' => 'Could not read audio file'];
+            }
+            
+            $base64Audio = base64_encode($audioData);
+            $mimeType = 'audio/mpeg';
+            
+            // Gradio API expects data in specific format
+            $payload = json_encode([
+                'data' => [
+                    'data:' . $mimeType . ';base64,' . $base64Audio  // Audio file as data URL
+                ]
+            ]);
+            
+            $ch = curl_init($spaceUrl);
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 120,  // Longer timeout for HF Spaces
+            ]);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            
+            if ($httpCode !== 200 || !$response) {
+                log_message('warning', "IndicWhisper API failed: HTTP {$httpCode}, Error: {$curlError}");
+                return ['success' => false, 'text' => '', 'error' => "API failed: HTTP {$httpCode}"];
+            }
+            
+            $data = json_decode($response, true);
+            
+            // Gradio returns data in 'data' array
+            $text = '';
+            if (isset($data['data'][0])) {
+                $text = is_string($data['data'][0]) ? trim($data['data'][0]) : '';
+            }
+            
+            if (empty($text)) {
+                log_message('warning', "IndicWhisper returned empty response");
+                return ['success' => false, 'text' => '', 'error' => 'Empty response'];
+            }
+            
+            log_message('info', "IndicWhisper transcription: " . substr($text, 0, 200));
+            
+            return [
+                'success' => true,
+                'text' => $text,
+                'language' => 'Hindi',  // IndicWhisper is optimized for Hindi
+                'unreliable' => false,
+            ];
+            
+        } catch (\Exception $e) {
+            log_message('error', 'IndicWhisper error: ' . $e->getMessage());
+            return ['success' => false, 'text' => '', 'error' => $e->getMessage()];
+        }
     }
 
     /**

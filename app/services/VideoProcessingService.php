@@ -162,40 +162,72 @@ class VideoProcessingService
             // Step 4: Transcribe audio
             $transcript = '';
             $transcriptUnreliable = false;
+            $isNonEnglish = false;
+            $detectedLanguage = 'unknown';
+            
             if ($videoInfo['has_audio']) {
                 $transcriptResult = $this->transcriptionService->transcribe($filePath);
                 if ($transcriptResult['success']) {
                     $transcript = $transcriptResult['text'];
                     $transcriptUnreliable = $transcriptResult['unreliable'] ?? false;
                     $detectedLanguage = $transcriptResult['language'] ?? 'unknown';
+                    $whisperLanguage = $transcriptResult['whisper_language'] ?? $detectedLanguage;
                     $feedback[] = "Language detected: " . $detectedLanguage;
                     
-                    // If transcription is unreliable (garbage/hallucination), flag for manual audio review
-                    if ($transcriptUnreliable) {
-                        $score -= 30;  // Significant deduction to ensure flagging
-                        $flags[] = 'audio_needs_review';
-                        $feedback[] = "⚠️ Audio could not be transcribed reliably - MANUAL LISTEN REQUIRED for profanity check";
-                        log_message('warning', "Video {$videoId}: Unreliable transcription - flagging for manual audio review");
+                    // Check if Whisper detected non-English language
+                    $nonEnglishLanguages = ['hindi', 'punjabi', 'panjabi', 'tamil', 'telugu', 'bengali', 
+                                           'marathi', 'gujarati', 'kannada', 'malayalam', 'urdu', 'hinglish'];
+                    $isNonEnglish = false;
+                    foreach ($nonEnglishLanguages as $lang) {
+                        if (stripos($detectedLanguage, $lang) !== false || stripos($whisperLanguage, $lang) !== false) {
+                            $isNonEnglish = true;
+                            break;
+                        }
                     }
+                    
+                    log_message('info', "Video {$videoId}: Language={$detectedLanguage}, NonEnglish={$isNonEnglish}, Unreliable={$transcriptUnreliable}");
                 } else {
                     $feedback[] = "Audio transcription skipped: " . ($transcriptResult['error'] ?? 'unknown error');
                 }
             }
 
             // Step 5: Check transcript for profanity/hate speech
+            // Different logic for English vs Non-English
+            $hindiProfanityFound = false;
+            
             if (!empty($transcript)) {
                 $textResult = $this->moderationService->moderateText($transcript);
                 
-                if (!$textResult['safe'] && $textResult['score'] >= $this->profanityRejectThreshold) {
-                    return $this->reject($videoId,
-                        "Audio content contains prohibited content. Categories: " . implode(', ', $textResult['categories']),
-                        $startTime
-                    );
-                }
-                if (!$textResult['safe'] && $textResult['score'] >= $this->profanityFlagThreshold) {
-                    $score -= 30;
-                    $flags[] = 'profanity_warning';
-                    $feedback[] = "Audio content flagged for review. Categories: " . implode(', ', $textResult['categories']);
+                // For English: trust the moderation result
+                if (!$isNonEnglish && !$transcriptUnreliable) {
+                    if (!$textResult['safe'] && $textResult['score'] >= $this->profanityRejectThreshold) {
+                        return $this->reject($videoId,
+                            "Audio content contains prohibited content. Categories: " . implode(', ', $textResult['categories']),
+                            $startTime
+                        );
+                    }
+                    if (!$textResult['safe'] && $textResult['score'] >= $this->profanityFlagThreshold) {
+                        $score -= 30;
+                        $flags[] = 'profanity_warning';
+                        $feedback[] = "Audio content flagged for review. Categories: " . implode(', ', $textResult['categories']);
+                    }
+                } else {
+                    // For Non-English OR Unreliable transcript:
+                    // Check for Hindi/Indian profanity patterns - ANY hint = manual review
+                    $hindiProfanityFound = $this->checkHindiProfanity($transcript);
+                    
+                    if ($hindiProfanityFound) {
+                        $score -= 40;
+                        $flags[] = 'hindi_profanity_suspected';
+                        $feedback[] = "⚠️ Possible Hindi/Indian profanity detected - MANUAL REVIEW REQUIRED";
+                        log_message('warning', "Video {$videoId}: Hindi profanity pattern found in transcript");
+                    } else if ($transcriptUnreliable) {
+                        // Transcript is garbage but no profanity found - still flag for safety
+                        $score -= 20;
+                        $flags[] = 'audio_unclear';
+                        $feedback[] = "Audio transcription unclear - manual review recommended";
+                    }
+                    // If non-English but transcript looks OK and no profanity → allow auto-approve
                 }
             }
 
@@ -335,6 +367,95 @@ class VideoProcessingService
             array_map('unlink', glob($framesDir . '/*'));
             @rmdir($framesDir);
         }
+    }
+    
+    /**
+     * Check for Hindi/Indian profanity in transcript
+     * This catches gaalis even in garbage transcripts from Whisper
+     * Returns true if ANY hint of profanity is found
+     */
+    private function checkHindiProfanity(string $text): bool
+    {
+        $lower = strtolower($text);
+        $normalized = preg_replace('/[\s\-_\.]+/', '', $lower);  // Remove spaces/separators
+        
+        // Comprehensive list of Hindi gaalis and variations
+        $gaalis = [
+            // Madarchod variations
+            'madarchod', 'maderchod', 'madarchodd', 'madarchot', 'motherchod',
+            'madar', 'mc', 'machod', 'maachod', 'maadarchodd',
+            
+            // Bhenchod variations  
+            'bhenchod', 'behenchod', 'banchod', 'benchod', 'bhenchot',
+            'behen', 'bc', 'bhnchod', 'bahinchod',
+            
+            // Chutiya variations
+            'chutiya', 'chutiye', 'chutia', 'chutiyo', 'choot', 'chut',
+            'chootiya', 'chutiyapa', 'chutiyap',
+            
+            // Gaand/Gandu
+            'gaand', 'gand', 'gaandu', 'gandu', 'gaandmein', 'gandmein',
+            
+            // Lund/Lauda
+            'lund', 'lauda', 'loda', 'lavda', 'lawda', 'lodu', 'laudu',
+            
+            // Bhosdike
+            'bhosdike', 'bsdk', 'bhosdiwale', 'bhosdika', 'bosdi', 'bhosd',
+            
+            // Randi
+            'randi', 'raand', 'rand', 'randwa', 'randikhana',
+            
+            // Other common ones
+            'harami', 'haramkhor', 'haram', 'haramzada', 'haramzade',
+            'kutte', 'kutta', 'kutiya', 'kutia', 'kutti',
+            'kamina', 'kamine', 'kameena', 'kameene',
+            'saala', 'sala', 'saale', 'sale', 'sali',
+            'jhaat', 'jhat', 'jhatu', 'jhaant',
+            'tatti', 'tatte', 'tattu',
+            'ullu', 'gadha', 'gadhe',
+            'chod', 'choda', 'chodi', 'chodna', 'chodu',
+            'maaiki', 'maaki', 'teri maa', 'terima',
+            
+            // Tamil gaalis
+            'thevdiya', 'thevidiya', 'otha', 'punda', 'pundai', 'sunni', 'thayoli', 'oombu',
+            
+            // Telugu gaalis
+            'lanja', 'lanjakodaka', 'pooka', 'modda', 'dengey', 'gudda',
+            
+            // Phonetic patterns that might appear in garbage transcripts
+            'madr', 'bhenc', 'chuti', 'gandu', 'loda', 'bhosdi', 'rand',
+        ];
+        
+        // Check direct matches
+        foreach ($gaalis as $gaali) {
+            if (str_contains($lower, $gaali) || str_contains($normalized, $gaali)) {
+                log_message('info', "Hindi profanity detected: '{$gaali}' in transcript");
+                return true;
+            }
+        }
+        
+        // Check phonetic patterns (Whisper might transcribe "madarchod" as "mother chord" etc.)
+        $patterns = [
+            '/mother\s*ch[oa]/i',           // mother chod/chord
+            '/maa\s*ch[oa]/i',              // maa chod
+            '/sister\s*f[u]+ck/i',          // sister fuck (bhenchod literal)
+            '/behen.*ch[oa]/i',             // behen chod
+            '/bhen.*ch[oa]/i',              // bhen chod
+            '/choo+t/i',                     // choot
+            '/g[au]+nd[u]?/i',               // gaandu/gandu
+            '/l[oa]+d[ua]/i',                // loda/lauda
+            '/r[au]nd[i]?/i',                // randi
+            '/b[ho]+sd/i',                   // bhosd...
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $text)) {
+                log_message('info', "Hindi profanity pattern matched in transcript");
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**
