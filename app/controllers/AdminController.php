@@ -653,8 +653,13 @@ class AdminController
             $results = [];
             $settingsModel = new \App\Models\Settings();
             
+            // Helper to get key from env or database
+            $getKey = function($key) use ($settingsModel) {
+                return $_ENV[$key] ?? getenv($key) ?: $settingsModel->get('env_' . $key) ?: '';
+            };
+            
             // Test OpenAI Moderation
-            $openaiKey = $_ENV['OPENAI_API_KEY'] ?? getenv('OPENAI_API_KEY') ?: $settingsModel->get('env_OPENAI_API_KEY');
+            $openaiKey = $getKey('OPENAI_API_KEY');
             if (!empty($openaiKey)) {
                 try {
                     $ch = curl_init('https://api.openai.com/v1/moderations');
@@ -671,40 +676,38 @@ class AdminController
                     $response = curl_exec($ch);
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                     curl_close($ch);
-                    $results['openai'] = $httpCode === 200 ? 'OK' : 'Failed (HTTP ' . $httpCode . ')';
+                    $results['openai'] = $httpCode === 200 ? 'OK' : 'HTTP ' . $httpCode;
                 } catch (\Exception $e) {
-                    $results['openai'] = 'Error: ' . $e->getMessage();
+                    $results['openai'] = 'Error';
                 }
             } else {
                 $results['openai'] = 'Not configured';
             }
             
             // Test Groq
-            $groqKey = $_ENV['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?: $settingsModel->get('env_GROQ_API_KEY');
+            $groqKey = $getKey('GROQ_API_KEY');
             if (!empty($groqKey)) {
                 try {
                     $ch = curl_init('https://api.groq.com/openai/v1/models');
                     curl_setopt_array($ch, [
                         CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_HTTPHEADER => [
-                            'Authorization: Bearer ' . $groqKey
-                        ],
+                        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $groqKey],
                         CURLOPT_TIMEOUT => 10
                     ]);
                     $response = curl_exec($ch);
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                     curl_close($ch);
-                    $results['groq'] = $httpCode === 200 ? 'OK' : 'Failed (HTTP ' . $httpCode . ')';
+                    $results['groq'] = $httpCode === 200 ? 'OK' : 'HTTP ' . $httpCode;
                 } catch (\Exception $e) {
-                    $results['groq'] = 'Error: ' . $e->getMessage();
+                    $results['groq'] = 'Error';
                 }
             } else {
                 $results['groq'] = 'Not configured';
             }
             
             // Test Azure
-            $azureEndpoint = $_ENV['AZURE_CONTENT_SAFETY_ENDPOINT'] ?? getenv('AZURE_CONTENT_SAFETY_ENDPOINT') ?: $settingsModel->get('env_AZURE_CONTENT_SAFETY_ENDPOINT');
-            $azureKey = $_ENV['AZURE_CONTENT_SAFETY_KEY'] ?? getenv('AZURE_CONTENT_SAFETY_KEY') ?: $settingsModel->get('env_AZURE_CONTENT_SAFETY_KEY');
+            $azureEndpoint = $getKey('AZURE_CONTENT_SAFETY_ENDPOINT');
+            $azureKey = $getKey('AZURE_CONTENT_SAFETY_KEY');
             if (!empty($azureEndpoint) && !empty($azureKey)) {
                 try {
                     $url = rtrim($azureEndpoint, '/') . '/contentsafety/text:analyze?api-version=2023-10-01';
@@ -722,23 +725,81 @@ class AdminController
                     $response = curl_exec($ch);
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                     curl_close($ch);
-                    $results['azure'] = $httpCode === 200 ? 'OK' : 'Failed (HTTP ' . $httpCode . ')';
+                    $results['azure'] = $httpCode === 200 ? 'OK' : 'HTTP ' . $httpCode;
                 } catch (\Exception $e) {
-                    $results['azure'] = 'Error: ' . $e->getMessage();
+                    $results['azure'] = 'Error';
                 }
             } else {
                 $results['azure'] = 'Not configured';
             }
             
+            // Test SightEngine
+            $sightUser = $getKey('SIGHTENGINE_API_USER');
+            $sightSecret = $getKey('SIGHTENGINE_API_SECRET');
+            if (!empty($sightUser) && !empty($sightSecret)) {
+                try {
+                    $url = 'https://api.sightengine.com/1.0/check.json';
+                    $ch = curl_init($url . '?models=nudity&api_user=' . $sightUser . '&api_secret=' . $sightSecret . '&url=' . urlencode('https://via.placeholder.com/100'));
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_TIMEOUT => 10
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $data = json_decode($response, true);
+                    $results['sightengine'] = ($httpCode === 200 && isset($data['status']) && $data['status'] === 'success') ? 'OK' : 'HTTP ' . $httpCode;
+                } catch (\Exception $e) {
+                    $results['sightengine'] = 'Error';
+                }
+            } else {
+                $results['sightengine'] = 'Not configured';
+            }
+            
+            // Test RapidAPI (API4AI NSFW)
+            $rapidKey = $getKey('RAPIDAPI_KEY');
+            if (!empty($rapidKey)) {
+                try {
+                    $ch = curl_init('https://nsfw3.p.rapidapi.com/v1/results');
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => [
+                            'X-RapidAPI-Key: ' . $rapidKey,
+                            'X-RapidAPI-Host: nsfw3.p.rapidapi.com',
+                            'Content-Type: application/json'
+                        ],
+                        CURLOPT_POSTFIELDS => json_encode(['url' => 'https://via.placeholder.com/100']),
+                        CURLOPT_TIMEOUT => 15
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['rapidapi'] = ($httpCode === 200) ? 'OK' : 'HTTP ' . $httpCode;
+                } catch (\Exception $e) {
+                    $results['rapidapi'] = 'Error';
+                }
+            } else {
+                $results['rapidapi'] = 'Not configured';
+            }
+            
+            // Test FFmpeg
+            $ffmpegPath = $getKey('FFMPEG_PATH') ?: 'ffmpeg';
+            $ffprobePath = $getKey('FFPROBE_PATH') ?: 'ffprobe';
+            exec($ffmpegPath . ' -version 2>&1', $ffmpegOut, $ffmpegCode);
+            exec($ffprobePath . ' -version 2>&1', $ffprobeOut, $ffprobeCode);
+            $results['ffmpeg'] = $ffmpegCode === 0 ? 'OK (' . $ffmpegPath . ')' : 'Not found';
+            $results['ffprobe'] = $ffprobeCode === 0 ? 'OK (' . $ffprobePath . ')' : 'Not found';
+            
             // Summary
-            $okCount = count(array_filter($results, fn($r) => $r === 'OK'));
-            $totalConfigured = count(array_filter($results, fn($r) => $r !== 'Not configured'));
+            $okCount = count(array_filter($results, fn($r) => str_starts_with($r, 'OK')));
+            $total = count($results);
             
             debug_log("Admin tested AI providers: " . json_encode($results), 'ADMIN');
             echo json_encode([
                 'success' => true, 
                 'result' => [
-                    'status' => "$okCount/$totalConfigured providers working",
+                    'status' => "$okCount/$total services working",
                     'details' => $results
                 ]
             ]);
