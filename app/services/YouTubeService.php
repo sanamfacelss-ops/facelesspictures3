@@ -182,14 +182,22 @@ class YouTubeService
     private function getAccessToken(): ?string
     {
         if (empty($this->refreshToken)) {
-            log_message('error', 'YouTube refresh token is empty');
+            log_message('error', 'YouTube refresh token is empty. Set YOUTUBE_REFRESH_TOKEN in .env');
             return null;
         }
         
-        if (empty($this->clientId) || empty($this->clientSecret)) {
-            log_message('error', 'YouTube client ID or client secret is empty');
+        if (empty($this->clientId)) {
+            log_message('error', 'YouTube client ID is empty. Set YOUTUBE_CLIENT_ID in .env');
             return null;
         }
+        
+        if (empty($this->clientSecret)) {
+            log_message('error', 'YouTube client secret is empty. Set YOUTUBE_CLIENT_SECRET in .env');
+            return null;
+        }
+        
+        // Log what we're using (masked)
+        log_message('info', 'YouTube OAuth: Using client_id=' . substr($this->clientId, 0, 20) . '..., refresh_token=' . substr($this->refreshToken, 0, 10) . '...');
 
         $ch = curl_init('https://oauth2.googleapis.com/token');
         curl_setopt_array($ch, [
@@ -206,21 +214,34 @@ class YouTubeService
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
         
+        if ($curlError) {
+            log_message('error', 'YouTube OAuth curl error: ' . $curlError);
+            return null;
+        }
+        
         if (!$response) {
-            log_message('error', 'YouTube OAuth request failed - no response');
+            log_message('error', 'YouTube OAuth request failed - no response (HTTP ' . $httpCode . ')');
             return null;
         }
 
         $data = json_decode($response, true);
         
         if (isset($data['error'])) {
-            log_message('error', 'YouTube OAuth error: ' . ($data['error_description'] ?? $data['error']));
+            $errorMsg = $data['error_description'] ?? $data['error'];
+            log_message('error', 'YouTube OAuth error: ' . $errorMsg . ' (Full response: ' . $response . ')');
             return null;
         }
         
-        return $data['access_token'] ?? null;
+        if (empty($data['access_token'])) {
+            log_message('error', 'YouTube OAuth: No access_token in response: ' . $response);
+            return null;
+        }
+        
+        log_message('info', 'YouTube OAuth: Successfully got access token');
+        return $data['access_token'];
     }
 
     private function buildMultipartBody(array $metadata, string $filePath, string $boundary): string
