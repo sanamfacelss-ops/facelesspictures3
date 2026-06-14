@@ -1152,6 +1152,24 @@ if (file_exists($errorLogFile)) {
                                         <input type="number" x-model="aiSettings.ai_max_duration" @change="saveAISetting('ai_max_duration', aiSettings.ai_max_duration)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="60" max="600">
                                     </div>
                                 </div>
+                                
+                                <!-- File Size Limits -->
+                                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-dark/5">
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Min File Size (MB)</label>
+                                        <input type="number" x-model="aiSettings.video_min_size_mb" @change="saveAISetting('video_min_size_mb', aiSettings.video_min_size_mb)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="0" max="50">
+                                        <p class="text-[10px] text-dark/30 mt-1">Ensures minimum quality</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Max File Size (MB)</label>
+                                        <input type="number" x-model="aiSettings.video_max_size_mb" @change="saveAISetting('video_max_size_mb', aiSettings.video_max_size_mb)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="10" max="500">
+                                        <p class="text-[10px] text-dark/30 mt-1">For 60s 1080p: ~50MB is enough</p>
+                                    </div>
+                                </div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Max Duration (sec)</label>
+                                        <input type="number" x-model="aiSettings.ai_max_duration" @change="saveAISetting('ai_max_duration', aiSettings.ai_max_duration)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="60" max="600">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -19,6 +19,13 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache rewrite
 RUN a2enmod rewrite
 
+# Configure PHP for large file uploads
+RUN echo "upload_max_filesize = 500M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size = 500M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_input_time = 300" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 # Update Apache document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \

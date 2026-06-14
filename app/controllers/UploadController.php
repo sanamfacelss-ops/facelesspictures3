@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Models\Video;
 use App\Models\Season;
 use App\Models\User;
+use App\Models\Settings;
 use App\Services\BackgroundProcessor;
 
 class UploadController
@@ -14,12 +15,14 @@ class UploadController
     private Video $videoModel;
     private Season $seasonModel;
     private User $userModel;
+    private Settings $settingsModel;
 
     public function __construct()
     {
         $this->videoModel = new Video();
         $this->seasonModel = new Season();
         $this->userModel = new User();
+        $this->settingsModel = new Settings();
     }
 
     public function store(): void
@@ -52,6 +55,11 @@ class UploadController
                 echo json_encode(['error' => 'Invalid CSRF token']);
                 return;
             }
+
+            // Get upload limits from settings
+            $uploadLimits = $this->settingsModel->getUploadLimits();
+            $minSizeBytes = $uploadLimits['min_size_mb'] * 1024 * 1024;
+            $maxSizeBytes = $uploadLimits['max_size_mb'] * 1024 * 1024;
 
             // Get user's allowed content categories
             $userCategories = $user['content_categories'] ?? [$user['role']];
@@ -93,6 +101,14 @@ class UploadController
                 $errorMsg = $errorMessages[$uploadError] ?? "Upload error code: {$uploadError}";
                 $errors[] = "Video file error: {$errorMsg}";
                 debug_log("File upload error: {$errorMsg}", 'UPLOAD');
+            } else {
+                // Validate file size against admin settings
+                $fileSize = $_FILES['video']['size'];
+                if ($fileSize < $minSizeBytes) {
+                    $errors[] = "Video file is too small. Minimum size: {$uploadLimits['min_size_mb']}MB";
+                } elseif ($fileSize > $maxSizeBytes) {
+                    $errors[] = "Video file is too large. Maximum size: {$uploadLimits['max_size_mb']}MB";
+                }
             }
 
             if (!empty($errors)) {

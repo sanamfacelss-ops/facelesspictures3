@@ -7,6 +7,7 @@ $title = 'Create Video - ' . APP_NAME;
 
 $scriptModel = new App\Models\Script();
 $seasonModel = new App\Models\Season();
+$settingsModel = new App\Models\Settings();
 
 $userCategories = $user['content_categories'] ?? [$user['role']];
 if (is_string($userCategories)) {
@@ -20,6 +21,12 @@ foreach ($userCategories as $cat) {
 }
 
 $activeSeason = $seasonModel->getActive();
+
+// Get upload limits from settings
+$uploadLimits = $settingsModel->getUploadLimits();
+$minSizeMB = $uploadLimits['min_size_mb'];
+$maxSizeMB = $uploadLimits['max_size_mb'];
+$maxDuration = $uploadLimits['max_duration'];
 
 $categoryInfo = [
     'actor' => [
@@ -237,9 +244,12 @@ $categoryInfo = [
                     <!-- Upload Area -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Video File</label>
+                        <p class="text-xs text-gray-500 mb-2">
+                            📏 Size: <?= $minSizeMB ?>MB - <?= $maxSizeMB ?>MB &nbsp;•&nbsp; ⏱️ Max duration: <?= $maxDuration ?> seconds
+                        </p>
                         <div @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop($event)"
                              @click="$refs.fileInput_<?= $cat ?>.click()"
-                             :class="dragOver ? 'border-gray-900 bg-gray-50' : 'border-gray-300 hover:border-gray-400'"
+                             :class="dragOver ? 'border-gray-900 bg-gray-50' : (fileSizeError ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-gray-400')"
                              class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition">
                             <input type="file" x-ref="fileInput_<?= $cat ?>" @change="handleFileSelect($event)" accept="video/*" class="hidden">
                             <template x-if="!selectedFile">
@@ -248,17 +258,18 @@ $categoryInfo = [
                                         <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                                     </div>
                                     <p class="text-gray-600 mb-1">Drop your video here or click to browse</p>
-                                    <p class="text-sm text-gray-400">MP4, MOV, WebM • Max 500MB</p>
+                                    <p class="text-sm text-gray-400">MP4, MOV, WebM • <?= $minSizeMB ?>-<?= $maxSizeMB ?>MB</p>
                                 </div>
                             </template>
                             <template x-if="selectedFile">
                                 <div class="flex items-center justify-center gap-3">
-                                    <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="fileSizeError ? 'bg-red-100' : 'bg-emerald-100'">
+                                        <svg x-show="!fileSizeError" class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        <svg x-show="fileSizeError" class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     </div>
                                     <div class="text-left">
                                         <p class="font-medium text-gray-900 truncate max-w-xs" x-text="selectedFile.name"></p>
-                                        <p class="text-sm text-gray-500" x-text="formatFileSize(selectedFile.size)"></p>
+                                        <p class="text-sm" :class="fileSizeError ? 'text-red-600 font-medium' : 'text-gray-500'" x-text="formatFileSize(selectedFile.size) + (fileSizeError ? ' - ' + fileSizeError : '')"></p>
                                     </div>
                                     <button type="button" @click.stop="clearFile()" class="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -295,12 +306,12 @@ $categoryInfo = [
                     </div>
 
                     <!-- Submit -->
-                    <button type="submit" :disabled="loading || !selectedFile"
-                            :class="(loading || !selectedFile) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'hover:opacity-90'"
+                    <button type="submit" :disabled="loading || !selectedFile || fileSizeError"
+                            :class="(loading || !selectedFile || fileSizeError) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'hover:opacity-90'"
                             class="w-full py-3 rounded-xl font-semibold text-white transition flex items-center justify-center gap-2"
                             style="background: <?= $info['color'] ?>">
                         <svg x-show="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span x-text="loading ? 'Uploading...' : 'Submit Video'"></span>
+                        <span x-text="loading ? 'Uploading...' : (fileSizeError ? 'Fix file size to submit' : 'Submit Video')"></span>
                     </button>
                 </form>
             </div>
@@ -317,12 +328,19 @@ $categoryInfo = [
                 showFullScript: false,
                 formData: { title: '' },
                 selectedFile: null,
+                fileSizeError: '',
                 dragOver: false,
                 uploading: false,
                 uploadProgress: 0,
                 loading: false,
                 errors: [],
                 success: '',
+                
+                // File size limits from PHP
+                minSizeBytes: <?= $minSizeMB * 1024 * 1024 ?>,
+                maxSizeBytes: <?= $maxSizeMB * 1024 * 1024 ?>,
+                minSizeMB: <?= $minSizeMB ?>,
+                maxSizeMB: <?= $maxSizeMB ?>,
 
                 selectScript(script, category) {
                     if (this.activeTab === category) {
@@ -330,24 +348,44 @@ $categoryInfo = [
                         this.formData.title = script.title + ' - My Performance';
                     }
                 },
+                validateFileSize(file) {
+                    if (file.size < this.minSizeBytes) {
+                        return `Too small! Min ${this.minSizeMB}MB`;
+                    }
+                    if (file.size > this.maxSizeBytes) {
+                        return `Too large! Max ${this.maxSizeMB}MB`;
+                    }
+                    return '';
+                },
                 handleFileSelect(e) {
-                    if (e.target.files[0]) this.selectedFile = e.target.files[0];
+                    if (e.target.files[0]) {
+                        this.selectedFile = e.target.files[0];
+                        this.fileSizeError = this.validateFileSize(this.selectedFile);
+                    }
                 },
                 handleDrop(e) {
                     this.dragOver = false;
                     const file = e.dataTransfer.files[0];
                     if (file?.type.startsWith('video/')) {
                         this.selectedFile = file;
+                        this.fileSizeError = this.validateFileSize(this.selectedFile);
                     }
                 },
                 clearFile() {
                     this.selectedFile = null;
+                    this.fileSizeError = '';
                 },
                 formatFileSize(bytes) {
                     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
                     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
                 },
                 async submitUpload(category) {
+                    // Check file size before upload
+                    if (this.fileSizeError) {
+                        this.errors = [this.fileSizeError];
+                        return;
+                    }
+                    
                     this.loading = true;
                     this.uploading = true;
                     this.errors = [];

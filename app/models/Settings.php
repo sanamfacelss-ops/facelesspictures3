@@ -98,9 +98,12 @@ class Settings
             'ai_profanity_flag_threshold' => '0.4',
             // Auto-approve if AI score is high enough
             'ai_auto_approve' => '1',
-            // Video duration limits
+            // Video duration limits (seconds)
             'ai_min_duration' => '10',
             'ai_max_duration' => '180',
+            // Video file size limits (MB)
+            'video_min_size_mb' => '1',
+            'video_max_size_mb' => '100',
         ];
 
         $settings = [];
@@ -109,6 +112,19 @@ class Settings
         }
 
         return $settings;
+    }
+
+    /**
+     * Get video upload limits
+     */
+    public function getUploadLimits(): array
+    {
+        return [
+            'min_size_mb' => (int) $this->get('video_min_size_mb', '1'),
+            'max_size_mb' => (int) $this->get('video_max_size_mb', '100'),
+            'min_duration' => (int) $this->get('ai_min_duration', '10'),
+            'max_duration' => (int) $this->get('ai_max_duration', '180'),
+        ];
     }
 
     /**
@@ -121,7 +137,8 @@ class Settings
             'ai_processing_enabled', 'ai_approve_threshold', 'ai_flag_threshold',
             'ai_nsfw_reject_threshold', 'ai_nsfw_flag_threshold',
             'ai_profanity_reject_threshold', 'ai_profanity_flag_threshold',
-            'ai_auto_approve', 'ai_min_duration', 'ai_max_duration'
+            'ai_auto_approve', 'ai_min_duration', 'ai_max_duration',
+            'video_min_size_mb', 'video_max_size_mb'
         ];
         
         if (!in_array($key, $allowedKeys)) {
