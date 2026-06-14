@@ -139,7 +139,7 @@ class TranscriptionService
     /**
      * Call Groq Whisper API
      */
-    private function callGroqWhisper(string $audioPath, string $language = ''): array
+    private function callGroqWhisper(string $audioPath, string $language = '', int $retryCount = 0): array
     {
         $ch = curl_init('https://api.groq.com/openai/v1/audio/transcriptions');
 
@@ -151,9 +151,14 @@ class TranscriptionService
         ];
 
         // Add language hint if provided
+        // For Indian content, we'll try Hindi first if no language specified
         if (!empty($language)) {
             $postFields['language'] = $language;
         }
+        
+        // Add prompt to help with Hindi/Hinglish detection
+        // This helps Whisper understand the context
+        $postFields['prompt'] = 'This audio may contain Hindi, Hinglish (Hindi-English mix), or English. Transcribe all words accurately including any profanity or slang.';
 
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
@@ -174,7 +179,7 @@ class TranscriptionService
             // Rate limited - wait and retry once
             log_message('info', 'Groq rate limited, waiting 2 seconds...');
             sleep(2);
-            return $this->callGroqWhisper($audioPath, $language);
+            return $this->callGroqWhisper($audioPath, $language, $retryCount);
         }
 
         if ($httpCode !== 200 || !$response) {
@@ -186,11 +191,28 @@ class TranscriptionService
         if (!isset($data['text'])) {
             throw new \Exception('Invalid Groq API response: ' . substr($response, 0, 500));
         }
+        
+        $detectedLanguage = $data['language'] ?? 'unknown';
+        $transcribedText = $data['text'];
+        
+        log_message('info', "Groq transcription: language={$detectedLanguage}, text=" . substr($transcribedText, 0, 100));
+        
+        // If detected as English but text looks suspicious (very short, repetitive), 
+        // retry with Hindi language hint
+        if ($retryCount === 0 && empty($language) && $detectedLanguage === 'english') {
+            $wordCount = str_word_count($transcribedText);
+            $hasRepetition = preg_match('/(\b\w+\b)(\s+\1){2,}/i', $transcribedText); // Repeated words
+            
+            if ($wordCount < 10 || $hasRepetition) {
+                log_message('info', "Suspicious transcription (words={$wordCount}, repetition={$hasRepetition}), retrying with Hindi hint");
+                return $this->callGroqWhisper($audioPath, 'hi', $retryCount + 1);
+            }
+        }
 
         return [
             'success' => true,
-            'text' => $data['text'],
-            'language' => $data['language'] ?? 'unknown',
+            'text' => $transcribedText,
+            'language' => $detectedLanguage,
             'duration' => $data['duration'] ?? null,
             'segments' => $data['segments'] ?? [],
         ];

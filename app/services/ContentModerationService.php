@@ -113,19 +113,44 @@ class ContentModerationService
             return ['safe' => true, 'score' => 0, 'categories' => [], 'provider' => 'none'];
         }
 
+        log_message('info', "Text moderation request for: " . substr($text, 0, 200));
+
         // Try Azure first
         $result = $this->tryAzureText($text);
         if ($result !== false) {
+            log_message('info', "Azure text moderation: safe=" . ($result['safe'] ? 'true' : 'false') . ", score=" . $result['score']);
+            // Also run local check as a safety net for Hindi profanity
+            $localResult = $this->localTextCheck($text);
+            if (!$localResult['safe'] && $localResult['score'] > $result['score']) {
+                log_message('warning', "Local wordlist caught profanity Azure missed: " . implode(', ', $localResult['matched_words'] ?? []));
+                $result['local_override'] = true;
+                $result['safe'] = false;
+                $result['score'] = max($result['score'], $localResult['score']);
+                $result['categories'] = array_unique(array_merge($result['categories'], $localResult['categories']));
+                $result['matched_words'] = $localResult['matched_words'] ?? [];
+            }
             return $result;
         }
 
         // Fallback to OpenAI
         $result = $this->tryOpenAIText($text);
         if ($result !== false) {
+            log_message('info', "OpenAI text moderation: safe=" . ($result['safe'] ? 'true' : 'false') . ", score=" . $result['score']);
+            // Also run local check as a safety net
+            $localResult = $this->localTextCheck($text);
+            if (!$localResult['safe'] && $localResult['score'] > $result['score']) {
+                log_message('warning', "Local wordlist caught profanity OpenAI missed: " . implode(', ', $localResult['matched_words'] ?? []));
+                $result['local_override'] = true;
+                $result['safe'] = false;
+                $result['score'] = max($result['score'], $localResult['score']);
+                $result['categories'] = array_unique(array_merge($result['categories'], $localResult['categories']));
+                $result['matched_words'] = $localResult['matched_words'] ?? [];
+            }
             return $result;
         }
 
         // Last resort: local wordlist
+        log_message('info', "Using local wordlist for text moderation");
         return $this->localTextCheck($text);
     }
 
@@ -342,24 +367,56 @@ class ContentModerationService
      */
     private function localTextCheck(string $text): array
     {
+        // Comprehensive Hindi/Hinglish profanity list with common variations/misspellings
         $bannedWords = [
-            'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'damn', 'cunt',
-            'bhenchod', 'madarchod', 'chutiya', 'gaand', 'lund', 'randi',
-            'behenchod', 'mc', 'bc', 'bhosdike', 'harami', 'kutte', 'kamina',
-            'saala', 'chod', 'maa ki', 'baap ki',
-            'kill', 'murder', 'terrorist', 'bomb', 'attack', 'rape'
+            // English profanity
+            'fuck', 'fucking', 'fucker', 'fucked', 'shit', 'bitch', 'asshole', 'bastard', 'damn', 'cunt', 'dick', 'penis', 'vagina', 'pussy',
+            
+            // Hindi/Hinglish profanity (various spellings)
+            'madarchod', 'madarchodd', 'madarchot', 'maderchod', 'maderchot', 'mc',
+            'bhenchod', 'behenchod', 'banchod', 'benchod', 'bhenchot', 'bc',
+            'chutiya', 'chutiye', 'chutia', 'chutiyo', 'choot', 'chut',
+            'gaand', 'gand', 'gaandu', 'gandu',
+            'lund', 'lauda', 'loda', 'lavda', 'lawda',
+            'randi', 'raand', 'rand',
+            'bhosdike', 'bsdk', 'bhosdiwale', 'bhosdika',
+            'harami', 'haramkhor', 'haram',
+            'kutte', 'kutta', 'kutiya', 'kutia',
+            'kamina', 'kamine', 'kameena', 'kameene',
+            'saala', 'sala', 'saale', 'sale',
+            'chod', 'choda', 'chodi', 'chodna',
+            'maa ki', 'maaki', 'teri maa', 'teri ma',
+            'baap ki', 'baapki', 'tera baap',
+            'jhaat', 'jhat', 'jhatu',
+            'tatte', 'tatti', 'tatte',
+            'ullu', 'gadha', 'gadhe',
+            
+            // Tamil profanity
+            'thevdiya', 'thevidiya', 'otha', 'punda', 'pundai', 'sunni', 'thayoli', 'oombu',
+            
+            // Telugu profanity  
+            'lanja', 'lanjakodaka', 'pooka', 'modda', 'dengey', 'gudda',
+            
+            // Violence/hate
+            'kill', 'murder', 'terrorist', 'bomb', 'attack', 'rape', 'suicide'
         ];
 
         $lower = strtolower($text);
+        // Remove common separators that might be used to evade detection
+        $normalized = preg_replace('/[\s\-_\.]+/', '', $lower);
+        
         $found = [];
 
         foreach ($bannedWords as $word) {
-            if (str_contains($lower, $word)) {
+            // Check both original text and normalized version
+            if (str_contains($lower, $word) || str_contains($normalized, $word)) {
                 $found[] = $word;
             }
         }
 
-        $score = min(1.0, count($found) * 0.3);
+        $score = min(1.0, count($found) * 0.4); // Increased weight per word
+
+        log_message('info', "Local profanity check: found " . count($found) . " matches: " . implode(', ', $found));
 
         return [
             'safe' => empty($found),
