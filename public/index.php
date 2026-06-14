@@ -17,6 +17,58 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Serve uploaded files (uploads folder is outside public)
+if (preg_match('/^uploads\/(.+)$/', $uri, $matches)) {
+    $filename = basename($matches[1]); // Sanitize - only filename, no paths
+    $filePath = UPLOAD_PATH . '/' . $filename;
+    
+    if (file_exists($filePath) && is_file($filePath)) {
+        // Get MIME type
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'mp4' => 'video/mp4',
+            'webm' => 'video/webm',
+            'mov' => 'video/quicktime',
+            'avi' => 'video/x-msvideo',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+        ];
+        $mime = $mimeTypes[$ext] ?? 'application/octet-stream';
+        
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . filesize($filePath));
+        header('Accept-Ranges: bytes');
+        header('Cache-Control: public, max-age=86400');
+        
+        // Support range requests for video seeking
+        if (isset($_SERVER['HTTP_RANGE'])) {
+            $size = filesize($filePath);
+            $range = $_SERVER['HTTP_RANGE'];
+            preg_match('/bytes=(\d+)-(\d*)/', $range, $matches);
+            $start = intval($matches[1]);
+            $end = $matches[2] !== '' ? intval($matches[2]) : $size - 1;
+            
+            header('HTTP/1.1 206 Partial Content');
+            header("Content-Range: bytes $start-$end/$size");
+            header('Content-Length: ' . ($end - $start + 1));
+            
+            $fp = fopen($filePath, 'rb');
+            fseek($fp, $start);
+            echo fread($fp, $end - $start + 1);
+            fclose($fp);
+        } else {
+            readfile($filePath);
+        }
+        exit;
+    } else {
+        http_response_code(404);
+        echo 'File not found';
+        exit;
+    }
+}
+
 // Debug routing - log every request
 debug_log("=== ROUTER: URI='$uri' METHOD='$method' ===", 'ROUTER');
 
