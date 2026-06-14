@@ -64,16 +64,16 @@ class YouTubeService
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            log_message('error', "Failed to get YouTube access token for video {$videoId}");
+            log_message('error', "Failed to get YouTube access token for video {$videoId}. Check YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, and YOUTUBE_REFRESH_TOKEN.");
             $this->videoModel->updateYoutubeStatus($videoId, 'failed');
-            return null;
+            return ['error' => 'Failed to get YouTube access token. Check OAuth credentials (Client ID, Client Secret, Refresh Token).'];
         }
 
         $filePath = UPLOAD_PATH . '/' . $video['file_path'];
         if (!file_exists($filePath)) {
             log_message('error', "Video file not found: {$filePath}");
             $this->videoModel->updateYoutubeStatus($videoId, 'failed');
-            return null;
+            return ['error' => "Video file not found on server: {$video['file_path']}"];
         }
 
         $metadata = [
@@ -118,9 +118,22 @@ class YouTubeService
             }
         }
 
-        log_message('error', "YouTube upload failed for video {$videoId}: " . ($response ?: 'Unknown error'));
+        // Parse error response from YouTube API
+        $errorMsg = 'Unknown error';
+        if ($response) {
+            $data = json_decode($response, true);
+            if (isset($data['error']['message'])) {
+                $errorMsg = $data['error']['message'];
+            } elseif (isset($data['error'])) {
+                $errorMsg = is_string($data['error']) ? $data['error'] : json_encode($data['error']);
+            } else {
+                $errorMsg = substr($response, 0, 200);
+            }
+        }
+
+        log_message('error', "YouTube upload failed for video {$videoId} (HTTP {$httpCode}): " . $errorMsg);
         $this->videoModel->updateYoutubeStatus($videoId, 'failed');
-        return null;
+        return ['error' => "YouTube API error (HTTP {$httpCode}): {$errorMsg}"];
     }
 
     public function syncStats(): void
@@ -168,7 +181,15 @@ class YouTubeService
 
     private function getAccessToken(): ?string
     {
-        if (empty($this->refreshToken)) return null;
+        if (empty($this->refreshToken)) {
+            log_message('error', 'YouTube refresh token is empty');
+            return null;
+        }
+        
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            log_message('error', 'YouTube client ID or client secret is empty');
+            return null;
+        }
 
         $ch = curl_init('https://oauth2.googleapis.com/token');
         curl_setopt_array($ch, [
@@ -184,10 +205,21 @@ class YouTubeService
         ]);
 
         $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        if (!$response) return null;
+        
+        if (!$response) {
+            log_message('error', 'YouTube OAuth request failed - no response');
+            return null;
+        }
 
         $data = json_decode($response, true);
+        
+        if (isset($data['error'])) {
+            log_message('error', 'YouTube OAuth error: ' . ($data['error_description'] ?? $data['error']));
+            return null;
+        }
+        
         return $data['access_token'] ?? null;
     }
 
