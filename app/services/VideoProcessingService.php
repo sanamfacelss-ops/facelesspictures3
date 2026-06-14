@@ -147,16 +147,23 @@ class VideoProcessingService
                 );
             }
             
-            // Flag if score is above threshold OR if any concerning categories detected
-            $concerningCategories = ['violence', 'sexual', 'hate', 'selfharm', 'self-harm', 'nudity', 'gore', 'nsfw'];
-            $hasConcerningCategory = !empty(array_intersect(array_map('strtolower', $nsfwResult['categories']), $concerningCategories));
+            // Flag if score is above threshold OR if any SERIOUS concerning categories detected
+            // "sexual" at low scores is usually just romantic content - only flag if score >= 0.5
+            $seriousCategories = ['violence', 'hate', 'selfharm', 'self-harm', 'nudity', 'gore', 'nsfw'];
+            $hasSeriousCategory = !empty(array_intersect(array_map('strtolower', $nsfwResult['categories']), $seriousCategories));
             
-            if ($nsfwResult['max_score'] >= $this->nsfwFlagThreshold || $hasConcerningCategory) {
-                $deduction = $hasConcerningCategory ? max(20, (int)($nsfwResult['max_score'] * 100 * 0.5)) : 30;
+            // Sexual only counts if score is high enough (>50%) - romantic content often triggers low sexual scores
+            $hasSexualConcern = in_array('sexual', array_map('strtolower', $nsfwResult['categories'])) && $nsfwResult['max_score'] >= 0.5;
+            
+            if ($nsfwResult['max_score'] >= $this->nsfwFlagThreshold || $hasSeriousCategory || $hasSexualConcern) {
+                $deduction = ($hasSeriousCategory || $hasSexualConcern) ? max(20, (int)($nsfwResult['max_score'] * 100 * 0.5)) : 30;
                 $score -= $deduction;
                 $flags[] = 'nsfw_warning';
                 $feedback[] = "Visual content flagged: " . implode(', ', $nsfwResult['categories']) . " (score: " . round($nsfwResult['max_score'] * 100) . "%)";
                 log_message('info', "Video {$videoId} flagged for visual content: categories=" . implode(',', $nsfwResult['categories']) . ", score=" . $nsfwResult['max_score']);
+            } else if (!empty($nsfwResult['categories'])) {
+                // Minor categories detected but not serious - just add feedback without flagging
+                $feedback[] = "Note: " . implode(', ', $nsfwResult['categories']) . " detected at low level (" . round($nsfwResult['max_score'] * 100) . "%) - within acceptable range";
             }
 
             // Step 4: Transcribe audio
@@ -230,10 +237,20 @@ class VideoProcessingService
                     // If non-English but clean transcript and no profanity → auto-approve (no flag)
                     
                     // Also check Azure/OpenAI result for any flags
+                    // BUT ignore "sexual" category at low scores for non-English - often triggers on romantic content
                     if (!$textResult['safe'] && $textResult['score'] >= $this->profanityFlagThreshold) {
-                        $score -= 20;
-                        $flags[] = 'content_warning';
-                        $feedback[] = "Content flagged by AI: " . implode(', ', $textResult['categories']);
+                        // Filter out "sexual" category if it's the only one and score is low
+                        $categories = $textResult['categories'] ?? [];
+                        $nonSexualCategories = array_filter($categories, fn($c) => strtolower($c) !== 'sexual');
+                        
+                        if (!empty($nonSexualCategories) || $textResult['score'] >= 0.5) {
+                            $score -= 20;
+                            $flags[] = 'content_warning';
+                            $feedback[] = "Content flagged by AI: " . implode(', ', $textResult['categories']);
+                        } else {
+                            // Only sexual at low score - just note it, don't flag
+                            $feedback[] = "Note: Romantic/mild content detected (" . round($textResult['score'] * 100) . "%) - within acceptable range";
+                        }
                     }
                 }
             }
@@ -384,75 +401,54 @@ class VideoProcessingService
     private function checkHindiProfanity(string $text): bool
     {
         $lower = strtolower($text);
-        $normalized = preg_replace('/[\s\-_\.]+/', '', $lower);  // Remove spaces/separators
         
-        // Comprehensive list of Hindi gaalis and variations
-        $gaalis = [
-            // Madarchod variations
+        // Strong gaalis - always flag if found anywhere (even as substring)
+        $strongGaalis = [
             'madarchod', 'maderchod', 'madarchodd', 'madarchot', 'motherchod',
-            'madar', 'mc', 'machod', 'maachod', 'maadarchodd',
-            
-            // Bhenchod variations  
-            'bhenchod', 'behenchod', 'banchod', 'benchod', 'bhenchot',
-            'behen', 'bc', 'bhnchod', 'bahinchod',
-            
-            // Chutiya variations
-            'chutiya', 'chutiye', 'chutia', 'chutiyo', 'choot', 'chut',
-            'chootiya', 'chutiyapa', 'chutiyap',
-            
-            // Gaand/Gandu
-            'gaand', 'gand', 'gaandu', 'gandu', 'gaandmein', 'gandmein',
-            
-            // Lund/Lauda
-            'lund', 'lauda', 'loda', 'lavda', 'lawda', 'lodu', 'laudu',
-            
-            // Bhosdike
-            'bhosdike', 'bsdk', 'bhosdiwale', 'bhosdika', 'bosdi', 'bhosd',
-            
-            // Randi
-            'randi', 'raand', 'rand', 'randwa', 'randikhana',
-            
-            // Other common ones
-            'harami', 'haramkhor', 'haram', 'haramzada', 'haramzade',
-            'kutte', 'kutta', 'kutiya', 'kutia', 'kutti',
-            'kamina', 'kamine', 'kameena', 'kameene',
-            'saala', 'sala', 'saale', 'sale', 'sali',
-            'jhaat', 'jhat', 'jhatu', 'jhaant',
-            'tatti', 'tatte', 'tattu',
-            'ullu', 'gadha', 'gadhe',
-            'chod', 'choda', 'chodi', 'chodna', 'chodu',
-            'maaiki', 'maaki', 'teri maa', 'terima',
-            
-            // Tamil gaalis
-            'thevdiya', 'thevidiya', 'otha', 'punda', 'pundai', 'sunni', 'thayoli', 'oombu',
-            
-            // Telugu gaalis
-            'lanja', 'lanjakodaka', 'pooka', 'modda', 'dengey', 'gudda',
-            
-            // Phonetic patterns that might appear in garbage transcripts
-            'madr', 'bhenc', 'chuti', 'gandu', 'loda', 'bhosdi', 'rand',
+            'bhenchod', 'behenchod', 'banchod', 'benchod', 'bhenchot', 'bahinchod',
+            'chutiya', 'chutiye', 'chutia', 'chutiyo', 'chootiya', 'chutiyapa',
+            'gaandu', 'gandu',
+            'bhosdike', 'bsdk', 'bhosdiwale', 'bhosdika',
+            'randi', 'randikhana',
+            'harami', 'haramkhor', 'haramzada', 'haramzade',
+            'lanjakodaka',
+            'thevdiya', 'thevidiya', 'thayoli',
         ];
         
-        // Check direct matches
-        foreach ($gaalis as $gaali) {
-            if (str_contains($lower, $gaali) || str_contains($normalized, $gaali)) {
-                log_message('info', "Hindi profanity detected: '{$gaali}' in transcript");
+        foreach ($strongGaalis as $gaali) {
+            if (str_contains($lower, $gaali)) {
+                log_message('info', "Hindi profanity detected (strong): '{$gaali}' in transcript");
+                return true;
+            }
+        }
+        
+        // Weaker words - only match as whole words (with word boundaries)
+        // These can appear in normal English words (e.g., "sale" in "wholesale", "rand" in "random")
+        $weakGaalis = [
+            'madar', 'behen', 'choot', 'chut', 'gaand', 'gand', 'lund', 'lauda', 'loda',
+            'lavda', 'lawda', 'bosdi', 'bhosd', 'raand', 'rand', 'haram',
+            'kutte', 'kutta', 'kutiya', 'kutia', 'kutti',
+            'kamina', 'kamine', 'kameena', 'kameene',
+            'saala', 'sala', 'saale', 'sale', 'sali',  // Common false positives!
+            'chod', 'choda', 'chodi', 'chodna', 'chodu',
+            'lanja', 'modda', 'gudda', 'punda', 'sunni',
+        ];
+        
+        foreach ($weakGaalis as $gaali) {
+            // Use word boundary regex to avoid false positives
+            if (preg_match('/\b' . preg_quote($gaali, '/') . '\b/i', $text)) {
+                log_message('info', "Hindi profanity detected (word boundary): '{$gaali}' in transcript");
                 return true;
             }
         }
         
         // Check phonetic patterns (Whisper might transcribe "madarchod" as "mother chord" etc.)
         $patterns = [
-            '/mother\s*ch[oa]/i',           // mother chod/chord
-            '/maa\s*ch[oa]/i',              // maa chod
-            '/sister\s*f[u]+ck/i',          // sister fuck (bhenchod literal)
-            '/behen.*ch[oa]/i',             // behen chod
-            '/bhen.*ch[oa]/i',              // bhen chod
-            '/choo+t/i',                     // choot
-            '/g[au]+nd[u]?/i',               // gaandu/gandu
-            '/l[oa]+d[ua]/i',                // loda/lauda
-            '/r[au]nd[i]?/i',                // randi
-            '/b[ho]+sd/i',                   // bhosd...
+            '/\bmother\s*ch[oa]d/i',          // mother chod/chord
+            '/\bmaa\s*ch[oa]d/i',             // maa chod
+            '/\bsister\s*f[u]+ck/i',          // sister fuck (bhenchod literal)
+            '/\bbehen.*chod/i',               // behen chod
+            '/\bbhen.*chod/i',                // bhen chod
         ];
         
         foreach ($patterns as $pattern) {
