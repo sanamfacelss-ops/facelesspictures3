@@ -400,6 +400,31 @@ class ContentModerationService
             // Violence/hate
             'kill', 'murder', 'terrorist', 'bomb', 'attack', 'rape', 'suicide'
         ];
+        
+        // Phonetic/fuzzy patterns - common mistranscriptions of Hindi profanity
+        $phoneticPatterns = [
+            // "madarchod" often becomes "mother" + variations
+            '/\bmother\s*ch[aou]+[dt]?\b/i' => 'madarchod',
+            '/\bmadar\s*ch[aou]+[dt]?\b/i' => 'madarchod',
+            '/\bmader\s*ch[aou]+[dt]?\b/i' => 'madarchod',
+            '/\bma+[dt]ar?\s*cho+[dt]?\b/i' => 'madarchod',
+            // "le madarchod" often transcribed with "la" or "lay" or "let"
+            '/\b(le|la|lay|let)[\'s]?\s*(ma|mo).*ch[aou]+[dt]?\b/i' => 'le madarchod',
+            // "bhenchod" patterns
+            '/\bben\s*ch[aou]+[dt]?\b/i' => 'bhenchod',
+            '/\bsister\s*f[u]+ck/i' => 'bhenchod',
+            // "chutiya" patterns  
+            '/\bchoo+t[iy]+[ae]?\b/i' => 'chutiya',
+            // "gaandu/gandu" patterns
+            '/\bg[au]+n?d[u]+\b/i' => 'gandu',
+            // "bhosdike" patterns
+            '/\bb[ho]+s[dt]i?k[ea]?\b/i' => 'bhosdike',
+            // "randi" patterns
+            '/\br[au]n?di\b/i' => 'randi',
+            // "lund/lauda" patterns
+            '/\bl[au]+n?d[a]?\b/i' => 'lund',
+            '/\bl[ao]+d[a]+\b/i' => 'lauda',
+        ];
 
         $lower = strtolower($text);
         // Remove common separators that might be used to evade detection
@@ -407,10 +432,19 @@ class ContentModerationService
         
         $found = [];
 
+        // Direct word matching
         foreach ($bannedWords as $word) {
             // Check both original text and normalized version
             if (str_contains($lower, $word) || str_contains($normalized, $word)) {
                 $found[] = $word;
+            }
+        }
+        
+        // Phonetic/fuzzy pattern matching
+        foreach ($phoneticPatterns as $pattern => $represents) {
+            if (preg_match($pattern, $text)) {
+                $found[] = $represents . ' (phonetic)';
+                log_message('info', "Phonetic profanity match: '{$represents}' via pattern in text");
             }
         }
 

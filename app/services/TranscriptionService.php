@@ -138,30 +138,30 @@ class TranscriptionService
 
     /**
      * Call Groq Whisper API
+     * 
+     * @param string $audioPath Path to audio file
+     * @param string $language Optional language hint
+     * @param string $model Which Whisper model to use
+     * @param int $retryCount Retry counter for bad transcriptions
      */
-    private function callGroqWhisper(string $audioPath, string $language = '', int $retryCount = 0): array
+    private function callGroqWhisper(string $audioPath, string $language = '', string $model = 'whisper-large-v3', int $retryCount = 0): array
     {
         $ch = curl_init('https://api.groq.com/openai/v1/audio/transcriptions');
 
         $postFields = [
             'file' => new \CURLFile($audioPath, 'audio/mpeg', 'audio.mp3'),
-            'model' => 'whisper-large-v3-turbo',
+            'model' => $model,
             'response_format' => 'verbose_json',
             'temperature' => 0,
         ];
 
-        // Default to Hindi for Indian content platform
-        // This significantly improves Hindi/Hinglish detection
-        if (empty($language) && $retryCount === 0) {
-            $language = 'hi'; // Default to Hindi
-        }
-        
+        // Only set language if explicitly provided - otherwise let Whisper auto-detect
         if (!empty($language)) {
             $postFields['language'] = $language;
         }
         
-        // Add prompt to help with Hindi/Hinglish detection and profanity
-        $postFields['prompt'] = 'This audio contains Hindi, Hinglish (Hindi-English mix), or English. Transcribe exactly what is said including any gaali, profanity or slang like madarchod, bhenchod, chutiya. Do not censor.';
+        // Prompt helps with context but doesn't force language
+        $postFields['prompt'] = 'Transcribe exactly what is said. Include any profanity, slang, or gaali words accurately without censoring.';
 
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
@@ -181,7 +181,7 @@ class TranscriptionService
         if ($httpCode === 429) {
             log_message('info', 'Groq rate limited, waiting 2 seconds...');
             sleep(2);
-            return $this->callGroqWhisper($audioPath, $language, $retryCount);
+            return $this->callGroqWhisper($audioPath, $language, $model, $retryCount);
         }
 
         if ($httpCode !== 200 || !$response) {
@@ -197,29 +197,25 @@ class TranscriptionService
         $detectedLanguage = $data['language'] ?? 'unknown';
         $transcribedText = trim($data['text']);
         
-        log_message('info', "Groq transcription (lang={$language}): detected={$detectedLanguage}, text=" . substr($transcribedText, 0, 200));
-        
-        // If result looks like garbage (too short, repetitive patterns, no real words), retry with English
-        if ($retryCount === 0 && $language === 'hi') {
-            $wordCount = str_word_count($transcribedText);
-            // Check for repetitive patterns like "tons of the tons of the"
-            $words = preg_split('/\s+/', strtolower($transcribedText));
-            $uniqueWords = array_unique($words);
-            $repetitionRatio = count($words) > 0 ? count($uniqueWords) / count($words) : 1;
+        log_message('info', "Groq transcription (model={$model}): detected_lang={$detectedLanguage}, text=" . substr($transcribedText, 0, 200));
+
+        // Check for suspicious/garbage transcription patterns
+        if ($retryCount < 2) {
+            $isSuspicious = $this->isGarbageTranscription($transcribedText);
             
-            // If very few unique words (high repetition) or very short, try English
-            if ($wordCount < 5 || $repetitionRatio < 0.5) {
-                log_message('info', "Suspicious Hindi transcription (words={$wordCount}, uniqueRatio={$repetitionRatio}), retrying with English");
-                $englishResult = $this->callGroqWhisper($audioPath, 'en', $retryCount + 1);
+            if ($isSuspicious) {
+                log_message('warning', "Suspicious transcription detected (model={$model}, retry={$retryCount}), trying different approach");
                 
-                // Return whichever has more unique content
-                $englishWords = preg_split('/\s+/', strtolower($englishResult['text']));
-                $englishUnique = count(array_unique($englishWords));
-                $hindiUnique = count($uniqueWords);
+                // First retry: try with Hindi hint (common case)
+                if ($retryCount === 0 && empty($language)) {
+                    log_message('info', "Retrying with Hindi language hint");
+                    return $this->callGroqWhisper($audioPath, 'hi', $model, $retryCount + 1);
+                }
                 
-                if ($englishUnique > $hindiUnique) {
-                    log_message('info', "English transcription better (unique: {$englishUnique} vs {$hindiUnique})");
-                    return $englishResult;
+                // Second retry: try turbo model if we're on the large model
+                if ($retryCount === 1 && $model === 'whisper-large-v3') {
+                    log_message('info', "Retrying with turbo model");
+                    return $this->callGroqWhisper($audioPath, '', 'whisper-large-v3-turbo', $retryCount + 1);
                 }
             }
         }
@@ -227,10 +223,94 @@ class TranscriptionService
         return [
             'success' => true,
             'text' => $transcribedText,
-            'language' => $detectedLanguage,
+            'language' => $this->normalizeLanguageName($detectedLanguage),
             'duration' => $data['duration'] ?? null,
             'segments' => $data['segments'] ?? [],
         ];
+    }
+    
+    /**
+     * Check if transcription looks like garbage/hallucination
+     */
+    private function isGarbageTranscription(string $text): bool
+    {
+        $text = strtolower(trim($text));
+        
+        // Empty or very short
+        if (strlen($text) < 3) {
+            return false; // Could be legitimate short audio
+        }
+        
+        // Check for repetitive patterns like "the the the" or "tons of the tons of the"
+        $words = preg_split('/\s+/', $text);
+        $wordCount = count($words);
+        
+        if ($wordCount >= 3) {
+            // Check for high repetition
+            $uniqueWords = array_unique($words);
+            $repetitionRatio = count($uniqueWords) / $wordCount;
+            
+            // If less than 40% unique words, it's likely garbage
+            if ($repetitionRatio < 0.4) {
+                log_message('info', "Garbage detection: high repetition ratio " . round($repetitionRatio, 2));
+                return true;
+            }
+        }
+        
+        // Check for common Whisper hallucination patterns
+        $hallucinations = [
+            'thanks for watching',
+            'subscribe to',
+            'like and subscribe',
+            'tons of the',
+            'the the the',
+            'silence',
+            '[music]',
+            '[applause]',
+        ];
+        
+        foreach ($hallucinations as $pattern) {
+            if (str_contains($text, $pattern)) {
+                log_message('info', "Garbage detection: hallucination pattern '{$pattern}'");
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Normalize language name to proper English name
+     */
+    private function normalizeLanguageName(string $code): string
+    {
+        $languages = [
+            'en' => 'English',
+            'english' => 'English',
+            'hi' => 'Hindi',
+            'hindi' => 'Hindi',
+            'ta' => 'Tamil',
+            'tamil' => 'Tamil',
+            'te' => 'Telugu',
+            'telugu' => 'Telugu',
+            'mr' => 'Marathi',
+            'marathi' => 'Marathi',
+            'bn' => 'Bengali',
+            'bengali' => 'Bengali',
+            'gu' => 'Gujarati',
+            'gujarati' => 'Gujarati',
+            'kn' => 'Kannada',
+            'kannada' => 'Kannada',
+            'ml' => 'Malayalam',
+            'malayalam' => 'Malayalam',
+            'pa' => 'Punjabi',
+            'punjabi' => 'Punjabi',
+            'ur' => 'Urdu',
+            'urdu' => 'Urdu',
+        ];
+        
+        $lower = strtolower($code);
+        return $languages[$lower] ?? ucfirst($code);
     }
 
     /**
