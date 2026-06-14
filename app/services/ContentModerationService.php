@@ -44,12 +44,12 @@ class ContentModerationService
             }
             // Fallback to settings table with env_ prefix
             try {
-                $stmt = $this->db->prepare("SELECT value FROM settings WHERE `key` = ?");
+                $stmt = $this->db->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
                 $stmt->execute(['env_' . $key]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                if (!empty($row['value'])) {
+                if (!empty($row['setting_value'])) {
                     log_message('debug', "ContentModerationService: Got {$key} from database");
-                    return $row['value'];
+                    return $row['setting_value'];
                 }
                 log_message('debug', "ContentModerationService: {$key} not found in database");
                 return '';

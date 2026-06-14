@@ -32,10 +32,10 @@ class TranscriptionService
         
         try {
             $db = \App\Config\Database::getConnection();
-            $stmt = $db->prepare("SELECT value FROM settings WHERE `key` = ?");
+            $stmt = $db->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
             $stmt->execute(['env_' . $key]);
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-            return $row['value'] ?? '';
+            return $row['setting_value'] ?? '';
         } catch (\Exception $e) {
             return '';
         }
