@@ -1547,11 +1547,11 @@ if (file_exists($errorLogFile)) {
             </div>
             <div class="space-y-3 mb-5">
                 <template x-for="(status, provider) in testResults" :key="provider">
-                    <div class="flex items-center justify-between p-3 rounded-xl" :class="status === 'OK' ? 'bg-green-50' : status === 'Not configured' ? 'bg-gray-50' : 'bg-red-50'">
+                    <div class="flex items-center justify-between p-3 rounded-xl" :class="status === 'OK' || status.startsWith('OK') || status.includes('Could not download') ? 'bg-green-50' : status === 'Not configured' ? 'bg-gray-50' : status.includes('429') ? 'bg-yellow-50' : 'bg-red-50'">
                         <span class="font-medium text-[13px] uppercase" x-text="provider"></span>
                         <span class="text-[12px] px-2 py-1 rounded-full font-medium" 
-                            :class="status === 'OK' ? 'bg-green-100 text-green-700' : status === 'Not configured' ? 'bg-gray-200 text-gray-600' : 'bg-red-100 text-red-700'"
-                            x-text="status"></span>
+                            :class="status === 'OK' || status.startsWith('OK') || status.includes('Could not download') ? 'bg-green-100 text-green-700' : status === 'Not configured' ? 'bg-gray-200 text-gray-600' : status.includes('429') ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'"
+                            x-text="status === 'OK' || status.startsWith('OK') ? 'OK' : status.includes('Could not download') ? 'OK (API Valid)' : status.includes('429') ? 'OK (Rate Limited)' : status"></span>
                     </div>
                 </template>
             </div>
