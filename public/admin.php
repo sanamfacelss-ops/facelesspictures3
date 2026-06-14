@@ -2128,7 +2128,7 @@ if (file_exists($errorLogFile)) {
                     const res = await fetch('/api/admin/ai/keys/update', { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        this.showToast('API keys updated! ' + (data.updated?.length || 0) + ' key(s) saved.');
+                        this.showToast('API keys saved! Refreshing...', 'success');
                         // Clear form
                         this.apiKeyForm = {
                             AZURE_CONTENT_SAFETY_ENDPOINT: '',
@@ -2141,14 +2141,10 @@ if (file_exists($errorLogFile)) {
                             FFMPEG_PATH: '',
                             FFPROBE_PATH: ''
                         };
-                        // Reload status after a short delay
+                        // Auto refresh after short delay
                         setTimeout(() => {
-                            this.loadAPIKeys();
-                            // Suggest page reload for provider status
-                            if (confirm('API keys saved. Refresh page to update provider status?')) {
-                                location.reload();
-                            }
-                        }, 500);
+                            location.reload();
+                        }, 1500);
                     } else {
                         this.showToast(data.error || 'Failed to save API keys', 'error');
                     }
