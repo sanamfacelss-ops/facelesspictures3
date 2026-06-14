@@ -902,12 +902,27 @@ class AdminController
             }
 
             // Debug: Check YouTube credentials before attempting upload
+            $settingsModel = new \App\Models\Settings();
+            $getKey = function($key) use ($settingsModel) {
+                $value = $_ENV[$key] ?? getenv($key) ?: '';
+                if (empty($value)) {
+                    try { $value = $settingsModel->get('env_' . $key) ?: ''; } catch (\Exception $e) {}
+                }
+                return $value;
+            };
+            
             $debugInfo = [];
-            $debugInfo['client_id'] = !empty($_ENV['YOUTUBE_CLIENT_ID']) ? 'SET (' . strlen($_ENV['YOUTUBE_CLIENT_ID']) . ' chars)' : 'MISSING';
-            $debugInfo['client_secret'] = !empty($_ENV['YOUTUBE_CLIENT_SECRET']) ? 'SET (' . strlen($_ENV['YOUTUBE_CLIENT_SECRET']) . ' chars)' : 'MISSING';
-            $debugInfo['refresh_token'] = !empty($_ENV['YOUTUBE_REFRESH_TOKEN']) ? 'SET (' . strlen($_ENV['YOUTUBE_REFRESH_TOKEN']) . ' chars)' : 'MISSING';
-            $debugInfo['api_key'] = !empty($_ENV['YOUTUBE_API_KEY']) ? 'SET' : 'MISSING';
-            $debugInfo['channel_id'] = !empty($_ENV['YOUTUBE_CHANNEL_ID']) ? 'SET' : 'MISSING';
+            $clientId = $getKey('YOUTUBE_CLIENT_ID');
+            $clientSecret = $getKey('YOUTUBE_CLIENT_SECRET');
+            $refreshToken = $getKey('YOUTUBE_REFRESH_TOKEN');
+            $apiKey = $getKey('YOUTUBE_API_KEY');
+            $channelId = $getKey('YOUTUBE_CHANNEL_ID');
+            
+            $debugInfo['client_id'] = !empty($clientId) ? 'SET (' . strlen($clientId) . ' chars)' : 'MISSING';
+            $debugInfo['client_secret'] = !empty($clientSecret) ? 'SET (' . strlen($clientSecret) . ' chars)' : 'MISSING';
+            $debugInfo['refresh_token'] = !empty($refreshToken) ? 'SET (' . strlen($refreshToken) . ' chars)' : 'MISSING';
+            $debugInfo['api_key'] = !empty($apiKey) ? 'SET (' . strlen($apiKey) . ' chars)' : 'MISSING';
+            $debugInfo['channel_id'] = !empty($channelId) ? 'SET (' . strlen($channelId) . ' chars)' : 'MISSING';
             
             debug_log("YouTube credentials check: " . json_encode($debugInfo), 'ADMIN');
 

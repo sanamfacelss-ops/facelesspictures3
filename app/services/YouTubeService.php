@@ -19,13 +19,45 @@ class YouTubeService
 
     public function __construct()
     {
-        $this->apiKey = $_ENV['YOUTUBE_API_KEY'] ?? '';
-        $this->clientId = $_ENV['YOUTUBE_CLIENT_ID'] ?? '';
-        $this->clientSecret = $_ENV['YOUTUBE_CLIENT_SECRET'] ?? '';
-        $this->refreshToken = $_ENV['YOUTUBE_REFRESH_TOKEN'] ?? '';
-        $this->channelId = $_ENV['YOUTUBE_CHANNEL_ID'] ?? '';
+        // Try environment variables first, then fall back to database settings
+        $settingsModel = new \App\Models\Settings();
+        
+        $this->apiKey = $this->getConfigValue('YOUTUBE_API_KEY', $settingsModel);
+        $this->clientId = $this->getConfigValue('YOUTUBE_CLIENT_ID', $settingsModel);
+        $this->clientSecret = $this->getConfigValue('YOUTUBE_CLIENT_SECRET', $settingsModel);
+        $this->refreshToken = $this->getConfigValue('YOUTUBE_REFRESH_TOKEN', $settingsModel);
+        $this->channelId = $this->getConfigValue('YOUTUBE_CHANNEL_ID', $settingsModel);
         $this->videoModel = new Video();
         $this->leaderboardModel = new Leaderboard();
+    }
+    
+    /**
+     * Get config value from environment or database
+     */
+    private function getConfigValue(string $key, $settingsModel): string
+    {
+        // Check $_ENV first
+        if (!empty($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+        
+        // Check getenv()
+        $envValue = getenv($key);
+        if (!empty($envValue)) {
+            return $envValue;
+        }
+        
+        // Check database settings (stored with env_ prefix)
+        try {
+            $dbValue = $settingsModel->get('env_' . $key);
+            if (!empty($dbValue)) {
+                return $dbValue;
+            }
+        } catch (\Exception $e) {
+            // Settings table might not exist
+        }
+        
+        return '';
     }
 
     public function uploadVideo(int $videoId): array|string|null
