@@ -26,13 +26,15 @@ class VideoProcessingService
     private string $ffprobePath;
     private string $uploadPath;
 
-    // Thresholds
-    private const MIN_DURATION = 0;       // seconds (0 = no minimum, set higher for production)
-    private const MAX_DURATION = 300;     // seconds (5 min)
-    private const NSFW_REJECT_THRESHOLD = 0.7;
-    private const NSFW_FLAG_THRESHOLD = 0.4;
-    private const PROFANITY_REJECT_THRESHOLD = 0.7;
-    private const PROFANITY_FLAG_THRESHOLD = 0.4;
+    // Dynamic thresholds (loaded from database settings)
+    private float $minDuration;
+    private float $maxDuration;
+    private float $nsfwRejectThreshold;
+    private float $nsfwFlagThreshold;
+    private float $profanityRejectThreshold;
+    private float $profanityFlagThreshold;
+    private float $approveThreshold;
+    private float $flagThreshold;
 
     public function __construct()
     {
@@ -45,6 +47,32 @@ class VideoProcessingService
         $this->ffmpegPath = $_ENV['FFMPEG_PATH'] ?? 'ffmpeg';
         $this->ffprobePath = $_ENV['FFPROBE_PATH'] ?? 'ffprobe';
         $this->uploadPath = UPLOAD_PATH;
+        
+        // Load thresholds from database settings
+        $this->loadThresholds();
+    }
+    
+    /**
+     * Load thresholds from database settings
+     */
+    private function loadThresholds(): void
+    {
+        $settingsModel = new \App\Models\Settings();
+        $aiSettings = $settingsModel->getAISettings();
+        
+        $this->minDuration = (float) ($aiSettings['ai_min_duration'] ?? 0);
+        $this->maxDuration = (float) ($aiSettings['ai_max_duration'] ?? 300);
+        $this->nsfwRejectThreshold = (float) ($aiSettings['ai_nsfw_reject_threshold'] ?? 0.7);
+        $this->nsfwFlagThreshold = (float) ($aiSettings['ai_nsfw_flag_threshold'] ?? 0.4);
+        $this->profanityRejectThreshold = (float) ($aiSettings['ai_profanity_reject_threshold'] ?? 0.7);
+        $this->profanityFlagThreshold = (float) ($aiSettings['ai_profanity_flag_threshold'] ?? 0.4);
+        $this->approveThreshold = (float) ($aiSettings['ai_approve_threshold'] ?? 70);
+        $this->flagThreshold = (float) ($aiSettings['ai_flag_threshold'] ?? 40);
+        
+        log_message('debug', sprintf(
+            "AI Thresholds loaded: minDuration=%.1f, maxDuration=%.1f, nsfwReject=%.2f, approveThreshold=%.0f",
+            $this->minDuration, $this->maxDuration, $this->nsfwRejectThreshold, $this->approveThreshold
+        ));
     }
 
     /**
@@ -86,12 +114,12 @@ class VideoProcessingService
             }
 
             // Check duration
-            if ($videoInfo['duration'] < self::MIN_DURATION) {
-                return $this->reject($videoId, "Video too short ({$videoInfo['duration']}s). Minimum is " . self::MIN_DURATION . " seconds.", $startTime);
+            if ($this->minDuration > 0 && $videoInfo['duration'] < $this->minDuration) {
+                return $this->reject($videoId, "Video too short ({$videoInfo['duration']}s). Minimum is {$this->minDuration} seconds.", $startTime);
             }
-            if ($videoInfo['duration'] > self::MAX_DURATION) {
+            if ($videoInfo['duration'] > $this->maxDuration) {
                 $score -= 10;
-                $feedback[] = "Video exceeds recommended length ({$videoInfo['duration']}s > " . self::MAX_DURATION . "s)";
+                $feedback[] = "Video exceeds recommended length ({$videoInfo['duration']}s > {$this->maxDuration}s)";
             }
 
             // Check audio
@@ -111,14 +139,14 @@ class VideoProcessingService
             // Cleanup frames
             $this->cleanupFrames($framesDir);
             
-            if ($nsfwResult['max_score'] >= self::NSFW_REJECT_THRESHOLD) {
+            if ($nsfwResult['max_score'] >= $this->nsfwRejectThreshold) {
                 return $this->reject($videoId, 
                     "Content flagged as inappropriate (NSFW score: " . round($nsfwResult['max_score'], 2) . "). " .
                     "Categories: " . implode(', ', $nsfwResult['categories']), 
                     $startTime
                 );
             }
-            if ($nsfwResult['max_score'] >= self::NSFW_FLAG_THRESHOLD) {
+            if ($nsfwResult['max_score'] >= $this->nsfwFlagThreshold) {
                 $score -= 30;
                 $flags[] = 'nsfw_warning';
                 $feedback[] = "Visual content requires review (score: " . round($nsfwResult['max_score'], 2) . ")";
@@ -140,13 +168,13 @@ class VideoProcessingService
             if (!empty($transcript)) {
                 $textResult = $this->moderationService->moderateText($transcript);
                 
-                if (!$textResult['safe'] && $textResult['score'] >= self::PROFANITY_REJECT_THRESHOLD) {
+                if (!$textResult['safe'] && $textResult['score'] >= $this->profanityRejectThreshold) {
                     return $this->reject($videoId,
                         "Audio content contains prohibited content. Categories: " . implode(', ', $textResult['categories']),
                         $startTime
                     );
                 }
-                if (!$textResult['safe'] && $textResult['score'] >= self::PROFANITY_FLAG_THRESHOLD) {
+                if (!$textResult['safe'] && $textResult['score'] >= $this->profanityFlagThreshold) {
                     $score -= 30;
                     $flags[] = 'profanity_warning';
                     $feedback[] = "Audio content flagged for review. Categories: " . implode(', ', $textResult['categories']);
@@ -157,8 +185,8 @@ class VideoProcessingService
             $score = max(0, min(100, $score));
             $processingTime = (int)((microtime(true) - $startTime) * 1000);
 
-            // Determine final status
-            if ($score >= 70 && empty($flags)) {
+            // Determine final status - use configurable thresholds
+            if ($score >= $this->approveThreshold && empty($flags)) {
                 return $this->approve($videoId, $score, $feedback, $flags, $transcript, $nsfwResult, $processingTime);
             } else {
                 return $this->flag($videoId, $score, $feedback, $flags, $transcript, $nsfwResult, $processingTime);
