@@ -471,7 +471,7 @@ class AdminController
     }
 
     /**
-     * Update API keys in .env file
+     * Update API keys in .env file or environment
      */
     public function updateAPIKeys(): void
     {
@@ -479,12 +479,9 @@ class AdminController
         
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
+        // Check for .env file - if not exists, store in database settings instead
         $envFile = BASE_PATH . '/.env';
-        if (!file_exists($envFile)) {
-            http_response_code(500);
-            echo json_encode(['error' => '.env file not found']);
-            return;
-        }
+        $useEnvFile = file_exists($envFile) && is_writable($envFile);
 
         // Allowed keys that can be updated
         $allowedKeys = [
@@ -513,35 +510,45 @@ class AdminController
         }
 
         try {
-            $content = file_get_contents($envFile);
-            
-            foreach ($updates as $key => $value) {
-                // Escape special characters for .env
-                $escapedValue = $value;
-                if (preg_match('/[\s#]/', $value)) {
-                    $escapedValue = '"' . addslashes($value) . '"';
-                }
+            if ($useEnvFile) {
+                // Update .env file
+                $content = file_get_contents($envFile);
                 
-                // Check if key exists and update, or add new
-                if (preg_match('/^' . preg_quote($key, '/') . '=.*/m', $content)) {
-                    $content = preg_replace(
-                        '/^' . preg_quote($key, '/') . '=.*/m',
-                        $key . '=' . $escapedValue,
-                        $content
-                    );
-                } else {
-                    // Add new key at the end
-                    $content = rtrim($content) . "\n" . $key . '=' . $escapedValue . "\n";
+                foreach ($updates as $key => $value) {
+                    // Escape special characters for .env
+                    $escapedValue = $value;
+                    if (preg_match('/[\s#]/', $value)) {
+                        $escapedValue = '"' . addslashes($value) . '"';
+                    }
+                    
+                    // Check if key exists and update, or add new
+                    if (preg_match('/^' . preg_quote($key, '/') . '=.*/m', $content)) {
+                        $content = preg_replace(
+                            '/^' . preg_quote($key, '/') . '=.*/m',
+                            $key . '=' . $escapedValue,
+                            $content
+                        );
+                    } else {
+                        // Add new key at the end
+                        $content = rtrim($content) . "\n" . $key . '=' . $escapedValue . "\n";
+                    }
+                }
+
+                file_put_contents($envFile, $content);
+            } else {
+                // No .env file - store in database settings table
+                $settingsModel = new \App\Models\Settings();
+                foreach ($updates as $key => $value) {
+                    $settingsModel->set('env_' . $key, $value, 'api_keys', "API Key: $key");
                 }
             }
-
-            file_put_contents($envFile, $content);
             
             debug_log("Admin updated API keys: " . implode(', ', array_keys($updates)), 'ADMIN');
             echo json_encode([
                 'success' => true, 
-                'message' => 'API keys updated successfully. Refresh page to see status changes.',
-                'updated' => array_keys($updates)
+                'message' => 'API keys updated successfully.' . (!$useEnvFile ? ' (Stored in database - add to hosting env vars for full effect)' : ''),
+                'updated' => array_keys($updates),
+                'storage' => $useEnvFile ? 'env_file' : 'database'
             ]);
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_UPDATE_API_KEYS');
@@ -559,20 +566,48 @@ class AdminController
         
         if (!$this->requireAdmin()) return;
 
-        $keys = [
-            'AZURE_CONTENT_SAFETY_ENDPOINT' => $_ENV['AZURE_CONTENT_SAFETY_ENDPOINT'] ?? '',
-            'AZURE_CONTENT_SAFETY_KEY' => $_ENV['AZURE_CONTENT_SAFETY_KEY'] ?? '',
-            'OPENAI_API_KEY' => $_ENV['OPENAI_API_KEY'] ?? '',
-            'SIGHTENGINE_API_USER' => $_ENV['SIGHTENGINE_API_USER'] ?? '',
-            'SIGHTENGINE_API_SECRET' => $_ENV['SIGHTENGINE_API_SECRET'] ?? '',
-            'RAPIDAPI_KEY' => $_ENV['RAPIDAPI_KEY'] ?? '',
-            'GROQ_API_KEY' => $_ENV['GROQ_API_KEY'] ?? '',
-            'FFMPEG_PATH' => $_ENV['FFMPEG_PATH'] ?? 'ffmpeg',
-            'FFPROBE_PATH' => $_ENV['FFPROBE_PATH'] ?? 'ffprobe',
+        // Try to get from environment variables first, then from database settings
+        $settingsModel = new \App\Models\Settings();
+        
+        $keyNames = [
+            'AZURE_CONTENT_SAFETY_ENDPOINT',
+            'AZURE_CONTENT_SAFETY_KEY',
+            'OPENAI_API_KEY',
+            'SIGHTENGINE_API_USER',
+            'SIGHTENGINE_API_SECRET',
+            'RAPIDAPI_KEY',
+            'GROQ_API_KEY',
+            'FFMPEG_PATH',
+            'FFPROBE_PATH',
+        ];
+        
+        $defaults = [
+            'FFMPEG_PATH' => 'ffmpeg',
+            'FFPROBE_PATH' => 'ffprobe',
         ];
 
         $status = [];
-        foreach ($keys as $key => $value) {
+        foreach ($keyNames as $key) {
+            // Check environment variable first
+            $value = $_ENV[$key] ?? getenv($key) ?: '';
+            
+            // If not in env, check database
+            if (empty($value)) {
+                try {
+                    $dbValue = $settingsModel->get('env_' . $key);
+                    if ($dbValue) {
+                        $value = $dbValue;
+                    }
+                } catch (\Exception $e) {
+                    // Settings table might not exist yet
+                }
+            }
+            
+            // Apply defaults
+            if (empty($value) && isset($defaults[$key])) {
+                $value = $defaults[$key];
+            }
+            
             $status[$key] = [
                 'configured' => !empty($value),
                 'masked' => !empty($value) ? $this->maskValue($value, $key) : '',
