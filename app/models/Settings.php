@@ -21,10 +21,31 @@ class Settings
      */
     public function get(string $key, ?string $default = null): ?string
     {
-        $stmt = $this->db->prepare("SELECT setting_value FROM settings WHERE setting_key = ? LIMIT 1");
-        $stmt->execute([$key]);
-        $result = $stmt->fetch();
-        return $result ? $result['setting_value'] : $default;
+        // Try with setting_key column first (new schema)
+        try {
+            $stmt = $this->db->prepare("SELECT setting_value FROM settings WHERE setting_key = ? LIMIT 1");
+            $stmt->execute([$key]);
+            $result = $stmt->fetch();
+            if ($result) {
+                return $result['setting_value'];
+            }
+        } catch (\PDOException $e) {
+            // Column might not exist, try old schema
+        }
+        
+        // Fallback to key/value columns (old schema)
+        try {
+            $stmt = $this->db->prepare("SELECT value FROM settings WHERE `key` = ? LIMIT 1");
+            $stmt->execute([$key]);
+            $result = $stmt->fetch();
+            if ($result) {
+                return $result['value'];
+            }
+        } catch (\PDOException $e) {
+            // Neither schema worked
+        }
+        
+        return $default;
     }
 
     /**
@@ -32,12 +53,30 @@ class Settings
      */
     public function set(string $key, string $value, string $type = 'text', ?string $description = null): bool
     {
-        $stmt = $this->db->prepare(
-            "INSERT INTO settings (setting_key, setting_value, setting_type, description) 
-             VALUES (?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE setting_value = ?, setting_type = ?"
-        );
-        return $stmt->execute([$key, $value, $type, $description, $value, $type]);
+        // Try new schema first (setting_key, setting_value)
+        try {
+            $stmt = $this->db->prepare(
+                "INSERT INTO settings (setting_key, setting_value, setting_type, description) 
+                 VALUES (?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE setting_value = ?, setting_type = ?"
+            );
+            return $stmt->execute([$key, $value, $type, $description, $value, $type]);
+        } catch (\PDOException $e) {
+            // Fallback to old schema
+        }
+        
+        // Try old schema (key, value)
+        try {
+            $stmt = $this->db->prepare(
+                "INSERT INTO settings (`key`, value, category, description, created_at, updated_at) 
+                 VALUES (?, ?, ?, ?, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE value = ?, updated_at = NOW()"
+            );
+            return $stmt->execute([$key, $value, $type, $description, $value]);
+        } catch (\PDOException $e) {
+            log_message('error', 'Settings set error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
