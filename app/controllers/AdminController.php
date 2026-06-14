@@ -323,6 +323,121 @@ class AdminController
         }
     }
 
+    /**
+     * Delete a single video (permanently - removes file and DB record)
+     */
+    public function deleteVideo(int $videoId): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            // Get video info first
+            $video = $this->videoModel->findById($videoId);
+            if (!$video) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Video not found']);
+                return;
+            }
+
+            // Delete the file from server
+            $filePath = UPLOAD_PATH . '/' . $video['file_path'];
+            if (file_exists($filePath)) {
+                unlink($filePath);
+                debug_log("Deleted file: {$filePath}", 'ADMIN');
+            }
+
+            // Delete moderation logs
+            $stmt = $this->db->prepare("DELETE FROM moderation_logs WHERE video_id = ?");
+            $stmt->execute([$videoId]);
+
+            // Delete leaderboard entries
+            $stmt = $this->db->prepare("DELETE FROM leaderboard WHERE video_id = ?");
+            $stmt->execute([$videoId]);
+
+            // Delete the video record
+            $stmt = $this->db->prepare("DELETE FROM videos WHERE id = ?");
+            $stmt->execute([$videoId]);
+
+            debug_log("Admin deleted video ID: {$videoId} (file: {$video['file_path']})", 'ADMIN');
+            log_message('info', "Admin deleted video {$videoId}: {$video['title']}");
+
+            echo json_encode(['success' => true, 'message' => 'Video deleted permanently']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_DELETE_VIDEO');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete video: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Bulk delete videos (permanently - removes files and DB records)
+     */
+    public function bulkDeleteVideos(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $videoIds = json_decode($_POST['video_ids'] ?? '[]', true);
+        if (empty($videoIds) || !is_array($videoIds)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'No videos selected']);
+            return;
+        }
+
+        try {
+            $deleted = 0;
+            $errors = [];
+
+            foreach ($videoIds as $videoId) {
+                $videoId = (int) $videoId;
+                
+                // Get video info
+                $video = $this->videoModel->findById($videoId);
+                if (!$video) {
+                    $errors[] = "Video {$videoId} not found";
+                    continue;
+                }
+
+                // Delete the file from server
+                $filePath = UPLOAD_PATH . '/' . $video['file_path'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+
+                // Delete moderation logs
+                $stmt = $this->db->prepare("DELETE FROM moderation_logs WHERE video_id = ?");
+                $stmt->execute([$videoId]);
+
+                // Delete leaderboard entries
+                $stmt = $this->db->prepare("DELETE FROM leaderboard WHERE video_id = ?");
+                $stmt->execute([$videoId]);
+
+                // Delete the video record
+                $stmt = $this->db->prepare("DELETE FROM videos WHERE id = ?");
+                $stmt->execute([$videoId]);
+
+                $deleted++;
+            }
+
+            debug_log("Admin bulk deleted {$deleted} videos", 'ADMIN');
+            log_message('info', "Admin bulk deleted {$deleted} videos");
+
+            echo json_encode([
+                'success' => true, 
+                'deleted' => $deleted,
+                'errors' => $errors,
+                'message' => "{$deleted} video(s) deleted permanently"
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_BULK_DELETE_VIDEOS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete videos: ' . $e->getMessage()]);
+        }
+    }
+
     // ==================== GUIDES ====================
 
     /**

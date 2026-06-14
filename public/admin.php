@@ -654,6 +654,14 @@ if (file_exists($errorLogFile)) {
                         <button @click="videoFilter = 'approved'" :class="videoFilter === 'approved' ? 'bg-green-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Approved</button>
                         <button @click="videoFilter = 'rejected'" :class="videoFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Rejected</button>
                         <button @click="videoFilter = 'flagged'" :class="videoFilter === 'flagged' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">AI Flagged</button>
+                        
+                        <!-- Bulk Delete Button -->
+                        <template x-if="selectedVideos.length > 0">
+                            <button @click="bulkDeleteVideos()" class="ml-auto bg-red-600 text-white px-3 py-1.5 rounded-lg text-[12px] font-medium hover:bg-red-700 transition flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Delete Selected (<span x-text="selectedVideos.length"></span>)
+                            </button>
+                        </template>
                     </div>
 
                     <!-- Videos Table -->
@@ -662,6 +670,9 @@ if (file_exists($errorLogFile)) {
                             <table class="w-full text-[13px]">
                                 <thead class="bg-cream/50 text-dark/50">
                                     <tr>
+                                        <th class="px-3 py-3 text-left font-medium">
+                                            <input type="checkbox" @change="toggleAllVideos($event)" class="rounded border-dark/20">
+                                        </th>
                                         <th class="px-5 py-3 text-left font-medium">Creator</th>
                                         <th class="px-5 py-3 text-left font-medium">Role</th>
                                         <th class="px-5 py-3 text-left font-medium">Season</th>
@@ -675,6 +686,9 @@ if (file_exists($errorLogFile)) {
                                 <tbody class="divide-y divide-dark/5">
                                     <template x-for="v in filteredVideos" :key="v.id">
                                         <tr class="hover:bg-cream/30 transition">
+                                            <td class="px-3 py-3">
+                                                <input type="checkbox" :value="v.id" x-model="selectedVideos" class="rounded border-dark/20">
+                                            </td>
                                             <td class="px-5 py-3 font-medium text-dark" x-text="v.user_name"></td>
                                             <td class="px-5 py-3">
                                                 <span class="text-[11px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60" x-text="v.user_role"></span>
@@ -691,7 +705,7 @@ if (file_exists($errorLogFile)) {
                                             </td>
                                             <td class="px-5 py-3 text-dark/40" x-text="new Date(v.created_at).toLocaleDateString()"></td>
                                             <td class="px-5 py-3">
-                                                <div class="flex gap-2">
+                                                <div class="flex gap-2 flex-wrap">
                                                     <template x-if="v.status === 'pending'">
                                                         <button @click="approveVideo(v.id)" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">Approve</button>
                                                     </template>
@@ -714,12 +728,15 @@ if (file_exists($errorLogFile)) {
                                                         <a :href="'/uploads/' + v.file_path" target="_blank" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Preview</a>
                                                     </template>
                                                     <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">Details</button>
+                                                    <button @click="deleteVideo(v.id, v.title)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition" title="Delete video permanently">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
                                     </template>
                                     <tr x-show="filteredVideos.length === 0">
-                                        <td colspan="8" class="px-5 py-10 text-center text-dark/30">No videos found</td>
+                                        <td colspan="9" class="px-5 py-10 text-center text-dark/30">No videos found</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -2296,6 +2313,9 @@ if (file_exists($errorLogFile)) {
             userFilter: 'all',
             scriptFilter: 'all',
             
+            // Selected videos for bulk operations
+            selectedVideos: [],
+            
             // Video modal
             modalOpen: false,
             modalAction: '',
@@ -2696,6 +2716,68 @@ if (file_exists($errorLogFile)) {
                     }
                 } catch (e) {
                     this.showToast('Failed to publish to YouTube', 'error');
+                }
+            },
+            
+            // Delete single video
+            async deleteVideo(videoId, title) {
+                if (!confirm(`Are you sure you want to permanently delete "${title}"?\n\nThis will:\n• Remove the video file from server\n• Delete all database records\n• This action cannot be undone!`)) {
+                    return;
+                }
+                
+                this.showToast('Deleting video...');
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                
+                try {
+                    const res = await fetch('/api/admin/video/delete/' + videoId, { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('Video deleted successfully', 'success');
+                        this.videos = this.videos.filter(v => v.id !== videoId);
+                        this.selectedVideos = this.selectedVideos.filter(id => id !== videoId);
+                    } else {
+                        this.showToast('Delete failed: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to delete video', 'error');
+                }
+            },
+            
+            // Bulk delete videos
+            async bulkDeleteVideos() {
+                const count = this.selectedVideos.length;
+                if (!confirm(`Are you sure you want to permanently delete ${count} video(s)?\n\nThis will:\n• Remove all video files from server\n• Delete all database records\n• This action cannot be undone!`)) {
+                    return;
+                }
+                
+                this.showToast(`Deleting ${count} videos...`);
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('video_ids', JSON.stringify(this.selectedVideos));
+                
+                try {
+                    const res = await fetch('/api/admin/video/bulk-delete', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(`${data.deleted} video(s) deleted successfully`, 'success');
+                        const deletedIds = this.selectedVideos.map(id => parseInt(id));
+                        this.videos = this.videos.filter(v => !deletedIds.includes(v.id));
+                        this.selectedVideos = [];
+                    } else {
+                        this.showToast('Bulk delete failed: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to delete videos', 'error');
+                }
+            },
+            
+            // Toggle all videos selection
+            toggleAllVideos(event) {
+                if (event.target.checked) {
+                    this.selectedVideos = this.filteredVideos.map(v => v.id);
+                } else {
+                    this.selectedVideos = [];
                 }
             },
             
