@@ -483,7 +483,7 @@ class AdminController
         $envFile = BASE_PATH . '/.env';
         $useEnvFile = file_exists($envFile) && is_writable($envFile);
 
-        // Allowed keys that can be updated
+    // Allowed keys that can be updated
         $allowedKeys = [
             'AZURE_CONTENT_SAFETY_ENDPOINT',
             'AZURE_CONTENT_SAFETY_KEY',
@@ -494,6 +494,11 @@ class AdminController
             'GROQ_API_KEY',
             'FFMPEG_PATH',
             'FFPROBE_PATH',
+            'YOUTUBE_API_KEY',
+            'YOUTUBE_CLIENT_ID',
+            'YOUTUBE_CLIENT_SECRET',
+            'YOUTUBE_REFRESH_TOKEN',
+            'YOUTUBE_CHANNEL_ID',
         ];
 
         $updates = [];
@@ -579,6 +584,11 @@ class AdminController
             'GROQ_API_KEY',
             'FFMPEG_PATH',
             'FFPROBE_PATH',
+            'YOUTUBE_API_KEY',
+            'YOUTUBE_CLIENT_ID',
+            'YOUTUBE_CLIENT_SECRET',
+            'YOUTUBE_REFRESH_TOKEN',
+            'YOUTUBE_CHANNEL_ID',
         ];
         
         $defaults = [
@@ -809,6 +819,42 @@ class AdminController
             $results['ffmpeg'] = $ffmpegCode === 0 ? 'OK (' . $ffmpegPath . ')' : 'Not found';
             $results['ffprobe'] = $ffprobeCode === 0 ? 'OK (' . $ffprobePath . ')' : 'Not found';
             
+            // Test YouTube API
+            $youtubeKey = $getKey('YOUTUBE_API_KEY');
+            $youtubeClientId = $getKey('YOUTUBE_CLIENT_ID');
+            $youtubeRefreshToken = $getKey('YOUTUBE_REFRESH_TOKEN');
+            if (!empty($youtubeKey) && !empty($youtubeClientId) && !empty($youtubeRefreshToken)) {
+                try {
+                    // Test by getting access token
+                    $ch = curl_init('https://oauth2.googleapis.com/token');
+                    curl_setopt_array($ch, [
+                        CURLOPT_POST => true,
+                        CURLOPT_POSTFIELDS => http_build_query([
+                            'grant_type' => 'refresh_token',
+                            'client_id' => $youtubeClientId,
+                            'client_secret' => $getKey('YOUTUBE_CLIENT_SECRET'),
+                            'refresh_token' => $youtubeRefreshToken,
+                        ]),
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_TIMEOUT => 10,
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $data = json_decode($response, true);
+                    if ($httpCode === 200 && !empty($data['access_token'])) {
+                        $results['youtube'] = 'OK';
+                    } else {
+                        $errorMsg = $data['error_description'] ?? $data['error'] ?? 'HTTP ' . $httpCode;
+                        $results['youtube'] = substr($errorMsg, 0, 25);
+                    }
+                } catch (\Exception $e) {
+                    $results['youtube'] = 'Error';
+                }
+            } else {
+                $results['youtube'] = 'Not configured';
+            }
+            
             // Summary
             $okCount = count(array_filter($results, fn($r) => str_starts_with($r, 'OK')));
             $total = count($results);
@@ -824,6 +870,54 @@ class AdminController
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_TEST_AI_PROVIDER');
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Publish a video to YouTube
+     */
+    public function publishToYouTube(int $videoId): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $video = $this->videoModel->findById($videoId);
+            if (!$video) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Video not found']);
+                return;
+            }
+
+            if ($video['status'] !== 'approved') {
+                http_response_code(400);
+                echo json_encode(['error' => 'Video must be approved before publishing']);
+                return;
+            }
+
+            if (!empty($video['youtube_id'])) {
+                echo json_encode(['success' => true, 'message' => 'Already published', 'youtube_id' => $video['youtube_id']]);
+                return;
+            }
+
+            $youtubeService = new \App\Services\YouTubeService();
+            $youtubeId = $youtubeService->uploadVideo($videoId);
+
+            if ($youtubeId) {
+                debug_log("Admin published video {$videoId} to YouTube: {$youtubeId}", 'ADMIN');
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Video published to YouTube',
+                    'youtube_id' => $youtubeId,
+                    'youtube_url' => 'https://youtube.com/watch?v=' . $youtubeId
+                ]);
+            } else {
+                echo json_encode(['error' => 'YouTube upload failed. Check API credentials and video file.']);
+            }
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_YOUTUBE_PUBLISH');
+            echo json_encode(['error' => 'YouTube upload error: ' . $e->getMessage()]);
         }
     }
 }

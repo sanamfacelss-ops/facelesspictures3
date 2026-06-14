@@ -688,6 +688,18 @@ if (file_exists($errorLogFile)) {
                                                     <template x-if="v.status === 'pending'">
                                                         <button @click="rejectVideo(v.id)" class="bg-crimson text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-crimson/90 transition">Reject</button>
                                                     </template>
+                                                    <template x-if="v.status === 'approved' && !v.youtube_id">
+                                                        <button @click="publishToYouTube(v.id)" class="bg-red-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-red-700 transition flex items-center gap-1">
+                                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                            Publish
+                                                        </button>
+                                                    </template>
+                                                    <template x-if="v.youtube_id">
+                                                        <a :href="'https://youtube.com/watch?v=' + v.youtube_id" target="_blank" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition flex items-center gap-1">
+                                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                            Watch
+                                                        </a>
+                                                    </template>
                                                     <template x-if="v.file_path">
                                                         <a :href="'/uploads/' + v.file_path" target="_blank" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Preview</a>
                                                     </template>
@@ -1302,6 +1314,50 @@ if (file_exists($errorLogFile)) {
                                     </div>
                                     <p class="text-[10px] text-dark/40">Used for frame extraction & audio processing</p>
                                 </div>
+                                
+                                <!-- YouTube API -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl lg:col-span-2">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">YouTube API (Auto-Publish)</h4>
+                                    </div>
+                                    <div class="grid md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[11px] text-dark/50 mb-1">YouTube API Key</label>
+                                            <input type="password" x-model="apiKeyForm.YOUTUBE_API_KEY" 
+                                                :placeholder="apiKeyStatus.YOUTUBE_API_KEY?.configured ? '••••••••••••' : 'AIza...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-dark/50 mb-1">Channel ID</label>
+                                            <input type="text" x-model="apiKeyForm.YOUTUBE_CHANNEL_ID" 
+                                                :placeholder="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? apiKeyStatus.YOUTUBE_CHANNEL_ID.masked : 'UC...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-dark/50 mb-1">OAuth Client ID</label>
+                                            <input type="text" x-model="apiKeyForm.YOUTUBE_CLIENT_ID" 
+                                                :placeholder="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? apiKeyStatus.YOUTUBE_CLIENT_ID.masked : 'xxxx.apps.googleusercontent.com'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-dark/50 mb-1">OAuth Client Secret</label>
+                                            <input type="password" x-model="apiKeyForm.YOUTUBE_CLIENT_SECRET" 
+                                                :placeholder="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? '••••••••••••' : 'GOCSPX-...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-[11px] text-dark/50 mb-1">OAuth Refresh Token</label>
+                                            <input type="password" x-model="apiKeyForm.YOUTUBE_REFRESH_TOKEN" 
+                                                :placeholder="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? '••••••••••••' : '1//0g...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-2 mt-2">
+                                        <svg class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <p class="text-[10px] text-dark/50">Approved videos are automatically published to your YouTube channel. <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Get credentials from Google Cloud Console</a></p>
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- Save Button -->
@@ -1482,14 +1538,56 @@ if (file_exists($errorLogFile)) {
     </div>
 
     <!-- Modal for Video Approve/Reject -->
-    <div x-show="modalOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="modalOpen = false">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop>
-            <h3 class="font-display text-[22px] text-dark mb-2" x-text="modalTitle"></h3>
-            <p class="text-[12px] text-dark/50 mb-4">Provide a reason for this action.</p>
-            <textarea x-model="modalReason" rows="3" class="w-full border border-dark/10 rounded-xl px-4 py-3 text-[13px] focus:outline-none focus:border-crimson transition mb-4" placeholder="Reason..."></textarea>
-            <div class="flex justify-end gap-3">
-                <button @click="modalOpen = false" class="px-4 py-2 text-[12px] text-dark/50 hover:text-dark transition">Cancel</button>
-                <button @click="confirmVideoAction()" class="px-5 py-2 text-[12px] bg-crimson text-white rounded-xl hover:bg-crimson/90 transition font-medium" x-text="modalAction === 'approve' ? 'Approve' : 'Reject'"></button>
+    <div x-show="modalOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="modalOpen = false"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop 
+            x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+            
+            <!-- Header with icon -->
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center" :class="modalAction === 'approve' ? 'bg-green-100' : 'bg-red-100'">
+                    <svg x-show="modalAction === 'approve'" class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <svg x-show="modalAction === 'reject'" class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-display text-[22px] text-dark" x-text="modalTitle"></h3>
+                    <p class="text-[12px] text-dark/50" x-text="modalAction === 'approve' ? 'Video will be queued for YouTube upload' : 'User will be notified via email'"></p>
+                </div>
+            </div>
+            
+            <!-- Reason input -->
+            <div class="mb-4">
+                <label class="block text-[12px] text-dark/60 mb-2 font-medium" x-text="modalAction === 'approve' ? 'Approval note (optional)' : 'Rejection reason (required)'"></label>
+                <textarea x-model="modalReason" rows="3" 
+                    class="w-full border rounded-xl px-4 py-3 text-[13px] focus:outline-none transition resize-none"
+                    :class="modalAction === 'approve' ? 'border-green-200 focus:border-green-500 bg-green-50/30' : 'border-red-200 focus:border-red-500 bg-red-50/30'"
+                    :placeholder="modalAction === 'approve' ? 'Great performance! (optional)' : 'Please explain why this video was rejected...'"></textarea>
+                <p x-show="modalAction === 'reject' && !modalReason.trim()" class="text-[11px] text-red-500 mt-1">* Rejection reason is required</p>
+            </div>
+            
+            <!-- Quick rejection reasons -->
+            <div x-show="modalAction === 'reject'" class="mb-4">
+                <p class="text-[11px] text-dark/50 mb-2">Quick reasons:</p>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" @click="modalReason = 'Video contains inappropriate content'" class="text-[10px] px-2.5 py-1 bg-dark/5 hover:bg-dark/10 rounded-full transition">Inappropriate content</button>
+                    <button type="button" @click="modalReason = 'Poor audio/video quality'" class="text-[10px] px-2.5 py-1 bg-dark/5 hover:bg-dark/10 rounded-full transition">Poor quality</button>
+                    <button type="button" @click="modalReason = 'Video is too short or does not meet requirements'" class="text-[10px] px-2.5 py-1 bg-dark/5 hover:bg-dark/10 rounded-full transition">Too short</button>
+                    <button type="button" @click="modalReason = 'Content does not match the selected category'" class="text-[10px] px-2.5 py-1 bg-dark/5 hover:bg-dark/10 rounded-full transition">Wrong category</button>
+                    <button type="button" @click="modalReason = 'Contains copyrighted material'" class="text-[10px] px-2.5 py-1 bg-dark/5 hover:bg-dark/10 rounded-full transition">Copyright issue</button>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex justify-end gap-3 pt-2 border-t border-dark/5">
+                <button @click="modalOpen = false" class="px-4 py-2.5 text-[12px] text-dark/50 hover:text-dark hover:bg-dark/5 rounded-xl transition">Cancel</button>
+                <button @click="confirmVideoAction()" 
+                    :disabled="modalAction === 'reject' && !modalReason.trim()"
+                    :class="modalAction === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'"
+                    class="px-5 py-2.5 text-[12px] text-white rounded-xl transition font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg x-show="modalAction === 'approve'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <svg x-show="modalAction === 'reject'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span x-text="modalAction === 'approve' ? 'Approve & Queue for YouTube' : 'Reject Video'"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -1755,7 +1853,12 @@ if (file_exists($errorLogFile)) {
                 RAPIDAPI_KEY: '',
                 GROQ_API_KEY: '',
                 FFMPEG_PATH: '',
-                FFPROBE_PATH: ''
+                FFPROBE_PATH: '',
+                YOUTUBE_API_KEY: '',
+                YOUTUBE_CLIENT_ID: '',
+                YOUTUBE_CLIENT_SECRET: '',
+                YOUTUBE_REFRESH_TOKEN: '',
+                YOUTUBE_CHANNEL_ID: ''
             },
             savingKeys: false,
             
@@ -2123,6 +2226,25 @@ if (file_exists($errorLogFile)) {
                 }
             },
             
+            // YouTube publish
+            async publishToYouTube(videoId) {
+                this.showToast('Publishing to YouTube...');
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                try {
+                    const res = await fetch('/api/admin/youtube/publish/' + videoId, { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('Video published to YouTube!', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        this.showToast('YouTube publish failed: ' + (data.error || 'Check YouTube API settings'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to publish to YouTube', 'error');
+                }
+            },
+            
             // API Keys management
             async loadAPIKeys() {
                 try {
@@ -2172,7 +2294,12 @@ if (file_exists($errorLogFile)) {
                             RAPIDAPI_KEY: '',
                             GROQ_API_KEY: '',
                             FFMPEG_PATH: '',
-                            FFPROBE_PATH: ''
+                            FFPROBE_PATH: '',
+                            YOUTUBE_API_KEY: '',
+                            YOUTUBE_CLIENT_ID: '',
+                            YOUTUBE_CLIENT_SECRET: '',
+                            YOUTUBE_REFRESH_TOKEN: '',
+                            YOUTUBE_CHANNEL_ID: ''
                         };
                         // Auto refresh after short delay
                         setTimeout(() => {
