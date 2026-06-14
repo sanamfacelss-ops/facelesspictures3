@@ -191,6 +191,88 @@ if (file_exists($errorLogFile)) {
         ::-webkit-scrollbar-track { background: #F8F5F0; }
         ::-webkit-scrollbar-thumb { background: #D92B3A33; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #D92B3A66; }
+        
+        /* Mobile-first responsive fixes */
+        html { overflow-x: hidden; }
+        body { overflow-x: hidden; max-width: 100vw; }
+        
+        /* Prevent horizontal scroll on mobile */
+        .mobile-safe { max-width: 100%; overflow-x: hidden; }
+        
+        /* Mobile table cards */
+        @media (max-width: 767px) {
+            .mobile-card-view tbody tr {
+                display: block;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                background: white;
+                border-radius: 0.75rem;
+                border: 1px solid rgba(13, 13, 13, 0.05);
+            }
+            .mobile-card-view thead { display: none; }
+            .mobile-card-view tbody { display: block; }
+            .mobile-card-view td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: 0.5rem 0;
+                border: none !important;
+                gap: 0.5rem;
+            }
+            .mobile-card-view td::before {
+                content: attr(data-label);
+                font-weight: 500;
+                font-size: 11px;
+                color: rgba(13, 13, 13, 0.5);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                flex-shrink: 0;
+                min-width: 80px;
+            }
+            .mobile-card-view td:last-child {
+                border-top: 1px solid rgba(13, 13, 13, 0.05);
+                padding-top: 0.75rem;
+                margin-top: 0.25rem;
+            }
+            
+            /* Fix text overflow */
+            .mobile-truncate {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-width: 100%;
+            }
+            
+            /* Stack action buttons */
+            .mobile-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            /* Fix stat cards text */
+            .stat-card p {
+                word-break: break-word;
+            }
+            
+            /* Ensure proper spacing for bottom nav */
+            main { padding-bottom: 5rem !important; }
+        }
+        
+        /* Tablet adjustments */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .tablet-scroll-x {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Form input mobile fixes */
+        @media (max-width: 640px) {
+            input, select, textarea {
+                font-size: 16px !important; /* Prevent iOS zoom */
+            }
+        }
     </style>
 </head>
 <body class="bg-cream min-h-screen" x-data="adminDashboard()" x-init="init()">
@@ -416,41 +498,86 @@ if (file_exists($errorLogFile)) {
             </header>
 
             <!-- Content Area -->
-            <div class="p-4 md:p-6">
+            <div class="p-4 md:p-6 mobile-safe">
 
                 <!-- ==================== OVERVIEW TAB ==================== -->
                 <div x-show="activeTab === 'overview'" x-cloak>
-                    <!-- Stat Cards -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <div class="stat-card rounded-xl p-4">
-                            <p class="text-[11px] text-dark/40 uppercase tracking-wider mb-1">Total Users</p>
-                            <p class="font-display text-[32px] text-dark leading-none"><?= $totalUsers ?></p>
+                    <!-- Stat Cards - Mobile: 2 columns, Desktop: 4 columns -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+                        <div class="stat-card rounded-xl p-3 md:p-4">
+                            <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">Total Users</p>
+                            <p class="font-display text-[24px] md:text-[32px] text-dark leading-none"><?= $totalUsers ?></p>
                         </div>
-                        <div class="stat-card rounded-xl p-4">
-                            <p class="text-[11px] text-dark/40 uppercase tracking-wider mb-1">Pending Videos</p>
-                            <p class="font-display text-[32px] text-amber-600 leading-none"><?= $pendingCount ?></p>
+                        <div class="stat-card rounded-xl p-3 md:p-4">
+                            <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">Pending</p>
+                            <p class="font-display text-[24px] md:text-[32px] text-amber-600 leading-none"><?= $pendingCount ?></p>
                         </div>
-                        <div class="stat-card rounded-xl p-4">
-                            <p class="text-[11px] text-dark/40 uppercase tracking-wider mb-1">AI Flagged</p>
-                            <p class="font-display text-[32px] text-crimson leading-none"><?= $flaggedCount ?></p>
+                        <div class="stat-card rounded-xl p-3 md:p-4">
+                            <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">AI Flagged</p>
+                            <p class="font-display text-[24px] md:text-[32px] text-crimson leading-none"><?= $flaggedCount ?></p>
                         </div>
-                        <div class="stat-card rounded-xl p-4">
-                            <p class="text-[11px] text-dark/40 uppercase tracking-wider mb-1">Active Season</p>
-                            <p class="font-display text-[18px] text-teal-600 leading-tight truncate"><?= $activeSeason ? e($activeSeason['title']) : 'None' ?></p>
+                        <div class="stat-card rounded-xl p-3 md:p-4">
+                            <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">Active Season</p>
+                            <p class="font-display text-[14px] md:text-[18px] text-teal-600 leading-tight truncate"><?= $activeSeason ? e($activeSeason['title']) : 'None' ?></p>
                         </div>
                     </div>
 
-                    <!-- AI Flagged Videos -->
+                    <!-- AI Flagged Videos - Mobile Card View -->
                     <?php if (!empty($flagged)): ?>
                     <div class="bg-white rounded-xl border border-dark/5 overflow-hidden mb-6">
-                        <div class="px-5 py-4 border-b border-dark/5 bg-red-50/50">
-                            <h2 class="font-semibold text-dark flex items-center gap-2">
+                        <div class="px-4 md:px-5 py-3 md:py-4 border-b border-dark/5 bg-red-50/50">
+                            <h2 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                 <span class="w-2 h-2 bg-crimson rounded-full animate-pulse"></span>
-                                AI Flagged — Manual Review
+                                <span class="hidden sm:inline">AI Flagged — Manual Review</span>
+                                <span class="sm:hidden">Flagged</span>
                                 <span class="bg-crimson text-white text-[10px] px-2 py-0.5 rounded-full"><?= count($flagged) ?></span>
                             </h2>
                         </div>
-                        <div class="overflow-x-auto">
+                        
+                        <!-- Mobile Card View -->
+                        <div class="md:hidden p-3 space-y-3">
+                            <?php foreach ($flagged as $v): 
+                                $fb = is_string($v['ai_feedback'] ?? '') ? json_decode($v['ai_feedback'], true) : ($v['ai_feedback'] ?? []);
+                                $flags = $fb['flags'] ?? [];
+                            ?>
+                            <div class="bg-cream/30 rounded-xl p-4 border border-dark/5">
+                                <div class="flex items-start justify-between gap-3 mb-3">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <div class="w-8 h-8 bg-crimson/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <span class="text-crimson font-semibold text-[10px]"><?= strtoupper(substr($v['user_name'], 0, 1)) ?></span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-medium text-dark text-[13px] truncate"><?= e($v['user_name']) ?></p>
+                                            <p class="text-[11px] text-dark/50 truncate"><?= e($v['title']) ?></p>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 <?= ($v['ai_score'] ?? 0) >= 60 ? 'bg-green-100 text-green-700' : (($v['ai_score'] ?? 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') ?>">
+                                        <?= $v['ai_score'] !== null ? round($v['ai_score']) : 'N/A' ?>
+                                    </span>
+                                </div>
+                                
+                                <?php if (!empty($flags)): ?>
+                                <div class="flex flex-wrap gap-1 mb-3">
+                                    <?php foreach (array_slice($flags, 0, 3) as $flag): ?>
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700"><?= e($flag) ?></span>
+                                    <?php endforeach; ?>
+                                    <?php if (count($flags) > 3): ?>
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-dark/10 text-dark/50">+<?= count($flags) - 3 ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <div class="flex gap-2">
+                                    <button @click="openVideoDetail(<?= $v['id'] ?>, '<?= e(addslashes($v['title'])) ?>', '<?= e($v['file_path'] ?? '') ?>', <?= htmlspecialchars(json_encode($fb), ENT_QUOTES, 'UTF-8') ?>, <?= $v['ai_score'] !== null ? $v['ai_score'] : 'null' ?>)" class="flex-1 bg-dark/10 text-dark/60 px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-dark/20 transition text-center">Details</button>
+                                    <button @click="approveVideo(<?= $v['id'] ?>)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
+                                    <button @click="rejectVideo(<?= $v['id'] ?>)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <!-- Desktop Table View -->
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-[13px]">
                                 <thead class="bg-cream/50 text-dark/50">
                                     <tr>
@@ -548,13 +675,50 @@ if (file_exists($errorLogFile)) {
                     </div>
                     <?php endif; ?>
 
-                    <!-- Pending Videos -->
+                    <!-- Pending Videos - Mobile Card View -->
                     <div class="bg-white rounded-xl border border-dark/5 overflow-hidden mb-6">
-                        <div class="px-5 py-4 border-b border-dark/5 flex items-center justify-between">
-                            <h2 class="font-semibold text-dark">Pending Videos</h2>
-                            <span class="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-medium"><?= count($pending) ?> pending</span>
+                        <div class="px-4 md:px-5 py-3 md:py-4 border-b border-dark/5 flex items-center justify-between">
+                            <h2 class="font-semibold text-dark text-[14px] md:text-base">Pending Videos</h2>
+                            <span class="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-medium"><?= count($pending) ?></span>
                         </div>
-                        <div class="overflow-x-auto">
+                        
+                        <!-- Mobile Card View -->
+                        <div class="md:hidden p-3 space-y-3">
+                            <?php if (empty($pending)): ?>
+                            <p class="text-center text-dark/30 py-8 text-[13px]">No pending videos</p>
+                            <?php else: foreach ($pending as $v): ?>
+                            <div class="bg-cream/30 rounded-xl p-4 border border-dark/5">
+                                <div class="flex items-start justify-between gap-3 mb-3">
+                                    <div class="min-w-0">
+                                        <p class="font-medium text-dark text-[13px] truncate"><?= e($v['user_name']) ?></p>
+                                        <p class="text-[12px] text-dark/70 truncate"><?= e($v['title']) ?></p>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60"><?= e($v['content_type'] ?? 'N/A') ?></span>
+                                            <?php 
+                                            $aiStatus = $v['ai_status'] ?? 'pending';
+                                            $aiStatusClass = match($aiStatus) {
+                                                'approved' => 'bg-green-100 text-green-700',
+                                                'processing' => 'bg-blue-100 text-blue-700',
+                                                'flagged' => 'bg-amber-100 text-amber-700',
+                                                'rejected' => 'bg-red-100 text-red-700',
+                                                default => 'bg-dark/5 text-dark/40'
+                                            };
+                                            ?>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full <?= $aiStatusClass ?>"><?= ucfirst($aiStatus) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-dark/40 mb-3"><?= date('M j, g:i A', strtotime($v['created_at'])) ?></p>
+                                <div class="flex gap-2">
+                                    <button @click="approveVideo(<?= $v['id'] ?>)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
+                                    <button @click="rejectVideo(<?= $v['id'] ?>)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                </div>
+                            </div>
+                            <?php endforeach; endif; ?>
+                        </div>
+                        
+                        <!-- Desktop Table View -->
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-[13px]">
                                 <thead class="bg-cream/50 text-dark/50">
                                     <tr>
@@ -603,8 +767,8 @@ if (file_exists($errorLogFile)) {
                         </div>
                     </div>
 
-                    <!-- Quick Widgets Row -->
-                    <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Quick Widgets Row - Stack on mobile -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Seasons Widget -->
                         <div class="bg-white rounded-xl border border-dark/5 p-5">
                             <h3 class="font-semibold text-dark mb-3 flex items-center gap-2">
@@ -657,23 +821,54 @@ if (file_exists($errorLogFile)) {
                 <div x-show="activeTab === 'videos'" x-cloak>
                     <!-- Filters -->
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <button @click="videoFilter = 'all'" :class="videoFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">All</button>
-                        <button @click="videoFilter = 'pending'" :class="videoFilter === 'pending' ? 'bg-amber-500 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Pending</button>
-                        <button @click="videoFilter = 'approved'" :class="videoFilter === 'approved' ? 'bg-green-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Approved</button>
-                        <button @click="videoFilter = 'rejected'" :class="videoFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Rejected</button>
-                        <button @click="videoFilter = 'flagged'" :class="videoFilter === 'flagged' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">AI Flagged</button>
+                        <button @click="videoFilter = 'all'" :class="videoFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">All</button>
+                        <button @click="videoFilter = 'pending'" :class="videoFilter === 'pending' ? 'bg-amber-500 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Pending</button>
+                        <button @click="videoFilter = 'approved'" :class="videoFilter === 'approved' ? 'bg-green-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Approved</button>
+                        <button @click="videoFilter = 'rejected'" :class="videoFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Rejected</button>
+                        <button @click="videoFilter = 'flagged'" :class="videoFilter === 'flagged' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition hidden sm:block">Flagged</button>
                         
                         <!-- Bulk Delete Button -->
                         <template x-if="selectedVideos.length > 0">
-                            <button @click="bulkDeleteVideos()" class="ml-auto bg-red-600 text-white px-3 py-1.5 rounded-lg text-[12px] font-medium hover:bg-red-700 transition flex items-center gap-1">
+                            <button @click="bulkDeleteVideos()" class="ml-auto bg-red-600 text-white px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium hover:bg-red-700 transition flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                Delete Selected (<span x-text="selectedVideos.length"></span>)
+                                (<span x-text="selectedVideos.length"></span>)
                             </button>
                         </template>
                     </div>
 
-                    <!-- Videos Table -->
-                    <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
+                    <!-- Mobile Card View for Videos -->
+                    <div class="md:hidden space-y-3">
+                        <template x-for="v in filteredVideos" :key="v.id">
+                            <div class="bg-white rounded-xl border border-dark/5 p-4">
+                                <div class="flex items-start justify-between gap-3 mb-3">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <input type="checkbox" :value="v.id" x-model="selectedVideos" class="rounded border-dark/20 flex-shrink-0">
+                                        <div class="min-w-0">
+                                            <p class="font-medium text-dark text-[13px] truncate" x-text="v.user_name"></p>
+                                            <p class="text-[11px] text-dark/50 truncate" x-text="v.season_title"></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="(v.ai_score || 0) >= 60 ? 'bg-green-100 text-green-700' : ((v.ai_score || 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')" x-text="v.ai_score || 'N/A'"></span>
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-700': v.status === 'pending', 'bg-green-100 text-green-700': v.status === 'approved', 'bg-red-100 text-red-700': v.status === 'rejected'}" x-text="v.status"></span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-if="v.status === 'pending'">
+                                        <button @click="approveVideo(v.id)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium">Approve</button>
+                                    </template>
+                                    <template x-if="v.status === 'pending'">
+                                        <button @click="rejectVideo(v.id)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium">Reject</button>
+                                    </template>
+                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {}, v.ai_score)" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-[11px] font-medium">Details</button>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="filteredVideos.length === 0" class="bg-white rounded-xl border border-dark/5 p-8 text-center text-dark/30 text-[13px]">No videos found</div>
+                    </div>
+
+                    <!-- Desktop Table View -->
+                    <div class="hidden md:block bg-white rounded-xl border border-dark/5 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-[13px]">
                                 <thead class="bg-cream/50 text-dark/50">
@@ -756,14 +951,46 @@ if (file_exists($errorLogFile)) {
                 <div x-show="activeTab === 'users'" x-cloak>
                     <!-- Filter -->
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <button @click="userFilter = 'all'" :class="userFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">All Users</button>
-                        <button @click="userFilter = 'actor'" :class="userFilter === 'actor' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Actors</button>
-                        <button @click="userFilter = 'director'" :class="userFilter === 'director' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Directors</button>
-                        <button @click="userFilter = 'writer'" :class="userFilter === 'writer' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Writers</button>
+                        <button @click="userFilter = 'all'" :class="userFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">All</button>
+                        <button @click="userFilter = 'actor'" :class="userFilter === 'actor' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Actors</button>
+                        <button @click="userFilter = 'director'" :class="userFilter === 'director' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Directors</button>
+                        <button @click="userFilter = 'writer'" :class="userFilter === 'writer' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Writers</button>
                     </div>
 
-                    <!-- Users Table -->
-                    <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
+                    <!-- Mobile Card View for Users -->
+                    <div class="md:hidden space-y-3">
+                        <template x-for="u in filteredUsers" :key="u.id">
+                            <div class="bg-white rounded-xl border border-dark/5 p-4">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 bg-crimson/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <span class="text-crimson font-semibold text-[14px]" x-text="u.name.charAt(0).toUpperCase()"></span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <p class="font-medium text-dark text-[14px] truncate" x-text="u.name"></p>
+                                                <template x-if="u.is_admin == 1">
+                                                    <span class="text-[9px] bg-crimson text-white px-1.5 py-0.5 rounded-full flex-shrink-0">ADMIN</span>
+                                                </template>
+                                            </div>
+                                            <p class="text-[12px] text-dark/50 truncate" x-text="u.email"></p>
+                                        </div>
+                                    </div>
+                                    <template x-if="u.is_admin != 1">
+                                        <button @click="deleteUser(u.id, u.name)" class="text-crimson text-[12px] flex-shrink-0">Delete</button>
+                                    </template>
+                                </div>
+                                <div class="flex items-center gap-2 mt-3">
+                                    <span class="text-[11px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60" x-text="u.role"></span>
+                                    <span class="text-[11px] text-dark/40" x-text="'Joined ' + new Date(u.created_at).toLocaleDateString()"></span>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="filteredUsers.length === 0" class="bg-white rounded-xl border border-dark/5 p-8 text-center text-dark/30 text-[13px]">No users found</div>
+                    </div>
+
+                    <!-- Desktop Table View -->
+                    <div class="hidden md:block bg-white rounded-xl border border-dark/5 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-[13px]">
                                 <thead class="bg-cream/50 text-dark/50">
@@ -820,10 +1047,10 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== SEASONS TAB ==================== -->
                 <div x-show="activeTab === 'seasons'" x-cloak>
-                    <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Create Season Form -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-5">
-                            <h3 class="font-semibold text-dark mb-4">Create New Season</h3>
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 text-[14px] md:text-base">Create New Season</h3>
                             <form @submit.prevent="createSeason()">
                                 <div class="space-y-4">
                                     <div>
@@ -859,21 +1086,21 @@ if (file_exists($errorLogFile)) {
 
                         <!-- Seasons List -->
                         <div class="lg:col-span-2 bg-white rounded-xl border border-dark/5 overflow-hidden">
-                            <div class="px-5 py-4 border-b border-dark/5">
-                                <h3 class="font-semibold text-dark">All Seasons</h3>
+                            <div class="px-4 md:px-5 py-3 md:py-4 border-b border-dark/5">
+                                <h3 class="font-semibold text-dark text-[14px] md:text-base">All Seasons</h3>
                             </div>
                             <div class="divide-y divide-dark/5">
                                 <template x-for="s in seasons" :key="s.id">
-                                    <div class="p-5 hover:bg-cream/30 transition">
-                                        <div class="flex items-start justify-between">
-                                            <div>
-                                                <h4 class="font-medium text-dark" x-text="s.title"></h4>
-                                                <p class="text-[12px] text-dark/50 mt-1" x-text="s.brief || 'No description'"></p>
+                                    <div class="p-4 md:p-5 hover:bg-cream/30 transition">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <h4 class="font-medium text-dark truncate" x-text="s.title"></h4>
+                                                <p class="text-[12px] text-dark/50 mt-1 line-clamp-2" x-text="s.brief || 'No description'"></p>
                                                 <div class="flex items-center gap-3 mt-2 text-[11px] text-dark/40">
                                                     <span x-text="s.start_date + ' → ' + s.end_date"></span>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 flex-shrink-0">
                                                 <span class="text-[10px] px-2 py-0.5 rounded-full" :class="{'bg-teal-100 text-teal-700': s.status === 'active', 'bg-amber-100 text-amber-700': s.status === 'upcoming', 'bg-dark/10 text-dark/50': s.status === 'closed'}" x-text="s.status"></span>
                                                 <button @click="editSeason(s)" class="text-[11px] text-dark/50 hover:text-crimson">Edit</button>
                                             </div>
@@ -889,51 +1116,52 @@ if (file_exists($errorLogFile)) {
                 <!-- ==================== SCRIPTS TAB ==================== -->
                 <div x-show="activeTab === 'scripts'" x-cloak>
                     <!-- Guide Editor Section -->
-                    <div class="bg-white rounded-xl border border-dark/5 p-5 mb-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold text-dark flex items-center gap-2">
+                    <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5 mb-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                 <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                Role Guides (Shown on Create Screen)
+                                <span class="hidden sm:inline">Role Guides (Shown on Create Screen)</span>
+                                <span class="sm:hidden">Role Guides</span>
                             </h3>
-                            <div class="flex gap-2">
-                                <button @click="guideTab = 'actor'" :class="guideTab === 'actor' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">🎭 Actor</button>
-                                <button @click="guideTab = 'director'" :class="guideTab === 'director' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">🎬 Director</button>
-                                <button @click="guideTab = 'writer'" :class="guideTab === 'writer' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">✍️ Writer</button>
+                            <div class="flex gap-2 overflow-x-auto pb-1">
+                                <button @click="guideTab = 'actor'" :class="guideTab === 'actor' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition whitespace-nowrap">🎭 Actor</button>
+                                <button @click="guideTab = 'director'" :class="guideTab === 'director' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition whitespace-nowrap">🎬 Director</button>
+                                <button @click="guideTab = 'writer'" :class="guideTab === 'writer' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition whitespace-nowrap">✍️ Writer</button>
                             </div>
                         </div>
                         
                         <!-- Actor Guide -->
                         <div x-show="guideTab === 'actor'" x-cloak>
                             <textarea x-model="guides.actor" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for actors..."></textarea>
-                            <div class="flex items-center justify-between mt-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
                                 <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
-                                <button @click="saveGuide('actor')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Save Actor Guide</button>
+                                <button @click="saveGuide('actor')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition w-full sm:w-auto">Save Actor Guide</button>
                             </div>
                         </div>
                         
                         <!-- Director Guide -->
                         <div x-show="guideTab === 'director'" x-cloak>
                             <textarea x-model="guides.director" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for directors..."></textarea>
-                            <div class="flex items-center justify-between mt-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
                                 <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
-                                <button @click="saveGuide('director')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Save Director Guide</button>
+                                <button @click="saveGuide('director')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition w-full sm:w-auto">Save Director Guide</button>
                             </div>
                         </div>
                         
                         <!-- Writer Guide -->
                         <div x-show="guideTab === 'writer'" x-cloak>
                             <textarea x-model="guides.writer" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for writers..."></textarea>
-                            <div class="flex items-center justify-between mt-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
                                 <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
-                                <button @click="saveGuide('writer')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">Save Writer Guide</button>
+                                <button @click="saveGuide('writer')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition w-full sm:w-auto">Save Writer Guide</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Create Script Form -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-5">
-                            <h3 class="font-semibold text-dark mb-4" x-text="editingScript ? 'Edit Script' : 'Create New Script'"></h3>
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 text-[14px] md:text-base" x-text="editingScript ? 'Edit Script' : 'Create New Script'"></h3>
                             <form @submit.prevent="editingScript ? updateScript() : createScript()">
                                 <div class="space-y-4">
                                     <div>
@@ -987,13 +1215,13 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
-                                <div class="divide-y divide-dark/5 max-h-[600px] overflow-y-auto">
+                                <div class="divide-y divide-dark/5 max-h-[500px] md:max-h-[600px] overflow-y-auto">
                                     <template x-for="sc in filteredScripts" :key="sc.id">
                                         <div class="p-4 hover:bg-cream/30 transition">
-                                            <div class="flex items-start justify-between gap-4">
+                                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center gap-2 mb-1">
-                                                        <h4 class="font-medium text-dark truncate" x-text="sc.title"></h4>
+                                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                                        <h4 class="font-medium text-dark truncate text-[13px] md:text-[14px]" x-text="sc.title"></h4>
                                                         <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-dark/5 text-dark/50" x-text="sc.category"></span>
                                                         <span class="text-[9px] px-1.5 py-0.5 rounded-full" :class="{'bg-green-100 text-green-700': sc.difficulty === 'beginner', 'bg-amber-100 text-amber-700': sc.difficulty === 'intermediate', 'bg-red-100 text-red-700': sc.difficulty === 'advanced'}" x-text="sc.difficulty"></span>
                                                     </div>
@@ -1803,10 +2031,10 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== SETTINGS TAB ==================== -->
                 <div x-show="activeTab === 'settings'" x-cloak>
-                    <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         <!-- Debug Controls -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2">
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
                                 <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -1814,12 +2042,12 @@ if (file_exists($errorLogFile)) {
                                 Debug Mode
                             </h3>
                             
-                            <div class="flex items-center justify-between p-4 bg-cream rounded-xl mb-4">
-                                <div>
+                            <div class="flex items-center justify-between p-3 md:p-4 bg-cream rounded-xl mb-4">
+                                <div class="min-w-0 mr-3">
                                     <p class="font-medium text-dark text-[13px]">Debug Logging</p>
-                                    <p class="text-[11px] text-dark/40">Logs to /logs/debug.log</p>
+                                    <p class="text-[11px] text-dark/40 truncate">Logs to /logs/debug.log</p>
                                 </div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-shrink-0">
                                     <span class="text-[11px] font-medium <?= FP3_DEBUG ? 'text-green-600' : 'text-dark/30' ?>">
                                         <?= FP3_DEBUG ? 'ON' : 'OFF' ?>
                                     </span>
@@ -1849,8 +2077,8 @@ if (file_exists($errorLogFile)) {
                         </div>
 
                         <!-- Log Files -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2">
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
                                 <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
@@ -1863,11 +2091,11 @@ if (file_exists($errorLogFile)) {
                             <div class="space-y-2">
                                 <?php foreach ($logFiles as $log): ?>
                                 <div class="flex items-center justify-between p-3 bg-cream rounded-lg">
-                                    <div>
-                                        <p class="font-medium text-dark text-[12px]"><?= e($log['name']) ?></p>
+                                    <div class="min-w-0">
+                                        <p class="font-medium text-dark text-[12px] truncate"><?= e($log['name']) ?></p>
                                         <p class="text-[10px] text-dark/40"><?= date('M j, H:i', $log['modified']) ?></p>
                                     </div>
-                                    <span class="text-[10px] text-dark/40"><?= number_format($log['size'] / 1024, 1) ?> KB</span>
+                                    <span class="text-[10px] text-dark/40 flex-shrink-0 ml-2"><?= number_format($log['size'] / 1024, 1) ?> KB</span>
                                 </div>
                                 <?php endforeach; ?>
                             </div>
@@ -1875,8 +2103,8 @@ if (file_exists($errorLogFile)) {
                         </div>
 
                         <!-- Environment -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2">
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
                                 <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                 </svg>
@@ -1908,9 +2136,9 @@ if (file_exists($errorLogFile)) {
                         </div>
                     </div>
 
-                    <!-- Log Viewers -->
+                    <!-- Log Viewers - Stack on mobile -->
                     <?php if ($debugLogContent || $errorLogContent): ?>
-                    <div class="grid lg:grid-cols-2 gap-6 mt-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-6">
                         <?php if ($debugLogContent): ?>
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
                             <div class="px-5 py-3 border-b border-dark/5 bg-blue-50">
