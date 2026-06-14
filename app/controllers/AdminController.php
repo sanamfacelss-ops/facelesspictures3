@@ -901,6 +901,16 @@ class AdminController
                 return;
             }
 
+            // Debug: Check YouTube credentials before attempting upload
+            $debugInfo = [];
+            $debugInfo['client_id'] = !empty($_ENV['YOUTUBE_CLIENT_ID']) ? 'SET (' . strlen($_ENV['YOUTUBE_CLIENT_ID']) . ' chars)' : 'MISSING';
+            $debugInfo['client_secret'] = !empty($_ENV['YOUTUBE_CLIENT_SECRET']) ? 'SET (' . strlen($_ENV['YOUTUBE_CLIENT_SECRET']) . ' chars)' : 'MISSING';
+            $debugInfo['refresh_token'] = !empty($_ENV['YOUTUBE_REFRESH_TOKEN']) ? 'SET (' . strlen($_ENV['YOUTUBE_REFRESH_TOKEN']) . ' chars)' : 'MISSING';
+            $debugInfo['api_key'] = !empty($_ENV['YOUTUBE_API_KEY']) ? 'SET' : 'MISSING';
+            $debugInfo['channel_id'] = !empty($_ENV['YOUTUBE_CHANNEL_ID']) ? 'SET' : 'MISSING';
+            
+            debug_log("YouTube credentials check: " . json_encode($debugInfo), 'ADMIN');
+
             $youtubeService = new \App\Services\YouTubeService();
             
             // Log video state before upload
@@ -910,8 +920,12 @@ class AdminController
 
             if ($youtubeId) {
                 if (is_array($youtubeId) && isset($youtubeId['error'])) {
-                    // YouTubeService returned an error
-                    echo json_encode(['error' => $youtubeId['error']]);
+                    // YouTubeService returned an error - include debug info
+                    debug_log("YouTube publish failed: " . $youtubeId['error'], 'ADMIN');
+                    echo json_encode([
+                        'error' => 'YouTube publish failed: ' . $youtubeId['error'],
+                        'debug' => $debugInfo
+                    ]);
                     return;
                 }
                 debug_log("Admin published video {$videoId} to YouTube: {$youtubeId}", 'ADMIN');
@@ -922,7 +936,11 @@ class AdminController
                     'youtube_url' => 'https://youtube.com/watch?v=' . $youtubeId
                 ]);
             } else {
-                echo json_encode(['error' => 'YouTube upload failed. Check API credentials and video file.']);
+                debug_log("YouTube upload returned null - credentials: " . json_encode($debugInfo), 'ADMIN');
+                echo json_encode([
+                    'error' => 'YouTube upload failed. Check API credentials and video file.',
+                    'debug' => $debugInfo
+                ]);
             }
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_YOUTUBE_PUBLISH');
