@@ -501,7 +501,7 @@ if (file_exists($errorLogFile)) {
                                         </td>
                                         <td class="px-5 py-3">
                                             <div class="flex gap-2">
-                                                <button @click="openVideoDetail(<?= $v['id'] ?>, '<?= e(addslashes($v['title'])) ?>', '<?= e($v['file_path'] ?? '') ?>', <?= htmlspecialchars(json_encode($fb), ENT_QUOTES, 'UTF-8') ?>)" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Details</button>
+                                                <button @click="openVideoDetail(<?= $v['id'] ?>, '<?= e(addslashes($v['title'])) ?>', '<?= e($v['file_path'] ?? '') ?>', <?= htmlspecialchars(json_encode($fb), ENT_QUOTES, 'UTF-8') ?>, <?= $v['ai_score'] !== null ? $v['ai_score'] : 'null' ?>)" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Details</button>
                                                 <button @click="approveVideo(<?= $v['id'] ?>)" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">✓</button>
                                                 <button @click="rejectVideo(<?= $v['id'] ?>)" class="bg-crimson text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-crimson/90 transition">✗</button>
                                             </div>
@@ -735,7 +735,7 @@ if (file_exists($errorLogFile)) {
                                                     <template x-if="v.file_path">
                                                         <a :href="'/uploads/' + v.file_path" target="_blank" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Preview</a>
                                                     </template>
-                                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">Details</button>
+                                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {}, v.ai_score)" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">Details</button>
                                                     <button @click="deleteVideo(v.id, v.title)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition" title="Delete video permanently">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                     </button>
@@ -2098,14 +2098,14 @@ if (file_exists($errorLogFile)) {
                     <!-- Score -->
                     <div class="flex items-center gap-4 mb-4">
                         <div class="text-center">
-                            <div class="text-[32px] font-display" :class="videoDetail.feedback?.score >= 70 ? 'text-green-600' : (videoDetail.feedback?.score >= 40 ? 'text-amber-600' : 'text-red-600')" x-text="videoDetail.feedback?.score || 'N/A'"></div>
+                            <div class="text-[32px] font-display" :class="(videoDetail.feedback?.score ?? videoDetail.aiScore ?? 0) >= 70 ? 'text-green-600' : ((videoDetail.feedback?.score ?? videoDetail.aiScore ?? 0) >= 40 ? 'text-amber-600' : 'text-red-600')" x-text="videoDetail.feedback?.score ?? videoDetail.aiScore ?? 'N/A'"></div>
                             <div class="text-[10px] text-dark/40 uppercase">Quality Score</div>
                         </div>
                         <div class="flex-1">
                             <div class="h-3 bg-dark/10 rounded-full overflow-hidden">
                                 <div class="h-full rounded-full transition-all" 
-                                     :class="videoDetail.feedback?.score >= 70 ? 'bg-green-500' : (videoDetail.feedback?.score >= 40 ? 'bg-amber-500' : 'bg-red-500')"
-                                     :style="'width: ' + (videoDetail.feedback?.score || 0) + '%'"></div>
+                                     :class="(videoDetail.feedback?.score ?? videoDetail.aiScore ?? 0) >= 70 ? 'bg-green-500' : ((videoDetail.feedback?.score ?? videoDetail.aiScore ?? 0) >= 40 ? 'bg-amber-500' : 'bg-red-500')"
+                                     :style="'width: ' + (videoDetail.feedback?.score ?? videoDetail.aiScore ?? 0) + '%'"></div>
                             </div>
                         </div>
                     </div>
@@ -2433,12 +2433,13 @@ if (file_exists($errorLogFile)) {
             videoPlayer: null,
 
             // Open video detail modal
-            openVideoDetail(id, title, filePath, feedback) {
+            openVideoDetail(id, title, filePath, feedback, aiScore = null) {
                 this.videoDetail = {
                     id: id,
                     title: title,
                     filePath: filePath,
-                    feedback: feedback || {}
+                    feedback: feedback || {},
+                    aiScore: aiScore  // Store ai_score from database as fallback
                 };
                 this.videoDetailOpen = true;
                 
