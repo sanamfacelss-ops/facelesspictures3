@@ -374,6 +374,7 @@ class ContentModerationService
             
             // Hindi/Hinglish profanity (various spellings)
             'madarchod', 'madarchodd', 'madarchot', 'maderchod', 'maderchot', 'mc',
+            'macdrcchod', 'macdrchod', 'madrchod', 'madrcchod',  // common misspellings
             'bhenchod', 'behenchod', 'banchod', 'benchod', 'bhenchot', 'bc',
             'chutiya', 'chutiye', 'chutia', 'chutiyo', 'choot', 'chut',
             'gaand', 'gand', 'gaandu', 'gandu',
@@ -403,22 +404,31 @@ class ContentModerationService
         
         // Phonetic/fuzzy patterns - common mistranscriptions of Hindi profanity
         $phoneticPatterns = [
-            // "madarchod" often becomes "mother" + variations
+            // "madarchod" - many variations and misspellings
             '/\bmother\s*ch[aou]+[dt]?\b/i' => 'madarchod',
             '/\bmadar\s*ch[aou]+[dt]?\b/i' => 'madarchod',
             '/\bmader\s*ch[aou]+[dt]?\b/i' => 'madarchod',
             '/\bma+[dt]ar?\s*cho+[dt]?\b/i' => 'madarchod',
+            '/\bmadr[c]?ch/i' => 'madarchod',
+            '/\bmadrc+h/i' => 'madarchod',
+            '/\bmadc+h/i' => 'madarchod',
+            '/\bmacdr/i' => 'madarchod',
+            '/\bm[ae]c?dr/i' => 'madarchod',  // catches "macdr", "madr", "mecdr"
             // "le madarchod" often transcribed with "la" or "lay" or "let"
             '/\b(le|la|lay|let)[\'s]?\s*(ma|mo).*ch[aou]+[dt]?\b/i' => 'le madarchod',
             // "bhenchod" patterns
             '/\bben\s*ch[aou]+[dt]?\b/i' => 'bhenchod',
+            '/\bbhen\s*ch/i' => 'bhenchod',
             '/\bsister\s*f[u]+ck/i' => 'bhenchod',
             // "chutiya" patterns  
             '/\bchoo+t[iy]+[ae]?\b/i' => 'chutiya',
+            '/\bchut[iy]/i' => 'chutiya',
             // "gaandu/gandu" patterns
             '/\bg[au]+n?d[u]+\b/i' => 'gandu',
             // "bhosdike" patterns
             '/\bb[ho]+s[dt]i?k[ea]?\b/i' => 'bhosdike',
+            '/\bbosdi/i' => 'bhosdike',
+            '/\bbosri/i' => 'bhosdike',  // common mistranscription
             // "randi" patterns
             '/\br[au]n?di\b/i' => 'randi',
             // "lund/lauda" patterns
