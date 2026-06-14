@@ -146,10 +146,17 @@ class VideoProcessingService
                     $startTime
                 );
             }
-            if ($nsfwResult['max_score'] >= $this->nsfwFlagThreshold) {
-                $score -= 30;
+            
+            // Flag if score is above threshold OR if any concerning categories detected
+            $concerningCategories = ['violence', 'sexual', 'hate', 'selfharm', 'self-harm', 'nudity', 'gore', 'nsfw'];
+            $hasConcerningCategory = !empty(array_intersect(array_map('strtolower', $nsfwResult['categories']), $concerningCategories));
+            
+            if ($nsfwResult['max_score'] >= $this->nsfwFlagThreshold || $hasConcerningCategory) {
+                $deduction = $hasConcerningCategory ? max(20, (int)($nsfwResult['max_score'] * 100 * 0.5)) : 30;
+                $score -= $deduction;
                 $flags[] = 'nsfw_warning';
-                $feedback[] = "Visual content requires review (score: " . round($nsfwResult['max_score'], 2) . ")";
+                $feedback[] = "Visual content flagged: " . implode(', ', $nsfwResult['categories']) . " (score: " . round($nsfwResult['max_score'] * 100) . "%)";
+                log_message('info', "Video {$videoId} flagged for visual content: categories=" . implode(',', $nsfwResult['categories']) . ", score=" . $nsfwResult['max_score']);
             }
 
             // Step 4: Transcribe audio
