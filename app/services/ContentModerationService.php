@@ -39,6 +39,7 @@ class ContentModerationService
         $getEnv = function(string $key): string {
             // First try $_ENV
             if (!empty($_ENV[$key])) {
+                log_message('debug', "ContentModerationService: Got {$key} from \$_ENV");
                 return $_ENV[$key];
             }
             // Fallback to settings table with env_ prefix
@@ -46,8 +47,14 @@ class ContentModerationService
                 $stmt = $this->db->prepare("SELECT value FROM settings WHERE `key` = ?");
                 $stmt->execute(['env_' . $key]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                return $row['value'] ?? '';
+                if (!empty($row['value'])) {
+                    log_message('debug', "ContentModerationService: Got {$key} from database");
+                    return $row['value'];
+                }
+                log_message('debug', "ContentModerationService: {$key} not found in database");
+                return '';
             } catch (\Exception $e) {
+                log_message('error', "ContentModerationService: Error getting {$key}: " . $e->getMessage());
                 return '';
             }
         };
@@ -65,6 +72,14 @@ class ContentModerationService
         
         // RapidAPI / API4AI (Fallback for images)
         $this->rapidApiKey = $getEnv('RAPIDAPI_KEY');
+        
+        // Log what was loaded
+        log_message('info', sprintf(
+            "ContentModerationService initialized - Azure: %s, SightEngine: %s, RapidAPI: %s",
+            !empty($this->azureEndpoint) && !empty($this->azureKey) ? 'YES' : 'NO',
+            !empty($this->sightengineUser) && !empty($this->sightengineSecret) ? 'YES' : 'NO',
+            !empty($this->rapidApiKey) ? 'YES' : 'NO'
+        ));
     }
 
     /**
