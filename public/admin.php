@@ -1166,10 +1166,6 @@ if (file_exists($errorLogFile)) {
                                         <p class="text-[10px] text-dark/30 mt-1">For 60s 1080p: ~50MB is enough</p>
                                     </div>
                                 </div>
-                                        <label class="block text-[12px] text-dark/50 mb-1">Max Duration (sec)</label>
-                                        <input type="number" x-model="aiSettings.ai_max_duration" @change="saveAISetting('ai_max_duration', aiSettings.ai_max_duration)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="60" max="600">
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
