@@ -370,6 +370,7 @@ $categoryInfo = [
                     xhr.onload = () => {
                         this.uploading = false;
                         this.loading = false;
+                        console.log('Upload response:', xhr.status, xhr.responseText);
                         try {
                             const res = JSON.parse(xhr.responseText);
                             if (xhr.status >= 200 && xhr.status < 300) {
@@ -378,7 +379,10 @@ $categoryInfo = [
                             } else {
                                 this.errors = res.errors || [res.error || 'Upload failed'];
                             }
-                        } catch { this.errors = ['Server error']; }
+                        } catch (e) { 
+                            console.error('Parse error:', e, 'Response:', xhr.responseText);
+                            this.errors = ['Server error: ' + (xhr.responseText.substring(0, 200) || 'Empty response')]; 
+                        }
                     };
                     xhr.onerror = () => {
                         this.uploading = false;

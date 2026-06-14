@@ -32,30 +32,38 @@ class Video
 
     public function create(array $data): int
     {
-        $columns = ['user_id', 'season_id', 'title', 'content_type', 'file_path', 'status'];
+        // Check which columns exist in the table to avoid errors from missing migrations
+        $existingColumns = $this->getTableColumns();
+        
+        $columns = ['user_id', 'season_id', 'title', 'file_path', 'status'];
         $values = [
             $data['user_id'],
             $data['season_id'],
             $data['title'],
-            $data['content_type'] ?? null,
             $data['file_path'],
             'pending'
         ];
         
-        // Add optional fields if present
-        if (isset($data['recording_mode'])) {
+        // Add content_type if column exists (migration 002)
+        if (in_array('content_type', $existingColumns) && isset($data['content_type'])) {
+            $columns[] = 'content_type';
+            $values[] = $data['content_type'];
+        }
+        
+        // Add optional fields if present AND column exists (migration 003)
+        if (in_array('recording_mode', $existingColumns) && isset($data['recording_mode'])) {
             $columns[] = 'recording_mode';
             $values[] = $data['recording_mode'];
         }
-        if (isset($data['script_content'])) {
+        if (in_array('script_content', $existingColumns) && isset($data['script_content'])) {
             $columns[] = 'script_content';
             $values[] = $data['script_content'];
         }
-        if (isset($data['video_duration'])) {
+        if (in_array('video_duration', $existingColumns) && isset($data['video_duration'])) {
             $columns[] = 'video_duration';
             $values[] = $data['video_duration'];
         }
-        if (isset($data['thumbnail_path'])) {
+        if (in_array('thumbnail_path', $existingColumns) && isset($data['thumbnail_path'])) {
             $columns[] = 'thumbnail_path';
             $values[] = $data['thumbnail_path'];
         }
@@ -66,6 +74,19 @@ class Video
         $stmt = $this->db->prepare("INSERT INTO videos ({$columnStr}) VALUES ({$placeholders})");
         $stmt->execute($values);
         return (int) $this->db->lastInsertId();
+    }
+    
+    /**
+     * Get list of column names in the videos table
+     */
+    private function getTableColumns(): array
+    {
+        static $columns = null;
+        if ($columns === null) {
+            $stmt = $this->db->query("DESCRIBE videos");
+            $columns = array_column($stmt->fetchAll(), 'Field');
+        }
+        return $columns;
     }
 
     public function updateStatus(int $id, string $status, ?string $reason = null): bool
@@ -128,10 +149,21 @@ class Video
      */
     public function existsForSeasonAndType(int $userId, int $seasonId, string $contentType): bool
     {
-        $stmt = $this->db->prepare(
-            "SELECT 1 FROM videos WHERE user_id = ? AND season_id = ? AND content_type = ? LIMIT 1"
-        );
-        $stmt->execute([$userId, $seasonId, $contentType]);
+        // Check if content_type column exists (migration 002)
+        $existingColumns = $this->getTableColumns();
+        
+        if (in_array('content_type', $existingColumns)) {
+            $stmt = $this->db->prepare(
+                "SELECT 1 FROM videos WHERE user_id = ? AND season_id = ? AND content_type = ? LIMIT 1"
+            );
+            $stmt->execute([$userId, $seasonId, $contentType]);
+        } else {
+            // Fallback: one video per user per season (original schema)
+            $stmt = $this->db->prepare(
+                "SELECT 1 FROM videos WHERE user_id = ? AND season_id = ? LIMIT 1"
+            );
+            $stmt->execute([$userId, $seasonId]);
+        }
         return (bool) $stmt->fetch();
     }
 
