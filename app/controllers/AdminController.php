@@ -738,8 +738,9 @@ class AdminController
             $sightSecret = $getKey('SIGHTENGINE_API_SECRET');
             if (!empty($sightUser) && !empty($sightSecret)) {
                 try {
-                    $url = 'https://api.sightengine.com/1.0/check.json';
-                    $ch = curl_init($url . '?models=nudity&api_user=' . $sightUser . '&api_secret=' . $sightSecret . '&url=' . urlencode('https://via.placeholder.com/100'));
+                    $testImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png';
+                    $url = 'https://api.sightengine.com/1.0/check.json?models=nudity-2.0&api_user=' . $sightUser . '&api_secret=' . $sightSecret . '&url=' . urlencode($testImageUrl);
+                    $ch = curl_init($url);
                     curl_setopt_array($ch, [
                         CURLOPT_RETURNTRANSFER => true,
                         CURLOPT_TIMEOUT => 10
@@ -748,7 +749,12 @@ class AdminController
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                     curl_close($ch);
                     $data = json_decode($response, true);
-                    $results['sightengine'] = ($httpCode === 200 && isset($data['status']) && $data['status'] === 'success') ? 'OK' : 'HTTP ' . $httpCode;
+                    if ($httpCode === 200 && isset($data['status']) && $data['status'] === 'success') {
+                        $results['sightengine'] = 'OK';
+                    } else {
+                        $errorMsg = $data['error']['message'] ?? 'HTTP ' . $httpCode;
+                        $results['sightengine'] = substr($errorMsg, 0, 30);
+                    }
                 } catch (\Exception $e) {
                     $results['sightengine'] = 'Error';
                 }
@@ -760,16 +766,13 @@ class AdminController
             $rapidKey = $getKey('RAPIDAPI_KEY');
             if (!empty($rapidKey)) {
                 try {
-                    $ch = curl_init('https://nsfw3.p.rapidapi.com/v1/results');
+                    $ch = curl_init('https://nsfw3.p.rapidapi.com/v1/results?url=' . urlencode('https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png'));
                     curl_setopt_array($ch, [
                         CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_POST => true,
                         CURLOPT_HTTPHEADER => [
                             'X-RapidAPI-Key: ' . $rapidKey,
-                            'X-RapidAPI-Host: nsfw3.p.rapidapi.com',
-                            'Content-Type: application/json'
+                            'X-RapidAPI-Host: nsfw3.p.rapidapi.com'
                         ],
-                        CURLOPT_POSTFIELDS => json_encode(['url' => 'https://via.placeholder.com/100']),
                         CURLOPT_TIMEOUT => 15
                     ]);
                     $response = curl_exec($ch);
