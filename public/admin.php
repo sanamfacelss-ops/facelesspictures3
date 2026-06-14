@@ -1565,7 +1565,7 @@ if (file_exists($errorLogFile)) {
                         
                         <!-- API Configuration Form -->
                         <div class="lg:col-span-1">
-                            <form @submit.prevent="saveApiKeys()" class="bg-white rounded-xl border border-dark/5 p-5">
+                            <form @submit.prevent="saveAPIKeys()" class="bg-white rounded-xl border border-dark/5 p-5">
                                 <h3 class="font-semibold text-dark mb-4 flex items-center gap-2">
                                     <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                     API Configuration
