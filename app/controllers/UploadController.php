@@ -82,9 +82,10 @@ class UploadController
                 $errors[] = 'You are not registered for this content type.';
             }
             
-            // Check if already submitted this content type for this season
-            if (!empty($contentType) && $seasonId && $this->videoModel->existsForSeasonAndType((int) $user['id'], $seasonId, $contentType)) {
-                $errors[] = 'You have already uploaded a ' . $contentType . ' video for this season.';
+            // Check if user has reached the limit for this script (2 videos per script)
+            $scriptId = !empty($_POST['script_id']) ? (int) $_POST['script_id'] : null;
+            if ($seasonId && $this->videoModel->hasReachedScriptLimit((int) $user['id'], $seasonId, $scriptId, 2)) {
+                $errors[] = 'You have already uploaded 2 videos for this script. Try a different script!';
             }
             
             if (empty($_FILES['video']) || $_FILES['video']['error'] !== UPLOAD_ERR_OK) {

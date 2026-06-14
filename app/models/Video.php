@@ -145,26 +145,47 @@ class Video
     }
 
     /**
-     * Check if user has already submitted a specific content type for a season
+     * Count how many videos user has uploaded for a specific script in a season
      */
-    public function existsForSeasonAndType(int $userId, int $seasonId, string $contentType): bool
+    public function countForSeasonAndScript(int $userId, int $seasonId, ?int $scriptId): int
     {
-        // Check if content_type column exists (migration 002)
-        $existingColumns = $this->getTableColumns();
-        
-        if (in_array('content_type', $existingColumns)) {
+        if ($scriptId) {
+            // Count videos for this specific script
             $stmt = $this->db->prepare(
-                "SELECT 1 FROM videos WHERE user_id = ? AND season_id = ? AND content_type = ? LIMIT 1"
+                "SELECT COUNT(*) FROM videos 
+                 WHERE user_id = ? AND season_id = ? AND script_content = (
+                     SELECT content FROM scripts WHERE id = ?
+                 )"
             );
-            $stmt->execute([$userId, $seasonId, $contentType]);
+            $stmt->execute([$userId, $seasonId, $scriptId]);
         } else {
-            // Fallback: one video per user per season (original schema)
+            // For freeform uploads (no script), count all freeform videos
             $stmt = $this->db->prepare(
-                "SELECT 1 FROM videos WHERE user_id = ? AND season_id = ? LIMIT 1"
+                "SELECT COUNT(*) FROM videos 
+                 WHERE user_id = ? AND season_id = ? AND (script_content IS NULL OR script_content = '')"
             );
             $stmt->execute([$userId, $seasonId]);
         }
-        return (bool) $stmt->fetch();
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Check if user has reached the limit for a specific script (2 videos per script)
+     */
+    public function hasReachedScriptLimit(int $userId, int $seasonId, ?int $scriptId, int $limit = 2): bool
+    {
+        return $this->countForSeasonAndScript($userId, $seasonId, $scriptId) >= $limit;
+    }
+
+    /**
+     * Check if user has already submitted a specific content type for a season
+     * @deprecated Use hasReachedScriptLimit instead
+     */
+    public function existsForSeasonAndType(int $userId, int $seasonId, string $contentType): bool
+    {
+        // This method is kept for backward compatibility but now always returns false
+        // to allow multiple uploads per content type
+        return false;
     }
 
     public function allApproved(): array
