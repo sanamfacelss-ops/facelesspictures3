@@ -252,9 +252,17 @@ class VideoProcessingService
         foreach ($frameFiles as $framePath) {
             $result = $this->moderationService->moderateImage($framePath);
             
+            // Always capture the provider from the first successful result
+            if ($provider === 'none' && !empty($result['provider']) && $result['provider'] !== 'none' && $result['provider'] !== 'error') {
+                $provider = $result['provider'];
+            }
+            
             if ($result['score'] > $maxScore) {
                 $maxScore = $result['score'];
-                $provider = $result['provider'];
+                // Update provider to the one that found the highest score
+                if (!empty($result['provider']) && $result['provider'] !== 'none' && $result['provider'] !== 'error') {
+                    $provider = $result['provider'];
+                }
             }
             
             foreach ($result['categories'] as $cat) {
