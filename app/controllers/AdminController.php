@@ -641,7 +641,7 @@ class AdminController
     }
 
     /**
-     * Test an AI provider
+     * Test AI providers
      */
     public function testAIProvider(): void
     {
@@ -649,33 +649,99 @@ class AdminController
         
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
-        $provider = trim($_POST['provider'] ?? '');
-        $type = trim($_POST['type'] ?? 'text'); // text, image, transcription
-
-        if (!in_array($provider, ['azure', 'openai', 'sightengine', 'rapidapi', 'groq', 'local'])) {
-            http_response_code(422);
-            echo json_encode(['error' => 'Invalid provider']);
-            return;
-        }
-
         try {
-            $result = ['provider' => $provider, 'type' => $type, 'status' => 'unknown'];
+            $results = [];
+            $settingsModel = new \App\Models\Settings();
             
-            if ($type === 'text') {
-                $moderationService = new \App\Services\ContentModerationService();
-                $testResult = $moderationService->moderateText('This is a test message for content moderation.');
-                $result['status'] = 'success';
-                $result['response'] = $testResult;
-            } elseif ($type === 'transcription') {
-                $transcriptionService = new \App\Services\TranscriptionService();
-                $result['status'] = $transcriptionService->isAvailable() ? 'available' : 'not_configured';
-                $result['message'] = $result['status'] === 'available' 
-                    ? 'Groq Whisper API is configured and ready'
-                    : 'GROQ_API_KEY not set in environment';
+            // Test OpenAI Moderation
+            $openaiKey = $_ENV['OPENAI_API_KEY'] ?? getenv('OPENAI_API_KEY') ?: $settingsModel->get('env_OPENAI_API_KEY');
+            if (!empty($openaiKey)) {
+                try {
+                    $ch = curl_init('https://api.openai.com/v1/moderations');
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => [
+                            'Authorization: Bearer ' . $openaiKey,
+                            'Content-Type: application/json'
+                        ],
+                        CURLOPT_POSTFIELDS => json_encode(['input' => 'test']),
+                        CURLOPT_TIMEOUT => 10
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['openai'] = $httpCode === 200 ? 'OK' : 'Failed (HTTP ' . $httpCode . ')';
+                } catch (\Exception $e) {
+                    $results['openai'] = 'Error: ' . $e->getMessage();
+                }
+            } else {
+                $results['openai'] = 'Not configured';
             }
             
-            debug_log("Admin tested AI provider: $provider ($type) - {$result['status']}", 'ADMIN');
-            echo json_encode(['success' => true, 'result' => $result]);
+            // Test Groq
+            $groqKey = $_ENV['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?: $settingsModel->get('env_GROQ_API_KEY');
+            if (!empty($groqKey)) {
+                try {
+                    $ch = curl_init('https://api.groq.com/openai/v1/models');
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HTTPHEADER => [
+                            'Authorization: Bearer ' . $groqKey
+                        ],
+                        CURLOPT_TIMEOUT => 10
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['groq'] = $httpCode === 200 ? 'OK' : 'Failed (HTTP ' . $httpCode . ')';
+                } catch (\Exception $e) {
+                    $results['groq'] = 'Error: ' . $e->getMessage();
+                }
+            } else {
+                $results['groq'] = 'Not configured';
+            }
+            
+            // Test Azure
+            $azureEndpoint = $_ENV['AZURE_CONTENT_SAFETY_ENDPOINT'] ?? getenv('AZURE_CONTENT_SAFETY_ENDPOINT') ?: $settingsModel->get('env_AZURE_CONTENT_SAFETY_ENDPOINT');
+            $azureKey = $_ENV['AZURE_CONTENT_SAFETY_KEY'] ?? getenv('AZURE_CONTENT_SAFETY_KEY') ?: $settingsModel->get('env_AZURE_CONTENT_SAFETY_KEY');
+            if (!empty($azureEndpoint) && !empty($azureKey)) {
+                try {
+                    $url = rtrim($azureEndpoint, '/') . '/contentsafety/text:analyze?api-version=2023-10-01';
+                    $ch = curl_init($url);
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => [
+                            'Ocp-Apim-Subscription-Key: ' . $azureKey,
+                            'Content-Type: application/json'
+                        ],
+                        CURLOPT_POSTFIELDS => json_encode(['text' => 'test']),
+                        CURLOPT_TIMEOUT => 10
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['azure'] = $httpCode === 200 ? 'OK' : 'Failed (HTTP ' . $httpCode . ')';
+                } catch (\Exception $e) {
+                    $results['azure'] = 'Error: ' . $e->getMessage();
+                }
+            } else {
+                $results['azure'] = 'Not configured';
+            }
+            
+            // Summary
+            $okCount = count(array_filter($results, fn($r) => $r === 'OK'));
+            $totalConfigured = count(array_filter($results, fn($r) => $r !== 'Not configured'));
+            
+            debug_log("Admin tested AI providers: " . json_encode($results), 'ADMIN');
+            echo json_encode([
+                'success' => true, 
+                'result' => [
+                    'status' => "$okCount/$totalConfigured providers working",
+                    'details' => $results
+                ]
+            ]);
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_TEST_AI_PROVIDER');
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);

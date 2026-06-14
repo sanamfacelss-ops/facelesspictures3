@@ -2075,13 +2075,17 @@ if (file_exists($errorLogFile)) {
                 this.showToast('Testing AI providers...');
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                formData.append('provider', 'all');
-                formData.append('type', 'text');
                 try {
                     const res = await fetch('/api/admin/ai/test', { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
-                        this.showToast('AI connection test passed: ' + data.result.status);
+                        const details = data.result.details;
+                        let msg = data.result.status + '\n';
+                        for (const [provider, status] of Object.entries(details)) {
+                            msg += `${provider}: ${status}\n`;
+                        }
+                        this.showToast(data.result.status);
+                        alert('AI Provider Test Results:\n\n' + Object.entries(details).map(([k,v]) => `${k.toUpperCase()}: ${v}`).join('\n'));
                     } else {
                         this.showToast('AI test failed: ' + (data.error || 'Unknown error'), 'error');
                     }
