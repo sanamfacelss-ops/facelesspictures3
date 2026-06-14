@@ -102,33 +102,53 @@ class ContentModerationService
             return ['safe' => true, 'score' => 0, 'categories' => [], 'provider' => 'error', 'error' => 'File not found'];
         }
 
+        $errors = [];
+
         // Try Azure first
-        $result = $this->tryAzureImage($imagePath);
-        if ($result !== false) {
-            return $result;
+        if (empty($this->azureEndpoint) || empty($this->azureKey)) {
+            $errors[] = 'Azure: Not configured (missing endpoint or key)';
+            log_message('debug', 'Azure image moderation skipped: not configured');
+        } else {
+            $result = $this->tryAzureImage($imagePath);
+            if ($result !== false) {
+                return $result;
+            }
+            $errors[] = 'Azure: API call failed';
         }
 
         // Fallback to SightEngine
-        $result = $this->trySightEngineImage($imagePath);
-        if ($result !== false) {
-            return $result;
+        if (empty($this->sightengineUser) || empty($this->sightengineSecret)) {
+            $errors[] = 'SightEngine: Not configured (missing user or secret)';
+            log_message('debug', 'SightEngine skipped: not configured');
+        } else {
+            $result = $this->trySightEngineImage($imagePath);
+            if ($result !== false) {
+                return $result;
+            }
+            $errors[] = 'SightEngine: API call failed';
         }
 
         // Fallback to API4AI
-        $result = $this->tryApi4AIImage($imagePath);
-        if ($result !== false) {
-            return $result;
+        if (empty($this->rapidApiKey)) {
+            $errors[] = 'RapidAPI: Not configured (missing key)';
+            log_message('debug', 'API4AI/RapidAPI skipped: not configured');
+        } else {
+            $result = $this->tryApi4AIImage($imagePath);
+            if ($result !== false) {
+                return $result;
+            }
+            $errors[] = 'RapidAPI: API call failed';
         }
 
         // All APIs failed - assume safe and let through (don't penalize user for API issues)
-        log_message('warning', 'All image moderation APIs failed, assuming safe content');
+        log_message('warning', 'All image moderation APIs failed: ' . implode('; ', $errors));
         return [
             'safe' => true,
             'score' => 0,
             'categories' => ['api_failure'],
             'provider' => 'none',
             'needs_manual_review' => false,
-            'error' => 'All moderation APIs unavailable - content assumed safe'
+            'error' => implode('; ', $errors)
         ];
     }
 
