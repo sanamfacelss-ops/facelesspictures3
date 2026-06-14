@@ -920,4 +920,287 @@ class AdminController
             echo json_encode(['error' => 'YouTube upload error: ' . $e->getMessage()]);
         }
     }
+
+    /**
+     * Test YouTube connection only (also checks AI is ready)
+     */
+    public function testYouTube(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            
+            $getKey = function($key) use ($settingsModel) {
+                $value = $_ENV[$key] ?? getenv($key) ?: null;
+                if (empty($value)) {
+                    $value = $settingsModel->get('api_key_' . strtolower($key));
+                }
+                return $value;
+            };
+
+            $results = [
+                'api_key' => false,
+                'client_id' => false,
+                'client_secret' => false,
+                'refresh_token' => false,
+                'channel_id' => false,
+                'oauth_test' => false,
+                'channel_access' => false,
+                'ai_ready' => false,
+            ];
+
+            // Check each credential
+            $apiKey = $getKey('YOUTUBE_API_KEY');
+            $clientId = $getKey('YOUTUBE_CLIENT_ID');
+            $clientSecret = $getKey('YOUTUBE_CLIENT_SECRET');
+            $refreshToken = $getKey('YOUTUBE_REFRESH_TOKEN');
+            $channelId = $getKey('YOUTUBE_CHANNEL_ID');
+
+            $results['api_key'] = !empty($apiKey);
+            $results['client_id'] = !empty($clientId);
+            $results['client_secret'] = !empty($clientSecret);
+            $results['refresh_token'] = !empty($refreshToken);
+            $results['channel_id'] = !empty($channelId);
+
+            $accessToken = null;
+            $errorMessage = null;
+
+            // Test OAuth token refresh
+            if ($results['client_id'] && $results['client_secret'] && $results['refresh_token']) {
+                $ch = curl_init('https://oauth2.googleapis.com/token');
+                curl_setopt_array($ch, [
+                    CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => http_build_query([
+                        'grant_type' => 'refresh_token',
+                        'client_id' => $clientId,
+                        'client_secret' => $clientSecret,
+                        'refresh_token' => $refreshToken,
+                    ]),
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 15,
+                ]);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                $data = json_decode($response, true);
+                if ($httpCode === 200 && !empty($data['access_token'])) {
+                    $results['oauth_test'] = true;
+                    $accessToken = $data['access_token'];
+                } else {
+                    $errorMessage = $data['error_description'] ?? $data['error'] ?? 'OAuth failed';
+                }
+            }
+
+            // Test channel access if we have access token
+            if ($accessToken && $results['channel_id']) {
+                $ch = curl_init('https://www.googleapis.com/youtube/v3/channels?part=snippet&id=' . urlencode($channelId));
+                curl_setopt_array($ch, [
+                    CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $accessToken],
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 10,
+                ]);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                $data = json_decode($response, true);
+                if ($httpCode === 200 && !empty($data['items'])) {
+                    $results['channel_access'] = true;
+                    $results['channel_name'] = $data['items'][0]['snippet']['title'] ?? 'Unknown';
+                }
+            }
+
+            // Check if AI is ready (at least one text + one image provider working)
+            $aiWorking = 0;
+            
+            // Check Azure
+            $azureEndpoint = $getKey('AZURE_CONTENT_SAFETY_ENDPOINT');
+            $azureKey = $getKey('AZURE_CONTENT_SAFETY_KEY');
+            if (!empty($azureEndpoint) && !empty($azureKey)) {
+                $aiWorking++;
+            }
+            
+            // Check SightEngine
+            $seUser = $getKey('SIGHTENGINE_API_USER');
+            $seSecret = $getKey('SIGHTENGINE_API_SECRET');
+            if (!empty($seUser) && !empty($seSecret)) {
+                $aiWorking++;
+            }
+            
+            // Check Groq (transcription)
+            $groqKey = $getKey('GROQ_API_KEY');
+            if (!empty($groqKey)) {
+                $aiWorking++;
+            }
+            
+            // Check FFmpeg
+            $ffmpegPath = $getKey('FFMPEG_PATH') ?: 'ffmpeg';
+            exec($ffmpegPath . ' -version 2>&1', $ffmpegOut, $ffmpegCode);
+            if ($ffmpegCode === 0) {
+                $aiWorking++;
+            }
+            
+            $results['ai_ready'] = ($aiWorking >= 3); // Need at least 3 AI services configured
+            $results['ai_services'] = $aiWorking;
+
+            // Summary
+            $youtubeChecks = ['api_key', 'client_id', 'client_secret', 'refresh_token', 'channel_id', 'oauth_test', 'channel_access'];
+            $youtubePassed = count(array_filter($youtubeChecks, fn($k) => $results[$k] === true));
+
+            echo json_encode([
+                'success' => true,
+                'results' => $results,
+                'youtube_passed' => $youtubePassed,
+                'youtube_total' => 7,
+                'youtube_ready' => ($youtubePassed >= 6),
+                'ai_ready' => $results['ai_ready'],
+                'all_ready' => ($youtubePassed >= 6 && $results['ai_ready']),
+                'error' => $errorMessage,
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_TEST_YOUTUBE');
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Test AI providers only (no YouTube)
+     */
+    public function testAI(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $results = [];
+            
+            $getKey = function($key) use ($settingsModel) {
+                $value = $_ENV[$key] ?? getenv($key) ?: null;
+                if (empty($value)) {
+                    $value = $settingsModel->get('api_key_' . strtolower($key));
+                }
+                return $value;
+            };
+
+            // Test Azure
+            $azureEndpoint = $getKey('AZURE_CONTENT_SAFETY_ENDPOINT');
+            $azureKey = $getKey('AZURE_CONTENT_SAFETY_KEY');
+            if (!empty($azureEndpoint) && !empty($azureKey)) {
+                try {
+                    $ch = curl_init(rtrim($azureEndpoint, '/') . '/contentsafety/text:analyze?api-version=2023-10-01');
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Ocp-Apim-Subscription-Key: ' . $azureKey],
+                        CURLOPT_POSTFIELDS => json_encode(['text' => 'test', 'categories' => ['Hate']]),
+                        CURLOPT_TIMEOUT => 15
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['azure'] = ($httpCode === 200) ? 'OK' : 'HTTP ' . $httpCode;
+                } catch (\Exception $e) {
+                    $results['azure'] = 'Error';
+                }
+            } else {
+                $results['azure'] = 'Not configured';
+            }
+
+            // Test OpenAI
+            $openaiKey = $getKey('OPENAI_API_KEY');
+            if (!empty($openaiKey)) {
+                try {
+                    $ch = curl_init('https://api.openai.com/v1/models');
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $openaiKey],
+                        CURLOPT_TIMEOUT => 10
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['openai'] = ($httpCode === 200) ? 'OK' : 'HTTP ' . $httpCode;
+                } catch (\Exception $e) {
+                    $results['openai'] = 'Error';
+                }
+            } else {
+                $results['openai'] = 'Not configured';
+            }
+
+            // Test SightEngine
+            $seUser = $getKey('SIGHTENGINE_API_USER');
+            $seSecret = $getKey('SIGHTENGINE_API_SECRET');
+            if (!empty($seUser) && !empty($seSecret)) {
+                try {
+                    $testImageUrl = 'https://sightengine.com/assets/img/examples/example7.jpg';
+                    $ch = curl_init('https://api.sightengine.com/1.0/check.json?' . http_build_query([
+                        'models' => 'nudity-2.0',
+                        'api_user' => $seUser,
+                        'api_secret' => $seSecret,
+                        'url' => $testImageUrl
+                    ]));
+                    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 15]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $data = json_decode($response, true);
+                    $results['sightengine'] = ($httpCode === 200 && ($data['status'] ?? '') === 'success') ? 'OK' : 'HTTP ' . $httpCode;
+                } catch (\Exception $e) {
+                    $results['sightengine'] = 'Error';
+                }
+            } else {
+                $results['sightengine'] = 'Not configured';
+            }
+
+            // Test Groq
+            $groqKey = $getKey('GROQ_API_KEY');
+            if (!empty($groqKey)) {
+                try {
+                    $ch = curl_init('https://api.groq.com/openai/v1/models');
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $groqKey],
+                        CURLOPT_TIMEOUT => 10
+                    ]);
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    $results['groq'] = ($httpCode === 200) ? 'OK' : 'HTTP ' . $httpCode;
+                } catch (\Exception $e) {
+                    $results['groq'] = 'Error';
+                }
+            } else {
+                $results['groq'] = 'Not configured';
+            }
+
+            // Test FFmpeg
+            $ffmpegPath = $getKey('FFMPEG_PATH') ?: 'ffmpeg';
+            $ffprobePath = $getKey('FFPROBE_PATH') ?: 'ffprobe';
+            exec($ffmpegPath . ' -version 2>&1', $ffmpegOut, $ffmpegCode);
+            exec($ffprobePath . ' -version 2>&1', $ffprobeOut, $ffprobeCode);
+            $results['ffmpeg'] = $ffmpegCode === 0 ? 'OK' : 'Not found';
+            $results['ffprobe'] = $ffprobeCode === 0 ? 'OK' : 'Not found';
+
+            // Summary
+            $okCount = count(array_filter($results, fn($r) => str_starts_with($r, 'OK')));
+            $total = count($results);
+            
+            echo json_encode([
+                'success' => true, 
+                'results' => $results,
+                'passed' => $okCount,
+                'total' => $total,
+                'ready' => ($okCount >= 4), // Need at least 4 services working
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_TEST_AI');
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
 }

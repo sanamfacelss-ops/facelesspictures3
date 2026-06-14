@@ -125,6 +125,8 @@ $routes = [
     'api/admin/ai/keys' => [AdminController::class, 'getAPIKeyStatus', 'GET'],
     'api/admin/ai/keys/update' => [AdminController::class, 'updateAPIKeys', 'POST'],
     'api/admin/youtube/publish/{id}' => [AdminController::class, 'publishToYouTube', 'POST'],
+    'api/admin/youtube/test' => [AdminController::class, 'testYouTube', 'POST'],
+    'api/admin/ai/test-only' => [AdminController::class, 'testAI', 'POST'],
 ];
 
 $matched = false;

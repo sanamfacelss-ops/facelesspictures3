@@ -1425,11 +1425,113 @@ if (file_exists($errorLogFile)) {
                                 </div>
                                 
                                 <!-- Test Button -->
-                                <button @click="testAIConnection()" 
-                                    class="px-4 py-2 bg-red-600 text-white rounded-lg text-[12px] font-medium hover:bg-red-700 transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    Test YouTube Connection
+                                <button @click="testYouTubeConnection()" 
+                                    :disabled="testingYouTube"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-lg text-[12px] font-medium hover:bg-red-700 transition flex items-center gap-2"
+                                    :class="testingYouTube ? 'opacity-50 cursor-not-allowed' : ''">
+                                    <svg x-show="testingYouTube" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <svg x-show="!testingYouTube" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span x-text="testingYouTube ? 'Testing...' : 'Test YouTube + AI Connection'"></span>
                                 </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Test Results Panel -->
+                        <div x-show="youtubeTestResults" x-cloak class="lg:col-span-3">
+                            <div class="bg-white rounded-xl border border-dark/5 p-5">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-dark flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                        Connection Test Results
+                                    </h3>
+                                    <button @click="youtubeTestResults = null" class="text-dark/30 hover:text-dark">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                                
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <!-- YouTube Results -->
+                                    <div>
+                                        <h4 class="font-medium text-[13px] text-dark mb-3 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                            YouTube (<span x-text="youtubeTestResults?.youtube_passed || 0"></span>/<span x-text="youtubeTestResults?.youtube_total || 7"></span>)
+                                        </h4>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">API Key</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.api_key ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">Client ID</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.client_id ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">Client Secret</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.client_secret ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">Refresh Token</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.refresh_token ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">Channel ID</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.channel_id ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">OAuth Token Test</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.oauth_test ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-2 bg-cream rounded-lg">
+                                                <span class="text-[12px] text-dark/70">Channel Access</span>
+                                                <span class="w-2 h-2 rounded-full" :class="youtubeTestResults?.results?.channel_access ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            </div>
+                                            <template x-if="youtubeTestResults?.results?.channel_name">
+                                                <div class="p-2 bg-green-50 border border-green-200 rounded-lg">
+                                                    <span class="text-[11px] text-green-700">Channel: <strong x-text="youtubeTestResults.results.channel_name"></strong></span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- AI Results -->
+                                    <div>
+                                        <h4 class="font-medium text-[13px] text-dark mb-3 flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                            AI Services (<span x-text="youtubeTestResults?.results?.ai_services || 0"></span>/4 configured)
+                                        </h4>
+                                        <div class="p-3 rounded-lg" :class="youtubeTestResults?.results?.ai_ready ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-3 h-3 rounded-full" :class="youtubeTestResults?.results?.ai_ready ? 'bg-green-500' : 'bg-red-500'"></span>
+                                                <span class="text-[12px] font-medium" :class="youtubeTestResults?.results?.ai_ready ? 'text-green-700' : 'text-red-700'" x-text="youtubeTestResults?.results?.ai_ready ? 'AI Ready for Processing' : 'AI Not Ready - Configure more services'"></span>
+                                            </div>
+                                            <p class="text-[10px] mt-1" :class="youtubeTestResults?.results?.ai_ready ? 'text-green-600' : 'text-red-600'">
+                                                Videos will be processed by AI before approval
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Overall Status -->
+                                <div class="mt-4 p-4 rounded-xl" :class="youtubeTestResults?.all_ready ? 'bg-green-100 border border-green-300' : 'bg-yellow-100 border border-yellow-300'">
+                                    <div class="flex items-center gap-3">
+                                        <template x-if="youtubeTestResults?.all_ready">
+                                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </template>
+                                        <template x-if="!youtubeTestResults?.all_ready">
+                                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        </template>
+                                        <div>
+                                            <p class="font-semibold" :class="youtubeTestResults?.all_ready ? 'text-green-800' : 'text-yellow-800'" x-text="youtubeTestResults?.all_ready ? '✓ System Ready!' : '⚠ Some issues detected'"></p>
+                                            <p class="text-[11px]" :class="youtubeTestResults?.all_ready ? 'text-green-700' : 'text-yellow-700'" x-text="youtubeTestResults?.all_ready ? 'Videos can be uploaded, processed by AI, and published to YouTube' : 'Check failed items above and fix credentials'"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <template x-if="youtubeTestResults?.error">
+                                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                        <p class="text-[11px] text-red-700"><strong>Error:</strong> <span x-text="youtubeTestResults.error"></span></p>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                         
@@ -2176,6 +2278,10 @@ if (file_exists($errorLogFile)) {
             confirmMessage: '',
             confirmCallback: null,
             
+            // YouTube test
+            testingYouTube: false,
+            youtubeTestResults: null,
+            
             // Toast
             toastShow: false,
             toastMessage: '',
@@ -2492,6 +2598,31 @@ if (file_exists($errorLogFile)) {
                 } catch (e) {
                     this.showToast('Failed to test AI connection', 'error');
                 }
+            },
+            
+            async testYouTubeConnection() {
+                this.testingYouTube = true;
+                this.youtubeTestResults = null;
+                this.showToast('Testing YouTube + AI connection...');
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                try {
+                    const res = await fetch('/api/admin/youtube/test', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.youtubeTestResults = data;
+                        if (data.all_ready) {
+                            this.showToast('✓ YouTube + AI ready!', 'success');
+                        } else {
+                            this.showToast('Some checks failed - see results', 'warning');
+                        }
+                    } else {
+                        this.showToast('Test failed: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to test connection', 'error');
+                }
+                this.testingYouTube = false;
             },
             
             // YouTube publish
