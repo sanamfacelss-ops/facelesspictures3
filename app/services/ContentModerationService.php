@@ -36,28 +36,49 @@ class ContentModerationService
         $this->db = Database::getConnection();
         
         // Helper function to get env value with database fallback
-        $getEnv = function(string $key): string {
+        $getEnv = function(string $key) use (&$debugKeys): string {
             // First try $_ENV
             if (!empty($_ENV[$key])) {
-                log_message('debug', "ContentModerationService: Got {$key} from \$_ENV");
+                log_message('info', "ContentModerationService: Got {$key} from \$_ENV");
                 return $_ENV[$key];
             }
+            
             // Fallback to settings table with env_ prefix
+            $dbKey = 'env_' . $key;
             try {
                 $stmt = $this->db->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
-                $stmt->execute(['env_' . $key]);
+                $stmt->execute([$dbKey]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 if (!empty($row['setting_value'])) {
-                    log_message('debug', "ContentModerationService: Got {$key} from database");
+                    log_message('info', "ContentModerationService: Got {$key} from database (key: {$dbKey}), value length: " . strlen($row['setting_value']));
                     return $row['setting_value'];
                 }
-                log_message('debug', "ContentModerationService: {$key} not found in database");
+                
+                // Try without env_ prefix as well
+                $stmt2 = $this->db->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
+                $stmt2->execute([$key]);
+                $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                if (!empty($row2['setting_value'])) {
+                    log_message('info', "ContentModerationService: Got {$key} from database (direct key), value length: " . strlen($row2['setting_value']));
+                    return $row2['setting_value'];
+                }
+                
+                log_message('warning', "ContentModerationService: {$key} NOT FOUND in database (tried: {$dbKey} and {$key})");
                 return '';
             } catch (\Exception $e) {
                 log_message('error', "ContentModerationService: Error getting {$key}: " . $e->getMessage());
                 return '';
             }
         };
+        
+        // Debug: List all env_ keys in database
+        try {
+            $stmt = $this->db->query("SELECT setting_key FROM settings WHERE setting_key LIKE 'env_%' OR setting_key LIKE '%AZURE%' OR setting_key LIKE '%SIGHTENGINE%' OR setting_key LIKE '%RAPIDAPI%'");
+            $allKeys = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            log_message('info', "ContentModerationService: Available API keys in DB: " . implode(', ', $allKeys));
+        } catch (\Exception $e) {
+            log_message('error', "ContentModerationService: Could not list keys: " . $e->getMessage());
+        }
         
         // Azure AI Content Safety (Primary)
         $this->azureEndpoint = $getEnv('AZURE_CONTENT_SAFETY_ENDPOINT');
