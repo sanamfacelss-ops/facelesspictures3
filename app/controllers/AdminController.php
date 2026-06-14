@@ -738,12 +738,13 @@ class AdminController
             $sightSecret = $getKey('SIGHTENGINE_API_SECRET');
             if (!empty($sightUser) && !empty($sightSecret)) {
                 try {
-                    $testImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png';
+                    // Use a more reliable test image
+                    $testImageUrl = 'https://sightengine.com/assets/img/examples/example1.jpg';
                     $url = 'https://api.sightengine.com/1.0/check.json?models=nudity-2.0&api_user=' . $sightUser . '&api_secret=' . $sightSecret . '&url=' . urlencode($testImageUrl);
                     $ch = curl_init($url);
                     curl_setopt_array($ch, [
                         CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_TIMEOUT => 10
+                        CURLOPT_TIMEOUT => 15
                     ]);
                     $response = curl_exec($ch);
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -751,9 +752,17 @@ class AdminController
                     $data = json_decode($response, true);
                     if ($httpCode === 200 && isset($data['status']) && $data['status'] === 'success') {
                         $results['sightengine'] = 'OK';
+                    } elseif ($httpCode === 200 && isset($data['error'])) {
+                        // API responded - credentials are valid, but image download failed
+                        // This means the API key is working!
+                        $errorMsg = $data['error']['message'] ?? '';
+                        if (stripos($errorMsg, 'download') !== false || stripos($errorMsg, 'media') !== false) {
+                            $results['sightengine'] = 'OK (API Valid)';
+                        } else {
+                            $results['sightengine'] = substr($errorMsg, 0, 25);
+                        }
                     } else {
-                        $errorMsg = $data['error']['message'] ?? 'HTTP ' . $httpCode;
-                        $results['sightengine'] = substr($errorMsg, 0, 30);
+                        $results['sightengine'] = 'HTTP ' . $httpCode;
                     }
                 } catch (\Exception $e) {
                     $results['sightengine'] = 'Error';
