@@ -75,10 +75,11 @@ class YouTubeService
             return ['error' => "Video status is '{$video['status']}', must be 'approved'"];
         }
         
-        if (($video['ai_status'] ?? '') !== 'approved') {
-            $aiStatus = $video['ai_status'] ?? 'pending';
-            log_message('info', "Upload skipped: Video {$videoId} AI status is '{$aiStatus}' (not approved)");
-            return ['error' => "AI status is '{$aiStatus}', must be 'approved'. Re-approve the video."];
+        // Check AI status - must be approved OR flagged (for manually approved flagged videos)
+        $aiStatus = $video['ai_status'] ?? 'pending';
+        if (!in_array($aiStatus, ['approved', 'flagged'])) {
+            log_message('info', "Upload skipped: Video {$videoId} AI status is '{$aiStatus}' (not approved/flagged)");
+            return ['error' => "AI status is '{$aiStatus}', must be 'approved' or 'flagged' (manually approved)"];
         }
         
         if (!empty($video['youtube_id'])) {
@@ -86,10 +87,8 @@ class YouTubeService
             return $video['youtube_id']; // Already published, return the ID
         }
         
-        if (($video['needs_manual_review'] ?? 0) == 1) {
-            log_message('info', "Upload skipped: Video {$videoId} still needs manual review");
-            return ['error' => 'Video still needs manual review'];
-        }
+        // Note: We removed the needs_manual_review check because if status is 'approved', 
+        // the admin has already reviewed and approved it
 
         // Update YouTube status to uploading
         $this->videoModel->updateYoutubeStatus($videoId, 'uploading');

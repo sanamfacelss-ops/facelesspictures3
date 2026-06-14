@@ -317,6 +317,19 @@ class VideoProcessingService
 
         log_message('info', "Video {$videoId} approved with score {$score}");
 
+        // Auto-upload to YouTube for approved videos
+        try {
+            $youtubeService = new YouTubeService();
+            $youtubeResult = $youtubeService->uploadVideo($videoId);
+            if (is_string($youtubeResult) && !empty($youtubeResult)) {
+                log_message('info', "Video {$videoId} auto-uploaded to YouTube: {$youtubeResult}");
+            } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
+                log_message('warning', "Video {$videoId} YouTube auto-upload failed: {$youtubeResult['error']}");
+            }
+        } catch (\Exception $e) {
+            log_message('error', "Video {$videoId} YouTube auto-upload error: " . $e->getMessage());
+        }
+
         return [
             'success' => true,
             'video_id' => $videoId,

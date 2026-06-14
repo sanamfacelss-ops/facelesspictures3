@@ -57,7 +57,25 @@ class ModerationController
         
         log_message('info', "Admin {$user['id']} approved video {$videoId}");
 
-        echo json_encode(['success' => true, 'message' => 'Video approved successfully']);
+        // Auto-upload to YouTube after manual approval
+        $youtubeResult = null;
+        try {
+            $youtubeService = new \App\Services\YouTubeService();
+            $youtubeResult = $youtubeService->uploadVideo($videoId);
+            if (is_string($youtubeResult) && !empty($youtubeResult)) {
+                log_message('info', "Video {$videoId} uploaded to YouTube after manual approval: {$youtubeResult}");
+            } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
+                log_message('warning', "Video {$videoId} YouTube upload failed after manual approval: {$youtubeResult['error']}");
+            }
+        } catch (\Exception $e) {
+            log_message('error', "Video {$videoId} YouTube upload error after manual approval: " . $e->getMessage());
+        }
+
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Video approved successfully',
+            'youtube' => $youtubeResult
+        ]);
     }
 
     /**
