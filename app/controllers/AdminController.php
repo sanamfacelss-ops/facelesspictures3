@@ -352,10 +352,6 @@ class AdminController
             $stmt = $this->db->prepare("DELETE FROM moderation_logs WHERE video_id = ?");
             $stmt->execute([$videoId]);
 
-            // Delete leaderboard entries
-            $stmt = $this->db->prepare("DELETE FROM leaderboard WHERE video_id = ?");
-            $stmt->execute([$videoId]);
-
             // Delete the video record
             $stmt = $this->db->prepare("DELETE FROM videos WHERE id = ?");
             $stmt->execute([$videoId]);
@@ -409,10 +405,6 @@ class AdminController
 
                 // Delete moderation logs
                 $stmt = $this->db->prepare("DELETE FROM moderation_logs WHERE video_id = ?");
-                $stmt->execute([$videoId]);
-
-                // Delete leaderboard entries
-                $stmt = $this->db->prepare("DELETE FROM leaderboard WHERE video_id = ?");
                 $stmt->execute([$videoId]);
 
                 // Delete the video record

@@ -19,7 +19,6 @@
             <div class="flex items-center space-x-4">
                 <a href="/" class="text-xl font-bold tracking-tight"><?= e(APP_NAME) ?></a>
                 <div class="hidden md:flex space-x-4">
-                    <a href="/leaderboard" class="hover:text-gray-300 transition">Leaderboard</a>
                     <?php if (is_authenticated()): ?>
                         <a href="/dashboard" class="hover:text-gray-300 transition">Dashboard</a>
                         <a href="/upload" class="hover:text-gray-300 transition">Upload</a>
@@ -49,7 +48,6 @@
         </div>
     </div>
     <div x-show="open" x-cloak class="md:hidden px-4 pb-4 space-y-2">
-        <a href="/leaderboard" class="block hover:text-gray-300">Leaderboard</a>
         <?php if (is_authenticated()): ?>
             <a href="/dashboard" class="block hover:text-gray-300">Dashboard</a>
             <a href="/upload" class="block hover:text-gray-300">Upload</a>

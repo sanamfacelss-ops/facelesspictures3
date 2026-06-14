@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Video;
-use App\Models\Leaderboard;
 
 class YouTubeService
 {
@@ -15,7 +14,6 @@ class YouTubeService
     private string $refreshToken;
     private string $channelId;
     private Video $videoModel;
-    private Leaderboard $leaderboardModel;
 
     public function __construct()
     {
@@ -28,7 +26,6 @@ class YouTubeService
         $this->refreshToken = $this->getConfigValue('YOUTUBE_REFRESH_TOKEN', $settingsModel);
         $this->channelId = $this->getConfigValue('YOUTUBE_CHANNEL_ID', $settingsModel);
         $this->videoModel = new Video();
-        $this->leaderboardModel = new Leaderboard();
     }
     
     /**
@@ -169,45 +166,12 @@ class YouTubeService
 
     public function syncStats(): void
     {
-        $videos = $this->videoModel->allApproved();
-        $ids = array_filter(array_column($videos, 'youtube_id'));
-        if (empty($ids)) return;
-
-        $chunks = array_chunk($ids, 50);
-        foreach ($chunks as $chunk) {
-            $this->syncChunk($chunk);
-        }
+        // Stats sync removed - leaderboard functionality removed
     }
 
     private function syncChunk(array $youtubeIds): void
     {
-        $idString = implode(',', $youtubeIds);
-        $url = "https://www.googleapis.com/youtube/v3/videos?part=statistics&id={$idString}&key=" . $this->apiKey;
-
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 30,
-        ]);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        if (!$response) return;
-        $data = json_decode($response, true);
-        if (empty($data['items'])) return;
-
-        foreach ($data['items'] as $item) {
-            $youtubeId = $item['id'];
-            $stats = $item['statistics'] ?? [];
-            $video = $this->findVideoByYoutubeId($youtubeId);
-            if ($video) {
-                $this->leaderboardModel->createOrUpdate((int) $video['id'], [
-                    'views' => (int) ($stats['viewCount'] ?? 0),
-                    'likes' => (int) ($stats['likeCount'] ?? 0),
-                    'comments' => (int) ($stats['commentCount'] ?? 0),
-                ]);
-            }
-        }
+        // Stats sync removed - leaderboard functionality removed
     }
 
     private function getAccessToken(): ?string

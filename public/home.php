@@ -898,9 +898,6 @@
                 Enter the Competition
                 <span>→</span>
             </a>
-            <a href="/leaderboard" class="inline-flex items-center gap-2 border-2 border-white text-white text-[13px] font-semibold px-8 py-4 rounded-[3px] hover:bg-white hover:text-crimson transition">
-                View Leaderboard
-            </a>
         </div>
     </div>
 </section>
@@ -940,7 +937,6 @@
                 <ul class="space-y-3">
                     <li><a href="/register" class="text-[13px] text-white/40 hover:text-white transition">Register</a></li>
                     <li><a href="/brief" class="text-[13px] text-white/40 hover:text-white transition">Current Brief</a></li>
-                    <li><a href="/leaderboard" class="text-[13px] text-white/40 hover:text-white transition">Leaderboard</a></li>
                     <li><a href="/winners" class="text-[13px] text-white/40 hover:text-white transition">Past Winners</a></li>
                 </ul>
             </div>

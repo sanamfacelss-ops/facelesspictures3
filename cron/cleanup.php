@@ -91,10 +91,6 @@ foreach ($rejectedOld as $video) {
     $delLogs = $db->prepare("DELETE FROM moderation_logs WHERE video_id = ?");
     $delLogs->execute([$video['id']]);
     
-    // Delete leaderboard entry if exists
-    $delLeaderboard = $db->prepare("DELETE FROM leaderboard WHERE video_id = ?");
-    $delLeaderboard->execute([$video['id']]);
-    
     // Delete video row
     $delVideo = $db->prepare("DELETE FROM videos WHERE id = ?");
     $delVideo->execute([$video['id']]);
@@ -127,9 +123,6 @@ foreach ($pendingOld as $video) {
     // Delete related records
     $delLogs = $db->prepare("DELETE FROM moderation_logs WHERE video_id = ?");
     $delLogs->execute([$video['id']]);
-    
-    $delLeaderboard = $db->prepare("DELETE FROM leaderboard WHERE video_id = ?");
-    $delLeaderboard->execute([$video['id']]);
     
     // Delete video row
     $delVideo = $db->prepare("DELETE FROM videos WHERE id = ?");

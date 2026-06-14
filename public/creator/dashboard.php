@@ -110,7 +110,6 @@ try {
                     <a href="/creator/dashboard" class="px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-lg">Dashboard</a>
                     <a href="/creator/record" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition">Create</a>
                     <a href="/creator/videos" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition">My Videos</a>
-                    <a href="/leaderboard" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition">Leaderboard</a>
                 </div>
                 
                 <div class="flex items-center gap-3">
@@ -149,7 +148,6 @@ try {
                 <a href="/creator/dashboard" class="block px-4 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-lg">Dashboard</a>
                 <a href="/creator/record" class="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Create</a>
                 <a href="/creator/videos" class="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">My Videos</a>
-                <a href="/leaderboard" class="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Leaderboard</a>
             </div>
         </div>
     </nav>

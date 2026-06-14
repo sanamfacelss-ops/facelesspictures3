@@ -9,7 +9,6 @@ require_once __DIR__ . '/../app/config/config.php';
 use App\Controllers\AuthController;
 use App\Controllers\UploadController;
 use App\Controllers\ModerationController;
-use App\Controllers\LeaderboardController;
 use App\Controllers\AIController;
 use App\Controllers\AdminController;
 
@@ -151,10 +150,6 @@ $routes = [
     'api/moderation/approve/{id}' => [ModerationController::class, 'approve', 'POST'],
     'api/moderation/reject/{id}' => [ModerationController::class, 'reject', 'POST'],
 
-    // Leaderboard API
-    'api/leaderboard' => [LeaderboardController::class, 'index', 'GET'],
-    'api/seasons' => [LeaderboardController::class, 'seasons', 'GET'],
-
     // AI Quality Check API
     'api/ai/webhook' => [AIController::class, 'webhook', 'POST'],
     'api/ai/process/{id}' => [AIController::class, 'process', 'POST'],
@@ -226,7 +221,7 @@ $pageRoutes = [
     'reset-password' => 'reset-password.php',
     'dashboard' => 'dashboard.php',
     'upload' => 'upload.php',
-    'leaderboard' => 'leaderboard.php',
+
     // Creator studio routes
     'creator/dashboard' => 'creator/dashboard.php',
     'creator/record' => 'creator/record.php',

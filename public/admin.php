@@ -2040,6 +2040,111 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
+    <!-- Video Delete Modal -->
+    <div x-show="videoDeleteModalOpen" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="videoDeleteModalOpen = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" @click.stop
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <!-- Header with icon -->
+            <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-[17px]" x-text="videoDeleteBulk ? 'Delete Multiple Videos' : 'Delete Video'"></h3>
+                        <p class="text-white/70 text-[13px]">This action cannot be undone</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="px-6 py-5">
+                <!-- Video title or count -->
+                <div class="bg-red-50 border border-red-100 rounded-xl p-4 mb-4">
+                    <template x-if="!videoDeleteBulk">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            <div>
+                                <p class="text-red-800 font-medium text-[14px]" x-text="videoDeleteTitle"></p>
+                                <p class="text-red-600/70 text-[12px] mt-0.5">Video ID: <span x-text="videoDeleteId"></span></p>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="videoDeleteBulk">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                            <p class="text-red-800 font-medium text-[14px]"><span x-text="videoDeleteCount"></span> videos selected for deletion</p>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Warning list -->
+                <div class="space-y-2 mb-5">
+                    <p class="text-dark/70 text-[13px] font-medium">This will permanently:</p>
+                    <div class="flex items-center gap-2 text-[13px] text-dark/60">
+                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>Remove video file(s) from server</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[13px] text-dark/60">
+                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>Delete all database records</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[13px] text-dark/60">
+                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>Remove from YouTube queue (if queued)</span>
+                    </div>
+                </div>
+                
+                <!-- Warning notice -->
+                <div class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg mb-5">
+                    <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <p class="text-[12px] text-amber-700">This action is irreversible. Make sure you want to delete <span x-text="videoDeleteBulk ? 'these videos' : 'this video'"></span>.</p>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button @click="videoDeleteModalOpen = false" 
+                        class="px-5 py-2.5 text-[13px] text-dark/60 hover:text-dark hover:bg-gray-100 rounded-xl transition font-medium">
+                    Cancel
+                </button>
+                <button @click="executeVideoDelete()" 
+                        class="px-5 py-2.5 text-[13px] bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    <span x-text="videoDeleteBulk ? 'Delete ' + videoDeleteCount + ' Videos' : 'Delete Video'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- AI Test Results Modal -->
     <div x-show="testResultsOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="testResultsOpen = false">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
@@ -2346,6 +2451,13 @@ if (file_exists($errorLogFile)) {
             deleteType: '',
             deleteId: null,
             deleteName: '',
+            
+            // Video delete modal
+            videoDeleteModalOpen: false,
+            videoDeleteId: null,
+            videoDeleteTitle: '',
+            videoDeleteBulk: false,
+            videoDeleteCount: 0,
             
             // Confirm modal
             confirmModalOpen: false,
@@ -2752,21 +2864,35 @@ if (file_exists($errorLogFile)) {
             
             // Delete single video
             async deleteVideo(videoId, title) {
-                if (!confirm(`Are you sure you want to permanently delete "${title}"?\n\nThis will:\n• Remove the video file from server\n• Delete all database records\n• This action cannot be undone!`)) {
-                    return;
+                this.videoDeleteId = videoId;
+                this.videoDeleteTitle = title;
+                this.videoDeleteBulk = false;
+                this.videoDeleteModalOpen = true;
+            },
+            
+            // Execute video delete (called from modal)
+            async executeVideoDelete() {
+                if (this.videoDeleteBulk) {
+                    await this.doExecuteBulkDelete();
+                } else {
+                    await this.doExecuteSingleDelete();
                 }
-                
+                this.videoDeleteModalOpen = false;
+            },
+            
+            // Execute single video delete
+            async doExecuteSingleDelete() {
                 this.showToast('Deleting video...');
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
                 
                 try {
-                    const res = await fetch('/api/admin/video/delete/' + videoId, { method: 'POST', body: formData });
+                    const res = await fetch('/api/admin/video/delete/' + this.videoDeleteId, { method: 'POST', body: formData });
                     const data = await res.json();
                     if (data.success) {
                         this.showToast('Video deleted successfully', 'success');
-                        this.videos = this.videos.filter(v => v.id !== videoId);
-                        this.selectedVideos = this.selectedVideos.filter(id => id !== videoId);
+                        this.videos = this.videos.filter(v => v.id !== this.videoDeleteId);
+                        this.selectedVideos = this.selectedVideos.filter(id => id !== this.videoDeleteId);
                     } else {
                         this.showToast('Delete failed: ' + (data.error || 'Unknown error'), 'error');
                     }
@@ -2777,12 +2903,14 @@ if (file_exists($errorLogFile)) {
             
             // Bulk delete videos
             async bulkDeleteVideos() {
-                const count = this.selectedVideos.length;
-                if (!confirm(`Are you sure you want to permanently delete ${count} video(s)?\n\nThis will:\n• Remove all video files from server\n• Delete all database records\n• This action cannot be undone!`)) {
-                    return;
-                }
-                
-                this.showToast(`Deleting ${count} videos...`);
+                this.videoDeleteCount = this.selectedVideos.length;
+                this.videoDeleteBulk = true;
+                this.videoDeleteModalOpen = true;
+            },
+            
+            // Execute bulk delete
+            async doExecuteBulkDelete() {
+                this.showToast(`Deleting ${this.videoDeleteCount} videos...`);
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
                 formData.append('video_ids', JSON.stringify(this.selectedVideos));
