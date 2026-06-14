@@ -219,6 +219,9 @@ class TranscriptionService
                 }
             }
         }
+        
+        // Final check: if still garbage after retries, mark it as unreliable
+        $isGarbage = $this->isGarbageTranscription($transcribedText);
 
         return [
             'success' => true,
@@ -226,6 +229,7 @@ class TranscriptionService
             'language' => $this->normalizeLanguageName($detectedLanguage),
             'duration' => $data['duration'] ?? null,
             'segments' => $data['segments'] ?? [],
+            'unreliable' => $isGarbage,  // Flag for garbage transcription
         ];
     }
     

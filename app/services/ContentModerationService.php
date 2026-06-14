@@ -420,9 +420,12 @@ class ContentModerationService
             '/\bben\s*ch[aou]+[dt]?\b/i' => 'bhenchod',
             '/\bbhen\s*ch/i' => 'bhenchod',
             '/\bsister\s*f[u]+ck/i' => 'bhenchod',
+            '/\bbahen\s*ch/i' => 'bhenchod',
+            '/\bbahan\s*ch/i' => 'bhenchod',
             // "chutiya" patterns  
             '/\bchoo+t[iy]+[ae]?\b/i' => 'chutiya',
             '/\bchut[iy]/i' => 'chutiya',
+            '/\bchoot/i' => 'chutiya',
             // "gaandu/gandu" patterns
             '/\bg[au]+n?d[u]+\b/i' => 'gandu',
             // "bhosdike" patterns
@@ -434,6 +437,20 @@ class ContentModerationService
             // "lund/lauda" patterns
             '/\bl[au]+n?d[a]?\b/i' => 'lund',
             '/\bl[ao]+d[a]+\b/i' => 'lauda',
+            // "pakad" (grab) - often used with profanity
+            '/\bpakad\b/i' => 'pakad (grab)',
+        ];
+        
+        // Common Whisper hallucinations/mistranscriptions for Hindi profanity
+        // These are English phrases that Whisper outputs when it hears Hindi profanity
+        $whisperHallucinations = [
+            // Known hallucinations when Whisper hears Hindi but outputs English garbage
+            "i'm not sure how to use this" => 'possible_hindi_profanity',
+            "not sure how to use" => 'possible_hindi_profanity', 
+            "tons of the" => 'possible_hindi_profanity',
+            "thanks for watching" => 'possible_hallucination',
+            "please subscribe" => 'possible_hallucination',
+            "like and subscribe" => 'possible_hallucination',
         ];
 
         $lower = strtolower($text);
@@ -441,6 +458,7 @@ class ContentModerationService
         $normalized = preg_replace('/[\s\-_\.]+/', '', $lower);
         
         $found = [];
+        $suspiciousHallucination = false;
 
         // Direct word matching
         foreach ($bannedWords as $word) {
@@ -457,17 +475,31 @@ class ContentModerationService
                 log_message('info', "Phonetic profanity match: '{$represents}' via pattern in text");
             }
         }
+        
+        // Check for known Whisper hallucinations (suspicious but not definite profanity)
+        foreach ($whisperHallucinations as $hallucination => $flag) {
+            if (str_contains($lower, $hallucination)) {
+                $suspiciousHallucination = true;
+                log_message('warning', "Whisper hallucination detected: '{$hallucination}' - may indicate Hindi profanity");
+            }
+        }
 
         $score = min(1.0, count($found) * 0.4); // Increased weight per word
+        
+        // If hallucination detected but no direct match, still flag as suspicious
+        if ($suspiciousHallucination && empty($found)) {
+            $score = 0.3;  // Enough to trigger flagging but not rejection
+        }
 
-        log_message('info', "Local profanity check: found " . count($found) . " matches: " . implode(', ', $found));
+        log_message('info', "Local profanity check: found " . count($found) . " matches: " . implode(', ', $found) . ($suspiciousHallucination ? ' (+ hallucination detected)' : ''));
 
         return [
-            'safe' => empty($found),
+            'safe' => empty($found) && !$suspiciousHallucination,
             'score' => $score,
-            'categories' => empty($found) ? [] : ['profanity'],
+            'categories' => empty($found) ? ($suspiciousHallucination ? ['suspicious_audio'] : []) : ['profanity'],
             'matched_words' => $found,
-            'provider' => 'local'
+            'provider' => 'local',
+            'hallucination_detected' => $suspiciousHallucination,
         ];
     }
 

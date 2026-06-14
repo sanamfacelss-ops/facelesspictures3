@@ -161,11 +161,22 @@ class VideoProcessingService
 
             // Step 4: Transcribe audio
             $transcript = '';
+            $transcriptUnreliable = false;
             if ($videoInfo['has_audio']) {
                 $transcriptResult = $this->transcriptionService->transcribe($filePath);
                 if ($transcriptResult['success']) {
                     $transcript = $transcriptResult['text'];
-                    $feedback[] = "Language detected: " . ($transcriptResult['language'] ?? 'unknown');
+                    $transcriptUnreliable = $transcriptResult['unreliable'] ?? false;
+                    $detectedLanguage = $transcriptResult['language'] ?? 'unknown';
+                    $feedback[] = "Language detected: " . $detectedLanguage;
+                    
+                    // If transcription is unreliable (garbage/hallucination), flag for manual audio review
+                    if ($transcriptUnreliable) {
+                        $score -= 30;  // Significant deduction to ensure flagging
+                        $flags[] = 'audio_needs_review';
+                        $feedback[] = "⚠️ Audio could not be transcribed reliably - MANUAL LISTEN REQUIRED for profanity check";
+                        log_message('warning', "Video {$videoId}: Unreliable transcription - flagging for manual audio review");
+                    }
                 } else {
                     $feedback[] = "Audio transcription skipped: " . ($transcriptResult['error'] ?? 'unknown error');
                 }
