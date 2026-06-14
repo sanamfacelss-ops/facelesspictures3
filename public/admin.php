@@ -8,6 +8,7 @@ $videoModel = new App\Models\Video();
 $userModel = new App\Models\User();
 $seasonModel = new App\Models\Season();
 $scriptModel = new App\Models\Script();
+$settingsModel = new App\Models\Settings();
 
 $pending = $videoModel->pending();
 $flagged = $videoModel->needsManualReview();
@@ -19,7 +20,6 @@ $activeSeason = $seasonModel->getActive();
 // Load guides (with fallbacks if table doesn't exist yet)
 $guides = ['actor' => '', 'director' => '', 'writer' => ''];
 try {
-    $settingsModel = new App\Models\Settings();
     $guides = array_merge($guides, $settingsModel->getGuides());
 } catch (\Exception $e) {
     // Table might not exist yet - use defaults
@@ -28,6 +28,33 @@ try {
         'director' => "As a director, you'll pitch your creative vision for scenes and explain how you'd bring stories to life.\n\n**Tips:**\n• Be specific about your creative vision\n• Explain your choices with confidence\n• Keep pitches under 2 minutes",
         'writer' => "As a writer, you'll present original work, pitch story concepts, or perform script readings.\n\n**Tips:**\n• Read your work with conviction\n• Vary your pacing to maintain interest\n• Let your unique voice come through"
     ];
+}
+
+// Load AI settings and provider status
+$aiSettings = [];
+$aiProviders = [];
+try {
+    $aiSettings = $settingsModel->getAISettings();
+    
+    // Get provider status
+    $moderationService = new App\Services\ContentModerationService();
+    $aiProviders = $moderationService->getProviderStatus();
+    
+    // Check transcription service
+    $transcriptionService = new App\Services\TranscriptionService();
+    $aiProviders['groq'] = $transcriptionService->isAvailable();
+} catch (\Exception $e) {
+    // Default values if services not available
+    $aiSettings = [
+        'ai_text_providers' => 'azure,openai,local',
+        'ai_image_providers' => 'azure,sightengine,api4ai',
+        'ai_transcription_provider' => 'groq',
+        'ai_processing_enabled' => '1',
+        'ai_approve_threshold' => '70',
+        'ai_flag_threshold' => '40',
+        'ai_auto_approve' => '1',
+    ];
+    $aiProviders = ['azure' => false, 'openai' => false, 'sightengine' => false, 'rapidapi' => false, 'groq' => false];
 }
 
 // Get all videos for video management tab
@@ -45,6 +72,9 @@ $allVideos = $stmt->fetchAll();
 $totalUsers = count($allUsers);
 $pendingCount = count($pending);
 $flaggedCount = count($flagged);
+$processingCount = count(array_filter($allVideos, fn($v) => ($v['ai_status'] ?? '') === 'processing'));
+$approvedCount = count(array_filter($allVideos, fn($v) => $v['status'] === 'approved'));
+$publishedCount = count(array_filter($allVideos, fn($v) => !empty($v['youtube_id'])));
 
 $title = 'Admin Dashboard — ' . APP_NAME;
 
@@ -302,6 +332,12 @@ if (file_exists($errorLogFile)) {
                 
                 <div class="px-4 mt-5 mb-2 lg:block" :class="sidebarCollapsed ? 'hidden' : ''"><span class="text-[10px] font-semibold text-dark/30 uppercase tracking-wider">System</span></div>
                 
+                <button @click="activeTab = 'aiconfig'" :class="activeTab === 'aiconfig' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">AI Config</span>
+                    <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">AI Config</span>
+                </button>
+                
                 <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Settings</span>
@@ -398,34 +434,94 @@ if (file_exists($errorLogFile)) {
                                     <tr>
                                         <th class="px-5 py-3 text-left font-medium">Creator</th>
                                         <th class="px-5 py-3 text-left font-medium">Title</th>
+                                        <th class="px-5 py-3 text-left font-medium">Type</th>
                                         <th class="px-5 py-3 text-left font-medium">AI Score</th>
-                                        <th class="px-5 py-3 text-left font-medium">Reason</th>
+                                        <th class="px-5 py-3 text-left font-medium">Flags</th>
                                         <th class="px-5 py-3 text-left font-medium">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-dark/5">
                                     <?php foreach ($flagged as $v): 
                                         $fb = is_string($v['ai_feedback'] ?? '') ? json_decode($v['ai_feedback'], true) : ($v['ai_feedback'] ?? []);
+                                        $flags = $fb['flags'] ?? [];
                                     ?>
                                     <tr class="hover:bg-cream/30 transition">
-                                        <td class="px-5 py-3 font-medium text-dark"><?= e($v['user_name']) ?></td>
-                                        <td class="px-5 py-3 text-dark/70"><?= e($v['title']) ?></td>
+                                        <td class="px-5 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-7 h-7 bg-crimson/10 rounded-full flex items-center justify-center">
+                                                    <span class="text-crimson font-semibold text-[10px]"><?= strtoupper(substr($v['user_name'], 0, 1)) ?></span>
+                                                </div>
+                                                <span class="font-medium text-dark"><?= e($v['user_name']) ?></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-5 py-3">
+                                            <span class="text-dark/70"><?= e($v['title']) ?></span>
+                                            <?php if (!empty($v['video_duration'])): ?>
+                                            <span class="text-[10px] text-dark/40 ml-1">(<?= gmdate('i:s', $v['video_duration']) ?>)</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-5 py-3">
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60"><?= e($v['content_type'] ?? $v['user_role'] ?? 'N/A') ?></span>
+                                        </td>
                                         <td class="px-5 py-3">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium <?= ($v['ai_score'] ?? 0) >= 60 ? 'bg-green-100 text-green-700' : (($v['ai_score'] ?? 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') ?>">
-                                                <?= $v['ai_score'] ?? 'N/A' ?>
+                                                <?= $v['ai_score'] !== null ? round($v['ai_score']) : 'N/A' ?>
                                             </span>
                                         </td>
-                                        <td class="px-5 py-3 text-dark/50 max-w-[200px] truncate"><?= e($fb['summary'] ?? 'Flagged by AI') ?></td>
+                                        <td class="px-5 py-3">
+                                            <div class="flex flex-wrap gap-1 max-w-[200px]">
+                                                <?php if (!empty($flags)): foreach ($flags as $flag): ?>
+                                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700"><?= e($flag) ?></span>
+                                                <?php endforeach; else: ?>
+                                                <span class="text-[10px] text-dark/40"><?= e($fb['summary'] ?? 'Review required') ?></span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
                                         <td class="px-5 py-3">
                                             <div class="flex gap-2">
-                                                <button @click="approveVideo(<?= $v['id'] ?>)" class="bg-green-600 text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
-                                                <button @click="rejectVideo(<?= $v['id'] ?>)" class="bg-crimson text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                                <button @click="openVideoDetail(<?= $v['id'] ?>, '<?= e(addslashes($v['title'])) ?>', '<?= e($v['file_path'] ?? '') ?>', <?= htmlspecialchars(json_encode($fb), ENT_QUOTES, 'UTF-8') ?>)" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Details</button>
+                                                <button @click="approveVideo(<?= $v['id'] ?>)" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">✓</button>
+                                                <button @click="rejectVideo(<?= $v['id'] ?>)" class="bg-crimson text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-crimson/90 transition">✗</button>
                                             </div>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Pending AI Processing -->
+                    <?php 
+                    $processingVideos = array_filter($allVideos, fn($v) => ($v['ai_status'] ?? '') === 'processing');
+                    if (!empty($processingVideos)): 
+                    ?>
+                    <div class="bg-white rounded-xl border border-dark/5 overflow-hidden mb-6">
+                        <div class="px-5 py-4 border-b border-dark/5 bg-blue-50/50">
+                            <h2 class="font-semibold text-dark flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                AI Processing
+                                <span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full"><?= count($processingVideos) ?></span>
+                            </h2>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid gap-2">
+                                <?php foreach (array_slice($processingVideos, 0, 5) as $v): ?>
+                                <div class="flex items-center justify-between p-3 bg-cream/50 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-blue-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-[13px] font-medium text-dark"><?= e($v['title']) ?></p>
+                                            <p class="text-[11px] text-dark/40">by <?= e($v['user_name']) ?> • <?= e($v['content_type'] ?? 'video') ?></p>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] text-blue-600 font-medium">Analyzing...</span>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -442,20 +538,36 @@ if (file_exists($errorLogFile)) {
                                     <tr>
                                         <th class="px-5 py-3 text-left font-medium">Creator</th>
                                         <th class="px-5 py-3 text-left font-medium">Title</th>
-                                        <th class="px-5 py-3 text-left font-medium">Season</th>
+                                        <th class="px-5 py-3 text-left font-medium">Type</th>
+                                        <th class="px-5 py-3 text-left font-medium">AI Status</th>
                                         <th class="px-5 py-3 text-left font-medium">Submitted</th>
                                         <th class="px-5 py-3 text-left font-medium">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-dark/5">
                                     <?php if (empty($pending)): ?>
-                                    <tr><td colspan="5" class="px-5 py-10 text-center text-dark/30">No pending videos</td></tr>
+                                    <tr><td colspan="6" class="px-5 py-10 text-center text-dark/30">No pending videos</td></tr>
                                     <?php else: foreach ($pending as $v): ?>
                                     <tr class="hover:bg-cream/30 transition">
                                         <td class="px-5 py-3 font-medium text-dark"><?= e($v['user_name']) ?></td>
                                         <td class="px-5 py-3 text-dark/70"><?= e($v['title']) ?></td>
-                                        <td class="px-5 py-3 text-dark/50"><?= e($v['season_title']) ?></td>
-                                        <td class="px-5 py-3 text-dark/40"><?= date('M j', strtotime($v['created_at'])) ?></td>
+                                        <td class="px-5 py-3">
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60"><?= e($v['content_type'] ?? 'N/A') ?></span>
+                                        </td>
+                                        <td class="px-5 py-3">
+                                            <?php 
+                                            $aiStatus = $v['ai_status'] ?? 'pending';
+                                            $aiStatusClass = match($aiStatus) {
+                                                'approved' => 'bg-green-100 text-green-700',
+                                                'processing' => 'bg-blue-100 text-blue-700',
+                                                'flagged' => 'bg-amber-100 text-amber-700',
+                                                'rejected' => 'bg-red-100 text-red-700',
+                                                default => 'bg-dark/5 text-dark/40'
+                                            };
+                                            ?>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full <?= $aiStatusClass ?>"><?= ucfirst($aiStatus) ?></span>
+                                        </td>
+                                        <td class="px-5 py-3 text-dark/40"><?= date('M j, g:i A', strtotime($v['created_at'])) ?></td>
                                         <td class="px-5 py-3">
                                             <div class="flex gap-2">
                                                 <button @click="approveVideo(<?= $v['id'] ?>)" class="bg-green-600 text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
@@ -850,6 +962,376 @@ if (file_exists($errorLogFile)) {
                     </div>
                 </div>
 
+                <!-- ==================== AI CONFIG TAB ==================== -->
+                <div x-show="activeTab === 'aiconfig'" x-cloak>
+                    <!-- Provider Status Overview -->
+                    <div class="bg-white rounded-xl border border-dark/5 p-5 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-dark flex items-center gap-2">
+                                <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                AI Provider Status
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] text-dark/40">AI Processing:</span>
+                                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full" :class="aiSettings.ai_processing_enabled === '1' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'" x-text="aiSettings.ai_processing_enabled === '1' ? 'Enabled' : 'Disabled'"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+                            <!-- Azure -->
+                            <div class="p-4 rounded-xl" :class="aiProviders.azure ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="w-2 h-2 rounded-full" :class="aiProviders.azure ? 'bg-green-500' : 'bg-red-500'"></span>
+                                    <span class="font-medium text-[13px]">Azure AI</span>
+                                </div>
+                                <p class="text-[10px] text-dark/50">Text + Image</p>
+                                <p class="text-[10px] text-dark/30">5K/month free</p>
+                            </div>
+                            
+                            <!-- OpenAI -->
+                            <div class="p-4 rounded-xl" :class="aiProviders.openai ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="w-2 h-2 rounded-full" :class="aiProviders.openai ? 'bg-green-500' : 'bg-red-500'"></span>
+                                    <span class="font-medium text-[13px]">OpenAI</span>
+                                </div>
+                                <p class="text-[10px] text-dark/50">Text Only</p>
+                                <p class="text-[10px] text-dark/30">Unlimited free</p>
+                            </div>
+                            
+                            <!-- SightEngine -->
+                            <div class="p-4 rounded-xl" :class="aiProviders.sightengine ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="w-2 h-2 rounded-full" :class="aiProviders.sightengine ? 'bg-green-500' : 'bg-red-500'"></span>
+                                    <span class="font-medium text-[13px]">SightEngine</span>
+                                </div>
+                                <p class="text-[10px] text-dark/50">Image Only</p>
+                                <p class="text-[10px] text-dark/30">500/month free</p>
+                            </div>
+                            
+                            <!-- RapidAPI -->
+                            <div class="p-4 rounded-xl" :class="aiProviders.rapidapi ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="w-2 h-2 rounded-full" :class="aiProviders.rapidapi ? 'bg-green-500' : 'bg-red-500'"></span>
+                                    <span class="font-medium text-[13px]">API4AI</span>
+                                </div>
+                                <p class="text-[10px] text-dark/50">Image NSFW</p>
+                                <p class="text-[10px] text-dark/30">100/day free</p>
+                            </div>
+                            
+                            <!-- Groq -->
+                            <div class="p-4 rounded-xl" :class="aiProviders.groq ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="w-2 h-2 rounded-full" :class="aiProviders.groq ? 'bg-green-500' : 'bg-red-500'"></span>
+                                    <span class="font-medium text-[13px]">Groq Whisper</span>
+                                </div>
+                                <p class="text-[10px] text-dark/50">Transcription</p>
+                                <p class="text-[10px] text-dark/30">Unlimited (30 RPM)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        <!-- Provider Priority Configuration -->
+                        <div class="bg-white rounded-xl border border-dark/5 p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                                Provider Priority (Fallback Order)
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <!-- Text Moderation Providers -->
+                                <div>
+                                    <label class="block text-[12px] text-dark/50 mb-2">Text Moderation</label>
+                                    <select x-model="aiSettings.ai_text_providers" @change="saveAISetting('ai_text_providers', aiSettings.ai_text_providers)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                        <option value="azure,openai,local">Azure → OpenAI → Local</option>
+                                        <option value="openai,azure,local">OpenAI → Azure → Local</option>
+                                        <option value="azure,local">Azure → Local (skip OpenAI)</option>
+                                        <option value="openai,local">OpenAI → Local (skip Azure)</option>
+                                        <option value="local">Local Only (no API)</option>
+                                    </select>
+                                    <p class="text-[10px] text-dark/30 mt-1">System tries each provider in order until one succeeds</p>
+                                </div>
+                                
+                                <!-- Image Moderation Providers -->
+                                <div>
+                                    <label class="block text-[12px] text-dark/50 mb-2">Image Moderation</label>
+                                    <select x-model="aiSettings.ai_image_providers" @change="saveAISetting('ai_image_providers', aiSettings.ai_image_providers)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                        <option value="azure,sightengine,api4ai">Azure → SightEngine → API4AI</option>
+                                        <option value="sightengine,azure,api4ai">SightEngine → Azure → API4AI</option>
+                                        <option value="azure,api4ai">Azure → API4AI (skip SightEngine)</option>
+                                        <option value="sightengine,api4ai">SightEngine → API4AI (skip Azure)</option>
+                                        <option value="azure">Azure Only</option>
+                                        <option value="sightengine">SightEngine Only</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Transcription Provider -->
+                                <div>
+                                    <label class="block text-[12px] text-dark/50 mb-2">Audio Transcription</label>
+                                    <select x-model="aiSettings.ai_transcription_provider" @change="saveAISetting('ai_transcription_provider', aiSettings.ai_transcription_provider)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                        <option value="groq">Groq Whisper (50+ languages)</option>
+                                        <option value="none">Disabled (skip transcription)</option>
+                                    </select>
+                                    <p class="text-[10px] text-dark/30 mt-1">Supports Hindi, Hinglish, English, and more</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Threshold Settings -->
+                        <div class="bg-white rounded-xl border border-dark/5 p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                Quality Thresholds
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <!-- Approve Threshold -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-[12px] text-dark/50">Auto-Approve Score</label>
+                                        <span class="text-[12px] font-medium text-green-600" x-text="aiSettings.ai_approve_threshold + '%'"></span>
+                                    </div>
+                                    <input type="range" min="50" max="100" step="5" x-model="aiSettings.ai_approve_threshold" @change="saveAISetting('ai_approve_threshold', aiSettings.ai_approve_threshold)" class="w-full h-2 bg-dark/10 rounded-lg appearance-none cursor-pointer accent-green-600">
+                                    <p class="text-[10px] text-dark/30 mt-1">Videos scoring above this are auto-approved</p>
+                                </div>
+                                
+                                <!-- Flag Threshold -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-[12px] text-dark/50">Flag for Review Score</label>
+                                        <span class="text-[12px] font-medium text-amber-600" x-text="aiSettings.ai_flag_threshold + '%'"></span>
+                                    </div>
+                                    <input type="range" min="20" max="70" step="5" x-model="aiSettings.ai_flag_threshold" @change="saveAISetting('ai_flag_threshold', aiSettings.ai_flag_threshold)" class="w-full h-2 bg-dark/10 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <p class="text-[10px] text-dark/30 mt-1">Videos below this but above reject are flagged for manual review</p>
+                                </div>
+                                
+                                <!-- NSFW Threshold -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-[12px] text-dark/50">NSFW Reject Threshold</label>
+                                        <span class="text-[12px] font-medium text-red-600" x-text="(aiSettings.ai_nsfw_reject_threshold * 100) + '%'"></span>
+                                    </div>
+                                    <input type="range" min="0.3" max="0.9" step="0.1" x-model="aiSettings.ai_nsfw_reject_threshold" @change="saveAISetting('ai_nsfw_reject_threshold', aiSettings.ai_nsfw_reject_threshold)" class="w-full h-2 bg-dark/10 rounded-lg appearance-none cursor-pointer accent-red-600">
+                                    <p class="text-[10px] text-dark/30 mt-1">NSFW score above this = auto-reject</p>
+                                </div>
+                                
+                                <!-- Duration Limits -->
+                                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-dark/5">
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Min Duration (sec)</label>
+                                        <input type="number" x-model="aiSettings.ai_min_duration" @change="saveAISetting('ai_min_duration', aiSettings.ai_min_duration)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="5" max="60">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Max Duration (sec)</label>
+                                        <input type="number" x-model="aiSettings.ai_max_duration" @change="saveAISetting('ai_max_duration', aiSettings.ai_max_duration)" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" min="60" max="600">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Master Controls -->
+                    <div class="bg-white rounded-xl border border-dark/5 p-5 mt-6">
+                        <h3 class="font-semibold text-dark mb-4">Master Controls</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <!-- Enable/Disable AI Processing -->
+                            <div class="flex items-center justify-between p-4 bg-cream rounded-xl">
+                                <div>
+                                    <p class="font-medium text-dark text-[13px]">AI Processing</p>
+                                    <p class="text-[11px] text-dark/40">Process uploaded videos through AI</p>
+                                </div>
+                                <button @click="toggleAISetting('ai_processing_enabled')" class="relative w-11 h-6 rounded-full transition-colors" :class="aiSettings.ai_processing_enabled === '1' ? 'bg-green-500' : 'bg-dark/20'">
+                                    <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform" :class="aiSettings.ai_processing_enabled === '1' ? 'translate-x-5' : ''"></span>
+                                </button>
+                            </div>
+                            
+                            <!-- Auto-Approve -->
+                            <div class="flex items-center justify-between p-4 bg-cream rounded-xl">
+                                <div>
+                                    <p class="font-medium text-dark text-[13px]">Auto-Approve</p>
+                                    <p class="text-[11px] text-dark/40">High-score videos approved automatically</p>
+                                </div>
+                                <button @click="toggleAISetting('ai_auto_approve')" class="relative w-11 h-6 rounded-full transition-colors" :class="aiSettings.ai_auto_approve === '1' ? 'bg-green-500' : 'bg-dark/20'">
+                                    <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform" :class="aiSettings.ai_auto_approve === '1' ? 'translate-x-5' : ''"></span>
+                                </button>
+                            </div>
+                            
+                            <!-- Test API Connection -->
+                            <div class="p-4 bg-cream rounded-xl">
+                                <p class="font-medium text-dark text-[13px] mb-2">Test Connection</p>
+                                <button @click="testAIConnection()" class="w-full bg-crimson text-white py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">
+                                    Test AI Providers
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- API Keys Configuration -->
+                    <div class="bg-white rounded-xl border border-dark/5 p-5 mt-6" x-data="{ apiKeysLoaded: false }" x-init="loadAPIKeys()">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-dark flex items-center gap-2">
+                                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                API Keys Configuration
+                            </h3>
+                            <button @click="loadAPIKeys()" class="text-[11px] text-dark/40 hover:text-crimson flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                Refresh
+                            </button>
+                        </div>
+                        
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                            <p class="text-[11px] text-amber-800">
+                                <strong>⚠️ Security Note:</strong> API keys are stored in your .env file. Changes take effect immediately after save. 
+                                Keys are masked for security - enter a new value to update.
+                            </p>
+                        </div>
+                        
+                        <form @submit.prevent="saveAPIKeys()">
+                            <div class="grid lg:grid-cols-2 gap-6">
+                                <!-- Azure Content Safety -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.AZURE_CONTENT_SAFETY_KEY?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">Azure AI Content Safety</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">Endpoint URL</label>
+                                        <input type="text" x-model="apiKeyForm.AZURE_CONTENT_SAFETY_ENDPOINT" 
+                                            :placeholder="apiKeyStatus.AZURE_CONTENT_SAFETY_ENDPOINT?.masked || 'https://your-resource.cognitiveservices.azure.com'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">API Key</label>
+                                        <input type="password" x-model="apiKeyForm.AZURE_CONTENT_SAFETY_KEY" 
+                                            :placeholder="apiKeyStatus.AZURE_CONTENT_SAFETY_KEY?.configured ? '••••••••••••' : 'Enter Azure key'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <a href="https://portal.azure.com" target="_blank" class="text-[10px] text-blue-600 hover:underline">→ Get API key from Azure Portal</a>
+                                </div>
+                                
+                                <!-- OpenAI -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.OPENAI_API_KEY?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">OpenAI Moderation</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">API Key</label>
+                                        <input type="password" x-model="apiKeyForm.OPENAI_API_KEY" 
+                                            :placeholder="apiKeyStatus.OPENAI_API_KEY?.configured ? '••••••••••••' : 'sk-...'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <p class="text-[10px] text-dark/40">Free unlimited moderation API</p>
+                                    <a href="https://platform.openai.com/api-keys" target="_blank" class="text-[10px] text-blue-600 hover:underline">→ Get API key from OpenAI</a>
+                                </div>
+                                
+                                <!-- SightEngine -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.SIGHTENGINE_API_SECRET?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">SightEngine (Images)</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">API User ID</label>
+                                        <input type="text" x-model="apiKeyForm.SIGHTENGINE_API_USER" 
+                                            :placeholder="apiKeyStatus.SIGHTENGINE_API_USER?.configured ? apiKeyStatus.SIGHTENGINE_API_USER.masked : 'User ID'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">API Secret</label>
+                                        <input type="password" x-model="apiKeyForm.SIGHTENGINE_API_SECRET" 
+                                            :placeholder="apiKeyStatus.SIGHTENGINE_API_SECRET?.configured ? '••••••••••••' : 'Secret key'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <a href="https://sightengine.com" target="_blank" class="text-[10px] text-blue-600 hover:underline">→ Get keys from SightEngine</a>
+                                </div>
+                                
+                                <!-- RapidAPI -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.RAPIDAPI_KEY?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">RapidAPI / API4AI NSFW</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">RapidAPI Key</label>
+                                        <input type="password" x-model="apiKeyForm.RAPIDAPI_KEY" 
+                                            :placeholder="apiKeyStatus.RAPIDAPI_KEY?.configured ? '••••••••••••' : 'RapidAPI key'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <p class="text-[10px] text-dark/40">~100 requests/day free tier</p>
+                                    <a href="https://rapidapi.com/api4ai-api4ai-default/api/nsfw3" target="_blank" class="text-[10px] text-blue-600 hover:underline">→ Get key from RapidAPI</a>
+                                </div>
+                                
+                                <!-- Groq -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.GROQ_API_KEY?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">Groq Whisper (Transcription)</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">Groq API Key</label>
+                                        <input type="password" x-model="apiKeyForm.GROQ_API_KEY" 
+                                            :placeholder="apiKeyStatus.GROQ_API_KEY?.configured ? '••••••••••••' : 'gsk_...'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <p class="text-[10px] text-dark/40">Unlimited free, 30 RPM • 50+ languages</p>
+                                    <a href="https://console.groq.com/keys" target="_blank" class="text-[10px] text-blue-600 hover:underline">→ Get key from Groq Console</a>
+                                </div>
+                                
+                                <!-- FFmpeg Paths -->
+                                <div class="space-y-3 p-4 bg-cream/50 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                        <h4 class="font-medium text-[13px] text-dark">Local Tools (FFmpeg)</h4>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">FFmpeg Path</label>
+                                        <input type="text" x-model="apiKeyForm.FFMPEG_PATH" 
+                                            :placeholder="apiKeyStatus.FFMPEG_PATH?.masked || '/usr/bin/ffmpeg'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1">FFprobe Path</label>
+                                        <input type="text" x-model="apiKeyForm.FFPROBE_PATH" 
+                                            :placeholder="apiKeyStatus.FFPROBE_PATH?.masked || '/usr/bin/ffprobe'"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                    </div>
+                                    <p class="text-[10px] text-dark/40">Used for frame extraction & audio processing</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Save Button -->
+                            <div class="flex items-center justify-between mt-6 pt-4 border-t border-dark/10">
+                                <p class="text-[11px] text-dark/40">Only filled fields will be updated. Leave empty to keep current value.</p>
+                                <button type="submit" 
+                                    class="px-6 py-2.5 bg-crimson text-white rounded-xl text-[13px] font-medium hover:bg-crimson/90 transition flex items-center gap-2"
+                                    :disabled="savingKeys"
+                                    :class="savingKeys ? 'opacity-50 cursor-not-allowed' : ''">
+                                    <svg x-show="savingKeys" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <svg x-show="!savingKeys" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                    <span x-text="savingKeys ? 'Saving...' : 'Save API Keys'"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- How It Works Info -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mt-6">
+                        <h4 class="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            How AI Moderation Works
+                        </h4>
+                        <div class="text-[12px] text-blue-800 space-y-1">
+                            <p>1. <strong>Video Upload</strong> → User uploads video, background processing starts</p>
+                            <p>2. <strong>Frame Extraction</strong> → FFmpeg extracts frames every 5 seconds</p>
+                            <p>3. <strong>NSFW Check</strong> → Images sent to configured providers (Azure/SightEngine/API4AI)</p>
+                            <p>4. <strong>Audio Transcription</strong> → Groq Whisper transcribes audio (Hindi/English/50+ languages)</p>
+                            <p>5. <strong>Text Moderation</strong> → Transcript checked for profanity/hate speech</p>
+                            <p>6. <strong>Score & Status</strong> → Video scored and either approved, flagged, or rejected</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ==================== SETTINGS TAB ==================== -->
                 <div x-show="activeTab === 'settings'" x-cloak>
                     <div class="grid lg:grid-cols-3 gap-6">
@@ -1047,6 +1529,104 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
+    <!-- Video Detail Modal -->
+    <div x-show="videoDetailOpen" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="videoDetailOpen = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden" @click.stop>
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-dark/10 flex items-center justify-between">
+                <h3 class="font-display text-[20px] text-dark" x-text="videoDetail.title"></h3>
+                <button @click="videoDetailOpen = false" class="text-dark/40 hover:text-dark">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+                <!-- Video Preview -->
+                <template x-if="videoDetail.filePath">
+                    <div class="mb-6">
+                        <video :src="'/uploads/' + videoDetail.filePath" controls class="w-full rounded-xl bg-dark max-h-[300px]"></video>
+                    </div>
+                </template>
+                
+                <!-- AI Analysis Summary -->
+                <div class="bg-cream rounded-xl p-4 mb-6">
+                    <h4 class="font-semibold text-dark text-[14px] mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        AI Analysis
+                    </h4>
+                    
+                    <!-- Score -->
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="text-center">
+                            <div class="text-[32px] font-display" :class="videoDetail.feedback?.score >= 70 ? 'text-green-600' : (videoDetail.feedback?.score >= 40 ? 'text-amber-600' : 'text-red-600')" x-text="videoDetail.feedback?.score || 'N/A'"></div>
+                            <div class="text-[10px] text-dark/40 uppercase">Quality Score</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="h-3 bg-dark/10 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all" 
+                                     :class="videoDetail.feedback?.score >= 70 ? 'bg-green-500' : (videoDetail.feedback?.score >= 40 ? 'bg-amber-500' : 'bg-red-500')"
+                                     :style="'width: ' + (videoDetail.feedback?.score || 0) + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary -->
+                    <template x-if="videoDetail.feedback?.summary">
+                        <p class="text-[13px] text-dark/70 mb-3" x-text="videoDetail.feedback.summary"></p>
+                    </template>
+                    
+                    <!-- Flags -->
+                    <template x-if="videoDetail.feedback?.flags?.length > 0">
+                        <div class="mb-3">
+                            <span class="text-[11px] text-dark/40 uppercase">Flags:</span>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <template x-for="flag in videoDetail.feedback.flags" :key="flag">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-700" x-text="flag"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <!-- Feedback Items -->
+                    <template x-if="videoDetail.feedback?.feedback?.length > 0">
+                        <div>
+                            <span class="text-[11px] text-dark/40 uppercase">Details:</span>
+                            <ul class="mt-1 space-y-1">
+                                <template x-for="item in videoDetail.feedback.feedback" :key="item">
+                                    <li class="text-[12px] text-dark/60 flex items-start gap-2">
+                                        <span class="text-dark/30">•</span>
+                                        <span x-text="item"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                    
+                    <!-- Transcript Preview (if available) -->
+                    <template x-if="videoDetail.feedback?.transcript">
+                        <div class="mt-4 pt-4 border-t border-dark/10">
+                            <span class="text-[11px] text-dark/40 uppercase">Transcript Preview:</span>
+                            <p class="text-[12px] text-dark/50 mt-1 line-clamp-3" x-text="videoDetail.feedback.transcript"></p>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button @click="videoDetailOpen = false; approveVideo(videoDetail.id)" class="flex-1 bg-green-600 text-white py-3 rounded-xl text-[13px] font-medium hover:bg-green-700 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Approve Video
+                    </button>
+                    <button @click="videoDetailOpen = false; rejectVideo(videoDetail.id)" class="flex-1 bg-crimson text-white py-3 rounded-xl text-[13px] font-medium hover:bg-crimson/90 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Reject Video
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div x-show="toastShow" x-cloak 
          x-transition:enter="transition ease-out duration-300"
@@ -1118,6 +1698,7 @@ if (file_exists($errorLogFile)) {
                 users: 'USERS',
                 seasons: 'SEASONS',
                 scripts: 'SCRIPTS',
+                aiconfig: 'AI CONFIGURATION',
                 settings: 'SETTINGS'
             },
             
@@ -1126,6 +1707,25 @@ if (file_exists($errorLogFile)) {
             users: <?= json_encode($allUsers) ?>,
             seasons: <?= json_encode($allSeasons) ?>,
             scripts: <?= json_encode($allScripts) ?>,
+            
+            // AI Settings
+            aiSettings: <?= json_encode($aiSettings) ?>,
+            aiProviders: <?= json_encode($aiProviders) ?>,
+            
+            // API Keys
+            apiKeyStatus: {},
+            apiKeyForm: {
+                AZURE_CONTENT_SAFETY_ENDPOINT: '',
+                AZURE_CONTENT_SAFETY_KEY: '',
+                OPENAI_API_KEY: '',
+                SIGHTENGINE_API_USER: '',
+                SIGHTENGINE_API_SECRET: '',
+                RAPIDAPI_KEY: '',
+                GROQ_API_KEY: '',
+                FFMPEG_PATH: '',
+                FFPROBE_PATH: ''
+            },
+            savingKeys: false,
             
             // Filters
             videoFilter: 'all',
@@ -1138,6 +1738,10 @@ if (file_exists($errorLogFile)) {
             modalVideoId: null,
             modalTitle: '',
             modalReason: '',
+            
+            // Video detail modal
+            videoDetailOpen: false,
+            videoDetail: { id: null, title: '', filePath: '', feedback: null },
             
             // Season edit
             seasonModalOpen: false,
@@ -1236,6 +1840,17 @@ if (file_exists($errorLogFile)) {
             get filteredScripts() {
                 if (this.scriptFilter === 'all') return this.scripts;
                 return this.scripts.filter(s => s.category === this.scriptFilter);
+            },
+
+            // Open video detail modal
+            openVideoDetail(id, title, filePath, feedback) {
+                this.videoDetail = {
+                    id: id,
+                    title: title,
+                    filePath: filePath,
+                    feedback: feedback || {}
+                };
+                this.videoDetailOpen = true;
             },
 
             // Video actions
@@ -1425,6 +2040,118 @@ if (file_exists($errorLogFile)) {
                     }
                 } catch (e) {
                     this.showToast('Failed to save guide', 'error');
+                }
+            },
+            
+            // AI Settings actions
+            async saveAISetting(key, value) {
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append(key, value);
+                try {
+                    const res = await fetch('/api/admin/ai/config/update', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('AI setting saved');
+                    } else {
+                        this.showToast(data.error || 'Failed to save setting', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to save AI setting', 'error');
+                }
+            },
+            
+            async toggleAISetting(key) {
+                const newValue = this.aiSettings[key] === '1' ? '0' : '1';
+                this.aiSettings[key] = newValue;
+                await this.saveAISetting(key, newValue);
+            },
+            
+            async testAIConnection() {
+                this.showToast('Testing AI providers...');
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('provider', 'all');
+                formData.append('type', 'text');
+                try {
+                    const res = await fetch('/api/admin/ai/test', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('AI connection test passed: ' + data.result.status);
+                    } else {
+                        this.showToast('AI test failed: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to test AI connection', 'error');
+                }
+            },
+            
+            // API Keys management
+            async loadAPIKeys() {
+                try {
+                    const res = await fetch('/api/admin/ai/keys');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.apiKeyStatus = data.keys;
+                    }
+                } catch (e) {
+                    console.error('Failed to load API key status', e);
+                }
+            },
+            
+            async saveAPIKeys() {
+                // Filter out empty values
+                const keysToUpdate = {};
+                for (const [key, value] of Object.entries(this.apiKeyForm)) {
+                    if (value && value.trim() !== '') {
+                        keysToUpdate[key] = value.trim();
+                    }
+                }
+                
+                if (Object.keys(keysToUpdate).length === 0) {
+                    this.showToast('No changes to save', 'error');
+                    return;
+                }
+                
+                this.savingKeys = true;
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                for (const [key, value] of Object.entries(keysToUpdate)) {
+                    formData.append(key, value);
+                }
+                
+                try {
+                    const res = await fetch('/api/admin/ai/keys/update', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('API keys updated! ' + (data.updated?.length || 0) + ' key(s) saved.');
+                        // Clear form
+                        this.apiKeyForm = {
+                            AZURE_CONTENT_SAFETY_ENDPOINT: '',
+                            AZURE_CONTENT_SAFETY_KEY: '',
+                            OPENAI_API_KEY: '',
+                            SIGHTENGINE_API_USER: '',
+                            SIGHTENGINE_API_SECRET: '',
+                            RAPIDAPI_KEY: '',
+                            GROQ_API_KEY: '',
+                            FFMPEG_PATH: '',
+                            FFPROBE_PATH: ''
+                        };
+                        // Reload status after a short delay
+                        setTimeout(() => {
+                            this.loadAPIKeys();
+                            // Suggest page reload for provider status
+                            if (confirm('API keys saved. Refresh page to update provider status?')) {
+                                location.reload();
+                            }
+                        }, 500);
+                    } else {
+                        this.showToast(data.error || 'Failed to save API keys', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to save API keys', 'error');
+                } finally {
+                    this.savingKeys = false;
                 }
             }
         };

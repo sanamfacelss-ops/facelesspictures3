@@ -2,13 +2,16 @@
 /**
  * AI Processing Queue Cron Job
  * 
- * Processes pending videos through AI quality check
+ * Processes pending videos through AI quality check.
+ * This catches any videos that weren't processed by the background trigger.
+ * 
  * Run via cron: * * * * * php /path/to/cron/ai-process.php
  */
 
 require_once __DIR__ . '/../app/config/config.php';
 
-use App\Services\AIQualityService;
+use App\Services\VideoProcessingService;
+use App\Services\BackgroundProcessor;
 
 // Prevent web access
 if (php_sapi_name() !== 'cli' && !isset($_GET['key'])) {
@@ -23,13 +26,13 @@ if (isset($_GET['key']) && $_GET['key'] !== $cronKey) {
     exit('Invalid key');
 }
 
-$aiService = new AIQualityService();
 $limit = (int) ($argv[1] ?? $_GET['limit'] ?? 5);
 
-echo "Processing AI queue (limit: {$limit})...\n";
+echo "Processing AI queue (limit: {$limit}) at " . date('Y-m-d H:i:s') . "\n";
 
 try {
-    $results = $aiService->processQueue($limit);
+    $processor = new VideoProcessingService();
+    $results = $processor->processQueue($limit);
     
     echo "Processed " . count($results) . " videos:\n";
     foreach ($results as $item) {

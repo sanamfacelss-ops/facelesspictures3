@@ -31,27 +31,55 @@ class YouTubeService
     public function uploadVideo(int $videoId): ?string
     {
         $video = $this->videoModel->findById($videoId);
-        if (!$video || $video['status'] !== 'approved' || !empty($video['youtube_id'])) {
+        
+        // Only upload videos that are fully approved (both admin and AI)
+        if (!$video) {
+            log_message('warning', "Upload skipped: Video {$videoId} not found");
             return null;
         }
+        
+        if ($video['status'] !== 'approved') {
+            log_message('info', "Upload skipped: Video {$videoId} status is '{$video['status']}' (not approved)");
+            return null;
+        }
+        
+        if (($video['ai_status'] ?? '') !== 'approved') {
+            log_message('info', "Upload skipped: Video {$videoId} AI status is '" . ($video['ai_status'] ?? 'pending') . "' (not approved)");
+            return null;
+        }
+        
+        if (!empty($video['youtube_id'])) {
+            log_message('info', "Upload skipped: Video {$videoId} already published to YouTube");
+            return null;
+        }
+        
+        if (($video['needs_manual_review'] ?? 0) == 1) {
+            log_message('info', "Upload skipped: Video {$videoId} still needs manual review");
+            return null;
+        }
+
+        // Update YouTube status to uploading
+        $this->videoModel->updateYoutubeStatus($videoId, 'uploading');
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
             log_message('error', "Failed to get YouTube access token for video {$videoId}");
+            $this->videoModel->updateYoutubeStatus($videoId, 'failed');
             return null;
         }
 
         $filePath = UPLOAD_PATH . '/' . $video['file_path'];
         if (!file_exists($filePath)) {
             log_message('error', "Video file not found: {$filePath}");
+            $this->videoModel->updateYoutubeStatus($videoId, 'failed');
             return null;
         }
 
         $metadata = [
             'snippet' => [
                 'title' => $video['title'],
-                'description' => "Entry for season: {$video['season_title']}",
-                'tags' => ['facelesspictures', 'competition', $video['season_title']],
+                'description' => "Entry for season: {$video['season_title']}\n\nCreator: {$video['user_name']}\nCategory: " . ucfirst($video['content_type'] ?? 'General'),
+                'tags' => ['facelesspictures', 'competition', $video['season_title'], $video['content_type'] ?? 'video'],
                 'categoryId' => '1',
             ],
             'status' => [
@@ -83,12 +111,14 @@ class YouTubeService
             $youtubeId = $data['id'] ?? null;
             if ($youtubeId) {
                 $this->videoModel->setYoutubeId($videoId, $youtubeId);
+                $this->videoModel->updateYoutubeStatus($videoId, 'published');
                 log_message('info', "Video {$videoId} published to YouTube: {$youtubeId}");
                 return $youtubeId;
             }
         }
 
         log_message('error', "YouTube upload failed for video {$videoId}: " . ($response ?: 'Unknown error'));
+        $this->videoModel->updateYoutubeStatus($videoId, 'failed');
         return null;
     }
 

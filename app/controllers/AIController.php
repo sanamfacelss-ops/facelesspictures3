@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Services\AIQualityService;
+use App\Services\VideoProcessingService;
+use App\Services\BackgroundProcessor;
 use App\Models\Video;
 
 class AIController
 {
-    private AIQualityService $aiService;
+    private VideoProcessingService $processingService;
     private Video $videoModel;
 
     public function __construct()
     {
-        $this->aiService = new AIQualityService();
+        $this->processingService = new VideoProcessingService();
         $this->videoModel = new Video();
     }
 
@@ -86,8 +87,41 @@ class AIController
             return;
         }
 
-        $result = $this->aiService->processVideo($videoId);
-        echo json_encode($result);
+        // Trigger background processing
+        BackgroundProcessor::queueVideoProcessing($videoId);
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Video queued for AI processing',
+            'video_id' => $videoId
+        ]);
+    }
+
+    /**
+     * Re-run AI check for a video (admin only)
+     */
+    public function reprocess(int $videoId): void
+    {
+        header('Content-Type: application/json');
+
+        if (!is_admin()) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Admin access required']);
+            return;
+        }
+
+        // Reset status to pending first
+        $this->videoModel->updateAiStatus($videoId, 'pending', null, null);
+        $this->videoModel->updateStatus($videoId, 'pending', null);
+
+        // Trigger reprocessing
+        BackgroundProcessor::queueVideoProcessing($videoId);
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Video queued for AI re-processing',
+            'video_id' => $videoId
+        ]);
     }
 
     /**
@@ -108,7 +142,7 @@ class AIController
         }
 
         $limit = min(50, (int) ($_GET['limit'] ?? 10));
-        $results = $this->aiService->processQueue($limit);
+        $results = $this->processingService->processQueue($limit);
 
         echo json_encode([
             'success' => true,
@@ -118,7 +152,7 @@ class AIController
     }
 
     /**
-     * Get AI processing status for a video
+     * Get AI processing status for a video (for polling)
      */
     public function status(int $videoId): void
     {
@@ -145,14 +179,24 @@ class AIController
             return;
         }
 
+        // Parse AI feedback if exists
+        $aiFeedback = null;
+        if (!empty($video['ai_feedback'])) {
+            $aiFeedback = json_decode($video['ai_feedback'], true);
+        }
+
         echo json_encode([
             'video_id' => $videoId,
+            'title' => $video['title'],
             'status' => $video['status'],
             'ai_status' => $video['ai_status'] ?? 'pending',
             'ai_score' => $video['ai_score'] ?? null,
+            'ai_feedback' => $aiFeedback,
+            'rejection_reason' => $video['rejection_reason'] ?? null,
             'needs_manual_review' => (bool) ($video['needs_manual_review'] ?? false),
             'youtube_status' => $video['youtube_status'] ?? 'pending',
             'youtube_id' => $video['youtube_id'] ?? null,
+            'is_processing' => BackgroundProcessor::isProcessing($videoId),
         ]);
     }
 }

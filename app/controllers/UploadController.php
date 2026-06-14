@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Models\Video;
 use App\Models\Season;
 use App\Models\User;
+use App\Services\BackgroundProcessor;
 
 class UploadController
 {
@@ -128,10 +129,15 @@ class UploadController
         ]);
 
         log_message('info', "Video uploaded ID {$videoId} by user {$user['id']} (type: {$contentType}, mode: {$recordingMode})");
+
+        // Trigger background AI processing (non-blocking)
+        BackgroundProcessor::queueVideoProcessing($videoId);
+
         flash('success', 'Video uploaded successfully! AI review in progress.');
         echo json_encode([
             'success' => true, 
             'message' => 'Video uploaded! AI quality check in progress...',
+            'video_id' => $videoId,
             'redirect' => '/creator/dashboard'
         ]);
     }

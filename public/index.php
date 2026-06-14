@@ -94,6 +94,8 @@ $routes = [
 
     // Moderation API
     'api/moderation/pending' => [ModerationController::class, 'pendingList', 'GET'],
+    'api/moderation/flagged' => [ModerationController::class, 'flaggedList', 'GET'],
+    'api/moderation/detail/{id}' => [ModerationController::class, 'detail', 'GET'],
     'api/moderation/approve/{id}' => [ModerationController::class, 'approve', 'POST'],
     'api/moderation/reject/{id}' => [ModerationController::class, 'reject', 'POST'],
 
@@ -104,6 +106,7 @@ $routes = [
     // AI Quality Check API
     'api/ai/webhook' => [AIController::class, 'webhook', 'POST'],
     'api/ai/process/{id}' => [AIController::class, 'process', 'POST'],
+    'api/ai/reprocess/{id}' => [AIController::class, 'reprocess', 'POST'],
     'api/ai/queue' => [AIController::class, 'processQueue', 'GET'],
     'api/ai/status/{id}' => [AIController::class, 'status', 'GET'],
 
@@ -116,6 +119,11 @@ $routes = [
     'api/admin/users/delete/{id}' => [AdminController::class, 'deleteUser', 'POST'],
     'api/admin/videos' => [AdminController::class, 'allVideos', 'GET'],
     'api/admin/guides/update' => [AdminController::class, 'updateGuide', 'POST'],
+    'api/admin/ai/config' => [AdminController::class, 'getAIConfig', 'GET'],
+    'api/admin/ai/config/update' => [AdminController::class, 'updateAIConfig', 'POST'],
+    'api/admin/ai/test' => [AdminController::class, 'testAIProvider', 'POST'],
+    'api/admin/ai/keys' => [AdminController::class, 'getAPIKeyStatus', 'GET'],
+    'api/admin/ai/keys/update' => [AdminController::class, 'updateAPIKeys', 'POST'],
 ];
 
 $matched = false;
