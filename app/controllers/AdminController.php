@@ -766,13 +766,19 @@ class AdminController
             $rapidKey = $getKey('RAPIDAPI_KEY');
             if (!empty($rapidKey)) {
                 try {
-                    $ch = curl_init('https://nsfw3.p.rapidapi.com/v1/results?url=' . urlencode('https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png'));
+                    // Use form-urlencoded as per RapidAPI docs
+                    $ch = curl_init('https://nsfw3.p.rapidapi.com/v1/results');
                     curl_setopt_array($ch, [
                         CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
                         CURLOPT_HTTPHEADER => [
                             'X-RapidAPI-Key: ' . $rapidKey,
-                            'X-RapidAPI-Host: nsfw3.p.rapidapi.com'
+                            'X-RapidAPI-Host: nsfw3.p.rapidapi.com',
+                            'Content-Type: application/x-www-form-urlencoded'
                         ],
+                        CURLOPT_POSTFIELDS => http_build_query([
+                            'url' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png'
+                        ]),
                         CURLOPT_TIMEOUT => 15
                     ]);
                     $response = curl_exec($ch);
