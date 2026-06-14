@@ -289,6 +289,7 @@ class VideoProcessingService
     private function approve(int $videoId, float $score, array $feedback, array $flags, string $transcript, array $nsfwResult, int $processingTimeMs): array
     {
         $this->videoModel->updateAiStatus($videoId, 'approved', $score, [
+            'score' => $score,
             'summary' => 'Video passed AI quality check',
             'feedback' => $feedback,
             'flags' => $flags,
@@ -323,6 +324,7 @@ class VideoProcessingService
     private function flag(int $videoId, float $score, array $feedback, array $flags, string $transcript, array $nsfwResult, int $processingTimeMs): array
     {
         $this->videoModel->updateAiStatus($videoId, 'flagged', $score, [
+            'score' => $score,
             'summary' => 'Video flagged for manual review',
             'feedback' => $feedback,
             'flags' => $flags,
