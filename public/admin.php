@@ -713,6 +713,7 @@ if (file_exists($errorLogFile)) {
                                                     <template x-if="v.file_path">
                                                         <a :href="'/uploads/' + v.file_path" target="_blank" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Preview</a>
                                                     </template>
+                                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">Details</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -2121,6 +2122,46 @@ if (file_exists($errorLogFile)) {
                         <div class="mt-4 pt-4 border-t border-dark/10">
                             <span class="text-[11px] text-dark/40 uppercase">Transcript Preview:</span>
                             <p class="text-[12px] text-dark/50 mt-1 line-clamp-3" x-text="videoDetail.feedback.transcript"></p>
+                        </div>
+                    </template>
+                    
+                    <!-- NSFW Analysis (if available) -->
+                    <template x-if="videoDetail.feedback?.nsfw_result">
+                        <div class="mt-4 pt-4 border-t border-dark/10">
+                            <span class="text-[11px] text-dark/40 uppercase">Content Safety Analysis:</span>
+                            <div class="mt-2 grid grid-cols-2 gap-2 text-[11px]">
+                                <template x-if="videoDetail.feedback.nsfw_result.nudity !== undefined">
+                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
+                                        <span class="text-dark/50">Nudity:</span>
+                                        <span :class="videoDetail.feedback.nsfw_result.nudity > 0.5 ? 'text-red-600 font-medium' : 'text-green-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.nudity * 100) + '%'"></span>
+                                    </div>
+                                </template>
+                                <template x-if="videoDetail.feedback.nsfw_result.violence !== undefined">
+                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
+                                        <span class="text-dark/50">Violence:</span>
+                                        <span :class="videoDetail.feedback.nsfw_result.violence > 0.5 ? 'text-red-600 font-medium' : 'text-green-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.violence * 100) + '%'"></span>
+                                    </div>
+                                </template>
+                                <template x-if="videoDetail.feedback.nsfw_result.suggestive !== undefined">
+                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
+                                        <span class="text-dark/50">Suggestive:</span>
+                                        <span :class="videoDetail.feedback.nsfw_result.suggestive > 0.5 ? 'text-amber-600 font-medium' : 'text-green-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.suggestive * 100) + '%'"></span>
+                                    </div>
+                                </template>
+                                <template x-if="videoDetail.feedback.nsfw_result.safe !== undefined">
+                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
+                                        <span class="text-dark/50">Safe:</span>
+                                        <span :class="videoDetail.feedback.nsfw_result.safe > 0.7 ? 'text-green-600 font-medium' : 'text-amber-600'" x-text="Math.round(videoDetail.feedback.nsfw_result.safe * 100) + '%'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <!-- Checked At -->
+                    <template x-if="videoDetail.feedback?.checked_at">
+                        <div class="mt-3 text-[10px] text-dark/30 text-right">
+                            Analyzed: <span x-text="videoDetail.feedback.checked_at"></span>
                         </div>
                     </template>
                 </div>
