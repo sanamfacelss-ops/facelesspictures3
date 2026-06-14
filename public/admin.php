@@ -148,6 +148,8 @@ if (file_exists($errorLogFile)) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Plyr Video Player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -169,6 +171,7 @@ if (file_exists($errorLogFile)) {
         }
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <style>
         body { font-family: 'DM Sans', sans-serif; }
         .font-display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
@@ -178,6 +181,11 @@ if (file_exists($errorLogFile)) {
         .sidebar-link:hover { background: #FEF2F2; }
         .sidebar-link.active { background: #FEF2F2; border-left: 3px solid #D92B3A; color: #D92B3A; }
         .stat-card { background: #F1EFE8; }
+        /* Custom Plyr colors */
+        :root {
+            --plyr-color-main: #D92B3A;
+        }
+        .plyr { border-radius: 12px; }
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F8F5F0; }
@@ -2061,12 +2069,12 @@ if (file_exists($errorLogFile)) {
     </div>
 
     <!-- Video Detail Modal -->
-    <div x-show="videoDetailOpen" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="videoDetailOpen = false">
+    <div x-show="videoDetailOpen" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="closeVideoDetail()">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden" @click.stop>
             <!-- Header -->
             <div class="px-6 py-4 border-b border-dark/10 flex items-center justify-between">
                 <h3 class="font-display text-[20px] text-dark" x-text="videoDetail.title"></h3>
-                <button @click="videoDetailOpen = false" class="text-dark/40 hover:text-dark">
+                <button @click="closeVideoDetail()" class="text-dark/40 hover:text-dark">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -2076,7 +2084,7 @@ if (file_exists($errorLogFile)) {
                 <!-- Video Preview -->
                 <template x-if="videoDetail.filePath">
                     <div class="mb-6">
-                        <video :src="'/uploads/' + videoDetail.filePath" controls class="w-full rounded-xl bg-dark max-h-[300px]"></video>
+                        <video id="detail-video-player" :src="'/uploads/' + videoDetail.filePath" controls playsinline class="w-full rounded-xl bg-dark max-h-[300px] plyr-video"></video>
                     </div>
                 </template>
                 
@@ -2176,11 +2184,11 @@ if (file_exists($errorLogFile)) {
                 
                 <!-- Actions -->
                 <div class="flex gap-3">
-                    <button @click="videoDetailOpen = false; approveVideo(videoDetail.id)" class="flex-1 bg-green-600 text-white py-3 rounded-xl text-[13px] font-medium hover:bg-green-700 transition flex items-center justify-center gap-2">
+                    <button @click="closeVideoDetail(); approveVideo(videoDetail.id)" class="flex-1 bg-green-600 text-white py-3 rounded-xl text-[13px] font-medium hover:bg-green-700 transition flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Approve Video
                     </button>
-                    <button @click="videoDetailOpen = false; rejectVideo(videoDetail.id)" class="flex-1 bg-crimson text-white py-3 rounded-xl text-[13px] font-medium hover:bg-crimson/90 transition flex items-center justify-center gap-2">
+                    <button @click="closeVideoDetail(); rejectVideo(videoDetail.id)" class="flex-1 bg-crimson text-white py-3 rounded-xl text-[13px] font-medium hover:bg-crimson/90 transition flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         Reject Video
                     </button>
@@ -2421,6 +2429,9 @@ if (file_exists($errorLogFile)) {
                 return this.scripts.filter(s => s.category === this.scriptFilter);
             },
 
+            // Video player instance
+            videoPlayer: null,
+
             // Open video detail modal
             openVideoDetail(id, title, filePath, feedback) {
                 this.videoDetail = {
@@ -2430,6 +2441,34 @@ if (file_exists($errorLogFile)) {
                     feedback: feedback || {}
                 };
                 this.videoDetailOpen = true;
+                
+                // Initialize Plyr after DOM updates
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        const videoEl = document.getElementById('detail-video-player');
+                        if (videoEl && typeof Plyr !== 'undefined') {
+                            // Destroy previous instance if exists
+                            if (this.videoPlayer) {
+                                this.videoPlayer.destroy();
+                            }
+                            this.videoPlayer = new Plyr(videoEl, {
+                                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                                ratio: '16:9'
+                            });
+                        }
+                    }, 100);
+                });
+            },
+            
+            // Close video detail modal
+            closeVideoDetail() {
+                // Stop and destroy video player
+                if (this.videoPlayer) {
+                    this.videoPlayer.pause();
+                    this.videoPlayer.destroy();
+                    this.videoPlayer = null;
+                }
+                this.videoDetailOpen = false;
             },
 
             // Video actions
