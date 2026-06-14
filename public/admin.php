@@ -1533,6 +1533,34 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
+    <!-- AI Test Results Modal -->
+    <div x-show="testResultsOpen" x-cloak class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="testResultsOpen = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" @click.stop x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-dark text-[16px]">AI Provider Test Results</h3>
+                    <p class="text-[12px] text-dark/50">Connection status for each provider</p>
+                </div>
+            </div>
+            <div class="space-y-3 mb-5">
+                <template x-for="(status, provider) in testResults" :key="provider">
+                    <div class="flex items-center justify-between p-3 rounded-xl" :class="status === 'OK' ? 'bg-green-50' : status === 'Not configured' ? 'bg-gray-50' : 'bg-red-50'">
+                        <span class="font-medium text-[13px] uppercase" x-text="provider"></span>
+                        <span class="text-[12px] px-2 py-1 rounded-full font-medium" 
+                            :class="status === 'OK' ? 'bg-green-100 text-green-700' : status === 'Not configured' ? 'bg-gray-200 text-gray-600' : 'bg-red-100 text-red-700'"
+                            x-text="status"></span>
+                    </div>
+                </template>
+            </div>
+            <div class="flex justify-end">
+                <button @click="testResultsOpen = false" class="px-5 py-2.5 text-[13px] bg-dark text-white rounded-xl hover:bg-dark/90 transition font-medium">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Video Detail Modal -->
     <div x-show="videoDetailOpen" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="videoDetailOpen = false">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden" @click.stop>
@@ -1730,6 +1758,10 @@ if (file_exists($errorLogFile)) {
                 FFPROBE_PATH: ''
             },
             savingKeys: false,
+            
+            // Test Results Modal
+            testResults: {},
+            testResultsOpen: false,
             
             // Filters
             videoFilter: 'all',
@@ -2080,12 +2112,9 @@ if (file_exists($errorLogFile)) {
                     const data = await res.json();
                     if (data.success) {
                         const details = data.result.details;
-                        let msg = data.result.status + '\n';
-                        for (const [provider, status] of Object.entries(details)) {
-                            msg += `${provider}: ${status}\n`;
-                        }
+                        this.testResults = details;
+                        this.testResultsOpen = true;
                         this.showToast(data.result.status);
-                        alert('AI Provider Test Results:\n\n' + Object.entries(details).map(([k,v]) => `${k.toUpperCase()}: ${v}`).join('\n'));
                     } else {
                         this.showToast('AI test failed: ' + (data.error || 'Unknown error'), 'error');
                     }
