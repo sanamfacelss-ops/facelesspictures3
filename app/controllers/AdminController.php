@@ -936,7 +936,7 @@ class AdminController
             $getKey = function($key) use ($settingsModel) {
                 $value = $_ENV[$key] ?? getenv($key) ?: null;
                 if (empty($value)) {
-                    $value = $settingsModel->get('api_key_' . strtolower($key));
+                    $value = $settingsModel->get('env_' . $key);
                 }
                 return $value;
             };
@@ -1083,7 +1083,7 @@ class AdminController
             $getKey = function($key) use ($settingsModel) {
                 $value = $_ENV[$key] ?? getenv($key) ?: null;
                 if (empty($value)) {
-                    $value = $settingsModel->get('api_key_' . strtolower($key));
+                    $value = $settingsModel->get('env_' . $key);
                 }
                 return $value;
             };
