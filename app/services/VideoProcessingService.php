@@ -532,6 +532,33 @@ class VideoProcessingService
         
         log_message('info', "Video {$videoId} flagged for review with score {$score}");
 
+        // Send notifications
+        $video = $this->videoModel->findById($videoId);
+        if ($video) {
+            // Notify user that video is under manual review (if enabled)
+            if ($this->emailService->isNotificationEnabled('flagged')) {
+                $userModel = new User();
+                $user = $userModel->findById((int) $video['user_id']);
+                if ($user) {
+                    $this->emailService->sendVideoManualReviewEmail($user, $video);
+                }
+            }
+            
+            // Notify admin about flagged video (if enabled)
+            $notificationSettings = $this->emailService->getNotificationSettings();
+            $adminEmail = $this->emailService->getAdminEmail();
+            if (!empty($adminEmail) && ($notificationSettings['admin_flagged'] ?? '1') === '1') {
+                $userModel = $userModel ?? new User();
+                $user = $user ?? $userModel->findById((int) $video['user_id']);
+                if ($user) {
+                    $this->emailService->sendAdminFlaggedVideoEmail($adminEmail, $user, $video, [
+                        'score' => $score,
+                        'reason' => implode('. ', $feedback),
+                    ]);
+                }
+            }
+        }
+
         return [
             'success' => true,
             'video_id' => $videoId,
@@ -602,59 +629,32 @@ class VideoProcessingService
             $user = $userModel->findById((int) $video['user_id']);
             if (!$user) return;
 
-            $subject = match($status) {
-                'approved' => "✅ Your video '{$video['title']}' has been approved!",
-                'rejected' => "❌ Your video '{$video['title']}' was not approved",
-                default => "Video status update: {$video['title']}"
+            // Check if notification is enabled for this status
+            $notificationKey = match($status) {
+                'approved' => 'approved',
+                'rejected' => 'rejected',
+                'processing' => 'processing',
+                default => null
             };
+            
+            if ($notificationKey && !$this->emailService->isNotificationEnabled($notificationKey)) {
+                debug_log("Email notification for '{$status}' is disabled, skipping", 'VIDEO_PROCESSING');
+                return;
+            }
 
-            $statusColor = $status === 'approved' ? '#10B981' : '#EF4444';
-            $statusIcon = $status === 'approved' ? '✅' : '❌';
-            $statusText = $status === 'approved' 
-                ? 'Your video has passed our AI quality check and will be published to YouTube soon.'
-                : 'Unfortunately, your video did not pass our quality check.';
-
-            $reasonHtml = !empty($reason) 
-                ? "<div style='background: #FEF2F2; border-left: 4px solid #EF4444; padding: 15px; margin: 20px 0; border-radius: 4px;'><strong>Reason:</strong> {$reason}</div>" 
-                : '';
-
-            $body = "
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body { font-family: 'Segoe UI', Arial, sans-serif; background: #F8F5F0; padding: 40px 20px; }
-                    .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-                    .header { background: #141414; padding: 25px; text-align: center; }
-                    .header h1 { color: white; font-size: 20px; margin: 0; }
-                    .content { padding: 30px; }
-                    .status-badge { display: inline-block; background: {$statusColor}; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin: 15px 0; }
-                    .video-title { font-size: 18px; font-weight: bold; color: #1F2937; margin: 10px 0; }
-                    .footer { background: #F3F4F6; padding: 20px; text-align: center; font-size: 12px; color: #6B7280; }
-                </style>
-            </head>
-            <body>
-                <div class='container'>
-                    <div class='header'>
-                        <h1>FACELESS PICTURES</h1>
-                    </div>
-                    <div class='content'>
-                        <p style='font-size: 24px; margin: 0;'>{$statusIcon}</p>
-                        <div class='status-badge'>" . strtoupper($status) . "</div>
-                        <div class='video-title'>{$video['title']}</div>
-                        <p style='color: #6B7280;'>{$statusText}</p>
-                        {$reasonHtml}
-                        <a href='" . APP_URL . "/creator/dashboard' style='display: inline-block; background: #141414; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-top: 20px;'>View Dashboard</a>
-                    </div>
-                    <div class='footer'>
-                        &copy; " . date('Y') . " Faceless Pictures. All rights reserved.
-                    </div>
-                </div>
-            </body>
-            </html>
-            ";
-
-            $this->emailService->send($user['email'], $subject, $body, true);
+            // Use proper email templates from EmailService
+            $sent = match($status) {
+                'approved' => $this->emailService->sendVideoApprovedEmail($user, $video),
+                'rejected' => $this->emailService->sendVideoRejectedEmail($user, $video, $reason),
+                'processing' => $this->emailService->sendVideoProcessingEmail($user, $video),
+                default => false
+            };
+            
+            if ($sent) {
+                debug_log("Status email sent to {$user['email']} for video {$video['id']} (status: {$status})", 'VIDEO_PROCESSING');
+            } else {
+                debug_log("Failed to send status email to {$user['email']}: " . $this->emailService->getLastError(), 'VIDEO_PROCESSING');
+            }
         } catch (\Exception $e) {
             log_message('error', 'Failed to send status email: ' . $e->getMessage());
         }

@@ -134,6 +134,24 @@ class AuthController
 
             debug_log("User created with ID: $userId", 'REGISTER');
             $_SESSION['user_id'] = $userId;
+            
+            // Send welcome email if notification is enabled
+            try {
+                $emailService = new \App\Services\EmailService();
+                if ($emailService->isNotificationEnabled('signup')) {
+                    $emailService->sendWelcomeEmail([
+                        'id' => $userId,
+                        'name' => $name,
+                        'email' => $email,
+                        'role' => $role,
+                    ]);
+                    debug_log("Welcome email sent to $email", 'REGISTER');
+                }
+            } catch (\Exception $emailError) {
+                debug_log("Failed to send welcome email: " . $emailError->getMessage(), 'REGISTER');
+                // Don't fail registration if email fails
+            }
+            
             flash('success', 'Account created successfully.');
             echo json_encode(['success' => true, 'redirect' => '/onboarding']);
         } catch (\Exception $e) {

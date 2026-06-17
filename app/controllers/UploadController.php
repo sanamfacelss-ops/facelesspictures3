@@ -192,6 +192,34 @@ class UploadController
             // Trigger background AI processing (non-blocking)
             BackgroundProcessor::queueVideoProcessing($videoId);
 
+            // Send email notifications
+            try {
+                $emailService = new \App\Services\EmailService();
+                
+                // Get video data for email
+                $videoData = [
+                    'id' => $videoId,
+                    'title' => $title,
+                    'content_type' => $contentType,
+                ];
+                
+                // Notify user if enabled
+                if ($emailService->isNotificationEnabled('submit')) {
+                    $emailService->sendVideoSubmittedEmail($user, $videoData);
+                    debug_log("Video submitted email sent to {$user['email']}", 'UPLOAD');
+                }
+                
+                // Notify admin if enabled
+                $adminEmail = $emailService->getAdminEmail();
+                if (!empty($adminEmail) && ($emailService->getNotificationSettings()['admin_new_video'] ?? '1') === '1') {
+                    $emailService->sendAdminNewVideoEmail($adminEmail, $user, $videoData);
+                    debug_log("Admin notification sent for new video", 'UPLOAD');
+                }
+            } catch (\Exception $emailError) {
+                debug_log("Email notification failed: " . $emailError->getMessage(), 'UPLOAD');
+                // Don't fail upload if email fails
+            }
+
             flash('success', 'Video uploaded successfully! AI review in progress.');
             echo json_encode([
                 'success' => true, 
