@@ -161,13 +161,6 @@ class EmailService
         }
         return $result;
     }
-
-    private string $lastError = '';
-    
-    public function getLastError(): string
-    {
-        return $this->lastError;
-    }
     
     public function sendSmtp(string $to, string $subject, string $body, bool $isHtml = true): bool
     {

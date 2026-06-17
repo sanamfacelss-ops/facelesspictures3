@@ -1412,6 +1412,7 @@ class AdminController
             ]);
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_GET_EMAIL_SETTINGS');
+            http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
