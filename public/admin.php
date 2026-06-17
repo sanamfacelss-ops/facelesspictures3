@@ -2084,8 +2084,103 @@ if (file_exists($errorLogFile)) {
                 <div x-show="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         
-                        <!-- SMTP Configuration Card -->
-                        <div class="lg:col-span-2 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                        <!-- Email Provider Selection -->
+                        <div class="lg:col-span-3 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
+                                <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                Email Provider
+                            </h3>
+                            <div class="flex flex-wrap gap-3">
+                                <button type="button" @click="emailProvider = 'smtp'" 
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition"
+                                    :class="emailProvider === 'smtp' ? 'border-crimson bg-crimson/5' : 'border-dark/10 hover:border-dark/20'">
+                                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-[13px]" :class="emailProvider === 'smtp' ? 'text-crimson' : 'text-dark'">SMTP</p>
+                                        <p class="text-[10px] text-dark/50">Gmail, Zoho, Outlook, etc.</p>
+                                    </div>
+                                </button>
+                                <button type="button" @click="emailProvider = 'resend'" 
+                                    class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition"
+                                    :class="emailProvider === 'resend' ? 'border-crimson bg-crimson/5' : 'border-dark/10 hover:border-dark/20'">
+                                    <div class="w-10 h-10 rounded-lg bg-black flex items-center justify-center">
+                                        <span class="text-white font-bold text-[14px]">R</span>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-semibold text-[13px]" :class="emailProvider === 'resend' ? 'text-crimson' : 'text-dark'">Resend</p>
+                                        <p class="text-[10px] text-dark/50">3,000 free/month • Best deliverability</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Resend Configuration (shown when resend selected) -->
+                        <div x-show="emailProvider === 'resend'" x-cloak class="lg:col-span-2 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
+                                    <div class="w-6 h-6 rounded bg-black flex items-center justify-center">
+                                        <span class="text-white font-bold text-[11px]">R</span>
+                                    </div>
+                                    Resend Configuration
+                                </h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                                      :class="resendStatus.is_configured ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'"
+                                      x-text="resendStatus.is_configured ? 'Connected' : 'Not Configured'"></span>
+                            </div>
+                            
+                            <form @submit.prevent="saveResendSettings()" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">Resend API Key</label>
+                                        <div class="relative">
+                                            <input :type="showResendKey ? 'text' : 'password'" x-model="resend.api_key" placeholder="re_xxxxxxxxxx" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] pr-10 focus:border-crimson focus:ring-1 focus:ring-crimson/20 font-mono">
+                                            <button type="button" @click="showResendKey = !showResendKey" class="absolute right-3 top-1/2 -translate-y-1/2 text-dark/40 hover:text-dark">
+                                                <svg x-show="!showResendKey" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                <svg x-show="showResendKey" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                                            </button>
+                                        </div>
+                                        <p class="text-[10px] text-dark/40 mt-1">Get your API key from <a href="https://resend.com/api-keys" target="_blank" class="text-crimson underline">resend.com/api-keys</a></p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">From Email Address</label>
+                                        <input type="email" x-model="resend.from_address" placeholder="noreply@yourdomain.com" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                        <p class="text-[10px] text-dark/40 mt-1">Must use verified domain in Resend</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">From Name</label>
+                                        <input type="text" x-model="resend.from_name" placeholder="Faceless Pictures 3" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                    </div>
+                                </div>
+                                
+                                <!-- Setup Guide -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4">
+                                    <h4 class="font-semibold text-blue-900 text-[12px] mb-2 flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Setup Guide
+                                    </h4>
+                                    <ol class="text-[11px] text-blue-800 space-y-1 list-decimal list-inside">
+                                        <li>Create free account at <a href="https://resend.com" target="_blank" class="underline">resend.com</a></li>
+                                        <li>Add your domain in Resend → Domains</li>
+                                        <li>Add DNS records to Cloudflare (SPF, DKIM)</li>
+                                        <li>Create API key and paste above</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 pt-2">
+                                    <button type="submit" :disabled="savingResend" class="bg-crimson text-white px-6 py-2.5 rounded-lg text-[13px] font-semibold hover:bg-crimson/90 disabled:opacity-50">
+                                        <span x-text="savingResend ? 'Saving...' : 'Save Resend Settings'"></span>
+                                    </button>
+                                    <span x-show="resendMessage" x-text="resendMessage" class="text-[12px]" :class="resendSuccess ? 'text-green-600' : 'text-red-600'"></span>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- SMTP Configuration Card (shown when smtp selected) -->
+                        <div x-show="emailProvider === 'smtp'" x-cloak class="lg:col-span-2 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                     <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3514,8 +3609,15 @@ if (file_exists($errorLogFile)) {
     function emailSettings() {
         return {
             csrf: '<?= csrf_token() ?>',
+            emailProvider: 'smtp', // 'smtp' or 'resend'
             smtp: { host: '', port: '587', username: '', password: '', encryption: 'tls', from_address: '', from_name: '' },
             smtpStatus: { host: '', port: '', username: '', has_password: false, from_address: '', is_configured: false },
+            resend: { api_key: '', from_address: '', from_name: 'Faceless Pictures 3' },
+            resendStatus: { is_configured: false, has_api_key: false },
+            showResendKey: false,
+            savingResend: false,
+            resendMessage: '',
+            resendSuccess: false,
             notifications: { signup: true, submit: true, processing: true, approved: true, rejected: true, flagged: true, admin_address: '', admin_new_video: true, admin_flagged: true },
             showPassword: false,
             savingSmtp: false,
@@ -3534,15 +3636,22 @@ if (file_exists($errorLogFile)) {
                     const data = await res.json();
                     if (data.success) {
                         this.smtpStatus = data.config || {};
-                        // Pre-fill form with current values
+                        // Load email provider setting
                         if (data.settings) {
+                            this.emailProvider = data.settings.email_provider || 'smtp';
+                            // SMTP settings
                             this.smtp.host = data.settings.smtp_host || '';
                             this.smtp.port = data.settings.smtp_port || '587';
                             this.smtp.username = data.settings.smtp_username || '';
                             this.smtp.encryption = data.settings.smtp_encryption || 'tls';
                             this.smtp.from_address = data.settings.smtp_from_address || '';
                             this.smtp.from_name = data.settings.smtp_from_name || '';
-                            // Password stays empty - user must re-enter to change
+                            // Resend settings
+                            this.resend.from_address = data.settings.resend_from_address || '';
+                            this.resend.from_name = data.settings.resend_from_name || 'Faceless Pictures 3';
+                            this.resendStatus.has_api_key = !!data.settings.resend_api_key;
+                            this.resendStatus.is_configured = !!data.settings.resend_api_key && !!data.settings.resend_from_address;
+                            // Notification settings
                             this.notifications.signup = data.settings.email_notify_signup === '1';
                             this.notifications.submit = data.settings.email_notify_submit === '1';
                             this.notifications.processing = data.settings.email_notify_processing === '1';
@@ -3577,6 +3686,7 @@ if (file_exists($errorLogFile)) {
                 this.smtpMessage = '';
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
+                formData.append('email_provider', 'smtp');
                 formData.append('smtp_host', this.smtp.host);
                 formData.append('smtp_port', this.smtp.port);
                 formData.append('smtp_username', this.smtp.username);
@@ -3592,6 +3702,7 @@ if (file_exists($errorLogFile)) {
                     this.smtpMessage = data.success ? 'SMTP settings saved!' : (data.error || 'Failed to save');
                     if (data.success) {
                         this.smtp.password = '';
+                        this.emailProvider = 'smtp';
                         setTimeout(() => location.reload(), 1500);
                     }
                 } catch (e) {
@@ -3599,6 +3710,33 @@ if (file_exists($errorLogFile)) {
                     this.smtpMessage = 'Failed to save settings';
                 }
                 this.savingSmtp = false;
+            },
+            
+            async saveResendSettings() {
+                this.savingResend = true;
+                this.resendMessage = '';
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('email_provider', 'resend');
+                if (this.resend.api_key) formData.append('resend_api_key', this.resend.api_key);
+                formData.append('resend_from_address', this.resend.from_address);
+                formData.append('resend_from_name', this.resend.from_name);
+                
+                try {
+                    const res = await fetch('/api/admin/email/settings/save', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    this.resendSuccess = data.success;
+                    this.resendMessage = data.success ? 'Resend settings saved!' : (data.error || 'Failed to save');
+                    if (data.success) {
+                        this.resend.api_key = '';
+                        this.emailProvider = 'resend';
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } catch (e) {
+                    this.resendSuccess = false;
+                    this.resendMessage = 'Failed to save settings';
+                }
+                this.savingResend = false;
             },
             
             async saveNotificationSettings() {

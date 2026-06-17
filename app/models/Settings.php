@@ -219,6 +219,7 @@ class Settings
     public function getEmailSettings(): array
     {
         $defaults = [
+            'email_provider' => 'smtp', // 'smtp' or 'resend'
             'smtp_host' => $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com',
             'smtp_port' => $_ENV['MAIL_PORT'] ?? '587',
             'smtp_username' => $_ENV['MAIL_USERNAME'] ?? '',
@@ -226,6 +227,10 @@ class Settings
             'smtp_encryption' => $_ENV['MAIL_ENCRYPTION'] ?? 'tls',
             'smtp_from_address' => $_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com',
             'smtp_from_name' => $_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3',
+            // Resend settings
+            'resend_api_key' => '',
+            'resend_from_address' => '',
+            'resend_from_name' => 'Faceless Pictures 3',
             // Notification toggles
             'email_notify_signup' => '1',
             'email_notify_submit' => '1',
@@ -242,8 +247,8 @@ class Settings
         $settings = [];
         foreach ($defaults as $key => $default) {
             $dbValue = $this->get($key);
-            // For password, only use DB value if set (don't expose env password)
-            if ($key === 'smtp_password') {
+            // For sensitive keys, only use DB value if set (don't expose env values)
+            if ($key === 'smtp_password' || $key === 'resend_api_key') {
                 $settings[$key] = $dbValue ?? '';
             } else {
                 $settings[$key] = $dbValue ?? $default;
@@ -259,8 +264,10 @@ class Settings
     public function updateEmailSetting(string $key, string $value): bool
     {
         $allowedKeys = [
+            'email_provider',
             'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password',
             'smtp_encryption', 'smtp_from_address', 'smtp_from_name',
+            'resend_api_key', 'resend_from_address', 'resend_from_name',
             'email_notify_signup', 'email_notify_submit', 'email_notify_processing',
             'email_notify_approved', 'email_notify_rejected', 'email_notify_flagged',
             'email_admin_address', 'email_admin_new_video', 'email_admin_flagged',

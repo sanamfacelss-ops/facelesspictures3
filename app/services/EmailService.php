@@ -8,6 +8,7 @@ use App\Models\Settings;
 
 class EmailService
 {
+    private string $provider = 'smtp'; // 'smtp' or 'resend'
     private string $host;
     private int $port;
     private string $username;
@@ -15,8 +16,12 @@ class EmailService
     private string $encryption;
     private string $fromAddress;
     private string $fromName;
+    private string $resendApiKey = '';
+    private string $resendFromAddress = '';
+    private string $resendFromName = '';
     private ?EmailTemplateService $templateService = null;
     private array $notificationSettings = [];
+    private string $lastError = '';
 
     public function __construct()
     {
@@ -34,15 +39,22 @@ class EmailService
             $settingsModel = new Settings();
             $dbSettings = $settingsModel->getEmailSettings();
             
+            // Email provider (smtp or resend)
+            $this->provider = !empty($dbSettings['email_provider']) ? $dbSettings['email_provider'] : 'smtp';
+            
             // SMTP Settings - DB takes priority over .env
             $this->host = !empty($dbSettings['smtp_host']) ? $dbSettings['smtp_host'] : ($_ENV['MAIL_HOST'] ?? 'localhost');
             $this->port = (int) (!empty($dbSettings['smtp_port']) ? $dbSettings['smtp_port'] : ($_ENV['MAIL_PORT'] ?? 587));
             $this->username = !empty($dbSettings['smtp_username']) ? $dbSettings['smtp_username'] : ($_ENV['MAIL_USERNAME'] ?? '');
-            // Password: DB first, then .env
             $this->password = !empty($dbSettings['smtp_password']) ? $dbSettings['smtp_password'] : ($_ENV['MAIL_PASSWORD'] ?? '');
             $this->encryption = !empty($dbSettings['smtp_encryption']) ? $dbSettings['smtp_encryption'] : ($_ENV['MAIL_ENCRYPTION'] ?? 'tls');
             $this->fromAddress = !empty($dbSettings['smtp_from_address']) ? $dbSettings['smtp_from_address'] : ($_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com');
             $this->fromName = !empty($dbSettings['smtp_from_name']) ? $dbSettings['smtp_from_name'] : ($_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3');
+            
+            // Resend Settings
+            $this->resendApiKey = $dbSettings['resend_api_key'] ?? '';
+            $this->resendFromAddress = $dbSettings['resend_from_address'] ?? '';
+            $this->resendFromName = $dbSettings['resend_from_name'] ?? 'Faceless Pictures 3';
             
             // Notification settings
             $this->notificationSettings = [
@@ -58,6 +70,7 @@ class EmailService
             ];
         } catch (\Exception $e) {
             // Fallback to .env only
+            $this->provider = 'smtp';
             $this->host = $_ENV['MAIL_HOST'] ?? 'localhost';
             $this->port = (int) ($_ENV['MAIL_PORT'] ?? 587);
             $this->username = $_ENV['MAIL_USERNAME'] ?? '';
@@ -75,6 +88,7 @@ class EmailService
     public function getConfigStatus(): array
     {
         return [
+            'provider' => $this->provider,
             'host' => $this->host,
             'port' => $this->port,
             'username' => $this->username,
@@ -82,8 +96,28 @@ class EmailService
             'encryption' => $this->encryption,
             'from_address' => $this->fromAddress,
             'from_name' => $this->fromName,
-            'is_configured' => !empty($this->host) && $this->host !== 'localhost' && !empty($this->username) && !empty($this->password),
+            'is_configured' => $this->isConfigured(),
+            'resend_configured' => !empty($this->resendApiKey) && !empty($this->resendFromAddress),
         ];
+    }
+    
+    /**
+     * Check if email is configured
+     */
+    private function isConfigured(): bool
+    {
+        if ($this->provider === 'resend') {
+            return !empty($this->resendApiKey) && !empty($this->resendFromAddress);
+        }
+        return !empty($this->host) && $this->host !== 'localhost' && !empty($this->username) && !empty($this->password);
+    }
+    
+    /**
+     * Get last error message
+     */
+    public function getLastError(): string
+    {
+        return $this->lastError;
     }
 
     /**
@@ -462,11 +496,89 @@ class EmailService
      */
     private function sendEmail(string $to, string $subject, string $body): bool
     {
-        // Try SMTP first, fallback to mail()
+        // Use Resend if configured and selected
+        if ($this->provider === 'resend' && !empty($this->resendApiKey)) {
+            return $this->sendResend($to, $subject, $body);
+        }
+        
+        // Use SMTP if configured
         if (!empty($this->username) && !empty($this->password)) {
             return $this->sendSmtp($to, $subject, $body, true);
         }
+        
+        // Fallback to PHP mail()
         return $this->send($to, $subject, $body, true);
+    }
+    
+    /**
+     * Send email using Resend API
+     */
+    public function sendResend(string $to, string $subject, string $body): bool
+    {
+        $this->lastError = '';
+        
+        if (empty($this->resendApiKey)) {
+            $this->lastError = 'Resend API key not configured';
+            return false;
+        }
+        
+        if (empty($this->resendFromAddress)) {
+            $this->lastError = 'Resend from address not configured';
+            return false;
+        }
+        
+        $this->smtpLog("Resend: Sending email to {$to}");
+        
+        $payload = [
+            'from' => "{$this->resendFromName} <{$this->resendFromAddress}>",
+            'to' => [$to],
+            'subject' => $subject,
+            'html' => $body
+        ];
+        
+        try {
+            $ch = curl_init('https://api.resend.com/emails');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: Bearer ' . $this->resendApiKey,
+                    'Content-Type: application/json'
+                ],
+                CURLOPT_POSTFIELDS => json_encode($payload),
+                CURLOPT_TIMEOUT => 30
+            ]);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            
+            if ($curlError) {
+                $this->lastError = "Resend connection error: {$curlError}";
+                $this->smtpLog("ERROR: " . $this->lastError);
+                return false;
+            }
+            
+            $data = json_decode($response, true);
+            
+            if ($httpCode === 200 && isset($data['id'])) {
+                $this->smtpLog("Resend: SUCCESS - Email ID: {$data['id']}");
+                return true;
+            }
+            
+            // Handle errors
+            $errorMsg = $data['message'] ?? $data['error'] ?? 'Unknown error';
+            $this->lastError = "Resend error ({$httpCode}): {$errorMsg}";
+            $this->smtpLog("ERROR: " . $this->lastError);
+            
+            return false;
+            
+        } catch (\Exception $e) {
+            $this->lastError = "Resend exception: " . $e->getMessage();
+            $this->smtpLog("ERROR: " . $this->lastError);
+            return false;
+        }
     }
 
     /**
