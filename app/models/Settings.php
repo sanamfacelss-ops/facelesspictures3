@@ -53,6 +53,11 @@ class Settings
      */
     public function set(string $key, string $value, string $type = 'text', ?string $description = null): bool
     {
+        // Ensure type is valid for ENUM
+        if (!in_array($type, ['text', 'html', 'json'])) {
+            $type = 'text';
+        }
+        
         // Try new schema first (setting_key, setting_value)
         try {
             $stmt = $this->db->prepare(
@@ -60,8 +65,11 @@ class Settings
                  VALUES (?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE setting_value = ?, setting_type = ?"
             );
-            return $stmt->execute([$key, $value, $type, $description, $value, $type]);
+            $result = $stmt->execute([$key, $value, $type, $description, $value, $type]);
+            debug_log("Settings set '$key' = '$value' (type: $type) - result: " . ($result ? 'success' : 'failed'), 'SETTINGS');
+            return $result;
         } catch (\PDOException $e) {
+            debug_log("Settings set error (new schema): " . $e->getMessage(), 'SETTINGS');
             // Fallback to old schema
         }
         
@@ -74,7 +82,7 @@ class Settings
             );
             return $stmt->execute([$key, $value, $type, $description, $value]);
         } catch (\PDOException $e) {
-            log_message('error', 'Settings set error: ' . $e->getMessage());
+            debug_log("Settings set error (old schema): " . $e->getMessage(), 'SETTINGS');
             return false;
         }
     }
@@ -184,7 +192,7 @@ class Settings
             return false;
         }
 
-        return $this->set($key, $value, 'ai_config', "AI Configuration: {$key}");
+        return $this->set($key, $value, 'text', "AI Configuration: {$key}");
     }
 
     /**
@@ -262,7 +270,7 @@ class Settings
             return false;
         }
 
-        return $this->set($key, $value, 'email', "Email Configuration: {$key}");
+        return $this->set($key, $value, 'text', "Email Configuration: {$key}");
     }
 
     /**
