@@ -204,4 +204,86 @@ class Settings
             return false;
         }
     }
+
+    /**
+     * Get SMTP/Email settings
+     */
+    public function getEmailSettings(): array
+    {
+        $defaults = [
+            'smtp_host' => $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com',
+            'smtp_port' => $_ENV['MAIL_PORT'] ?? '587',
+            'smtp_username' => $_ENV['MAIL_USERNAME'] ?? '',
+            'smtp_password' => '', // Don't expose from env, only from DB
+            'smtp_encryption' => $_ENV['MAIL_ENCRYPTION'] ?? 'tls',
+            'smtp_from_address' => $_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com',
+            'smtp_from_name' => $_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3',
+            // Notification toggles
+            'email_notify_signup' => '1',
+            'email_notify_submit' => '1',
+            'email_notify_processing' => '1',
+            'email_notify_approved' => '1',
+            'email_notify_rejected' => '1',
+            'email_notify_flagged' => '1',
+            // Admin notifications
+            'email_admin_address' => '',
+            'email_admin_new_video' => '1',
+            'email_admin_flagged' => '1',
+        ];
+
+        $settings = [];
+        foreach ($defaults as $key => $default) {
+            $dbValue = $this->get($key);
+            // For password, only use DB value if set (don't expose env password)
+            if ($key === 'smtp_password') {
+                $settings[$key] = $dbValue ?? '';
+            } else {
+                $settings[$key] = $dbValue ?? $default;
+            }
+        }
+
+        return $settings;
+    }
+
+    /**
+     * Update SMTP setting
+     */
+    public function updateEmailSetting(string $key, string $value): bool
+    {
+        $allowedKeys = [
+            'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password',
+            'smtp_encryption', 'smtp_from_address', 'smtp_from_name',
+            'email_notify_signup', 'email_notify_submit', 'email_notify_processing',
+            'email_notify_approved', 'email_notify_rejected', 'email_notify_flagged',
+            'email_admin_address', 'email_admin_new_video', 'email_admin_flagged',
+        ];
+        
+        if (!in_array($key, $allowedKeys)) {
+            return false;
+        }
+
+        return $this->set($key, $value, 'email', "Email Configuration: {$key}");
+    }
+
+    /**
+     * Bulk update email/SMTP settings
+     */
+    public function updateEmailSettings(array $settings): bool
+    {
+        $this->db->beginTransaction();
+        try {
+            foreach ($settings as $key => $value) {
+                // Skip empty password (means don't change it)
+                if ($key === 'smtp_password' && empty($value)) {
+                    continue;
+                }
+                $this->updateEmailSetting($key, (string) $value);
+            }
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
 }

@@ -2081,58 +2081,134 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== EMAIL TAB ==================== -->
-                <div x-show="activeTab === 'email'" x-cloak>
+                <div x-show="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-                        <!-- Connection Status Card -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
-                            <div class="flex items-center justify-between mb-4 youtube-status-header">
+                        
+                        <!-- SMTP Configuration Card -->
+                        <div class="lg:col-span-2 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <div class="flex items-center justify-between mb-4">
                                 <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                     <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    Email Status
+                                    SMTP Configuration
                                 </h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                                      :class="smtpStatus.is_configured ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'"
+                                      x-text="smtpStatus.is_configured ? 'Connected' : 'Not Configured'"></span>
                             </div>
                             
-                            <div class="space-y-3" x-data="{ emailConfig: <?= e(json_encode((new \App\Services\EmailService())->getConfigStatus())) ?> }">
+                            <form @submit.prevent="saveSmtpSettings()" class="space-y-4">
+                                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">SMTP Host</label>
+                                        <input type="text" x-model="smtp.host" placeholder="smtp.gmail.com" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                        <p class="text-[10px] text-dark/40 mt-1">e.g., smtp.gmail.com, smtp.zoho.com</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">Port</label>
+                                        <select x-model="smtp.port" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson">
+                                            <option value="587">587 (TLS - Recommended)</option>
+                                            <option value="465">465 (SSL)</option>
+                                            <option value="25">25 (Unencrypted)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">Username / Email</label>
+                                        <input type="email" x-model="smtp.username" placeholder="your@email.com" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">Password / App Password</label>
+                                        <div class="relative">
+                                            <input :type="showPassword ? 'text' : 'password'" x-model="smtp.password" placeholder="Leave blank to keep existing" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] pr-10 focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                            <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-dark/40 hover:text-dark">
+                                                <svg x-show="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                <svg x-show="showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                                            </button>
+                                        </div>
+                                        <p class="text-[10px] text-dark/40 mt-1">For Gmail, use <a href="https://myaccount.google.com/apppasswords" target="_blank" class="text-crimson underline">App Password</a></p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">Encryption</label>
+                                        <select x-model="smtp.encryption" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson">
+                                            <option value="tls">TLS (Recommended)</option>
+                                            <option value="ssl">SSL</option>
+                                            <option value="">None</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">From Email Address</label>
+                                        <input type="email" x-model="smtp.from_address" placeholder="noreply@yourdomain.com" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[12px] font-medium text-dark/70 mb-1">From Name</label>
+                                        <input type="text" x-model="smtp.from_name" placeholder="Faceless Pictures 3" class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-[13px] focus:border-crimson focus:ring-1 focus:ring-crimson/20">
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Setup Buttons -->
+                                <div class="bg-cream rounded-xl p-4 mt-4">
+                                    <p class="text-[11px] font-semibold text-dark/50 uppercase mb-3">Quick Setup - Select Provider</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button type="button" @click="setProvider('gmail')" class="px-3 py-1.5 text-[11px] font-medium bg-white border border-dark/10 rounded-lg hover:border-crimson hover:text-crimson transition">Gmail</button>
+                                        <button type="button" @click="setProvider('zoho')" class="px-3 py-1.5 text-[11px] font-medium bg-white border border-dark/10 rounded-lg hover:border-crimson hover:text-crimson transition">Zoho</button>
+                                        <button type="button" @click="setProvider('outlook')" class="px-3 py-1.5 text-[11px] font-medium bg-white border border-dark/10 rounded-lg hover:border-crimson hover:text-crimson transition">Outlook</button>
+                                        <button type="button" @click="setProvider('sendgrid')" class="px-3 py-1.5 text-[11px] font-medium bg-white border border-dark/10 rounded-lg hover:border-crimson hover:text-crimson transition">SendGrid</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 pt-2">
+                                    <button type="submit" :disabled="savingSmtp" class="bg-crimson text-white px-6 py-2.5 rounded-lg text-[13px] font-semibold hover:bg-crimson/90 disabled:opacity-50">
+                                        <span x-text="savingSmtp ? 'Saving...' : 'Save SMTP Settings'"></span>
+                                    </button>
+                                    <span x-show="smtpMessage" x-text="smtpMessage" class="text-[12px]" :class="smtpSuccess ? 'text-green-600' : 'text-red-600'"></span>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Test Email & Status Card -->
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
+                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                Connection Status
+                            </h3>
+                            
+                            <div class="space-y-3 mb-4">
                                 <div class="flex items-center justify-between py-2 border-b border-dark/5">
-                                    <span class="text-[12px] text-dark/50">SMTP Host</span>
-                                    <span class="text-[12px] font-medium" x-text="emailConfig.host || 'Not set'"></span>
+                                    <span class="text-[12px] text-dark/50">Host</span>
+                                    <span class="text-[12px] font-medium" x-text="smtpStatus.host || 'Not set'"></span>
                                 </div>
                                 <div class="flex items-center justify-between py-2 border-b border-dark/5">
                                     <span class="text-[12px] text-dark/50">Port</span>
-                                    <span class="text-[12px] font-medium" x-text="emailConfig.port"></span>
+                                    <span class="text-[12px] font-medium" x-text="smtpStatus.port || '-'"></span>
                                 </div>
                                 <div class="flex items-center justify-between py-2 border-b border-dark/5">
                                     <span class="text-[12px] text-dark/50">Username</span>
-                                    <span class="text-[12px] font-medium" x-text="emailConfig.username || 'Not set'"></span>
+                                    <span class="text-[12px] font-medium truncate max-w-[120px]" x-text="smtpStatus.username || 'Not set'"></span>
                                 </div>
                                 <div class="flex items-center justify-between py-2 border-b border-dark/5">
                                     <span class="text-[12px] text-dark/50">Password</span>
-                                    <span class="text-[12px] font-medium" x-text="emailConfig.has_password ? '••••••••' : 'Not set'"></span>
-                                </div>
-                                <div class="flex items-center justify-between py-2 border-b border-dark/5">
-                                    <span class="text-[12px] text-dark/50">From Address</span>
-                                    <span class="text-[12px] font-medium" x-text="emailConfig.from_address"></span>
+                                    <span class="text-[12px] font-medium" x-text="smtpStatus.has_password ? '••••••••' : 'Not set'"></span>
                                 </div>
                                 <div class="flex items-center justify-between py-2">
-                                    <span class="text-[12px] text-dark/50">Status</span>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                                          :class="emailConfig.is_configured ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'"
-                                          x-text="emailConfig.is_configured ? 'Configured' : 'Not Configured'"></span>
+                                    <span class="text-[12px] text-dark/50">From</span>
+                                    <span class="text-[12px] font-medium truncate max-w-[120px]" x-text="smtpStatus.from_address || '-'"></span>
                                 </div>
                             </div>
                             
                             <!-- Test Email -->
-                            <div class="mt-4 pt-4 border-t border-dark/5" x-data="{ testEmail: '', testing: false, testResult: '' }">
+                            <div class="pt-4 border-t border-dark/5">
                                 <label class="block text-[11px] font-semibold text-dark/50 uppercase mb-2">Send Test Email</label>
                                 <div class="flex gap-2">
-                                    <input type="email" x-model="testEmail" placeholder="test@example.com" 
-                                           class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[13px]">
-                                    <button @click="testEmailSend()" :disabled="testing || !testEmail"
-                                            class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-semibold hover:bg-crimson/90 disabled:opacity-50">
-                                        <span x-show="!testing">Send</span>
-                                        <span x-show="testing">...</span>
+                                    <input type="email" x-model="testEmail" placeholder="test@example.com" class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[13px]">
+                                    <button @click="sendTestEmail()" :disabled="testingEmail || !testEmail" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-semibold hover:bg-crimson/90 disabled:opacity-50">
+                                        <span x-show="!testingEmail">Send</span>
+                                        <span x-show="testingEmail">...</span>
                                     </button>
                                 </div>
                                 <p x-show="testResult" class="text-[11px] mt-2" :class="testResult.includes('success') ? 'text-green-600' : 'text-red-600'" x-text="testResult"></p>
@@ -2140,105 +2216,56 @@ if (file_exists($errorLogFile)) {
                         </div>
                         
                         <!-- Email Notifications Settings -->
-                        <div class="lg:col-span-2 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                        <div class="lg:col-span-3 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
                             <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                                 Email Notification Settings
                             </h3>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Notification Toggles -->
-                                <div class="space-y-3">
-                                    <h4 class="text-[12px] font-semibold text-dark/50 uppercase">Send Emails When:</h4>
-                                    
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="notify_signup" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">User signs up</span>
-                                    </label>
-                                    
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="notify_submit" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">Video submitted</span>
-                                    </label>
-                                    
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="notify_processing" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">Video processing started</span>
-                                    </label>
-                                    
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="notify_approved" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">Video approved</span>
-                                    </label>
-                                    
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="notify_rejected" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">Video rejected</span>
-                                    </label>
-                                    
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="notify_flagged" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">Video flagged for review</span>
-                                    </label>
-                                </div>
-                                
-                                <!-- Admin Notifications -->
-                                <div class="space-y-3">
-                                    <h4 class="text-[12px] font-semibold text-dark/50 uppercase">Admin Notifications</h4>
-                                    
-                                    <div>
-                                        <label class="block text-[12px] text-dark/70 mb-1">Admin Email Address</label>
-                                        <input type="email" id="admin_email" placeholder="admin@facelesspictures.com"
-                                               class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px]">
-                                        <p class="text-[10px] text-dark/40 mt-1">Receives alerts for new videos and flagged content</p>
+                            <form @submit.prevent="saveNotificationSettings()">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <!-- User Notification Toggles -->
+                                    <div class="space-y-3">
+                                        <h4 class="text-[12px] font-semibold text-dark/50 uppercase">Send Emails to Users:</h4>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.signup" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">User signs up</span></label>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.submit" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">Video submitted</span></label>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.processing" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">Video processing</span></label>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.approved" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">Video approved</span></label>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.rejected" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">Video rejected</span></label>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.flagged" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">Video flagged</span></label>
                                     </div>
                                     
-                                    <label class="flex items-center gap-3 cursor-pointer mt-4">
-                                        <input type="checkbox" id="admin_new_video" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">New video submitted</span>
-                                    </label>
+                                    <!-- Admin Notifications -->
+                                    <div class="space-y-3">
+                                        <h4 class="text-[12px] font-semibold text-dark/50 uppercase">Admin Notifications</h4>
+                                        <div>
+                                            <label class="block text-[12px] text-dark/70 mb-1">Admin Email</label>
+                                            <input type="email" x-model="notifications.admin_address" placeholder="admin@example.com" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px]">
+                                        </div>
+                                        <label class="flex items-center gap-3 cursor-pointer mt-4"><input type="checkbox" x-model="notifications.admin_new_video" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">New video submitted</span></label>
+                                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" x-model="notifications.admin_flagged" class="w-4 h-4 rounded text-crimson border-dark/20"><span class="text-[13px] text-dark">Video flagged</span></label>
+                                    </div>
                                     
-                                    <label class="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" id="admin_flagged" checked class="w-4 h-4 rounded text-crimson">
-                                        <span class="text-[13px] text-dark">Video flagged for manual review</span>
-                                    </label>
+                                    <!-- Tips -->
+                                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                        <h4 class="text-[12px] font-semibold text-blue-800 uppercase mb-2">💡 Quick Tips</h4>
+                                        <ul class="text-[11px] text-blue-700 space-y-1.5">
+                                            <li><strong>Gmail:</strong> Use <a href="https://myaccount.google.com/apppasswords" target="_blank" class="underline">App Password</a></li>
+                                            <li><strong>Zoho:</strong> smtp.zoho.com:587</li>
+                                            <li><strong>SendGrid:</strong> apikey as username</li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div class="mt-6 pt-4 border-t border-dark/5">
-                                <button class="bg-crimson text-white px-6 py-2.5 rounded-lg text-[13px] font-semibold hover:bg-crimson/90">
-                                    Save Notification Settings
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- SMTP Setup Guide -->
-                        <div class="lg:col-span-3 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Email Configuration Guide
-                            </h3>
-                            
-                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                                <p class="text-[13px] text-blue-800 mb-3">Configure email settings in your <code class="bg-white px-2 py-0.5 rounded text-[12px]">.env</code> file:</p>
-                                <pre class="bg-white rounded-lg p-4 text-[11px] overflow-x-auto"><code># Email (SMTP) - Gmail Example
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@facelesspictures.com
-MAIL_FROM_NAME="Faceless Pictures 3"</code></pre>
                                 
-                                <div class="mt-4 space-y-2 text-[12px] text-blue-700">
-                                    <p><strong>For Gmail:</strong> Use an <a href="https://myaccount.google.com/apppasswords" target="_blank" class="underline">App Password</a> (not your regular password)</p>
-                                    <p><strong>For other providers:</strong> Use SMTP credentials from your email service</p>
+                                <div class="mt-6 pt-4 border-t border-dark/5 flex items-center gap-3">
+                                    <button type="submit" :disabled="savingNotifications" class="bg-crimson text-white px-6 py-2.5 rounded-lg text-[13px] font-semibold hover:bg-crimson/90 disabled:opacity-50">
+                                        <span x-text="savingNotifications ? 'Saving...' : 'Save Notification Settings'"></span>
+                                    </button>
+                                    <span x-show="notifMessage" x-text="notifMessage" class="text-[12px]" :class="notifSuccess ? 'text-green-600' : 'text-red-600'"></span>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -3477,6 +3504,143 @@ MAIL_FROM_NAME="Faceless Pictures 3"</code></pre>
                 } finally {
                     this.savingKeys = false;
                 }
+            }
+        };
+    }
+    
+    // Email Settings Component
+    function emailSettings() {
+        return {
+            csrf: '<?= csrf_token() ?>',
+            smtp: { host: '', port: '587', username: '', password: '', encryption: 'tls', from_address: '', from_name: '' },
+            smtpStatus: { host: '', port: '', username: '', has_password: false, from_address: '', is_configured: false },
+            notifications: { signup: true, submit: true, processing: true, approved: true, rejected: true, flagged: true, admin_address: '', admin_new_video: true, admin_flagged: true },
+            showPassword: false,
+            savingSmtp: false,
+            savingNotifications: false,
+            smtpMessage: '',
+            smtpSuccess: false,
+            notifMessage: '',
+            notifSuccess: false,
+            testEmail: '',
+            testingEmail: false,
+            testResult: '',
+            
+            async loadEmailSettings() {
+                try {
+                    const res = await fetch('/api/admin/email/settings');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.smtpStatus = data.config || {};
+                        // Pre-fill form with current values
+                        if (data.settings) {
+                            this.smtp.host = data.settings.smtp_host || '';
+                            this.smtp.port = data.settings.smtp_port || '587';
+                            this.smtp.username = data.settings.smtp_username || '';
+                            this.smtp.encryption = data.settings.smtp_encryption || 'tls';
+                            this.smtp.from_address = data.settings.smtp_from_address || '';
+                            this.smtp.from_name = data.settings.smtp_from_name || '';
+                            // Password stays empty - user must re-enter to change
+                            this.notifications.signup = data.settings.email_notify_signup === '1';
+                            this.notifications.submit = data.settings.email_notify_submit === '1';
+                            this.notifications.processing = data.settings.email_notify_processing === '1';
+                            this.notifications.approved = data.settings.email_notify_approved === '1';
+                            this.notifications.rejected = data.settings.email_notify_rejected === '1';
+                            this.notifications.flagged = data.settings.email_notify_flagged === '1';
+                            this.notifications.admin_address = data.settings.email_admin_address || '';
+                            this.notifications.admin_new_video = data.settings.email_admin_new_video === '1';
+                            this.notifications.admin_flagged = data.settings.email_admin_flagged === '1';
+                        }
+                    }
+                } catch (e) { console.error('Failed to load email settings', e); }
+            },
+            
+            setProvider(provider) {
+                const providers = {
+                    gmail: { host: 'smtp.gmail.com', port: '587', encryption: 'tls' },
+                    zoho: { host: 'smtp.zoho.com', port: '587', encryption: 'tls' },
+                    outlook: { host: 'smtp.office365.com', port: '587', encryption: 'tls' },
+                    sendgrid: { host: 'smtp.sendgrid.net', port: '587', encryption: 'tls' },
+                    mailgun: { host: 'smtp.mailgun.org', port: '587', encryption: 'tls' }
+                };
+                if (providers[provider]) {
+                    this.smtp.host = providers[provider].host;
+                    this.smtp.port = providers[provider].port;
+                    this.smtp.encryption = providers[provider].encryption;
+                }
+            },
+            
+            async saveSmtpSettings() {
+                this.savingSmtp = true;
+                this.smtpMessage = '';
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('smtp_host', this.smtp.host);
+                formData.append('smtp_port', this.smtp.port);
+                formData.append('smtp_username', this.smtp.username);
+                if (this.smtp.password) formData.append('smtp_password', this.smtp.password);
+                formData.append('smtp_encryption', this.smtp.encryption);
+                formData.append('smtp_from_address', this.smtp.from_address);
+                formData.append('smtp_from_name', this.smtp.from_name);
+                
+                try {
+                    const res = await fetch('/api/admin/email/settings', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    this.smtpSuccess = data.success;
+                    this.smtpMessage = data.success ? 'SMTP settings saved!' : (data.error || 'Failed to save');
+                    if (data.success) {
+                        this.smtp.password = '';
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } catch (e) {
+                    this.smtpSuccess = false;
+                    this.smtpMessage = 'Failed to save settings';
+                }
+                this.savingSmtp = false;
+            },
+            
+            async saveNotificationSettings() {
+                this.savingNotifications = true;
+                this.notifMessage = '';
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                if (this.notifications.signup) formData.append('email_notify_signup', '1');
+                if (this.notifications.submit) formData.append('email_notify_submit', '1');
+                if (this.notifications.processing) formData.append('email_notify_processing', '1');
+                if (this.notifications.approved) formData.append('email_notify_approved', '1');
+                if (this.notifications.rejected) formData.append('email_notify_rejected', '1');
+                if (this.notifications.flagged) formData.append('email_notify_flagged', '1');
+                formData.append('email_admin_address', this.notifications.admin_address);
+                if (this.notifications.admin_new_video) formData.append('email_admin_new_video', '1');
+                if (this.notifications.admin_flagged) formData.append('email_admin_flagged', '1');
+                
+                try {
+                    const res = await fetch('/api/admin/email/settings', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    this.notifSuccess = data.success;
+                    this.notifMessage = data.success ? 'Notification settings saved!' : (data.error || 'Failed to save');
+                } catch (e) {
+                    this.notifSuccess = false;
+                    this.notifMessage = 'Failed to save settings';
+                }
+                this.savingNotifications = false;
+            },
+            
+            async sendTestEmail() {
+                if (!this.testEmail) return;
+                this.testingEmail = true;
+                this.testResult = '';
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('email', this.testEmail);
+                try {
+                    const res = await fetch('/api/admin/email/test', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    this.testResult = data.success ? 'Test email sent successfully!' : ('Failed: ' + (data.error || 'Unknown error'));
+                } catch (e) {
+                    this.testResult = 'Failed to send test email';
+                }
+                this.testingEmail = false;
             }
         };
     }

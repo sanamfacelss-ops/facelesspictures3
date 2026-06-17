@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Settings;
+
 class EmailService
 {
     private string $host;
@@ -14,17 +16,57 @@ class EmailService
     private string $fromAddress;
     private string $fromName;
     private ?EmailTemplateService $templateService = null;
+    private array $notificationSettings = [];
 
     public function __construct()
     {
-        $this->host = $_ENV['MAIL_HOST'] ?? 'localhost';
-        $this->port = (int) ($_ENV['MAIL_PORT'] ?? 587);
-        $this->username = $_ENV['MAIL_USERNAME'] ?? '';
-        $this->password = $_ENV['MAIL_PASSWORD'] ?? '';
-        $this->encryption = $_ENV['MAIL_ENCRYPTION'] ?? 'tls';
-        $this->fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com';
-        $this->fromName = $_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3';
+        // Load settings from database first, fallback to .env
+        $this->loadSettings();
         $this->templateService = new EmailTemplateService();
+    }
+
+    /**
+     * Load SMTP settings from database, fallback to .env
+     */
+    private function loadSettings(): void
+    {
+        try {
+            $settingsModel = new Settings();
+            $dbSettings = $settingsModel->getEmailSettings();
+            
+            // SMTP Settings - DB takes priority over .env
+            $this->host = !empty($dbSettings['smtp_host']) ? $dbSettings['smtp_host'] : ($_ENV['MAIL_HOST'] ?? 'localhost');
+            $this->port = (int) (!empty($dbSettings['smtp_port']) ? $dbSettings['smtp_port'] : ($_ENV['MAIL_PORT'] ?? 587));
+            $this->username = !empty($dbSettings['smtp_username']) ? $dbSettings['smtp_username'] : ($_ENV['MAIL_USERNAME'] ?? '');
+            // Password: DB first, then .env
+            $this->password = !empty($dbSettings['smtp_password']) ? $dbSettings['smtp_password'] : ($_ENV['MAIL_PASSWORD'] ?? '');
+            $this->encryption = !empty($dbSettings['smtp_encryption']) ? $dbSettings['smtp_encryption'] : ($_ENV['MAIL_ENCRYPTION'] ?? 'tls');
+            $this->fromAddress = !empty($dbSettings['smtp_from_address']) ? $dbSettings['smtp_from_address'] : ($_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com');
+            $this->fromName = !empty($dbSettings['smtp_from_name']) ? $dbSettings['smtp_from_name'] : ($_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3');
+            
+            // Notification settings
+            $this->notificationSettings = [
+                'notify_signup' => $dbSettings['email_notify_signup'] ?? '1',
+                'notify_submit' => $dbSettings['email_notify_submit'] ?? '1',
+                'notify_processing' => $dbSettings['email_notify_processing'] ?? '1',
+                'notify_approved' => $dbSettings['email_notify_approved'] ?? '1',
+                'notify_rejected' => $dbSettings['email_notify_rejected'] ?? '1',
+                'notify_flagged' => $dbSettings['email_notify_flagged'] ?? '1',
+                'admin_address' => $dbSettings['email_admin_address'] ?? '',
+                'admin_new_video' => $dbSettings['email_admin_new_video'] ?? '1',
+                'admin_flagged' => $dbSettings['email_admin_flagged'] ?? '1',
+            ];
+        } catch (\Exception $e) {
+            // Fallback to .env only
+            $this->host = $_ENV['MAIL_HOST'] ?? 'localhost';
+            $this->port = (int) ($_ENV['MAIL_PORT'] ?? 587);
+            $this->username = $_ENV['MAIL_USERNAME'] ?? '';
+            $this->password = $_ENV['MAIL_PASSWORD'] ?? '';
+            $this->encryption = $_ENV['MAIL_ENCRYPTION'] ?? 'tls';
+            $this->fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com';
+            $this->fromName = $_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3';
+            $this->notificationSettings = [];
+        }
     }
     
     /**
@@ -35,13 +77,38 @@ class EmailService
         return [
             'host' => $this->host,
             'port' => $this->port,
-            'username' => $this->username ? substr($this->username, 0, 3) . '***' : '',
+            'username' => $this->username,
             'has_password' => !empty($this->password),
             'encryption' => $this->encryption,
             'from_address' => $this->fromAddress,
             'from_name' => $this->fromName,
-            'is_configured' => !empty($this->username) && !empty($this->password),
+            'is_configured' => !empty($this->host) && $this->host !== 'localhost' && !empty($this->username) && !empty($this->password),
         ];
+    }
+
+    /**
+     * Get notification settings
+     */
+    public function getNotificationSettings(): array
+    {
+        return $this->notificationSettings;
+    }
+
+    /**
+     * Check if a specific notification is enabled
+     */
+    public function isNotificationEnabled(string $type): bool
+    {
+        $key = 'notify_' . $type;
+        return ($this->notificationSettings[$key] ?? '1') === '1';
+    }
+
+    /**
+     * Get admin email address
+     */
+    public function getAdminEmail(): string
+    {
+        return $this->notificationSettings['admin_address'] ?? '';
     }
 
     public function send(string $to, string $subject, string $body, bool $isHtml = true): bool

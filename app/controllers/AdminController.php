@@ -1394,10 +1394,15 @@ class AdminController
         if (!$this->requireAdmin()) return;
 
         try {
+            $settingsModel = new \App\Models\Settings();
+            $emailSettings = $settingsModel->getEmailSettings();
             $emailService = new \App\Services\EmailService();
+            
             echo json_encode([
                 'success' => true,
-                'config' => $emailService->getConfigStatus()
+                'config' => $emailService->getConfigStatus(),
+                'settings' => $emailSettings,
+                'notifications' => $emailService->getNotificationSettings(),
             ]);
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -1405,7 +1410,7 @@ class AdminController
     }
 
     /**
-     * Update email settings
+     * Update email/SMTP settings
      */
     public function updateEmailSettings(): void
     {
@@ -1413,7 +1418,48 @@ class AdminController
         
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
-        // For now, just return success - actual settings are in .env
-        echo json_encode(['success' => true, 'message' => 'Settings saved']);
+        try {
+            $settingsModel = new \App\Models\Settings();
+            
+            // Collect all email settings from POST
+            $settings = [];
+            
+            // SMTP Settings
+            if (isset($_POST['smtp_host'])) $settings['smtp_host'] = trim($_POST['smtp_host']);
+            if (isset($_POST['smtp_port'])) $settings['smtp_port'] = trim($_POST['smtp_port']);
+            if (isset($_POST['smtp_username'])) $settings['smtp_username'] = trim($_POST['smtp_username']);
+            if (isset($_POST['smtp_password']) && !empty($_POST['smtp_password'])) {
+                $settings['smtp_password'] = $_POST['smtp_password']; // Don't trim passwords
+            }
+            if (isset($_POST['smtp_encryption'])) $settings['smtp_encryption'] = trim($_POST['smtp_encryption']);
+            if (isset($_POST['smtp_from_address'])) $settings['smtp_from_address'] = trim($_POST['smtp_from_address']);
+            if (isset($_POST['smtp_from_name'])) $settings['smtp_from_name'] = trim($_POST['smtp_from_name']);
+            
+            // Notification toggles (checkboxes - will be '1' if checked, absent if not)
+            $settings['email_notify_signup'] = isset($_POST['email_notify_signup']) ? '1' : '0';
+            $settings['email_notify_submit'] = isset($_POST['email_notify_submit']) ? '1' : '0';
+            $settings['email_notify_processing'] = isset($_POST['email_notify_processing']) ? '1' : '0';
+            $settings['email_notify_approved'] = isset($_POST['email_notify_approved']) ? '1' : '0';
+            $settings['email_notify_rejected'] = isset($_POST['email_notify_rejected']) ? '1' : '0';
+            $settings['email_notify_flagged'] = isset($_POST['email_notify_flagged']) ? '1' : '0';
+            
+            // Admin notifications
+            if (isset($_POST['email_admin_address'])) $settings['email_admin_address'] = trim($_POST['email_admin_address']);
+            $settings['email_admin_new_video'] = isset($_POST['email_admin_new_video']) ? '1' : '0';
+            $settings['email_admin_flagged'] = isset($_POST['email_admin_flagged']) ? '1' : '0';
+            
+            // Save to database
+            $result = $settingsModel->updateEmailSettings($settings);
+            
+            if ($result) {
+                debug_log("Admin updated email settings", 'ADMIN');
+                echo json_encode(['success' => true, 'message' => 'Email settings saved successfully']);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Failed to save settings']);
+            }
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_UPDATE_EMAIL_SETTINGS');
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
 }
