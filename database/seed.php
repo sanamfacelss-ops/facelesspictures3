@@ -8,7 +8,7 @@ require_once __DIR__ . '/../app/config/config.php';
 
 use App\Config\Database;
 
-echo "=== Faceless Pitcher 3 - Database Seeder ===\n\n";
+echo "=== Faceless Pictures 3 - Database Seeder ===\n\n";
 
 try {
     $db = Database::getConnection();

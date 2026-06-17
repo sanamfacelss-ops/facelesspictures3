@@ -231,6 +231,120 @@ class AuthController
     }
 
     /**
+     * Initiate Google OAuth login
+     */
+    public function googleAuth(): void
+    {
+        $googleService = new \App\Services\GoogleAuthService();
+        
+        if (!$googleService->isConfigured()) {
+            flash('error', 'Google sign-in is not configured. Please contact support.');
+            redirect('/login');
+            return;
+        }
+        
+        // Generate state for CSRF protection
+        $state = bin2hex(random_bytes(16));
+        $_SESSION['google_oauth_state'] = $state;
+        
+        $authUrl = $googleService->getAuthUrl($state);
+        redirect($authUrl);
+    }
+
+    /**
+     * Handle Google OAuth callback
+     */
+    public function googleCallback(): void
+    {
+        $code = $_GET['code'] ?? '';
+        $state = $_GET['state'] ?? '';
+        $error = $_GET['error'] ?? '';
+        
+        // Check for errors from Google
+        if ($error) {
+            debug_log("Google OAuth error: $error", 'GOOGLE_AUTH');
+            flash('error', 'Google sign-in was cancelled or failed.');
+            redirect('/login');
+            return;
+        }
+        
+        // Validate state
+        $savedState = $_SESSION['google_oauth_state'] ?? '';
+        unset($_SESSION['google_oauth_state']);
+        
+        if (!$state || $state !== $savedState) {
+            debug_log("Google OAuth state mismatch", 'GOOGLE_AUTH');
+            flash('error', 'Invalid request. Please try again.');
+            redirect('/login');
+            return;
+        }
+        
+        if (!$code) {
+            flash('error', 'No authorization code received from Google.');
+            redirect('/login');
+            return;
+        }
+        
+        $googleService = new \App\Services\GoogleAuthService();
+        $result = $googleService->handleCallback($code);
+        
+        if (!$result['success']) {
+            flash('error', $result['error'] ?? 'Google sign-in failed.');
+            redirect('/login');
+            return;
+        }
+        
+        // Redirect to appropriate page
+        $redirect = $result['redirect'] ?? '/dashboard';
+        
+        if ($result['is_new'] ?? false) {
+            flash('success', 'Welcome! Please complete your profile.');
+        } else {
+            flash('success', 'Welcome back!');
+        }
+        
+        redirect($redirect);
+    }
+
+    /**
+     * Complete Google signup with role selection
+     */
+    public function googleComplete(): void
+    {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
+        
+        $role = $_POST['role'] ?? '';
+        $categories = $_POST['categories'] ?? [];
+        
+        if (is_string($categories)) {
+            $categories = json_decode($categories, true) ?? [$role];
+        }
+        
+        $googleService = new \App\Services\GoogleAuthService();
+        $result = $googleService->completeSignup([
+            'role' => $role,
+            'categories' => $categories,
+        ]);
+        
+        if (!$result['success']) {
+            http_response_code(400);
+            echo json_encode(['error' => $result['error']]);
+            return;
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'redirect' => $result['redirect'] ?? '/dashboard'
+        ]);
+    }
+
+    /**
      * Delete user account
      */
     public function deleteAccount(): void

@@ -44,17 +44,53 @@ class User
 
     public function create(array $data): int
     {
-        $stmt = $this->db->prepare(
-            "INSERT INTO users (name, email, password, role, content_categories) VALUES (?, ?, ?, ?, ?)"
-        );
-        $stmt->execute([
-            $data['name'],
-            $data['email'],
-            password_hash($data['password'], PASSWORD_BCRYPT),
-            $data['role'],
-            json_encode($data['content_categories'] ?? [$data['role']]),
-        ]);
+        $hasGoogleId = isset($data['google_id']) && !empty($data['google_id']);
+        
+        if ($hasGoogleId) {
+            $stmt = $this->db->prepare(
+                "INSERT INTO users (name, email, password, role, content_categories, google_id) VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                $data['name'],
+                $data['email'],
+                password_hash($data['password'], PASSWORD_BCRYPT),
+                $data['role'],
+                json_encode($data['content_categories'] ?? [$data['role']]),
+                $data['google_id'],
+            ]);
+        } else {
+            $stmt = $this->db->prepare(
+                "INSERT INTO users (name, email, password, role, content_categories) VALUES (?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                $data['name'],
+                $data['email'],
+                password_hash($data['password'], PASSWORD_BCRYPT),
+                $data['role'],
+                json_encode($data['content_categories'] ?? [$data['role']]),
+            ]);
+        }
         return (int) $this->db->lastInsertId();
+    }
+
+    /**
+     * Update Google ID for existing user
+     */
+    public function updateGoogleId(int $userId, string $googleId): bool
+    {
+        $stmt = $this->db->prepare("UPDATE users SET google_id = ? WHERE id = ?");
+        return $stmt->execute([$googleId, $userId]);
+    }
+
+    /**
+     * Find user by Google ID
+     */
+    public function findByGoogleId(string $googleId): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE google_id = ? LIMIT 1");
+        $stmt->execute([$googleId]);
+        $result = $stmt->fetch();
+        return $result ?: null;
     }
 
     public function existsForSeason(int $userId, int $seasonId): bool

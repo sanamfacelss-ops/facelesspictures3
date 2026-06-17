@@ -15,7 +15,7 @@ $scripts = $scriptModel->byCategory($userRole);
 $seasonModel = new App\Models\Season();
 $activeSeason = $seasonModel->getActive();
 
-$title = 'Welcome to Faceless Pitcher — ' . APP_NAME;
+$title = 'Welcome to Faceless Pictures — ' . APP_NAME;
 
 // Role-specific content
 $roleGuides = [
@@ -100,7 +100,7 @@ $guide = $roleGuides[$userRole] ?? $roleGuides['actor'];
     <!-- Header -->
     <header class="bg-white border-b border-dark/5">
         <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <span class="font-display text-[18px] text-dark">FACELESS PITCHER</span>
+            <span class="font-display text-[18px] text-dark">FACELESS PICTURES</span>
             <span class="text-[12px] text-dark/40">Welcome, <?= e($user['name']) ?>!</span>
         </div>
     </header>

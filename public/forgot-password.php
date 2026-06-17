@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
-$title = 'Forgot Password — Faceless Pitcher 3';
+$title = 'Forgot Password — Faceless Pictures 3';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,8 +50,8 @@ $title = 'Forgot Password — Faceless Pitcher 3';
         <!-- Logo -->
         <div class="text-center mb-8">
             <a href="/" class="inline-flex items-center gap-2">
-                <span class="font-display text-[22px] text-dark">FACELESS PITCHER</span>
-                <span class="bg-crimson text-white text-[9px] font-semibold px-2 py-0.5 rounded-full">S3</span>
+                <span class="font-display text-[22px] text-dark">FACELESS PICTURES</span>
+                <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 12px; font-weight: bold; width: 24px; height: 24px; border-radius: 50%;">3</span>
             </a>
         </div>
 

@@ -13,6 +13,7 @@ class EmailService
     private string $encryption;
     private string $fromAddress;
     private string $fromName;
+    private ?EmailTemplateService $templateService = null;
 
     public function __construct()
     {
@@ -22,7 +23,25 @@ class EmailService
         $this->password = $_ENV['MAIL_PASSWORD'] ?? '';
         $this->encryption = $_ENV['MAIL_ENCRYPTION'] ?? 'tls';
         $this->fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@facelesspictures.com';
-        $this->fromName = $_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures';
+        $this->fromName = $_ENV['MAIL_FROM_NAME'] ?? 'Faceless Pictures 3';
+        $this->templateService = new EmailTemplateService();
+    }
+    
+    /**
+     * Get email configuration status
+     */
+    public function getConfigStatus(): array
+    {
+        return [
+            'host' => $this->host,
+            'port' => $this->port,
+            'username' => $this->username ? substr($this->username, 0, 3) . '***' : '',
+            'has_password' => !empty($this->password),
+            'encryption' => $this->encryption,
+            'from_address' => $this->fromAddress,
+            'from_name' => $this->fromName,
+            'is_configured' => !empty($this->username) && !empty($this->password),
+        ];
     }
 
     public function send(string $to, string $subject, string $body, bool $isHtml = true): bool
@@ -95,53 +114,108 @@ class EmailService
 
     public function sendPasswordResetOTP(string $to, string $otp): bool
     {
-        $subject = 'Password Reset OTP - Faceless Pitcher';
-        
-        $body = "
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                body { font-family: 'Segoe UI', Arial, sans-serif; background: #F8F5F0; padding: 40px 20px; }
-                .container { max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-                .header { background: #141414; padding: 30px; text-align: center; }
-                .header h1 { color: white; font-size: 24px; margin: 0; letter-spacing: 2px; }
-                .header span { background: #D92B3A; color: white; font-size: 10px; padding: 3px 8px; border-radius: 20px; }
-                .content { padding: 40px 30px; text-align: center; }
-                .otp-box { background: #F8F5F0; border: 2px dashed #D92B3A; border-radius: 12px; padding: 25px; margin: 25px 0; }
-                .otp-code { font-size: 36px; font-weight: bold; color: #D92B3A; letter-spacing: 8px; }
-                .expires { color: #666; font-size: 13px; margin-top: 10px; }
-                .footer { background: #F8F5F0; padding: 20px; text-align: center; font-size: 12px; color: #999; }
-            </style>
-        </head>
-        <body>
-            <div class='container'>
-                <div class='header'>
-                    <h1>FACELESS PITCHER <span>S3</span></h1>
-                </div>
-                <div class='content'>
-                    <h2 style='color: #0D0D0D; margin-bottom: 10px;'>Password Reset</h2>
-                    <p style='color: #666; font-size: 14px;'>Use this OTP to reset your password:</p>
-                    <div class='otp-box'>
-                        <div class='otp-code'>{$otp}</div>
-                        <p class='expires'>Expires in 10 minutes</p>
-                    </div>
-                    <p style='color: #999; font-size: 13px;'>If you didn't request this, please ignore this email.</p>
-                </div>
-                <div class='footer'>
-                    &copy; " . date('Y') . " Faceless Pitcher. All rights reserved.
-                </div>
-            </div>
-        </body>
-        </html>
-        ";
-        
+        $email = $this->templateService->passwordResetEmail($to, $otp);
+        return $this->sendEmail($to, $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send welcome email to new user
+     */
+    public function sendWelcomeEmail(array $user): bool
+    {
+        $email = $this->templateService->welcomeEmail($user);
+        return $this->sendEmail($user['email'], $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send video submitted notification
+     */
+    public function sendVideoSubmittedEmail(array $user, array $video): bool
+    {
+        $email = $this->templateService->videoSubmittedEmail($user, $video);
+        return $this->sendEmail($user['email'], $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send video approved notification
+     */
+    public function sendVideoApprovedEmail(array $user, array $video): bool
+    {
+        $email = $this->templateService->videoApprovedEmail($user, $video);
+        return $this->sendEmail($user['email'], $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send video rejected notification
+     */
+    public function sendVideoRejectedEmail(array $user, array $video, string $reason = ''): bool
+    {
+        $email = $this->templateService->videoRejectedEmail($user, $video, $reason);
+        return $this->sendEmail($user['email'], $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send video under manual review notification
+     */
+    public function sendVideoManualReviewEmail(array $user, array $video): bool
+    {
+        $email = $this->templateService->videoManualReviewEmail($user, $video);
+        return $this->sendEmail($user['email'], $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send video processing notification
+     */
+    public function sendVideoProcessingEmail(array $user, array $video): bool
+    {
+        $email = $this->templateService->videoProcessingEmail($user, $video);
+        return $this->sendEmail($user['email'], $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send admin notification for new video
+     */
+    public function sendAdminNewVideoEmail(string $adminEmail, array $user, array $video): bool
+    {
+        $email = $this->templateService->adminNewVideoEmail($user, $video);
+        return $this->sendEmail($adminEmail, $email['subject'], $email['body']);
+    }
+
+    /**
+     * Send admin notification for flagged video
+     */
+    public function sendAdminFlaggedVideoEmail(string $adminEmail, array $user, array $video, array $aiResult = []): bool
+    {
+        $email = $this->templateService->adminFlaggedVideoEmail($user, $video, $aiResult);
+        return $this->sendEmail($adminEmail, $email['subject'], $email['body']);
+    }
+
+    /**
+     * Helper method to send email using best available method
+     */
+    private function sendEmail(string $to, string $subject, string $body): bool
+    {
         // Try SMTP first, fallback to mail()
         if (!empty($this->username) && !empty($this->password)) {
             return $this->sendSmtp($to, $subject, $body, true);
         }
-        
         return $this->send($to, $subject, $body, true);
+    }
+
+    /**
+     * Test email configuration
+     */
+    public function sendTestEmail(string $to): bool
+    {
+        $subject = "Test Email from Faceless Pictures 3";
+        $body = $this->templateService->buildEmail([
+            'logo' => true,
+            'heading' => "Test Email",
+            'subheading' => "Your email configuration is working!",
+            'content' => '<p style="color: #666; font-size: 15px; text-align: center;">If you received this email, your email settings are configured correctly. 🎉</p>',
+            'footer_text' => "This is a test email from your Faceless Pictures 3 installation."
+        ]);
+        return $this->sendEmail($to, $subject, $body);
     }
 
     private function smtpCommand($smtp, string $command): string

@@ -1,6 +1,6 @@
 <?php
 /**
- * Faceless Pitcher 3 - Main Router
+ * Faceless Pictures 3 - Main Router
  * Routes API requests to controllers and page requests to views
  */
 
@@ -139,6 +139,11 @@ $routes = [
     'api/forgot-password' => [AuthController::class, 'forgotPassword', 'POST'],
     'api/verify-otp' => [AuthController::class, 'verifyOTP', 'POST'],
     'api/reset-password' => [AuthController::class, 'resetPassword', 'POST'],
+    
+    // Google OAuth API
+    'api/auth/google' => [AuthController::class, 'googleAuth', 'GET'],
+    'api/auth/google/callback' => [AuthController::class, 'googleCallback', 'GET'],
+    'api/auth/google/complete' => [AuthController::class, 'googleComplete', 'POST'],
 
     // Upload API
     'api/upload' => [UploadController::class, 'store', 'POST'],
@@ -176,6 +181,11 @@ $routes = [
     'api/admin/youtube/publish/{id}' => [AdminController::class, 'publishToYouTube', 'POST'],
     'api/admin/youtube/test' => [AdminController::class, 'testYouTube', 'POST'],
     'api/admin/ai/test-only' => [AdminController::class, 'testAI', 'POST'],
+    
+    // Email API
+    'api/admin/email/test' => [AdminController::class, 'testEmail', 'POST'],
+    'api/admin/email/settings' => [AdminController::class, 'getEmailSettings', 'GET'],
+    'api/admin/email/settings/update' => [AdminController::class, 'updateEmailSettings', 'POST'],
 ];
 
 $matched = false;

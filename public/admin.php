@@ -354,8 +354,8 @@ if (file_exists($errorLogFile)) {
             <!-- Logo -->
             <div class="p-5 border-b border-dark/5">
                 <div class="flex items-center gap-3">
-                    <span class="font-display text-[20px] text-dark">FACELESS PITCHER</span>
-                    <span class="bg-crimson text-white text-[9px] px-2 py-0.5 rounded-full font-semibold">ADMIN</span>
+                    <span class="font-display text-[20px] text-dark">FACELESS PICTURES</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 10px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%;">3</span>
                 </div>
             </div>
             <!-- Nav -->
@@ -391,6 +391,10 @@ if (file_exists($errorLogFile)) {
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                     YouTube
                 </button>
+                <button @click="activeTab = 'email'; mobileMenuOpen = false" :class="activeTab === 'email' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-5 py-3 text-[14px] text-dark/70">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Email
+                </button>
                 <button @click="activeTab = 'settings'; mobileMenuOpen = false" :class="activeTab === 'settings' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-5 py-3 text-[14px] text-dark/70">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Settings
@@ -425,8 +429,8 @@ if (file_exists($errorLogFile)) {
             <!-- Logo -->
             <div class="p-4 border-b border-dark/5 lg:block" :class="sidebarCollapsed ? 'hidden' : 'lg:block'">
                 <div class="flex items-center gap-2">
-                    <span class="font-display text-[18px] text-dark whitespace-nowrap">FACELESS PITCHER</span>
-                    <span class="bg-crimson text-white text-[8px] px-1.5 py-0.5 rounded-full font-semibold">ADMIN</span>
+                    <span class="font-display text-[18px] text-dark whitespace-nowrap">FACELESS PICTURES</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 9px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%;">3</span>
                 </div>
             </div>
             <!-- Collapsed Logo -->
@@ -482,6 +486,12 @@ if (file_exists($errorLogFile)) {
                     <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                     <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">YouTube</span>
                     <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">YouTube</span>
+                </button>
+                
+                <button @click="activeTab = 'email'" :class="activeTab === 'email' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Email</span>
+                    <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Email</span>
                 </button>
                 
                 <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
@@ -1881,7 +1891,7 @@ if (file_exists($errorLogFile)) {
                                                     <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Credentials</a></li>
                                                     <li>"Create Credentials" → "OAuth client ID"</li>
                                                     <li>Type: <strong>Web application</strong></li>
-                                                    <li>Name: "Faceless Pitcher"</li>
+                                                    <li>Name: "Faceless Pictures 3"</li>
                                                     <li class="break-all">Redirect URI: <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px] break-all">developers.google.com/oauthplayground</code></li>
                                                     <li>Copy <strong>Client ID</strong> & <strong>Secret</strong></li>
                                                 </ol>
@@ -2064,6 +2074,169 @@ if (file_exists($errorLogFile)) {
                                     <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" class="block text-[10px] md:text-[11px] text-blue-700 hover:underline">→ OAuth Consent</a>
                                     <a href="https://developers.google.com/oauthplayground" target="_blank" class="block text-[10px] md:text-[11px] text-blue-700 hover:underline">→ OAuth Playground</a>
                                     <a href="https://www.youtube.com/account_advanced" target="_blank" class="block text-[10px] md:text-[11px] text-blue-700 hover:underline">→ Channel ID</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== EMAIL TAB ==================== -->
+                <div x-show="activeTab === 'email'" x-cloak>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+                        <!-- Connection Status Card -->
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <div class="flex items-center justify-between mb-4 youtube-status-header">
+                                <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
+                                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                    Email Status
+                                </h3>
+                            </div>
+                            
+                            <div class="space-y-3" x-data="{ emailConfig: <?= e(json_encode((new \App\Services\EmailService())->getConfigStatus())) ?> }">
+                                <div class="flex items-center justify-between py-2 border-b border-dark/5">
+                                    <span class="text-[12px] text-dark/50">SMTP Host</span>
+                                    <span class="text-[12px] font-medium" x-text="emailConfig.host || 'Not set'"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b border-dark/5">
+                                    <span class="text-[12px] text-dark/50">Port</span>
+                                    <span class="text-[12px] font-medium" x-text="emailConfig.port"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b border-dark/5">
+                                    <span class="text-[12px] text-dark/50">Username</span>
+                                    <span class="text-[12px] font-medium" x-text="emailConfig.username || 'Not set'"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b border-dark/5">
+                                    <span class="text-[12px] text-dark/50">Password</span>
+                                    <span class="text-[12px] font-medium" x-text="emailConfig.has_password ? '••••••••' : 'Not set'"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b border-dark/5">
+                                    <span class="text-[12px] text-dark/50">From Address</span>
+                                    <span class="text-[12px] font-medium" x-text="emailConfig.from_address"></span>
+                                </div>
+                                <div class="flex items-center justify-between py-2">
+                                    <span class="text-[12px] text-dark/50">Status</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                                          :class="emailConfig.is_configured ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'"
+                                          x-text="emailConfig.is_configured ? 'Configured' : 'Not Configured'"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Test Email -->
+                            <div class="mt-4 pt-4 border-t border-dark/5" x-data="{ testEmail: '', testing: false, testResult: '' }">
+                                <label class="block text-[11px] font-semibold text-dark/50 uppercase mb-2">Send Test Email</label>
+                                <div class="flex gap-2">
+                                    <input type="email" x-model="testEmail" placeholder="test@example.com" 
+                                           class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[13px]">
+                                    <button @click="testEmailSend()" :disabled="testing || !testEmail"
+                                            class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-semibold hover:bg-crimson/90 disabled:opacity-50">
+                                        <span x-show="!testing">Send</span>
+                                        <span x-show="testing">...</span>
+                                    </button>
+                                </div>
+                                <p x-show="testResult" class="text-[11px] mt-2" :class="testResult.includes('success') ? 'text-green-600' : 'text-red-600'" x-text="testResult"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Notifications Settings -->
+                        <div class="lg:col-span-2 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
+                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                Email Notification Settings
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Notification Toggles -->
+                                <div class="space-y-3">
+                                    <h4 class="text-[12px] font-semibold text-dark/50 uppercase">Send Emails When:</h4>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="notify_signup" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">User signs up</span>
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="notify_submit" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">Video submitted</span>
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="notify_processing" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">Video processing started</span>
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="notify_approved" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">Video approved</span>
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="notify_rejected" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">Video rejected</span>
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="notify_flagged" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">Video flagged for review</span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Admin Notifications -->
+                                <div class="space-y-3">
+                                    <h4 class="text-[12px] font-semibold text-dark/50 uppercase">Admin Notifications</h4>
+                                    
+                                    <div>
+                                        <label class="block text-[12px] text-dark/70 mb-1">Admin Email Address</label>
+                                        <input type="email" id="admin_email" placeholder="admin@facelesspictures.com"
+                                               class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px]">
+                                        <p class="text-[10px] text-dark/40 mt-1">Receives alerts for new videos and flagged content</p>
+                                    </div>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer mt-4">
+                                        <input type="checkbox" id="admin_new_video" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">New video submitted</span>
+                                    </label>
+                                    
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="admin_flagged" checked class="w-4 h-4 rounded text-crimson">
+                                        <span class="text-[13px] text-dark">Video flagged for manual review</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 pt-4 border-t border-dark/5">
+                                <button class="bg-crimson text-white px-6 py-2.5 rounded-lg text-[13px] font-semibold hover:bg-crimson/90">
+                                    Save Notification Settings
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- SMTP Setup Guide -->
+                        <div class="lg:col-span-3 bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Email Configuration Guide
+                            </h3>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                <p class="text-[13px] text-blue-800 mb-3">Configure email settings in your <code class="bg-white px-2 py-0.5 rounded text-[12px]">.env</code> file:</p>
+                                <pre class="bg-white rounded-lg p-4 text-[11px] overflow-x-auto"><code># Email (SMTP) - Gmail Example
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@facelesspictures.com
+MAIL_FROM_NAME="Faceless Pictures 3"</code></pre>
+                                
+                                <div class="mt-4 space-y-2 text-[12px] text-blue-700">
+                                    <p><strong>For Gmail:</strong> Use an <a href="https://myaccount.google.com/apppasswords" target="_blank" class="underline">App Password</a> (not your regular password)</p>
+                                    <p><strong>For other providers:</strong> Use SMTP credentials from your email service</p>
                                 </div>
                             </div>
                         </div>
@@ -2644,6 +2817,7 @@ if (file_exists($errorLogFile)) {
                 scripts: 'SCRIPTS',
                 aiconfig: 'AI CONFIGURATION',
                 youtube: 'YOUTUBE',
+                email: 'EMAIL',
                 settings: 'SETTINGS'
             },
             
@@ -3110,6 +3284,32 @@ if (file_exists($errorLogFile)) {
                     this.showToast('Failed to test connection', 'error');
                 }
                 this.testingYouTube = false;
+            },
+            
+            // Email test function
+            async testEmailSend() {
+                const emailInput = document.querySelector('[x-model="testEmail"]');
+                const testEmail = emailInput?.value || '';
+                if (!testEmail) {
+                    this.showToast('Please enter an email address', 'error');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('email', testEmail);
+                
+                try {
+                    const res = await fetch('/api/admin/email/test', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('Test email sent successfully!', 'success');
+                    } else {
+                        this.showToast('Email failed: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to send test email', 'error');
+                }
             },
             
             // YouTube publish

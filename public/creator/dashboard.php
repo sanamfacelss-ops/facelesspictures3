@@ -218,7 +218,7 @@ try {
                 <div>
                     <div class="flex items-center gap-2 mb-2">
                         <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-                        <span class="text-xs font-medium text-emerald-400 uppercase tracking-wider">Season 3 Open</span>
+                        <span class="text-xs font-medium text-emerald-400 uppercase tracking-wider">Now Open</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Ready to create something amazing?</h2>
                     <p class="text-gray-400 text-sm sm:text-base">Choose a script or go freeform. Our AI handles the quality check.</p>

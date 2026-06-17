@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
-$title = 'Join Season 3 — Faceless Pitcher';
+$title = 'Join — Faceless Pictures 3';
 $preselectedRole = $_GET['role'] ?? '';
 ?>
 <!DOCTYPE html>
@@ -73,8 +73,8 @@ $preselectedRole = $_GET['role'] ?? '';
             
             <div class="relative z-10 flex flex-col justify-center px-12 xl:px-20 py-12">
                 <a href="/" class="flex items-center gap-3 mb-10">
-                    <span class="font-display text-[24px] tracking-wide text-white">FACELESS PITCHER</span>
-                    <span class="bg-crimson text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">S3</span>
+                    <span class="font-display text-[24px] tracking-wide text-white">FACELESS PICTURES</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 12px; font-weight: bold; width: 26px; height: 26px; border-radius: 50%;">3</span>
                 </a>
                 
                 <div class="mb-8">
@@ -162,8 +162,8 @@ $preselectedRole = $_GET['role'] ?? '';
                 
                 <div class="lg:hidden flex items-center justify-center gap-2 mb-6">
                     <a href="/" class="flex items-center gap-2">
-                        <span class="font-display text-[20px] tracking-wide text-dark">FACELESS PITCHER</span>
-                        <span class="bg-crimson text-white text-[9px] font-semibold px-2 py-0.5 rounded-full">S3</span>
+                        <span class="font-display text-[20px] tracking-wide text-dark">FACELESS PICTURES</span>
+                        <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 11px; font-weight: bold; width: 22px; height: 22px; border-radius: 50%;">3</span>
                     </a>
                 </div>
                 
@@ -343,7 +343,7 @@ $preselectedRole = $_GET['role'] ?? '';
                         :disabled="loading || formData.categories.length === 0 || !formData.terms"
                         class="btn-primary w-full bg-crimson text-white font-semibold text-[15px] py-4 rounded-xl hover:bg-crimson/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        <span x-show="!loading">Create Account & Join Season 3</span>
+                        <span x-show="!loading">Create Account & Get Started</span>
                         <span x-show="loading" class="flex items-center gap-2">
                             <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -362,7 +362,7 @@ $preselectedRole = $_GET['role'] ?? '';
                 </div>
                 
                 <!-- Social Signup -->
-                <button class="w-full bg-white border-2 border-dark/10 rounded-xl py-3.5 flex items-center justify-center gap-3 text-[13px] font-medium text-dark hover:border-dark/20 transition">
+                <a href="/api/auth/google" class="w-full bg-white border-2 border-dark/10 rounded-xl py-3.5 flex items-center justify-center gap-3 text-[13px] font-medium text-dark hover:border-dark/20 transition">
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -370,7 +370,7 @@ $preselectedRole = $_GET['role'] ?? '';
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
                     Sign up with Google
-                </button>
+                </a>
                 
                 <!-- Login Link -->
                 <p class="text-center mt-6 text-[13px] text-dark/50">

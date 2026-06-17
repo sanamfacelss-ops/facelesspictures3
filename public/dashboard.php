@@ -80,8 +80,8 @@ $userVideos = $videoModel->byUser((int)$user['id']);
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-14 md:h-16">
                 <a href="/" class="flex items-center gap-2">
-                    <span class="font-display text-lg md:text-xl">FACELESS PITCHER</span>
-                    <span class="bg-crimson text-white text-[8px] md:text-[9px] font-semibold px-1.5 md:px-2 py-0.5 rounded-full">S3</span>
+                    <span class="font-display text-lg md:text-xl">FACELESS PICTURES</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 10px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%;">3</span>
                 </a>
                 <div class="flex items-center gap-3 md:gap-6">
                     <span class="text-xs md:text-sm text-white/60 hidden sm:block">Welcome, <?= e($user['name']) ?></span>
@@ -102,7 +102,7 @@ $userVideos = $videoModel->byUser((int)$user['id']);
 
         <div class="mb-6 md:mb-8">
             <h1 class="font-display text-2xl md:text-4xl text-dark mb-1 md:mb-2">WELCOME BACK, <?= strtoupper(e($user['name'])) ?>!</h1>
-            <p class="text-dark/50 text-sm md:text-base">Your Season 3 dashboard</p>
+            <p class="text-dark/50 text-sm md:text-base">Your creator dashboard</p>
         </div>
 
         <!-- Stats Cards - Mobile: 1 column for first, then 2, Desktop: 3 columns -->
@@ -159,7 +159,7 @@ $userVideos = $videoModel->byUser((int)$user['id']);
             <div class="max-w-2xl">
                 <span class="inline-flex items-center gap-2 mb-3 md:mb-4">
                     <span class="w-2 h-2 bg-crimson rounded-full animate-pulse"></span>
-                    <span class="text-[10px] md:text-[11px] font-semibold tracking-[2px] md:tracking-[3px] uppercase text-white/40">Season 3 — Now Open</span>
+                    <span class="text-[10px] md:text-[11px] font-semibold tracking-[2px] md:tracking-[3px] uppercase text-white/40">Now Open — Submit Today</span>
                 </span>
                 <h2 class="font-display text-xl md:text-3xl mb-3 md:mb-4">READY TO SUBMIT YOUR ENTRY?</h2>
                 <p class="text-white/50 mb-4 md:mb-6 text-sm md:text-base">Upload your best work and compete with talent from across India. One video, under 3 minutes, shot on any device.</p>

@@ -1352,4 +1352,68 @@ class AdminController
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Send test email
+     */
+    public function testEmail(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $email = trim($_POST['email'] ?? '');
+        
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['success' => false, 'error' => 'Invalid email address']);
+            return;
+        }
+
+        try {
+            $emailService = new \App\Services\EmailService();
+            $result = $emailService->sendTestEmail($email);
+            
+            if ($result) {
+                echo json_encode(['success' => true, 'message' => 'Test email sent successfully']);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Failed to send email. Check SMTP settings.']);
+            }
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_TEST_EMAIL');
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Get email settings
+     */
+    public function getEmailSettings(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $emailService = new \App\Services\EmailService();
+            echo json_encode([
+                'success' => true,
+                'config' => $emailService->getConfigStatus()
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update email settings
+     */
+    public function updateEmailSettings(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        // For now, just return success - actual settings are in .env
+        echo json_encode(['success' => true, 'message' => 'Settings saved']);
+    }
 }

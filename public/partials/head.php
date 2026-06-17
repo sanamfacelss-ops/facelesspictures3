@@ -17,7 +17,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center space-x-4">
-                <a href="/" class="text-xl font-bold tracking-tight"><?= e(APP_NAME) ?></a>
+                <a href="/" class="flex items-center gap-2">
+                    <span class="text-xl font-bold tracking-tight">FACELESS PICTURES</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 11px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%;">3</span>
+                </a>
                 <div class="hidden md:flex space-x-4">
                     <?php if (is_authenticated()): ?>
                         <a href="/dashboard" class="hover:text-gray-300 transition">Dashboard</a>

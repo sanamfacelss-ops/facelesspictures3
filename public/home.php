@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faceless Pitcher 3 — No Face. Just Talent.</title>
+    <title>Faceless Pictures 3 — No Face. Just Talent.</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -129,8 +129,8 @@
     <div class="max-w-[1200px] mx-auto px-6 h-full flex items-center justify-between">
         <!-- Logo -->
         <a href="/" class="flex items-center gap-2">
-            <span class="font-display text-[19px] tracking-wide">FACELESS PITCHER</span>
-            <span class="bg-crimson text-white text-[9px] font-semibold px-2 py-0.5 rounded-full">S3</span>
+            <span class="font-display text-[19px] tracking-wide">FACELESS PICTURES</span>
+            <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 11px; font-weight: bold; width: 22px; height: 22px; border-radius: 50%;">3</span>
         </a>
         
         <!-- Center Links (desktop) -->
@@ -144,7 +144,7 @@
         
         <!-- CTA -->
         <a href="/register" class="hidden md:inline-flex bg-crimson text-white text-[12px] font-semibold px-5 py-2.5 rounded-[3px] hover:bg-crimson/90 transition">
-            Join Season 3
+            Get Started
         </a>
         
         <!-- Mobile menu button -->
@@ -160,7 +160,7 @@
         <a href="#films" class="nav-link block text-[13px] text-dark/60 py-2">Films</a>
         <a href="#brief" class="nav-link block text-[13px] text-dark/60 py-2">Brief</a>
         <a href="#courses" class="nav-link block text-[13px] text-dark/60 py-2">Courses</a>
-        <a href="/register" class="block bg-crimson text-white text-[12px] font-semibold px-5 py-2.5 rounded-[3px] text-center mt-4">Join Season 3</a>
+        <a href="/register" class="block bg-crimson text-white text-[12px] font-semibold px-5 py-2.5 rounded-[3px] text-center mt-4">Get Started</a>
     </div>
 </nav>
 
@@ -176,7 +176,7 @@
                 <!-- Eyebrow -->
                 <div class="flex items-center justify-center lg:justify-start gap-3 mb-4 hero-eyebrow opacity-0">
                     <span class="w-2 h-2 bg-crimson rounded-full animate-pulse"></span>
-                    <span class="text-[12px] font-semibold tracking-[3px] uppercase text-dark/50">Season 3 — Now Open</span>
+                    <span class="text-[12px] font-semibold tracking-[3px] uppercase text-dark/50">Now Open — Join Today</span>
                 </div>
                 
                 <!-- H1 -->
@@ -344,9 +344,9 @@
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
             <span class="font-display text-[15px] tracking-[2px] text-dark/70">ONE VIDEO</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
-            <span class="font-display text-[15px] tracking-[2px] text-dark/70">ONE SEASON</span>
+            <span class="font-display text-[15px] tracking-[2px] text-dark/70">ONE CHANCE</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
-            <span class="font-display text-[15px] tracking-[2px] text-dark/70">SEASON 3 OPEN</span>
+            <span class="font-display text-[15px] tracking-[2px] text-dark/70">NOW OPEN</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
             <span class="font-display text-[15px] tracking-[2px] text-dark/70">AUTO-PUBLISHED TO YOUTUBE</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
@@ -362,9 +362,9 @@
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
             <span class="font-display text-[15px] tracking-[2px] text-dark/70">ONE VIDEO</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
-            <span class="font-display text-[15px] tracking-[2px] text-dark/70">ONE SEASON</span>
+            <span class="font-display text-[15px] tracking-[2px] text-dark/70">ONE CHANCE</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
-            <span class="font-display text-[15px] tracking-[2px] text-dark/70">SEASON 3 OPEN</span>
+            <span class="font-display text-[15px] tracking-[2px] text-dark/70">NOW OPEN</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
             <span class="font-display text-[15px] tracking-[2px] text-dark/70">AUTO-PUBLISHED TO YOUTUBE</span>
             <span class="w-1.5 h-1.5 bg-crimson rounded-full"></span>
@@ -719,7 +719,7 @@
             
             <!-- LEFT — Content -->
             <div class="rv">
-                <span class="text-[10px] font-semibold tracking-[3px] uppercase text-crimson">Season 3 Brief</span>
+                <span class="text-[10px] font-semibold tracking-[3px] uppercase text-crimson">Current Brief</span>
                 <h2 class="font-display text-[48px] md:text-[64px] leading-none mt-2 mb-6">THE PHONE CALL</h2>
                 
                 <p class="text-[15px] text-dark/60 leading-relaxed mb-8">
@@ -891,7 +891,7 @@
             READY TO PROVE YOUR TALENT?
         </h2>
         <p class="text-[15px] text-white/60 max-w-[500px] mx-auto mb-8">
-            Season 3 is open. No face, no connections, no excuses. Just you and your craft against the world.
+            Submissions are open. No face, no connections, no excuses. Just you and your craft against the world.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
             <a href="/register" class="inline-flex items-center gap-2 bg-white text-crimson text-[13px] font-semibold px-8 py-4 rounded-[3px] hover:bg-cream transition">
@@ -912,8 +912,8 @@
             <!-- Logo & Tagline -->
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 mb-4">
-                    <span class="font-display text-[22px] text-white tracking-wide">FACELESS PITCHER</span>
-                    <span class="bg-crimson text-white text-[9px] font-semibold px-2 py-0.5 rounded-full">S3</span>
+                    <span class="font-display text-[22px] text-white tracking-wide">FACELESS PICTURES</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; background: #D92B3A; color: white; font-size: 12px; font-weight: bold; width: 24px; height: 24px; border-radius: 50%;">3</span>
                 </div>
                 <p class="text-[14px] text-white/40 leading-relaxed max-w-[280px] mb-6">
                     No face. No connections. Just talent. India's first anonymous film competition.
