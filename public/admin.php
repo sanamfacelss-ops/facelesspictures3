@@ -2211,7 +2211,9 @@ if (file_exists($errorLogFile)) {
                                         <span x-show="testingEmail">...</span>
                                     </button>
                                 </div>
-                                <p x-show="testResult" class="text-[11px] mt-2" :class="testResult.includes('success') ? 'text-green-600' : 'text-red-600'" x-text="testResult"></p>
+                                <p x-show="testResult" class="text-[12px] mt-2 p-2 rounded-lg" 
+                                   :class="testResult.includes('success') ? 'text-green-700 bg-green-50 border border-green-200' : 'text-red-700 bg-red-50 border border-red-200'" 
+                                   x-text="testResult"></p>
                             </div>
                         </div>
                         

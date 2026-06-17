@@ -128,55 +128,255 @@ class EmailService
         return $result;
     }
 
+    private string $lastError = '';
+    
+    public function getLastError(): string
+    {
+        return $this->lastError;
+    }
+    
     public function sendSmtp(string $to, string $subject, string $body, bool $isHtml = true): bool
     {
-        $smtp = fsockopen(
-            ($this->encryption === 'ssl' ? 'ssl://' : '') . $this->host,
-            $this->port,
-            $errno,
-            $errstr,
-            30
-        );
-
-        if (!$smtp) {
-            log_message('error', "SMTP connection failed: {$errstr} ({$errno})");
+        $this->lastError = '';
+        
+        // Always log for debugging (even if FP3_DEBUG is off, write to error log)
+        $this->smtpLog("Attempting to send email to {$to}");
+        $this->smtpLog("Host={$this->host}, Port={$this->port}, User={$this->username}, Encryption={$this->encryption}");
+        
+        // Validate settings
+        if (empty($this->host) || $this->host === 'localhost') {
+            $this->lastError = 'SMTP host not configured';
+            $this->smtpLog("ERROR: " . $this->lastError);
             return false;
         }
-
-        $this->smtpCommand($smtp, "EHLO " . gethostname());
-        if ($this->encryption === 'tls') {
-            $this->smtpCommand($smtp, "STARTTLS");
-            stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-            $this->smtpCommand($smtp, "EHLO " . gethostname());
+        
+        if (empty($this->username)) {
+            $this->lastError = 'SMTP username not configured';
+            $this->smtpLog("ERROR: " . $this->lastError);
+            return false;
         }
+        
+        if (empty($this->password)) {
+            $this->lastError = 'SMTP password not configured';
+            $this->smtpLog("ERROR: " . $this->lastError);
+            return false;
+        }
+        
+        try {
+            // For SSL, use ssl:// prefix. For TLS (STARTTLS), connect without encryption first
+            $socket = ($this->encryption === 'ssl') ? 'ssl://' . $this->host : $this->host;
+            $this->smtpLog("Connecting to {$socket}:{$this->port}");
+            
+            // Set longer timeout and configure context for SSL/TLS
+            $context = stream_context_create([
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ]
+            ]);
+            
+            $smtp = @stream_socket_client(
+                "{$socket}:{$this->port}",
+                $errno,
+                $errstr,
+                30,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
 
-        $this->smtpCommand($smtp, "AUTH LOGIN");
-        $this->smtpCommand($smtp, base64_encode($this->username));
-        $this->smtpCommand($smtp, base64_encode($this->password));
-        $this->smtpCommand($smtp, "MAIL FROM:<{$this->fromAddress}>");
-        $this->smtpCommand($smtp, "RCPT TO:<{$to}>");
-        $this->smtpCommand($smtp, "DATA");
+            if (!$smtp) {
+                $this->lastError = "Connection failed: {$errstr} ({$errno})";
+                $this->smtpLog("ERROR: " . $this->lastError);
+                return false;
+            }
+            
+            // Set stream timeout
+            stream_set_timeout($smtp, 30);
+            
+            // Read greeting
+            $greeting = $this->smtpGetResponse($smtp);
+            $this->smtpLog("Greeting: " . trim($greeting));
+            
+            if (!str_starts_with($greeting, '220')) {
+                $this->lastError = "Invalid server greeting: " . trim($greeting);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
 
-        $headers = "MIME-Version: 1.0\r\n";
-        $headers .= "From: {$this->fromName} <{$this->fromAddress}>\r\n";
-        $headers .= "To: {$to}\r\n";
-        $headers .= "Subject: {$subject}\r\n";
-        $headers .= $isHtml ? "Content-Type: text/html; charset=UTF-8\r\n" : "Content-Type: text/plain; charset=UTF-8\r\n";
-        $headers .= "\r\n";
+            // EHLO
+            $resp = $this->smtpCommand($smtp, "EHLO " . gethostname());
+            $this->smtpLog("EHLO response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '250')) {
+                $this->lastError = "EHLO failed: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
+            
+            // STARTTLS for TLS encryption
+            if ($this->encryption === 'tls') {
+                $resp = $this->smtpCommand($smtp, "STARTTLS");
+                $this->smtpLog("STARTTLS response: " . trim($resp));
+                
+                if (!str_starts_with($resp, '220')) {
+                    $this->lastError = "STARTTLS failed: " . trim($resp);
+                    $this->smtpLog("ERROR: " . $this->lastError);
+                    fclose($smtp);
+                    return false;
+                }
+                
+                // Enable TLS - try multiple TLS versions for compatibility
+                $crypto = @stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT);
+                if (!$crypto) {
+                    // Try TLS 1.2 only
+                    $crypto = @stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+                }
+                
+                if (!$crypto) {
+                    $this->lastError = "TLS handshake failed - server may not support TLS 1.2+";
+                    $this->smtpLog("ERROR: " . $this->lastError);
+                    fclose($smtp);
+                    return false;
+                }
+                
+                $this->smtpLog("TLS enabled successfully");
+                
+                // Send EHLO again after TLS
+                $resp = $this->smtpCommand($smtp, "EHLO " . gethostname());
+                $this->smtpLog("EHLO after TLS: " . trim($resp));
+            }
 
-        $message = $headers . $body . "\r\n.\r\n";
-        fwrite($smtp, $message);
+            // AUTH LOGIN
+            $resp = $this->smtpCommand($smtp, "AUTH LOGIN");
+            $this->smtpLog("AUTH LOGIN response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '334')) {
+                $this->lastError = "Server doesn't support AUTH LOGIN: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
+            
+            // Send username (base64 encoded)
+            $resp = $this->smtpCommand($smtp, base64_encode($this->username));
+            $this->smtpLog("Username response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '334')) {
+                $this->lastError = "Username rejected: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
+            
+            // Send password (base64 encoded)
+            $resp = $this->smtpCommand($smtp, base64_encode($this->password));
+            $this->smtpLog("Password response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '235')) {
+                $this->lastError = "Authentication failed - check username/App Password. Server said: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
+            
+            $this->smtpLog("Authentication successful");
+            
+            // MAIL FROM
+            $resp = $this->smtpCommand($smtp, "MAIL FROM:<{$this->fromAddress}>");
+            $this->smtpLog("MAIL FROM response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '250')) {
+                $this->lastError = "MAIL FROM rejected: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
+            
+            // RCPT TO
+            $resp = $this->smtpCommand($smtp, "RCPT TO:<{$to}>");
+            $this->smtpLog("RCPT TO response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '250') && !str_starts_with($resp, '251')) {
+                $this->lastError = "Recipient rejected: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
+            
+            // DATA
+            $resp = $this->smtpCommand($smtp, "DATA");
+            $this->smtpLog("DATA response: " . trim($resp));
+            
+            if (!str_starts_with($resp, '354')) {
+                $this->lastError = "DATA command rejected: " . trim($resp);
+                $this->smtpLog("ERROR: " . $this->lastError);
+                fclose($smtp);
+                return false;
+            }
 
+            // Build and send message
+            $headers = "MIME-Version: 1.0\r\n";
+            $headers .= "From: {$this->fromName} <{$this->fromAddress}>\r\n";
+            $headers .= "To: {$to}\r\n";
+            $headers .= "Subject: {$subject}\r\n";
+            $headers .= "Date: " . date('r') . "\r\n";
+            $headers .= $isHtml ? "Content-Type: text/html; charset=UTF-8\r\n" : "Content-Type: text/plain; charset=UTF-8\r\n";
+            $headers .= "\r\n";
+
+            $message = $headers . $body . "\r\n.\r\n";
+            fwrite($smtp, $message);
+
+            $response = $this->smtpGetResponse($smtp);
+            $this->smtpLog("Message send response: " . trim($response));
+
+            $this->smtpCommand($smtp, "QUIT");
+            fclose($smtp);
+
+            $success = str_starts_with($response, '250');
+            
+            if (!$success) {
+                $this->lastError = "Message not accepted: " . trim($response);
+            }
+            
+            $this->smtpLog("Send " . ($success ? "SUCCESS" : "FAILED: " . $this->lastError));
+            
+            return $success;
+            
+        } catch (\Exception $e) {
+            $this->lastError = "Exception: " . $e->getMessage();
+            $this->smtpLog("ERROR: " . $this->lastError);
+            return false;
+        }
+    }
+    
+    /**
+     * Log SMTP messages to debug.log
+     */
+    private function smtpLog(string $message): void
+    {
+        $logMessage = "[SMTP] " . $message;
+        
+        // Always log to debug
+        debug_log($message, 'SMTP');
+        
+        // Also log to a dedicated SMTP log file
+        $file = LOG_PATH . '/smtp.log';
+        $timestamp = date('Y-m-d H:i:s');
+        $line = "[$timestamp] $logMessage" . PHP_EOL;
+        @error_log($line, 3, $file);
+    }
+    
+    private function smtpGetResponse($smtp): string
+    {
         $response = '';
-        while ($line = fgets($smtp)) {
+        while ($line = fgets($smtp, 515)) {
             $response .= $line;
             if (substr($line, 3, 1) === ' ') break;
         }
-
-        $this->smtpCommand($smtp, "QUIT");
-        fclose($smtp);
-
-        return str_starts_with($response, '250');
+        return $response;
     }
 
     public function sendPasswordResetOTP(string $to, string $otp): bool

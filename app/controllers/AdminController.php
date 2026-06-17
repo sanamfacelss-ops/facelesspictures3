@@ -1374,13 +1374,16 @@ class AdminController
             $result = $emailService->sendTestEmail($email);
             
             if ($result) {
-                echo json_encode(['success' => true, 'message' => 'Test email sent successfully']);
+                echo json_encode(['success' => true, 'message' => 'Test email sent successfully! Check your inbox.']);
             } else {
-                echo json_encode(['success' => false, 'error' => 'Failed to send email. Check SMTP settings.']);
+                // Get detailed error from EmailService
+                $error = $emailService->getLastError();
+                $errorMsg = $error ?: 'Failed to send email. Check SMTP settings.';
+                echo json_encode(['success' => false, 'error' => $errorMsg]);
             }
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_TEST_EMAIL');
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            echo json_encode(['success' => false, 'error' => 'Exception: ' . $e->getMessage()]);
         }
     }
 
