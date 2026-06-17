@@ -1427,6 +1427,9 @@ class AdminController
             // Collect all email settings from POST
             $settings = [];
             
+            // Email provider selection
+            if (isset($_POST['email_provider'])) $settings['email_provider'] = trim($_POST['email_provider']);
+            
             // SMTP Settings
             if (isset($_POST['smtp_host'])) $settings['smtp_host'] = trim($_POST['smtp_host']);
             if (isset($_POST['smtp_port'])) $settings['smtp_port'] = trim($_POST['smtp_port']);
@@ -1437,6 +1440,13 @@ class AdminController
             if (isset($_POST['smtp_encryption'])) $settings['smtp_encryption'] = trim($_POST['smtp_encryption']);
             if (isset($_POST['smtp_from_address'])) $settings['smtp_from_address'] = trim($_POST['smtp_from_address']);
             if (isset($_POST['smtp_from_name'])) $settings['smtp_from_name'] = trim($_POST['smtp_from_name']);
+            
+            // Resend Settings
+            if (isset($_POST['resend_api_key']) && !empty($_POST['resend_api_key'])) {
+                $settings['resend_api_key'] = trim($_POST['resend_api_key']);
+            }
+            if (isset($_POST['resend_from_address'])) $settings['resend_from_address'] = trim($_POST['resend_from_address']);
+            if (isset($_POST['resend_from_name'])) $settings['resend_from_name'] = trim($_POST['resend_from_name']);
             
             // Notification toggles (checkboxes - will be '1' if checked, absent if not)
             $settings['email_notify_signup'] = isset($_POST['email_notify_signup']) ? '1' : '0';
@@ -1450,6 +1460,8 @@ class AdminController
             if (isset($_POST['email_admin_address'])) $settings['email_admin_address'] = trim($_POST['email_admin_address']);
             $settings['email_admin_new_video'] = isset($_POST['email_admin_new_video']) ? '1' : '0';
             $settings['email_admin_flagged'] = isset($_POST['email_admin_flagged']) ? '1' : '0';
+            
+            debug_log("Saving email settings: " . json_encode(array_keys($settings)), 'ADMIN');
             
             // Save to database
             $result = $settingsModel->updateEmailSettings($settings);

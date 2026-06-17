@@ -288,8 +288,8 @@ class Settings
         $this->db->beginTransaction();
         try {
             foreach ($settings as $key => $value) {
-                // Skip empty password (means don't change it)
-                if ($key === 'smtp_password' && empty($value)) {
+                // Skip empty passwords/API keys (means don't change them)
+                if (($key === 'smtp_password' || $key === 'resend_api_key') && empty($value)) {
                     continue;
                 }
                 $this->updateEmailSetting($key, (string) $value);
@@ -298,6 +298,7 @@ class Settings
             return true;
         } catch (\Exception $e) {
             $this->db->rollBack();
+            debug_log("Failed to update email settings: " . $e->getMessage(), 'SETTINGS');
             return false;
         }
     }
