@@ -4,6 +4,28 @@ declare(strict_types=1);
 
 use App\Config\Database;
 
+/**
+ * Get the current base URL dynamically from request
+ * Works correctly in both development (localhost) and production (custom domain)
+ */
+function get_base_url(): string
+{
+    static $baseUrl = null;
+    
+    if ($baseUrl === null) {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
+                    (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+                    ($_SERVER['SERVER_PORT'] ?? 80) == 443
+                    ? 'https' : 'http';
+        
+        $host = $_SERVER['HTTP_HOST'] ?? parse_url(APP_URL, PHP_URL_HOST) ?? 'localhost';
+        
+        $baseUrl = $protocol . '://' . $host;
+    }
+    
+    return $baseUrl;
+}
+
 function csrf_token(): string
 {
     if (empty($_SESSION[CSRF_TOKEN_NAME])) {
@@ -19,7 +41,7 @@ function verify_csrf(string $token): bool
 
 function redirect(string $url): void
 {
-    header("Location: " . APP_URL . "/" . ltrim($url, '/'));
+    header("Location: " . get_base_url() . "/" . ltrim($url, '/'));
     exit;
 }
 
@@ -72,7 +94,7 @@ function flash(string $key, ?string $value = null): ?string
 
 function asset(string $path): string
 {
-    return APP_URL . '/assets/' . ltrim($path, '/');
+    return get_base_url() . '/assets/' . ltrim($path, '/');
 }
 
 function e(string $text): string
