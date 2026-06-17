@@ -186,6 +186,12 @@ $routes = [
     'api/admin/email/test' => [AdminController::class, 'testEmail', 'POST'],
     'api/admin/email/settings' => [AdminController::class, 'getEmailSettings', 'GET'],
     'api/admin/email/settings/save' => [AdminController::class, 'updateEmailSettings', 'POST'],
+    
+    // YouTube publish queue API
+    'api/admin/youtube/status' => [AdminController::class, 'getYouTubeStatus', 'GET'],
+    'api/admin/youtube/toggle' => [AdminController::class, 'toggleYouTubePublish', 'POST'],
+    'api/admin/youtube/bulk-publish' => [AdminController::class, 'bulkPublishYouTube', 'POST'],
+    'api/admin/videos/refresh' => [AdminController::class, 'refreshVideos', 'GET'],
 ];
 
 $matched = false;

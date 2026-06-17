@@ -1482,4 +1482,162 @@ class AdminController
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Get YouTube publish status and queue
+     */
+    public function getYouTubeStatus(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $autoPublish = $settingsModel->isYouTubeAutoPublishEnabled();
+            
+            // Get videos ready for YouTube (approved but not published)
+            $stmt = $this->db->query(
+                "SELECT v.id, v.title, v.content_type, v.status, v.ai_status, v.ai_score, 
+                        v.youtube_id, v.youtube_status, v.created_at, v.moderated_at,
+                        u.name as user_name, u.role as user_role
+                 FROM videos v
+                 JOIN users u ON v.user_id = u.id
+                 WHERE v.status = 'approved' 
+                 AND (v.ai_status = 'approved' OR v.ai_status = 'flagged')
+                 AND v.youtube_id IS NULL
+                 ORDER BY v.moderated_at ASC"
+            );
+            $publishQueue = $stmt->fetchAll();
+            
+            echo json_encode([
+                'success' => true,
+                'auto_publish' => $autoPublish,
+                'queue_count' => count($publishQueue),
+                'queue' => $publishQueue
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_YOUTUBE_STATUS');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Toggle YouTube auto-publish
+     */
+    public function toggleYouTubePublish(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $currentState = $settingsModel->isYouTubeAutoPublishEnabled();
+            $newState = !$currentState;
+            
+            $result = $settingsModel->setYouTubeAutoPublish($newState);
+            
+            if ($result) {
+                debug_log("YouTube auto-publish toggled to: " . ($newState ? 'enabled' : 'disabled'), 'ADMIN');
+                echo json_encode([
+                    'success' => true,
+                    'auto_publish' => $newState,
+                    'message' => 'YouTube auto-publish ' . ($newState ? 'enabled' : 'paused')
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Failed to toggle setting']);
+            }
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_TOGGLE_YOUTUBE');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Bulk publish videos to YouTube
+     */
+    public function bulkPublishYouTube(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $videoIds = json_decode($_POST['video_ids'] ?? '[]', true);
+        if (empty($videoIds) || !is_array($videoIds)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'No videos selected']);
+            return;
+        }
+
+        try {
+            $youtubeService = new \App\Services\YouTubeService();
+            $published = 0;
+            $errors = [];
+
+            foreach ($videoIds as $videoId) {
+                $videoId = (int) $videoId;
+                $result = $youtubeService->uploadVideo($videoId);
+                
+                if (isset($result['youtube_id'])) {
+                    $published++;
+                } else {
+                    $errors[] = "Video {$videoId}: " . ($result['error'] ?? 'Unknown error');
+                }
+                
+                // Small delay to avoid rate limits
+                usleep(500000);
+            }
+
+            debug_log("Admin bulk published {$published} videos to YouTube", 'ADMIN');
+            
+            echo json_encode([
+                'success' => true,
+                'published' => $published,
+                'errors' => $errors,
+                'message' => "{$published} video(s) published to YouTube"
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_BULK_PUBLISH_YOUTUBE');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to publish videos: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Refresh videos data (for silent refresh)
+     */
+    public function refreshVideos(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $stmt = $this->db->query(
+                "SELECT v.*, u.name as user_name, u.role as user_role, s.title as season_title
+                 FROM videos v
+                 JOIN users u ON v.user_id = u.id
+                 JOIN seasons s ON v.season_id = s.id
+                 ORDER BY v.created_at DESC"
+            );
+            $videos = $stmt->fetchAll();
+            
+            // Get AI settings for status
+            $settingsModel = new \App\Models\Settings();
+            $aiSettings = $settingsModel->getAISettings();
+            
+            echo json_encode([
+                'success' => true,
+                'videos' => $videos,
+                'youtube_auto_publish' => $aiSettings['youtube_auto_publish'] ?? '1'
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_REFRESH_VIDEOS');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
 }

@@ -487,14 +487,19 @@ class VideoProcessingService
 
         log_message('info', "Video {$videoId} approved with score {$score}");
 
-        // Auto-upload to YouTube for approved videos
+        // Auto-upload to YouTube for approved videos (if enabled)
         try {
-            $youtubeService = new YouTubeService();
-            $youtubeResult = $youtubeService->uploadVideo($videoId);
-            if (is_string($youtubeResult) && !empty($youtubeResult)) {
-                log_message('info', "Video {$videoId} auto-uploaded to YouTube: {$youtubeResult}");
-            } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
-                log_message('warning', "Video {$videoId} YouTube auto-upload failed: {$youtubeResult['error']}");
+            $settingsModel = new \App\Models\Settings();
+            if ($settingsModel->isYouTubeAutoPublishEnabled()) {
+                $youtubeService = new YouTubeService();
+                $youtubeResult = $youtubeService->uploadVideo($videoId);
+                if (is_string($youtubeResult) && !empty($youtubeResult)) {
+                    log_message('info', "Video {$videoId} auto-uploaded to YouTube: {$youtubeResult}");
+                } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
+                    log_message('warning', "Video {$videoId} YouTube auto-upload failed: {$youtubeResult['error']}");
+                }
+            } else {
+                log_message('info', "Video {$videoId} approved but YouTube auto-publish is paused");
             }
         } catch (\Exception $e) {
             log_message('error', "Video {$videoId} YouTube auto-upload error: " . $e->getMessage());

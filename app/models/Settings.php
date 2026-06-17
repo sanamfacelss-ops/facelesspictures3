@@ -151,6 +151,8 @@ class Settings
             // Video file size limits (MB)
             'video_min_size_mb' => '1',
             'video_max_size_mb' => '100',
+            // YouTube auto-publish toggle (1 = enabled, 0 = paused)
+            'youtube_auto_publish' => '1',
         ];
 
         $settings = [];
@@ -185,7 +187,7 @@ class Settings
             'ai_nsfw_reject_threshold', 'ai_nsfw_flag_threshold',
             'ai_profanity_reject_threshold', 'ai_profanity_flag_threshold',
             'ai_auto_approve', 'ai_min_duration', 'ai_max_duration',
-            'video_min_size_mb', 'video_max_size_mb'
+            'video_min_size_mb', 'video_max_size_mb', 'youtube_auto_publish'
         ];
         
         if (!in_array($key, $allowedKeys)) {
@@ -193,6 +195,22 @@ class Settings
         }
 
         return $this->set($key, $value, 'text', "AI Configuration: {$key}");
+    }
+
+    /**
+     * Check if YouTube auto-publish is enabled
+     */
+    public function isYouTubeAutoPublishEnabled(): bool
+    {
+        return $this->get('youtube_auto_publish', '1') === '1';
+    }
+
+    /**
+     * Toggle YouTube auto-publish
+     */
+    public function setYouTubeAutoPublish(bool $enabled): bool
+    {
+        return $this->set('youtube_auto_publish', $enabled ? '1' : '0', 'text', 'YouTube auto-publish toggle');
     }
 
     /**

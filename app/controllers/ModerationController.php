@@ -57,15 +57,21 @@ class ModerationController
         
         log_message('info', "Admin {$user['id']} approved video {$videoId}");
 
-        // Auto-upload to YouTube after manual approval
+        // Auto-upload to YouTube after manual approval (if enabled)
         $youtubeResult = null;
         try {
-            $youtubeService = new \App\Services\YouTubeService();
-            $youtubeResult = $youtubeService->uploadVideo($videoId);
-            if (is_string($youtubeResult) && !empty($youtubeResult)) {
-                log_message('info', "Video {$videoId} uploaded to YouTube after manual approval: {$youtubeResult}");
-            } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
-                log_message('warning', "Video {$videoId} YouTube upload failed after manual approval: {$youtubeResult['error']}");
+            $settingsModel = new \App\Models\Settings();
+            if ($settingsModel->isYouTubeAutoPublishEnabled()) {
+                $youtubeService = new \App\Services\YouTubeService();
+                $youtubeResult = $youtubeService->uploadVideo($videoId);
+                if (is_string($youtubeResult) && !empty($youtubeResult)) {
+                    log_message('info', "Video {$videoId} uploaded to YouTube after manual approval: {$youtubeResult}");
+                } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
+                    log_message('warning', "Video {$videoId} YouTube upload failed after manual approval: {$youtubeResult['error']}");
+                }
+            } else {
+                log_message('info', "Video {$videoId} approved but YouTube auto-publish is paused");
+                $youtubeResult = ['paused' => true, 'message' => 'YouTube auto-publish is paused'];
             }
         } catch (\Exception $e) {
             log_message('error', "Video {$videoId} YouTube upload error after manual approval: " . $e->getMessage());

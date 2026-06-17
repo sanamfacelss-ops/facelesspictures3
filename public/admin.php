@@ -979,9 +979,6 @@ if (file_exists($errorLogFile)) {
                                                             Watch
                                                         </a>
                                                     </template>
-                                                    <template x-if="v.file_path">
-                                                        <a :href="'/uploads/' + v.file_path" target="_blank" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Preview</a>
-                                                    </template>
                                                     <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {}, v.ai_score)" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">Details</button>
                                                     <button @click="deleteVideo(v.id, v.title)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition" title="Delete video permanently">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -1738,10 +1735,32 @@ if (file_exists($errorLogFile)) {
                                             <p class="text-[11px] md:text-[12px] text-dark/50">Auto-publish approved videos</p>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-3 h-3 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
-                                        <span class="text-[11px] md:text-[12px] font-medium" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'text-green-600' : 'text-red-600'" x-text="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'Connected' : 'Not Connected'"></span>
+                                    <div class="flex items-center gap-4">
+                                        <!-- Auto-Publish Toggle -->
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[11px] text-dark/50">Auto-Publish:</span>
+                                            <button @click="toggleYouTubeAutoPublish()" 
+                                                class="relative w-12 h-6 rounded-full transition-colors duration-200"
+                                                :class="youtubeAutoPublish ? 'bg-green-500' : 'bg-dark/20'">
+                                                <span class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"
+                                                    :class="youtubeAutoPublish ? 'translate-x-6' : ''"></span>
+                                            </button>
+                                            <span class="text-[11px] font-medium" :class="youtubeAutoPublish ? 'text-green-600' : 'text-amber-600'" x-text="youtubeAutoPublish ? 'ON' : 'PAUSED'"></span>
+                                        </div>
+                                        <!-- Connection Status -->
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-3 h-3 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500' : 'bg-red-500'"></span>
+                                            <span class="text-[11px] md:text-[12px] font-medium" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'text-green-600' : 'text-red-600'" x-text="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'Connected' : 'Not Connected'"></span>
+                                        </div>
                                     </div>
+                                </div>
+                                
+                                <!-- Info when paused -->
+                                <div x-show="!youtubeAutoPublish" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                    <p class="text-[12px] text-amber-700 flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        <span><strong>Auto-publish paused.</strong> Videos will be judged by AI but won't go to YouTube. Use the Publish Queue below to manually push videos.</span>
+                                    </p>
                                 </div>
                                 
                                 <!-- Test Button -->
@@ -1753,6 +1772,77 @@ if (file_exists($errorLogFile)) {
                                     <svg x-show="!testingYouTube" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span x-text="testingYouTube ? 'Testing...' : 'Test YouTube + AI Connection'"></span>
                                 </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Publish Queue Card -->
+                        <div class="lg:col-span-3">
+                            <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
+                                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                        Publish Queue
+                                        <span class="text-[11px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700" x-text="publishQueue.length + ' videos'"></span>
+                                    </h3>
+                                    <div class="flex items-center gap-2">
+                                        <button @click="refreshPublishQueue()" class="text-dark/40 hover:text-dark p-1" title="Refresh">
+                                            <svg class="w-4 h-4" :class="loadingPublishQueue ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                        </button>
+                                        <button @click="publishAllQueue()" 
+                                            :disabled="publishQueue.length === 0 || publishingAll"
+                                            class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-[11px] font-medium hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-1">
+                                            <svg x-show="publishingAll" class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                            <svg x-show="!publishingAll" class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                            <span x-text="publishingAll ? 'Publishing...' : 'Publish All'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Queue Description -->
+                                <p class="text-[12px] text-dark/50 mb-4">Videos that are approved but not yet published to YouTube. These accumulate when auto-publish is paused.</p>
+                                
+                                <!-- Queue List -->
+                                <div x-show="publishQueue.length === 0" class="text-center py-8 text-dark/30 text-[13px]">
+                                    <svg class="w-12 h-12 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    No videos waiting to be published
+                                </div>
+                                
+                                <div x-show="publishQueue.length > 0" class="space-y-2 max-h-[300px] overflow-y-auto">
+                                    <template x-for="video in publishQueue" :key="video.id">
+                                        <div class="flex items-center justify-between p-3 bg-cream/50 rounded-lg hover:bg-cream transition">
+                                            <div class="flex items-center gap-3 min-w-0">
+                                                <input type="checkbox" :value="video.id" x-model="selectedQueueVideos" class="rounded border-dark/20">
+                                                <div class="min-w-0">
+                                                    <p class="font-medium text-dark text-[13px] truncate" x-text="video.title"></p>
+                                                    <p class="text-[11px] text-dark/50">
+                                                        <span x-text="video.user_name"></span> • 
+                                                        <span x-text="video.content_type"></span> • 
+                                                        Score: <span x-text="video.ai_score || 'N/A'"></span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] text-dark/40" x-text="video.moderated_at ? new Date(video.moderated_at).toLocaleDateString() : ''"></span>
+                                                <button @click="publishSingleVideo(video.id)" 
+                                                    :disabled="publishingVideoId === video.id"
+                                                    class="px-2 py-1 bg-red-600 text-white rounded text-[10px] font-medium hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-1">
+                                                    <svg x-show="publishingVideoId === video.id" class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                                    <span x-text="publishingVideoId === video.id ? '...' : 'Publish'"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                                
+                                <!-- Bulk publish selected -->
+                                <div x-show="selectedQueueVideos.length > 0" class="mt-4 pt-4 border-t border-dark/10 flex items-center justify-between">
+                                    <span class="text-[12px] text-dark/50"><span x-text="selectedQueueVideos.length"></span> videos selected</span>
+                                    <button @click="publishSelectedQueue()" 
+                                        :disabled="publishingAll"
+                                        class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-[11px] font-medium hover:bg-red-700 transition disabled:opacity-50">
+                                        Publish Selected
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -3038,6 +3128,17 @@ if (file_exists($errorLogFile)) {
             testingYouTube: false,
             youtubeTestResults: null,
             
+            // YouTube auto-publish
+            youtubeAutoPublish: true,
+            publishQueue: [],
+            selectedQueueVideos: [],
+            loadingPublishQueue: false,
+            publishingAll: false,
+            publishingVideoId: null,
+            
+            // Auto-refresh interval
+            refreshInterval: null,
+            
             // Toast
             toastShow: false,
             toastMessage: '',
@@ -3049,6 +3150,140 @@ if (file_exists($errorLogFile)) {
                 window.addEventListener('resize', () => {
                     this.sidebarCollapsed = window.innerWidth < 1024;
                 });
+                
+                // Load YouTube status
+                this.loadYouTubeStatus();
+                
+                // Start auto-refresh every 30 seconds (for AI processing status)
+                this.refreshInterval = setInterval(() => {
+                    this.silentRefreshVideos();
+                }, 30000);
+            },
+            
+            // Silent refresh videos without UI reload
+            async silentRefreshVideos() {
+                try {
+                    const res = await fetch('/api/admin/videos/refresh');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.videos = data.videos;
+                        this.youtubeAutoPublish = data.youtube_auto_publish === '1';
+                    }
+                } catch (e) {
+                    console.log('Silent refresh failed');
+                }
+            },
+            
+            // Load YouTube status and publish queue
+            async loadYouTubeStatus() {
+                try {
+                    const res = await fetch('/api/admin/youtube/status');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.youtubeAutoPublish = data.auto_publish;
+                        this.publishQueue = data.queue || [];
+                    }
+                } catch (e) {
+                    console.log('Failed to load YouTube status');
+                }
+            },
+            
+            // Toggle YouTube auto-publish
+            async toggleYouTubeAutoPublish() {
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                try {
+                    const res = await fetch('/api/admin/youtube/toggle', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.youtubeAutoPublish = data.auto_publish;
+                        this.showToast(data.message, 'success');
+                        // Refresh queue if we just paused
+                        if (!this.youtubeAutoPublish) {
+                            this.refreshPublishQueue();
+                        }
+                    } else {
+                        this.showToast(data.error || 'Failed to toggle', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to toggle auto-publish', 'error');
+                }
+            },
+            
+            // Refresh publish queue
+            async refreshPublishQueue() {
+                this.loadingPublishQueue = true;
+                await this.loadYouTubeStatus();
+                this.loadingPublishQueue = false;
+            },
+            
+            // Publish single video
+            async publishSingleVideo(videoId) {
+                this.publishingVideoId = videoId;
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                try {
+                    const res = await fetch('/api/admin/youtube/publish/' + videoId, { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success || data.youtube_id) {
+                        this.showToast('Video published to YouTube!', 'success');
+                        this.publishQueue = this.publishQueue.filter(v => v.id !== videoId);
+                        this.silentRefreshVideos();
+                    } else {
+                        this.showToast(data.error || 'Failed to publish', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to publish video', 'error');
+                }
+                this.publishingVideoId = null;
+            },
+            
+            // Publish all queue
+            async publishAllQueue() {
+                if (this.publishQueue.length === 0) return;
+                this.publishingAll = true;
+                const videoIds = this.publishQueue.map(v => v.id);
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('video_ids', JSON.stringify(videoIds));
+                try {
+                    const res = await fetch('/api/admin/youtube/bulk-publish', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(data.message, 'success');
+                        this.refreshPublishQueue();
+                        this.silentRefreshVideos();
+                    } else {
+                        this.showToast(data.error || 'Failed to publish', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to publish videos', 'error');
+                }
+                this.publishingAll = false;
+            },
+            
+            // Publish selected from queue
+            async publishSelectedQueue() {
+                if (this.selectedQueueVideos.length === 0) return;
+                this.publishingAll = true;
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append('video_ids', JSON.stringify(this.selectedQueueVideos));
+                try {
+                    const res = await fetch('/api/admin/youtube/bulk-publish', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(data.message, 'success');
+                        this.selectedQueueVideos = [];
+                        this.refreshPublishQueue();
+                        this.silentRefreshVideos();
+                    } else {
+                        this.showToast(data.error || 'Failed to publish', 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to publish videos', 'error');
+                }
+                this.publishingAll = false;
             },
             
             // Toast notification
