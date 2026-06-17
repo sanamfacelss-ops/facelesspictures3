@@ -187,6 +187,11 @@ $routes = [
     'api/admin/email/settings' => [AdminController::class, 'getEmailSettings', 'GET'],
     'api/admin/email/settings/save' => [AdminController::class, 'updateEmailSettings', 'POST'],
     
+    // Google OAuth API
+    'api/admin/google/settings' => [AdminController::class, 'getGoogleSettings', 'GET'],
+    'api/admin/google/settings/save' => [AdminController::class, 'updateGoogleSettings', 'POST'],
+    'api/admin/google/test' => [AdminController::class, 'testGoogleAuth', 'POST'],
+    
     // YouTube publish queue API
     'api/admin/youtube/status' => [AdminController::class, 'getYouTubeStatus', 'GET'],
     'api/admin/youtube/toggle' => [AdminController::class, 'toggleYouTubePublish', 'POST'],

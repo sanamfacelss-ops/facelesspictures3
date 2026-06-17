@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\Settings;
 
 /**
  * Google OAuth 2.0 Authentication Service
@@ -20,10 +21,34 @@ class GoogleAuthService
     
     public function __construct()
     {
-        $this->clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
-        $this->clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? '';
+        // Load from database first, fallback to env vars
+        $this->loadSettings();
+        
         // Use dynamic base URL for redirect URI (works in both dev and production)
         $this->redirectUri = get_base_url() . '/api/auth/google/callback';
+    }
+    
+    /**
+     * Load settings from database, with env fallback
+     */
+    private function loadSettings(): void
+    {
+        try {
+            $settingsModel = new Settings();
+            
+            // Try database first
+            $dbClientId = $settingsModel->get('google_client_id');
+            $dbClientSecret = $settingsModel->get('google_client_secret');
+            
+            // Use database values if set, otherwise fallback to env
+            $this->clientId = !empty($dbClientId) ? $dbClientId : ($_ENV['GOOGLE_CLIENT_ID'] ?? '');
+            $this->clientSecret = !empty($dbClientSecret) ? $dbClientSecret : ($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
+            
+        } catch (\Exception $e) {
+            // Fallback to env vars if database fails
+            $this->clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
+            $this->clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? '';
+        }
     }
     
     /**

@@ -395,6 +395,10 @@ if (file_exists($errorLogFile)) {
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     Email
                 </button>
+                <button @click="activeTab = 'google'; mobileMenuOpen = false" :class="activeTab === 'google' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-5 py-3 text-[14px] text-dark/70">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    Google Login
+                </button>
                 <button @click="activeTab = 'settings'; mobileMenuOpen = false" :class="activeTab === 'settings' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-5 py-3 text-[14px] text-dark/70">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Settings
@@ -492,6 +496,12 @@ if (file_exists($errorLogFile)) {
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Email</span>
                     <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Email</span>
+                </button>
+                
+                <button @click="activeTab = 'google'" :class="activeTab === 'google' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
+                    <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Google</span>
+                    <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Google</span>
                 </button>
                 
                 <button @click="activeTab = 'settings'" :class="activeTab === 'settings' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
@@ -2462,6 +2472,136 @@ if (file_exists($errorLogFile)) {
                     </div>
                 </div>
 
+                <!-- ==================== GOOGLE LOGIN TAB ==================== -->
+                <div x-show="activeTab === 'google'" x-cloak x-data="googleSettings()" x-init="loadGoogleSettings()">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Configuration Card -->
+                        <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
+                            <div class="px-5 py-4 border-b border-dark/5">
+                                <h3 class="font-semibold text-dark flex items-center gap-2">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                    </svg>
+                                    Google OAuth Settings
+                                </h3>
+                            </div>
+                            
+                            <div class="p-5">
+                                <!-- Status -->
+                                <div class="flex items-center justify-between p-4 rounded-xl mb-5" :class="isConfigured ? 'bg-green-50' : 'bg-amber-50'">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="isConfigured ? 'bg-green-100' : 'bg-amber-100'">
+                                            <svg x-show="isConfigured" class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <svg x-show="!isConfigured" class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-dark text-[13px]" x-text="isConfigured ? 'Google Login Enabled' : 'Not Configured'"></p>
+                                            <p class="text-[11px]" :class="isConfigured ? 'text-green-600' : 'text-amber-600'" x-text="isConfigured ? 'Users can sign in with Google' : 'Add credentials to enable'"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <form @submit.prevent="saveGoogleSettings()">
+                                    <div class="space-y-4">
+                                        <!-- Client ID -->
+                                        <div>
+                                            <label class="block text-[12px] font-medium text-dark/70 mb-1.5">Client ID</label>
+                                            <input type="text" x-model="clientId" :placeholder="hasClientId ? '••••••••••••••••••••...' : 'Enter Google Client ID'" class="w-full px-4 py-2.5 text-[13px] border border-dark/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson">
+                                            <p x-show="hasClientId && !clientId" class="text-[10px] text-green-600 mt-1">✓ Client ID configured (enter new value to change)</p>
+                                        </div>
+                                        
+                                        <!-- Client Secret -->
+                                        <div>
+                                            <label class="block text-[12px] font-medium text-dark/70 mb-1.5">Client Secret</label>
+                                            <input type="password" x-model="clientSecret" :placeholder="hasClientSecret ? '••••••••••••••••••••' : 'Enter Google Client Secret'" class="w-full px-4 py-2.5 text-[13px] border border-dark/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson">
+                                            <p x-show="hasClientSecret && !clientSecret" class="text-[10px] text-green-600 mt-1">✓ Client Secret configured (enter new value to change)</p>
+                                        </div>
+                                        
+                                        <!-- Redirect URI (read-only) -->
+                                        <div>
+                                            <label class="block text-[12px] font-medium text-dark/70 mb-1.5">Redirect URI (copy this to Google Console)</label>
+                                            <div class="flex items-center gap-2">
+                                                <input type="text" :value="redirectUri" readonly class="flex-1 px-4 py-2.5 text-[13px] border border-dark/10 rounded-lg bg-cream/50 font-mono">
+                                                <button type="button" @click="copyRedirectUri()" class="p-2.5 bg-dark/5 rounded-lg hover:bg-dark/10 transition">
+                                                    <svg class="w-4 h-4 text-dark/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Message -->
+                                    <div x-show="message" x-cloak class="mt-4 p-3 rounded-lg text-[12px]" :class="messageType === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" x-text="message"></div>
+                                    
+                                    <div class="mt-5 flex items-center gap-3">
+                                        <button type="submit" :disabled="saving" class="bg-crimson text-white px-6 py-2.5 rounded-lg text-[13px] font-semibold hover:bg-crimson/90 disabled:opacity-50 flex items-center gap-2">
+                                            <span x-text="saving ? 'Saving...' : 'Save Settings'"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Setup Guide -->
+                        <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
+                            <div class="px-5 py-4 border-b border-dark/5">
+                                <h3 class="font-semibold text-dark flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Setup Guide
+                                </h3>
+                            </div>
+                            
+                            <div class="p-5 space-y-4 text-[13px]">
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] font-bold">1</span>
+                                    <div>
+                                        <p class="font-medium text-dark">Go to Google Cloud Console</p>
+                                        <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-[12px] text-crimson hover:underline">console.cloud.google.com/apis/credentials →</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] font-bold">2</span>
+                                    <div>
+                                        <p class="font-medium text-dark">Create OAuth 2.0 Client ID</p>
+                                        <p class="text-[12px] text-dark/50">Click "+ Create Credentials" → "OAuth client ID" → "Web application"</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] font-bold">3</span>
+                                    <div>
+                                        <p class="font-medium text-dark">Add Authorized Origins</p>
+                                        <code class="block mt-1 bg-cream p-2 rounded text-[11px] font-mono"><?= get_base_url() ?></code>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] font-bold">4</span>
+                                    <div>
+                                        <p class="font-medium text-dark">Add Authorized Redirect URI</p>
+                                        <code class="block mt-1 bg-cream p-2 rounded text-[11px] font-mono break-all"><?= get_base_url() ?>/api/auth/google/callback</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] font-bold">5</span>
+                                    <div>
+                                        <p class="font-medium text-dark">Copy Client ID & Secret</p>
+                                        <p class="text-[12px] text-dark/50">Paste them in the form on the left</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-4">
+                                    <p class="text-[11px] text-amber-800"><strong>⚠️ Important:</strong> You may need to configure the OAuth Consent Screen first. Choose "External" and fill in app name & email.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ==================== SETTINGS TAB ==================== -->
                 <div x-show="activeTab === 'settings'" x-cloak>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -3037,6 +3177,7 @@ if (file_exists($errorLogFile)) {
                 aiconfig: 'AI CONFIGURATION',
                 youtube: 'YOUTUBE',
                 email: 'EMAIL',
+                google: 'GOOGLE LOGIN',
                 settings: 'SETTINGS'
             },
             
@@ -3911,6 +4052,86 @@ if (file_exists($errorLogFile)) {
                 } finally {
                     this.savingKeys = false;
                 }
+            }
+        };
+    }
+    
+    // Google Settings Component
+    function googleSettings() {
+        return {
+            csrf: '<?= csrf_token() ?>',
+            clientId: '',
+            clientSecret: '',
+            redirectUri: '<?= get_base_url() ?>/api/auth/google/callback',
+            isConfigured: false,
+            hasClientId: false,
+            hasClientSecret: false,
+            saving: false,
+            message: '',
+            messageType: 'success',
+            
+            async loadGoogleSettings() {
+                try {
+                    const res = await fetch('/api/admin/google/settings');
+                    const data = await res.json();
+                    if (data.success && data.config) {
+                        this.isConfigured = data.config.is_configured || false;
+                        this.hasClientId = !!data.config.client_id;
+                        this.hasClientSecret = data.config.has_secret || false;
+                        this.redirectUri = data.config.redirect_uri || this.redirectUri;
+                    }
+                } catch (e) {
+                    console.error('Failed to load Google settings', e);
+                }
+            },
+            
+            async saveGoogleSettings() {
+                if (!this.clientId && !this.clientSecret) {
+                    this.message = 'Please enter at least one value to update';
+                    this.messageType = 'error';
+                    return;
+                }
+                
+                this.saving = true;
+                this.message = '';
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('csrf_token', this.csrf);
+                    if (this.clientId) formData.append('google_client_id', this.clientId);
+                    if (this.clientSecret) formData.append('google_client_secret', this.clientSecret);
+                    
+                    const res = await fetch('/api/admin/google/settings/save', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        this.message = data.message || 'Settings saved successfully!';
+                        this.messageType = 'success';
+                        this.clientId = '';
+                        this.clientSecret = '';
+                        // Reload status
+                        if (data.config) {
+                            this.isConfigured = data.config.is_configured || false;
+                            this.hasClientId = !!data.config.client_id;
+                            this.hasClientSecret = data.config.has_secret || false;
+                        }
+                    } else {
+                        this.message = data.error || 'Failed to save settings';
+                        this.messageType = 'error';
+                    }
+                } catch (e) {
+                    this.message = 'Network error. Please try again.';
+                    this.messageType = 'error';
+                } finally {
+                    this.saving = false;
+                }
+            },
+            
+            copyRedirectUri() {
+                navigator.clipboard.writeText(this.redirectUri);
+                this.message = 'Redirect URI copied to clipboard!';
+                this.messageType = 'success';
+                setTimeout(() => { this.message = ''; }, 2000);
             }
         };
     }

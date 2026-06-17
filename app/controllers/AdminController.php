@@ -1640,4 +1640,115 @@ class AdminController
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Get Google OAuth settings
+     */
+    public function getGoogleSettings(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $googleService = new \App\Services\GoogleAuthService();
+            
+            $configStatus = $googleService->getConfigStatus();
+            
+            echo json_encode([
+                'success' => true,
+                'config' => $configStatus,
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_GOOGLE_SETTINGS');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update Google OAuth settings
+     */
+    public function updateGoogleSettings(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            
+            $settings = [];
+            
+            // Only update if provided (don't clear existing values)
+            if (isset($_POST['google_client_id']) && !empty($_POST['google_client_id'])) {
+                $settings['google_client_id'] = trim($_POST['google_client_id']);
+            }
+            if (isset($_POST['google_client_secret']) && !empty($_POST['google_client_secret'])) {
+                $settings['google_client_secret'] = trim($_POST['google_client_secret']);
+            }
+            
+            if (empty($settings)) {
+                echo json_encode(['success' => false, 'error' => 'No settings to update']);
+                return;
+            }
+            
+            // Save each setting
+            foreach ($settings as $key => $value) {
+                $settingsModel->set($key, $value);
+            }
+            
+            debug_log("Admin updated Google OAuth settings", 'ADMIN');
+            
+            // Get updated status
+            $googleService = new \App\Services\GoogleAuthService();
+            $configStatus = $googleService->getConfigStatus();
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Google OAuth settings saved!',
+                'config' => $configStatus
+            ]);
+            
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_UPDATE_GOOGLE_SETTINGS');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Test Google OAuth configuration
+     */
+    public function testGoogleAuth(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $googleService = new \App\Services\GoogleAuthService();
+            
+            if (!$googleService->isConfigured()) {
+                echo json_encode([
+                    'success' => false, 
+                    'error' => 'Google OAuth is not configured. Please add Client ID and Client Secret.'
+                ]);
+                return;
+            }
+            
+            $configStatus = $googleService->getConfigStatus();
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Google OAuth is configured correctly!',
+                'config' => $configStatus
+            ]);
+            
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_TEST_GOOGLE');
+            echo json_encode(['success' => false, 'error' => 'Error: ' . $e->getMessage()]);
+        }
+    }
 }
