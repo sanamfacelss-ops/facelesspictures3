@@ -1399,15 +1399,19 @@ class AdminController
         try {
             $settingsModel = new \App\Models\Settings();
             $emailSettings = $settingsModel->getEmailSettings();
+            
             $emailService = new \App\Services\EmailService();
+            $configStatus = $emailService->getConfigStatus();
+            $notificationSettings = $emailService->getNotificationSettings();
             
             echo json_encode([
                 'success' => true,
-                'config' => $emailService->getConfigStatus(),
+                'config' => $configStatus,
                 'settings' => $emailSettings,
-                'notifications' => $emailService->getNotificationSettings(),
+                'notifications' => $notificationSettings,
             ]);
         } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_EMAIL_SETTINGS');
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }

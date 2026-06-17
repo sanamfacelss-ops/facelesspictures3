@@ -9,16 +9,16 @@ use App\Models\Settings;
 class EmailService
 {
     private string $provider = 'smtp'; // 'smtp' or 'resend'
-    private string $host;
-    private int $port;
-    private string $username;
-    private string $password;
-    private string $encryption;
-    private string $fromAddress;
-    private string $fromName;
+    private string $host = 'localhost';
+    private int $port = 587;
+    private string $username = '';
+    private string $password = '';
+    private string $encryption = 'tls';
+    private string $fromAddress = 'noreply@facelesspictures.com';
+    private string $fromName = 'Faceless Pictures 3';
     private string $resendApiKey = '';
     private string $resendFromAddress = '';
-    private string $resendFromName = '';
+    private string $resendFromName = 'Faceless Pictures 3';
     private ?EmailTemplateService $templateService = null;
     private array $notificationSettings = [];
     private string $lastError = '';
