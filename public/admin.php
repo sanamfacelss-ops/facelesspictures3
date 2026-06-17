@@ -3584,7 +3584,7 @@ if (file_exists($errorLogFile)) {
                 formData.append('smtp_from_name', this.smtp.from_name);
                 
                 try {
-                    const res = await fetch('/api/admin/email/settings', { method: 'POST', body: formData });
+                    const res = await fetch('/api/admin/email/settings/save', { method: 'POST', body: formData });
                     const data = await res.json();
                     this.smtpSuccess = data.success;
                     this.smtpMessage = data.success ? 'SMTP settings saved!' : (data.error || 'Failed to save');
@@ -3615,7 +3615,7 @@ if (file_exists($errorLogFile)) {
                 if (this.notifications.admin_flagged) formData.append('email_admin_flagged', '1');
                 
                 try {
-                    const res = await fetch('/api/admin/email/settings', { method: 'POST', body: formData });
+                    const res = await fetch('/api/admin/email/settings/save', { method: 'POST', body: formData });
                     const data = await res.json();
                     this.notifSuccess = data.success;
                     this.notifMessage = data.success ? 'Notification settings saved!' : (data.error || 'Failed to save');

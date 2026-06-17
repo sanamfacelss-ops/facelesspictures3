@@ -185,7 +185,7 @@ $routes = [
     // Email API
     'api/admin/email/test' => [AdminController::class, 'testEmail', 'POST'],
     'api/admin/email/settings' => [AdminController::class, 'getEmailSettings', 'GET'],
-    'api/admin/email/settings' => [AdminController::class, 'updateEmailSettings', 'POST'],
+    'api/admin/email/settings/save' => [AdminController::class, 'updateEmailSettings', 'POST'],
 ];
 
 $matched = false;
