@@ -22,8 +22,8 @@ class GoogleAuthService
     {
         $this->clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
         $this->clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? '';
-        $appUrl = rtrim(APP_URL ?? 'http://localhost', '/');
-        $this->redirectUri = $appUrl . '/api/auth/google/callback';
+        // Use dynamic base URL for redirect URI (works in both dev and production)
+        $this->redirectUri = get_base_url() . '/api/auth/google/callback';
     }
     
     /**

@@ -266,7 +266,10 @@ class AuthController
         $_SESSION['google_oauth_state'] = $state;
         
         $authUrl = $googleService->getAuthUrl($state);
-        redirect($authUrl);
+        
+        // Direct redirect to Google (not using our redirect() which prepends base URL)
+        header("Location: " . $authUrl);
+        exit;
     }
 
     /**
