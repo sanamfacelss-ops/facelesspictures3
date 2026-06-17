@@ -533,6 +533,11 @@ if (file_exists($errorLogFile)) {
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         </button>
                         <h1 class="font-display text-[20px] md:text-[24px] text-dark" x-text="tabTitles[activeTab]"></h1>
+                        <!-- Live refresh indicator -->
+                        <span class="hidden sm:inline-flex items-center gap-1.5 text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full" :class="{'opacity-50': isRefreshing}">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                            <span x-text="isRefreshing ? 'Refreshing...' : 'Live'"></span>
+                        </span>
                     </div>
                     <div class="flex items-center gap-2">
                         <?php if (isset($_GET['debug_updated'])): ?>
@@ -554,78 +559,72 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== OVERVIEW TAB ==================== -->
                 <div x-show="activeTab === 'overview'" x-cloak>
-                    <!-- Stat Cards - Mobile: 2 columns, Desktop: 4 columns -->
+                    <!-- Stat Cards - Mobile: 2 columns, Desktop: 4 columns (REACTIVE) -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
                         <div class="stat-card rounded-xl p-3 md:p-4">
                             <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">Total Users</p>
-                            <p class="font-display text-[24px] md:text-[32px] text-dark leading-none"><?= $totalUsers ?></p>
+                            <p class="font-display text-[24px] md:text-[32px] text-dark leading-none" x-text="users.length"></p>
                         </div>
                         <div class="stat-card rounded-xl p-3 md:p-4">
                             <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">Pending</p>
-                            <p class="font-display text-[24px] md:text-[32px] text-amber-600 leading-none"><?= $pendingCount ?></p>
+                            <p class="font-display text-[24px] md:text-[32px] text-amber-600 leading-none" x-text="videos.filter(v => v.status === 'pending').length"></p>
                         </div>
                         <div class="stat-card rounded-xl p-3 md:p-4">
                             <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">AI Flagged</p>
-                            <p class="font-display text-[24px] md:text-[32px] text-crimson leading-none"><?= $flaggedCount ?></p>
+                            <p class="font-display text-[24px] md:text-[32px] text-crimson leading-none" x-text="videos.filter(v => v.needs_manual_review == 1).length"></p>
                         </div>
                         <div class="stat-card rounded-xl p-3 md:p-4">
                             <p class="text-[10px] md:text-[11px] text-dark/40 uppercase tracking-wider mb-1">Active Season</p>
-                            <p class="font-display text-[14px] md:text-[18px] text-teal-600 leading-tight truncate"><?= $activeSeason ? e($activeSeason['title']) : 'None' ?></p>
+                            <p class="font-display text-[14px] md:text-[18px] text-teal-600 leading-tight truncate" x-text="activeSeason ? activeSeason.title : 'None'"></p>
                         </div>
                     </div>
 
-                    <!-- AI Flagged Videos - Mobile Card View -->
-                    <?php if (!empty($flagged)): ?>
+                    <!-- AI Flagged Videos - Reactive (LIVE UPDATES) -->
+                    <template x-if="videos.filter(v => v.needs_manual_review == 1).length > 0">
                     <div class="bg-white rounded-xl border border-dark/5 overflow-hidden mb-6">
                         <div class="px-4 md:px-5 py-3 md:py-4 border-b border-dark/5 bg-red-50/50">
                             <h2 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                 <span class="w-2 h-2 bg-crimson rounded-full animate-pulse"></span>
                                 <span class="hidden sm:inline">AI Flagged — Manual Review</span>
                                 <span class="sm:hidden">Flagged</span>
-                                <span class="bg-crimson text-white text-[10px] px-2 py-0.5 rounded-full"><?= count($flagged) ?></span>
+                                <span class="bg-crimson text-white text-[10px] px-2 py-0.5 rounded-full" x-text="videos.filter(v => v.needs_manual_review == 1).length"></span>
                             </h2>
                         </div>
                         
                         <!-- Mobile Card View -->
                         <div class="md:hidden p-3 space-y-3">
-                            <?php foreach ($flagged as $v): 
-                                $fb = is_string($v['ai_feedback'] ?? '') ? json_decode($v['ai_feedback'], true) : ($v['ai_feedback'] ?? []);
-                                $flags = $fb['flags'] ?? [];
-                            ?>
+                            <template x-for="v in videos.filter(v => v.needs_manual_review == 1)" :key="v.id">
                             <div class="bg-cream/30 rounded-xl p-4 border border-dark/5">
                                 <div class="flex items-start justify-between gap-3 mb-3">
                                     <div class="flex items-center gap-2 min-w-0">
                                         <div class="w-8 h-8 bg-crimson/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <span class="text-crimson font-semibold text-[10px]"><?= strtoupper(substr($v['user_name'], 0, 1)) ?></span>
+                                            <span class="text-crimson font-semibold text-[10px]" x-text="(v.user_name || 'U').charAt(0).toUpperCase()"></span>
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="font-medium text-dark text-[13px] truncate"><?= e($v['user_name']) ?></p>
-                                            <p class="text-[11px] text-dark/50 truncate"><?= e($v['title']) ?></p>
+                                            <p class="font-medium text-dark text-[13px] truncate" x-text="v.user_name"></p>
+                                            <p class="text-[11px] text-dark/50 truncate" x-text="v.title"></p>
                                         </div>
                                     </div>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 <?= ($v['ai_score'] ?? 0) >= 60 ? 'bg-green-100 text-green-700' : (($v['ai_score'] ?? 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') ?>">
-                                        <?= $v['ai_score'] !== null ? round($v['ai_score']) : 'N/A' ?>
-                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0" 
+                                          :class="(v.ai_score || 0) >= 60 ? 'bg-green-100 text-green-700' : ((v.ai_score || 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')"
+                                          x-text="v.ai_score !== null ? Math.round(v.ai_score) : 'N/A'"></span>
                                 </div>
                                 
-                                <?php if (!empty($flags)): ?>
+                                <template x-if="v.ai_feedback && (typeof v.ai_feedback === 'object' ? v.ai_feedback.flags : (JSON.parse(v.ai_feedback || '{}').flags || [])).length > 0">
                                 <div class="flex flex-wrap gap-1 mb-3">
-                                    <?php foreach (array_slice($flags, 0, 3) as $flag): ?>
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700"><?= e($flag) ?></span>
-                                    <?php endforeach; ?>
-                                    <?php if (count($flags) > 3): ?>
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-dark/10 text-dark/50">+<?= count($flags) - 3 ?></span>
-                                    <?php endif; ?>
+                                    <template x-for="flag in (typeof v.ai_feedback === 'object' ? v.ai_feedback.flags : (JSON.parse(v.ai_feedback || '{}').flags || [])).slice(0, 3)" :key="flag">
+                                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" x-text="flag"></span>
+                                    </template>
                                 </div>
-                                <?php endif; ?>
+                                </template>
                                 
                                 <div class="flex gap-2">
-                                    <button @click="openVideoDetail(<?= $v['id'] ?>, '<?= e(addslashes($v['title'])) ?>', '<?= e($v['file_path'] ?? '') ?>', <?= htmlspecialchars(json_encode($fb), ENT_QUOTES, 'UTF-8') ?>, <?= $v['ai_score'] !== null ? $v['ai_score'] : 'null' ?>)" class="flex-1 bg-dark/10 text-dark/60 px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-dark/20 transition text-center">Details</button>
-                                    <button @click="approveVideo(<?= $v['id'] ?>)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
-                                    <button @click="rejectVideo(<?= $v['id'] ?>)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback, v.ai_score)" class="flex-1 bg-dark/10 text-dark/60 px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-dark/20 transition text-center">Details</button>
+                                    <button @click="approveVideo(v.id)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
+                                    <button @click="rejectVideo(v.id)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
                                 </div>
                             </div>
-                            <?php endforeach; ?>
+                            </template>
                         </div>
                         
                         <!-- Desktop Table View -->
@@ -642,131 +641,127 @@ if (file_exists($errorLogFile)) {
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-dark/5">
-                                    <?php foreach ($flagged as $v): 
-                                        $fb = is_string($v['ai_feedback'] ?? '') ? json_decode($v['ai_feedback'], true) : ($v['ai_feedback'] ?? []);
-                                        $flags = $fb['flags'] ?? [];
-                                    ?>
+                                    <template x-for="v in videos.filter(v => v.needs_manual_review == 1)" :key="v.id">
                                     <tr class="hover:bg-cream/30 transition">
                                         <td class="px-5 py-3">
                                             <div class="flex items-center gap-2">
                                                 <div class="w-7 h-7 bg-crimson/10 rounded-full flex items-center justify-center">
-                                                    <span class="text-crimson font-semibold text-[10px]"><?= strtoupper(substr($v['user_name'], 0, 1)) ?></span>
+                                                    <span class="text-crimson font-semibold text-[10px]" x-text="(v.user_name || 'U').charAt(0).toUpperCase()"></span>
                                                 </div>
-                                                <span class="font-medium text-dark"><?= e($v['user_name']) ?></span>
+                                                <span class="font-medium text-dark" x-text="v.user_name"></span>
                                             </div>
                                         </td>
                                         <td class="px-5 py-3">
-                                            <span class="text-dark/70"><?= e($v['title']) ?></span>
-                                            <?php if (!empty($v['video_duration'])): ?>
-                                            <span class="text-[10px] text-dark/40 ml-1">(<?= gmdate('i:s', $v['video_duration']) ?>)</span>
-                                            <?php endif; ?>
+                                            <span class="text-dark/70" x-text="v.title"></span>
+                                            <template x-if="v.video_duration">
+                                                <span class="text-[10px] text-dark/40 ml-1" x-text="'(' + formatDuration(v.video_duration) + ')'"></span>
+                                            </template>
                                         </td>
                                         <td class="px-5 py-3">
-                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60"><?= e($v['content_type'] ?? $v['user_role'] ?? 'N/A') ?></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60" x-text="v.content_type || v.user_role || 'N/A'"></span>
                                         </td>
                                         <td class="px-5 py-3">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium <?= ($v['ai_score'] ?? 0) >= 60 ? 'bg-green-100 text-green-700' : (($v['ai_score'] ?? 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') ?>">
-                                                <?= $v['ai_score'] !== null ? round($v['ai_score']) : 'N/A' ?>
-                                            </span>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" 
+                                                  :class="(v.ai_score || 0) >= 60 ? 'bg-green-100 text-green-700' : ((v.ai_score || 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')"
+                                                  x-text="v.ai_score !== null ? Math.round(v.ai_score) : 'N/A'"></span>
                                         </td>
                                         <td class="px-5 py-3">
                                             <div class="flex flex-wrap gap-1 max-w-[200px]">
-                                                <?php if (!empty($flags)): foreach ($flags as $flag): ?>
-                                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700"><?= e($flag) ?></span>
-                                                <?php endforeach; else: ?>
-                                                <span class="text-[10px] text-dark/40"><?= e($fb['summary'] ?? 'Review required') ?></span>
-                                                <?php endif; ?>
+                                                <template x-if="v.ai_feedback && (typeof v.ai_feedback === 'object' ? v.ai_feedback.flags : (JSON.parse(v.ai_feedback || '{}').flags || [])).length > 0">
+                                                    <template x-for="flag in (typeof v.ai_feedback === 'object' ? v.ai_feedback.flags : (JSON.parse(v.ai_feedback || '{}').flags || []))" :key="flag">
+                                                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" x-text="flag"></span>
+                                                    </template>
+                                                </template>
+                                                <template x-if="!v.ai_feedback || (typeof v.ai_feedback === 'object' ? !v.ai_feedback.flags : !(JSON.parse(v.ai_feedback || '{}').flags || []).length)">
+                                                    <span class="text-[10px] text-dark/40" x-text="(typeof v.ai_feedback === 'object' ? v.ai_feedback?.summary : (JSON.parse(v.ai_feedback || '{}').summary)) || 'Review required'"></span>
+                                                </template>
                                             </div>
                                         </td>
                                         <td class="px-5 py-3">
                                             <div class="flex gap-2">
-                                                <button @click="openVideoDetail(<?= $v['id'] ?>, '<?= e(addslashes($v['title'])) ?>', '<?= e($v['file_path'] ?? '') ?>', <?= htmlspecialchars(json_encode($fb), ENT_QUOTES, 'UTF-8') ?>, <?= $v['ai_score'] !== null ? $v['ai_score'] : 'null' ?>)" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Details</button>
-                                                <button @click="approveVideo(<?= $v['id'] ?>)" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">✓</button>
-                                                <button @click="rejectVideo(<?= $v['id'] ?>)" class="bg-crimson text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-crimson/90 transition">✗</button>
+                                                <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback, v.ai_score)" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Details</button>
+                                                <button @click="approveVideo(v.id)" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">✓</button>
+                                                <button @click="rejectVideo(v.id)" class="bg-crimson text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-crimson/90 transition">✗</button>
                                             </div>
                                         </td>
                                     </tr>
-                                    <?php endforeach; ?>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <?php endif; ?>
+                    </template>
 
-                    <!-- Pending AI Processing -->
-                    <?php 
-                    $processingVideos = array_filter($allVideos, fn($v) => ($v['ai_status'] ?? '') === 'processing');
-                    if (!empty($processingVideos)): 
-                    ?>
+                    <!-- AI Processing - Reactive (LIVE UPDATES) -->
+                    <template x-if="videos.filter(v => (v.ai_status || '') === 'processing').length > 0">
                     <div class="bg-white rounded-xl border border-dark/5 overflow-hidden mb-6">
                         <div class="px-5 py-4 border-b border-dark/5 bg-blue-50/50">
                             <h2 class="font-semibold text-dark flex items-center gap-2">
                                 <svg class="w-4 h-4 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 AI Processing
-                                <span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full"><?= count($processingVideos) ?></span>
+                                <span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full" x-text="videos.filter(v => (v.ai_status || '') === 'processing').length"></span>
                             </h2>
                         </div>
                         <div class="p-4">
                             <div class="grid gap-2">
-                                <?php foreach (array_slice($processingVideos, 0, 5) as $v): ?>
+                                <template x-for="v in videos.filter(v => (v.ai_status || '') === 'processing').slice(0, 5)" :key="v.id">
                                 <div class="flex items-center justify-between p-3 bg-cream/50 rounded-lg">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                                             <svg class="w-4 h-4 text-blue-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                                         </div>
                                         <div>
-                                            <p class="text-[13px] font-medium text-dark"><?= e($v['title']) ?></p>
-                                            <p class="text-[11px] text-dark/40">by <?= e($v['user_name']) ?> • <?= e($v['content_type'] ?? 'video') ?></p>
+                                            <p class="text-[13px] font-medium text-dark" x-text="v.title"></p>
+                                            <p class="text-[11px] text-dark/40">by <span x-text="v.user_name"></span> • <span x-text="v.content_type || 'video'"></span></p>
                                         </div>
                                     </div>
                                     <span class="text-[10px] text-blue-600 font-medium">Analyzing...</span>
                                 </div>
-                                <?php endforeach; ?>
+                                </template>
                             </div>
                         </div>
                     </div>
-                    <?php endif; ?>
+                    </template>
 
-                    <!-- Pending Videos - Mobile Card View -->
+                    <!-- Pending Videos - Reactive (LIVE UPDATES) -->
                     <div class="bg-white rounded-xl border border-dark/5 overflow-hidden mb-6">
                         <div class="px-4 md:px-5 py-3 md:py-4 border-b border-dark/5 flex items-center justify-between">
                             <h2 class="font-semibold text-dark text-[14px] md:text-base">Pending Videos</h2>
-                            <span class="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-medium"><?= count($pending) ?></span>
+                            <span class="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-medium" x-text="videos.filter(v => v.status === 'pending').length"></span>
                         </div>
                         
                         <!-- Mobile Card View -->
                         <div class="md:hidden p-3 space-y-3">
-                            <?php if (empty($pending)): ?>
-                            <p class="text-center text-dark/30 py-8 text-[13px]">No pending videos</p>
-                            <?php else: foreach ($pending as $v): ?>
+                            <template x-if="videos.filter(v => v.status === 'pending').length === 0">
+                                <p class="text-center text-dark/30 py-8 text-[13px]">No pending videos</p>
+                            </template>
+                            <template x-for="v in videos.filter(v => v.status === 'pending')" :key="v.id">
                             <div class="bg-cream/30 rounded-xl p-4 border border-dark/5">
                                 <div class="flex items-start justify-between gap-3 mb-3">
                                     <div class="min-w-0">
-                                        <p class="font-medium text-dark text-[13px] truncate"><?= e($v['user_name']) ?></p>
-                                        <p class="text-[12px] text-dark/70 truncate"><?= e($v['title']) ?></p>
+                                        <p class="font-medium text-dark text-[13px] truncate" x-text="v.user_name"></p>
+                                        <p class="text-[12px] text-dark/70 truncate" x-text="v.title"></p>
                                         <div class="flex items-center gap-2 mt-1">
-                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60"><?= e($v['content_type'] ?? 'N/A') ?></span>
-                                            <?php 
-                                            $aiStatus = $v['ai_status'] ?? 'pending';
-                                            $aiStatusClass = match($aiStatus) {
-                                                'approved' => 'bg-green-100 text-green-700',
-                                                'processing' => 'bg-blue-100 text-blue-700',
-                                                'flagged' => 'bg-amber-100 text-amber-700',
-                                                'rejected' => 'bg-red-100 text-red-700',
-                                                default => 'bg-dark/5 text-dark/40'
-                                            };
-                                            ?>
-                                            <span class="text-[10px] px-2 py-0.5 rounded-full <?= $aiStatusClass ?>"><?= ucfirst($aiStatus) ?></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60" x-text="v.content_type || 'N/A'"></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full" 
+                                                  :class="{
+                                                      'bg-green-100 text-green-700': (v.ai_status || 'pending') === 'approved',
+                                                      'bg-blue-100 text-blue-700': (v.ai_status || 'pending') === 'processing',
+                                                      'bg-amber-100 text-amber-700': (v.ai_status || 'pending') === 'flagged',
+                                                      'bg-red-100 text-red-700': (v.ai_status || 'pending') === 'rejected',
+                                                      'bg-dark/5 text-dark/40': !['approved','processing','flagged','rejected'].includes(v.ai_status || 'pending')
+                                                  }"
+                                                  x-text="(v.ai_status || 'pending').charAt(0).toUpperCase() + (v.ai_status || 'pending').slice(1)"></span>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-[11px] text-dark/40 mb-3"><?= date('M j, g:i A', strtotime($v['created_at'])) ?></p>
+                                <p class="text-[11px] text-dark/40 mb-3" x-text="formatDate(v.created_at)"></p>
                                 <div class="flex gap-2">
-                                    <button @click="approveVideo(<?= $v['id'] ?>)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
-                                    <button @click="rejectVideo(<?= $v['id'] ?>)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                    <button @click="approveVideo(v.id)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
+                                    <button @click="rejectVideo(v.id)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
                                 </div>
                             </div>
-                            <?php endforeach; endif; ?>
+                            </template>
                         </div>
                         
                         <!-- Desktop Table View -->
@@ -783,37 +778,36 @@ if (file_exists($errorLogFile)) {
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-dark/5">
-                                    <?php if (empty($pending)): ?>
-                                    <tr><td colspan="6" class="px-5 py-10 text-center text-dark/30">No pending videos</td></tr>
-                                    <?php else: foreach ($pending as $v): ?>
+                                    <template x-if="videos.filter(v => v.status === 'pending').length === 0">
+                                        <tr><td colspan="6" class="px-5 py-10 text-center text-dark/30">No pending videos</td></tr>
+                                    </template>
+                                    <template x-for="v in videos.filter(v => v.status === 'pending')" :key="v.id">
                                     <tr class="hover:bg-cream/30 transition">
-                                        <td class="px-5 py-3 font-medium text-dark"><?= e($v['user_name']) ?></td>
-                                        <td class="px-5 py-3 text-dark/70"><?= e($v['title']) ?></td>
+                                        <td class="px-5 py-3 font-medium text-dark" x-text="v.user_name"></td>
+                                        <td class="px-5 py-3 text-dark/70" x-text="v.title"></td>
                                         <td class="px-5 py-3">
-                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60"><?= e($v['content_type'] ?? 'N/A') ?></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60" x-text="v.content_type || 'N/A'"></span>
                                         </td>
                                         <td class="px-5 py-3">
-                                            <?php 
-                                            $aiStatus = $v['ai_status'] ?? 'pending';
-                                            $aiStatusClass = match($aiStatus) {
-                                                'approved' => 'bg-green-100 text-green-700',
-                                                'processing' => 'bg-blue-100 text-blue-700',
-                                                'flagged' => 'bg-amber-100 text-amber-700',
-                                                'rejected' => 'bg-red-100 text-red-700',
-                                                default => 'bg-dark/5 text-dark/40'
-                                            };
-                                            ?>
-                                            <span class="text-[10px] px-2 py-0.5 rounded-full <?= $aiStatusClass ?>"><?= ucfirst($aiStatus) ?></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded-full" 
+                                                  :class="{
+                                                      'bg-green-100 text-green-700': (v.ai_status || 'pending') === 'approved',
+                                                      'bg-blue-100 text-blue-700': (v.ai_status || 'pending') === 'processing',
+                                                      'bg-amber-100 text-amber-700': (v.ai_status || 'pending') === 'flagged',
+                                                      'bg-red-100 text-red-700': (v.ai_status || 'pending') === 'rejected',
+                                                      'bg-dark/5 text-dark/40': !['approved','processing','flagged','rejected'].includes(v.ai_status || 'pending')
+                                                  }"
+                                                  x-text="(v.ai_status || 'pending').charAt(0).toUpperCase() + (v.ai_status || 'pending').slice(1)"></span>
                                         </td>
-                                        <td class="px-5 py-3 text-dark/40"><?= date('M j, g:i A', strtotime($v['created_at'])) ?></td>
+                                        <td class="px-5 py-3 text-dark/40" x-text="formatDate(v.created_at)"></td>
                                         <td class="px-5 py-3">
                                             <div class="flex gap-2">
-                                                <button @click="approveVideo(<?= $v['id'] ?>)" class="bg-green-600 text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
-                                                <button @click="rejectVideo(<?= $v['id'] ?>)" class="bg-crimson text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
+                                                <button @click="approveVideo(v.id)" class="bg-green-600 text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-green-700 transition">Approve</button>
+                                                <button @click="rejectVideo(v.id)" class="bg-crimson text-white px-3 py-1 rounded-lg text-[11px] font-medium hover:bg-crimson/90 transition">Reject</button>
                                             </div>
                                         </td>
                                     </tr>
-                                    <?php endforeach; endif; ?>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
@@ -870,14 +864,22 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== VIDEOS TAB ==================== -->
-                <div x-show="activeTab === 'videos'" x-cloak>
+                <div x-show="activeTab === 'videos'" x-cloak x-init="silentRefreshVideos()">
                     <!-- Filters -->
-                    <div class="flex flex-wrap gap-2 mb-4">
+                    <div class="flex flex-wrap gap-2 mb-4 items-center">
                         <button @click="videoFilter = 'all'" :class="videoFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">All</button>
                         <button @click="videoFilter = 'pending'" :class="videoFilter === 'pending' ? 'bg-amber-500 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Pending</button>
                         <button @click="videoFilter = 'approved'" :class="videoFilter === 'approved' ? 'bg-green-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Approved</button>
                         <button @click="videoFilter = 'rejected'" :class="videoFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Rejected</button>
                         <button @click="videoFilter = 'flagged'" :class="videoFilter === 'flagged' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition hidden sm:block">Flagged</button>
+                        
+                        <!-- Manual Refresh Button -->
+                        <button @click="silentRefreshVideos()" class="text-dark/40 hover:text-dark p-1.5 rounded-lg hover:bg-white transition" title="Refresh">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </button>
+                        
+                        <!-- Auto-refresh indicator -->
+                        <span class="text-[10px] text-dark/30 hidden sm:inline">Auto-refresh: 10s</span>
                         
                         <!-- Bulk Delete Button -->
                         <template x-if="selectedVideos.length > 0">
@@ -3043,6 +3045,7 @@ if (file_exists($errorLogFile)) {
             users: <?= json_encode($allUsers) ?>,
             seasons: <?= json_encode($allSeasons) ?>,
             scripts: <?= json_encode($allScripts) ?>,
+            activeSeason: <?= json_encode($activeSeason) ?>,
             
             // AI Settings
             aiSettings: <?= json_encode($aiSettings) ?>,
@@ -3138,6 +3141,7 @@ if (file_exists($errorLogFile)) {
             
             // Auto-refresh interval
             refreshInterval: null,
+            isRefreshing: false,
             
             // Toast
             toastShow: false,
@@ -3154,23 +3158,70 @@ if (file_exists($errorLogFile)) {
                 // Load YouTube status
                 this.loadYouTubeStatus();
                 
-                // Start auto-refresh every 30 seconds (for AI processing status)
+                // Initial refresh
+                this.silentRefreshVideos();
+                
+                // Start auto-refresh every 10 seconds - runs on ALL tabs
                 this.refreshInterval = setInterval(() => {
                     this.silentRefreshVideos();
-                }, 30000);
+                }, 10000);
+                
+                console.log('Admin dashboard initialized with global auto-refresh (10s)');
             },
             
-            // Silent refresh videos without UI reload
+            // Silent refresh videos without UI reload - runs globally
             async silentRefreshVideos() {
+                this.isRefreshing = true;
                 try {
                     const res = await fetch('/api/admin/videos/refresh');
                     const data = await res.json();
                     if (data.success) {
-                        this.videos = data.videos;
+                        // Check if any video status changed (for showing toast)
+                        const oldVideos = new Map(this.videos.map(v => [v.id, v.ai_status]));
+                        const oldCount = this.videos.length;
+                        
+                        // Update videos array
+                        this.videos = data.videos.map(v => {
+                            // Parse ai_feedback if it's a string
+                            if (v.ai_feedback && typeof v.ai_feedback === 'string') {
+                                try { v.ai_feedback = JSON.parse(v.ai_feedback); } catch(e) {}
+                            }
+                            return v;
+                        });
+                        
+                        // Check for new videos
+                        if (this.videos.length > oldCount) {
+                            const newCount = this.videos.length - oldCount;
+                            this.showToast(`${newCount} new video${newCount > 1 ? 's' : ''} submitted!`, 'success');
+                        }
+                        
+                        // Check for status changes and notify
+                        let statusChanged = false;
+                        for (const video of this.videos) {
+                            const oldStatus = oldVideos.get(video.id);
+                            if (oldStatus && oldStatus !== video.ai_status) {
+                                statusChanged = true;
+                                if (video.ai_status === 'approved') {
+                                    this.showToast(`"${video.title}" - AI Approved! Score: ${video.ai_score}`, 'success');
+                                } else if (video.ai_status === 'rejected') {
+                                    this.showToast(`"${video.title}" - AI Rejected`, 'error');
+                                } else if (video.ai_status === 'flagged') {
+                                    this.showToast(`"${video.title}" - Flagged for review`, 'error');
+                                }
+                            }
+                        }
+                        
                         this.youtubeAutoPublish = data.youtube_auto_publish === '1';
+                        
+                        // Also refresh publish queue if status changed
+                        if (statusChanged) {
+                            this.loadYouTubeStatus();
+                        }
                     }
                 } catch (e) {
-                    console.log('Silent refresh failed');
+                    // Silent fail - don't spam console
+                } finally {
+                    this.isRefreshing = false;
                 }
             },
             
@@ -3292,6 +3343,27 @@ if (file_exists($errorLogFile)) {
                 this.toastType = type;
                 this.toastShow = true;
                 setTimeout(() => { this.toastShow = false; }, 3000);
+            },
+            
+            // Format date helper for reactive templates
+            formatDate(dateStr) {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                let hours = d.getHours();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                const mins = d.getMinutes().toString().padStart(2, '0');
+                return `${months[d.getMonth()]} ${d.getDate()}, ${hours}:${mins} ${ampm}`;
+            },
+            
+            // Format duration helper (seconds to mm:ss)
+            formatDuration(seconds) {
+                if (!seconds) return '';
+                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                return `${mins}:${secs}`;
             },
             
             // Open delete modal
