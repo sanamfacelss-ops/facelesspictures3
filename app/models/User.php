@@ -45,32 +45,61 @@ class User
     public function create(array $data): int
     {
         $hasGoogleId = isset($data['google_id']) && !empty($data['google_id']);
-        
-        if ($hasGoogleId) {
-            $stmt = $this->db->prepare(
-                "INSERT INTO users (name, email, password, role, content_categories, google_id) VALUES (?, ?, ?, ?, ?, ?)"
-            );
-            $stmt->execute([
-                $data['name'],
-                $data['email'],
-                password_hash($data['password'], PASSWORD_BCRYPT),
-                $data['role'],
-                json_encode($data['content_categories'] ?? [$data['role']]),
-                $data['google_id'],
-            ]);
-        } else {
-            $stmt = $this->db->prepare(
-                "INSERT INTO users (name, email, password, role, content_categories) VALUES (?, ?, ?, ?, ?)"
-            );
-            $stmt->execute([
-                $data['name'],
-                $data['email'],
-                password_hash($data['password'], PASSWORD_BCRYPT),
-                $data['role'],
-                json_encode($data['content_categories'] ?? [$data['role']]),
-            ]);
+        $hasContentCategories = $this->columnExists('content_categories');
+        $hasGoogleIdColumn = $this->columnExists('google_id');
+
+        $columns = ['name', 'email', 'password', 'role'];
+        $values = [
+            $data['name'],
+            $data['email'],
+            password_hash($data['password'], PASSWORD_BCRYPT),
+            $data['role'],
+        ];
+
+        if ($hasContentCategories) {
+            $columns[] = 'content_categories';
+            $values[] = json_encode($data['content_categories'] ?? [$data['role']]);
         }
-        return (int) $this->db->lastInsertId();
+
+        if ($hasGoogleId && $hasGoogleIdColumn) {
+            $columns[] = 'google_id';
+            $values[] = $data['google_id'];
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+        $colList = implode(', ', $columns);
+
+        $stmt = $this->db->prepare("INSERT INTO users ($colList) VALUES ($placeholders)");
+        $stmt->execute($values);
+
+        $userId = (int) $this->db->lastInsertId();
+
+        // If google_id column exists but wasn't in the INSERT (e.g., column added later), update now
+        if ($hasGoogleId && $hasGoogleIdColumn && !in_array('google_id', $columns)) {
+            $this->updateGoogleId($userId, $data['google_id']);
+        }
+
+        return $userId;
+    }
+
+    /**
+     * Check if a column exists in the users table (cached per request)
+     */
+    private array $columnCache = [];
+
+    private function columnExists(string $column): bool
+    {
+        if (isset($this->columnCache[$column])) {
+            return $this->columnCache[$column];
+        }
+        try {
+            $stmt = $this->db->prepare("SHOW COLUMNS FROM users LIKE ?");
+            $stmt->execute([$column]);
+            $this->columnCache[$column] = (bool) $stmt->fetch();
+        } catch (\Exception $e) {
+            $this->columnCache[$column] = false;
+        }
+        return $this->columnCache[$column];
     }
 
     /**

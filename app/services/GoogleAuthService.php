@@ -276,7 +276,12 @@ class GoogleAuthService
             
         } catch (\Exception $e) {
             debug_log("Google signup failed: " . $e->getMessage(), 'GOOGLE_AUTH');
-            return ['success' => false, 'error' => 'Failed to create account'];
+            debug_log("Google signup stack trace: " . $e->getTraceAsString(), 'GOOGLE_AUTH');
+            $errorMsg = 'Failed to create account';
+            if (defined('FP3_DEBUG') && FP3_DEBUG) {
+                $errorMsg .= ': ' . $e->getMessage();
+            }
+            return ['success' => false, 'error' => $errorMsg];
         }
     }
 }
