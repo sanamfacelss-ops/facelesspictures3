@@ -2945,9 +2945,12 @@ if (file_exists($errorLogFile)) {
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <?php
                                     $posterSlots = [
-                                        ['Poster 1', 'landing_poster_url', 'landing_poster_title', 'landing_trailer_url'],
+                                        ['Poster 1', 'landing_poster_url',  'landing_poster_title',  'landing_trailer_url'],
                                         ['Poster 2', 'landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url'],
                                         ['Poster 3', 'landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url'],
+                                        ['Poster 4', 'landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url'],
+                                        ['Poster 5', 'landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url'],
+                                        ['Poster 6', 'landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url'],
                                     ];
                                     foreach ($posterSlots as $p):
                                     $currentUrl = $settingsModel->get($p[1], '');
@@ -4984,6 +4987,15 @@ if (file_exists($errorLogFile)) {
                 landing_poster3_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_url',''))) ?>',
                 landing_poster3_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_title',''))) ?>',
                 landing_trailer3_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer3_url',''))) ?>',
+                landing_poster4_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster4_url',''))) ?>',
+                landing_poster4_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster4_title',''))) ?>',
+                landing_trailer4_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer4_url',''))) ?>',
+                landing_poster5_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_url',''))) ?>',
+                landing_poster5_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_title',''))) ?>',
+                landing_trailer5_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer5_url',''))) ?>',
+                landing_poster6_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_url',''))) ?>',
+                landing_poster6_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_title',''))) ?>',
+                landing_trailer6_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer6_url',''))) ?>',
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
             },
             init() {

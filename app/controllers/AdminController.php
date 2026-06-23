@@ -1766,6 +1766,7 @@ class AdminController
         $allowedFields = [
             'site_logo_url',
             'landing_poster_url', 'landing_poster2_url', 'landing_poster3_url',
+            'landing_poster4_url', 'landing_poster5_url', 'landing_poster6_url',
         ];
         if (!in_array($field, $allowedFields)) {
             http_response_code(422);
@@ -1847,6 +1848,9 @@ class AdminController
             'landing_poster_url',   'landing_poster_title',  'landing_trailer_url',
             'landing_poster2_url',  'landing_poster2_title', 'landing_trailer2_url',
             'landing_poster3_url',  'landing_poster3_title', 'landing_trailer3_url',
+            'landing_poster4_url',  'landing_poster4_title', 'landing_trailer4_url',
+            'landing_poster5_url',  'landing_poster5_title', 'landing_trailer5_url',
+            'landing_poster6_url',  'landing_poster6_title', 'landing_trailer6_url',
             'landing_about_text',
             'actor_dialog_script', 'actor_song_script',
             'director_brief', 'writer_brief',

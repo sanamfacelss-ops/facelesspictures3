@@ -2,30 +2,31 @@
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
 
-$trailerUrl  = $settingsModel->get('landing_trailer_url', '');
-$aboutText   = $settingsModel->get('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
-$logoUrl     = $settingsModel->get('site_logo_url', '');
-$siteTagline = $settingsModel->get('site_tagline', "India's first anonymous film competition — no face, no connections, just raw talent.");
+$aboutText    = $settingsModel->get('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
+$logoUrl      = $settingsModel->get('site_logo_url', '');
+$siteTagline  = $settingsModel->get('site_tagline', "India's first anonymous film competition — no face, no connections, just raw talent.");
 $heroHeadline = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
 
-// Up to 3 poster slots — admin sets these in Settings tab
-$posters = [
-    [
-        'url'   => $settingsModel->get('landing_poster_url',   ''),
-        'title' => $settingsModel->get('landing_poster_title', 'Faceless Pictures 3'),
-        'trailer' => $settingsModel->get('landing_trailer_url', ''),
-    ],
-    [
-        'url'   => $settingsModel->get('landing_poster2_url',   ''),
-        'title' => $settingsModel->get('landing_poster2_title', ''),
-        'trailer' => $settingsModel->get('landing_trailer2_url', ''),
-    ],
-    [
-        'url'   => $settingsModel->get('landing_poster3_url',   ''),
-        'title' => $settingsModel->get('landing_poster3_title', ''),
-        'trailer' => $settingsModel->get('landing_trailer3_url', ''),
-    ],
+// Up to 6 poster slots
+$posterKeys = [
+    ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url'],
+    ['landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url'],
+    ['landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url'],
+    ['landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url'],
+    ['landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url'],
+    ['landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url'],
 ];
+$posters = [];
+foreach ($posterKeys as $i => $keys) {
+    $url     = $settingsModel->get($keys[0], '');
+    $title   = $settingsModel->get($keys[1], $i === 0 ? 'Faceless Pictures 3' : '');
+    $trailer = $settingsModel->get($keys[2], '');
+    // Only include if image is set, or it's the first slot (always show as placeholder)
+    if ($url || $i === 0) {
+        $posters[] = ['url' => $url, 'title' => $title, 'trailer' => $trailer, 'idx' => $i];
+    }
+}
+$posterCount = count($posters);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,23 +85,81 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 .marquee-track{animation:marquee 40s linear infinite;display:flex;white-space:nowrap}
 .marquee-wrap:hover .marquee-track{animation-play-state:paused}
 
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.87);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem}
-.modal-box{width:100%;max-width:880px;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6);position:relative}
-.modal-box iframe,.modal-box video{width:100%;height:100%;border:none}
-.modal-close-btn{position:absolute;top:-.75rem;right:-.75rem;width:36px;height:36px;background:#fff;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.2);transition:background .2s}
-.modal-close-btn:hover{background:#f3f4f6}
+/* MODAL BACKDROP */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+
+/* VIDEO PLAYER WRAPPER */
+.vp-wrap{position:relative;width:100%;max-width:960px;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.8);user-select:none}
+.vp-wrap video{display:block;width:100%;max-height:80vh;background:#000}
+
+/* CLOSE BUTTON */
+.vp-close{position:absolute;top:.75rem;right:.75rem;width:36px;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;z-index:10;transition:background .2s;backdrop-filter:blur(4px)}
+.vp-close:hover{background:rgba(255,255,255,.22)}
+.vp-close svg{width:16px;height:16px;flex-shrink:0}
+
+/* CONTROLS BAR */
+.vp-controls{position:absolute;bottom:0;left:0;right:0;padding:.75rem 1rem 1rem;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 100%);display:flex;flex-direction:column;gap:.5rem;opacity:0;transition:opacity .25s}
+.vp-wrap:hover .vp-controls,.vp-wrap.paused .vp-controls{opacity:1}
+
+/* PROGRESS SCRUBBER */
+.vp-progress{position:relative;height:4px;background:rgba(255,255,255,.2);border-radius:2px;cursor:pointer;flex:1}
+.vp-progress:hover{height:6px;margin-top:-1px}
+.vp-buf{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.25);border-radius:2px;pointer-events:none}
+.vp-played{position:absolute;top:0;left:0;height:100%;background:#fff;border-radius:2px;pointer-events:none}
+.vp-thumb{position:absolute;top:50%;right:-6px;transform:translateY(-50%);width:12px;height:12px;background:#fff;border-radius:50%;box-shadow:0 0 4px rgba(0,0,0,.4);pointer-events:none;opacity:0;transition:opacity .15s}
+.vp-progress:hover .vp-thumb{opacity:1}
+.vp-tooltip{position:absolute;bottom:calc(100% + 8px);background:rgba(0,0,0,.8);color:#fff;font-size:.68rem;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;transform:translateX(-50%);display:none}
+.vp-progress:hover .vp-tooltip{display:block}
+
+/* BOTTOM ROW */
+.vp-row{display:flex;align-items:center;gap:.625rem}
+.vp-btn{background:none;border:none;cursor:pointer;color:#fff;opacity:.85;padding:4px;display:flex;align-items:center;justify-content:center;transition:opacity .15s;flex-shrink:0}
+.vp-btn:hover{opacity:1}
+.vp-btn svg{width:20px;height:20px}
+
+/* VOLUME */
+.vp-vol-wrap{display:flex;align-items:center;gap:.375rem}
+.vp-vol-slider{-webkit-appearance:none;appearance:none;height:3px;width:64px;background:rgba(255,255,255,.25);border-radius:2px;cursor:pointer;outline:none}
+.vp-vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;cursor:pointer}
+.vp-vol-slider::-moz-range-thumb{width:12px;height:12px;border:none;border-radius:50%;background:#fff;cursor:pointer}
+
+/* TIME */
+.vp-time{font-size:.72rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:.25rem}
+
+/* TITLE */
+.vp-title{position:absolute;top:0;left:0;right:0;padding:.875rem 1rem;background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);color:#fff;font-size:.8rem;font-weight:600;letter-spacing:.04em;opacity:0;transition:opacity .25s;pointer-events:none}
+.vp-wrap:hover .vp-title{opacity:1}
+
+/* BIG PLAY (centre) */
+.vp-bigplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.vp-bigplay-btn{width:72px;height:72px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:transform .2s,background .2s;transform:scale(0);opacity:0}
+.vp-wrap.paused .vp-bigplay-btn{transform:scale(1);opacity:1}
+.vp-bigplay-btn svg{width:28px;height:28px;color:#fff;margin-left:4px}
+
+/* FULLSCREEN icon swap */
+.icon-fs-enter{display:block}
+.icon-fs-exit{display:none}
+.vp-wrap.fullscreen .icon-fs-enter{display:none}
+.vp-wrap.fullscreen .icon-fs-exit{display:block}
+
+/* POSTER ROW SLIDER */
+.poster-slider{position:relative}
+.poster-track{display:flex;gap:1rem;transition:transform .4s cubic-bezier(.25,.46,.45,.94)}
+.slider-btn{position:absolute;top:50%;transform:translateY(-60%);width:36px;height:36px;background:#fff;border:1px solid #e5e7eb;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,.12);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:box-shadow .2s,background .2s}
+.slider-btn:hover{background:#f9fafb;box-shadow:0 4px 16px rgba(0,0,0,.16)}
+.slider-btn svg{width:16px;height:16px;color:#374151}
+.slider-btn.prev{left:-18px}
+.slider-btn.next{right:-18px}
+.slider-dots{display:flex;justify-content:center;gap:.4rem;margin-top:.75rem}
+.slider-dot{width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s,width .2s;cursor:pointer}
+.slider-dot.active{background:#111;width:16px;border-radius:3px}
 
 /* FOOTER */
 .fp-footer{background:#111;color:#fff;padding:2.5rem 1rem}
 </style>
 </head>
 
-<body x-data="{
-    activeTrailer: '',
-    openTrailer(url){ if(url){ this.activeTrailer=url } },
-    closeTrailer(){ this.activeTrailer='' }
-}" @keydown.escape.window="closeTrailer()">
+<body x-data="homePage()" @keydown.escape.window="closePlayer()" x-init="init()">
 
 <!-- ── NAV ── -->
 <nav class="fp-nav">
@@ -141,34 +200,37 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
     <p class="section-label">Now Showing — Auditions Open</p>
-    <div class="grid grid-cols-3 gap-4 sm:gap-6 mb-14">
 
-      <?php foreach ($posters as $idx => $poster): ?>
-      <div>
+    <?php if ($posterCount <= 3): ?>
+    <!-- 3 or fewer: simple grid -->
+    <div style="display:grid;grid-template-columns:repeat(<?= $posterCount ?>,1fr);gap:1rem 1.25rem;margin-bottom:3.5rem">
+    <?php else: ?>
+    <!-- 4+ on desktop: slider -->
+    <div class="poster-slider" style="margin-bottom:3.5rem;overflow:hidden;padding:0 4px" x-data="posterSlider(<?= $posterCount ?>)">
+      <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div style="overflow:hidden">
+        <div class="poster-track" :style="'transform:translateX(-'+offset+'px)'">
+    <?php endif; ?>
+
+      <?php foreach ($posters as $p):
+        $hasTrailer = !empty($p['trailer']);
+      ?>
+      <div style="flex-shrink:0;width:<?= $posterCount > 3 ? 'calc((100% / 3.2))' : 'auto' ?>">
         <div class="poster-card"
-          <?php if ($poster['trailer']): ?>
-            @click="openTrailer('<?= addslashes(htmlspecialchars($poster['trailer'])) ?>')"
-            style="cursor:pointer"
-          <?php else: ?>
-            style="cursor:default"
-          <?php endif; ?>>
+          <?= $hasTrailer ? 'style="cursor:pointer" @click="openPlayer(\'' . addslashes(htmlspecialchars($p['trailer'])) . '\',\'' . addslashes(htmlspecialchars($p['title'])) . '\')"' : 'style="cursor:default"' ?>>
 
-          <?php if ($poster['url']): ?>
-            <img src="<?= htmlspecialchars($poster['url']) ?>"
-                 alt="<?= htmlspecialchars($poster['title'] ?: 'Film Poster') ?>">
+          <?php if ($p['url']): ?>
+            <img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy">
           <?php else: ?>
             <div class="poster-empty">
-              <svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-              </svg>
-              <span style="font-size:.68rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">
-                <?= $idx === 0 ? 'Set poster in Admin' : 'Poster ' . ($idx+1) ?>
-              </span>
+              <svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span>
             </div>
           <?php endif; ?>
 
-          <!-- Play overlay — only if trailer set -->
-          <?php if ($poster['trailer']): ?>
+          <?php if ($hasTrailer): ?>
           <div class="play-overlay">
             <div class="play-circle">
               <svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -176,20 +238,32 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
           </div>
           <?php endif; ?>
 
-          <?php if ($poster['title']): ?>
-          <div class="poster-title-bar"><?= htmlspecialchars($poster['title']) ?></div>
+          <?php if ($p['title']): ?>
+          <div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div>
           <?php endif; ?>
         </div>
-
-        <!-- Audition CTA below poster -->
-        <a href="/actor" class="btn-black mt-3">
+        <a href="/actor" class="btn-black" style="margin-top:.625rem">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           Audition for this film
         </a>
       </div>
       <?php endforeach; ?>
 
+    <?php if ($posterCount <= 3): ?>
     </div>
+    <?php else: ?>
+        </div><!-- /poster-track -->
+      </div>
+      <button class="slider-btn next" @click="next()" x-show="canNext" x-cloak aria-label="Next">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <div class="slider-dots">
+        <template x-for="i in pages" :key="i">
+          <div class="slider-dot" :class="i===currentPage?'active':''" @click="goTo(i)"></div>
+        </template>
+      </div>
+    </div><!-- /poster-slider -->
+    <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
     <p class="section-label">Choose Your Role</p>
@@ -281,25 +355,313 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   </div>
 </footer>
 
-<!-- ── TRAILER MODAL ── -->
-<div x-show="activeTrailer" x-cloak class="modal-bg"
-  @click.self="closeTrailer()"
+<!-- ══ CUSTOM VIDEO PLAYER MODAL ══ -->
+<div x-show="playerOpen" x-cloak class="modal-bg"
+  @click.self="closePlayer()"
   x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
   x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-  <div style="position:relative;width:100%;max-width:880px">
-    <button class="modal-close-btn" @click="closeTrailer()">✕</button>
-    <div class="modal-box">
-      <template x-if="activeTrailer">
-        <template x-if="activeTrailer.includes('youtube.com') || activeTrailer.includes('youtu.be')">
-          <iframe :src="activeTrailer + '?autoplay=1'" allow="autoplay;encrypted-media" allowfullscreen></iframe>
-        </template>
-      </template>
-      <template x-if="activeTrailer && !activeTrailer.includes('youtube.com') && !activeTrailer.includes('youtu.be')">
-        <video :src="activeTrailer" controls autoplay></video>
-      </template>
+
+  <div class="vp-wrap" :class="{paused: !playing, fullscreen: isFullscreen}" x-ref="vpWrap"
+    @mousemove="showControls()" @mouseleave="scheduleHide()">
+
+    <!-- Title bar -->
+    <div class="vp-title" x-text="playerTitle"></div>
+
+    <!-- Close button -->
+    <button class="vp-close" @click="closePlayer()" aria-label="Close">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+
+    <!-- Video element -->
+    <video x-ref="video" @timeupdate="onTimeUpdate()" @loadedmetadata="onMeta()"
+      @ended="playing=false" @waiting="buffering=true" @playing="buffering=false"
+      @progress="onProgress()" @click="togglePlay()"
+      preload="metadata" playsinline
+      style="display:block;width:100%;max-height:80vh;background:#000;cursor:pointer">
+    </video>
+
+    <!-- Big centre play/pause indicator -->
+    <div class="vp-bigplay">
+      <div class="vp-bigplay-btn">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
     </div>
-  </div>
-</div>
+
+    <!-- Buffering spinner -->
+    <div x-show="buffering" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+      <svg class="animate-spin" width="40" height="40" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="3"></circle>
+        <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+    </div>
+
+    <!-- Controls -->
+    <div class="vp-controls" x-ref="controls">
+
+      <!-- Scrubber -->
+      <div class="vp-progress" x-ref="progress"
+        @click="seek($event)"
+        @mousemove="hoverScrub($event)"
+        @mouseleave="hoverTime=''">
+        <div class="vp-buf" :style="'width:'+buffered+'%'"></div>
+        <div class="vp-played" :style="'width:'+pct+'%'">
+          <div class="vp-thumb"></div>
+        </div>
+        <div class="vp-tooltip" :style="'left:'+hoverPct+'%'" x-text="hoverTime"></div>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="vp-row">
+
+        <!-- Play/Pause -->
+        <button class="vp-btn" @click="togglePlay()" :aria-label="playing?'Pause':'Play'">
+          <template x-if="!playing">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </template>
+          <template x-if="playing">
+            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </template>
+        </button>
+
+        <!-- Rewind 10s -->
+        <button class="vp-btn" @click="skip(-10)" aria-label="Rewind 10s">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m0-8A9 9 0 1 0 6.168 6.168"/>
+            <text x="8.5" y="15" font-size="5" fill="currentColor" stroke="none" font-family="sans-serif" font-weight="700">10</text>
+          </svg>
+        </button>
+
+        <!-- Skip 10s -->
+        <button class="vp-btn" @click="skip(10)" aria-label="Skip 10s">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l-4 2m0-8A9 9 0 1 1 17.832 6.168"/>
+            <text x="8.5" y="15" font-size="5" fill="currentColor" stroke="none" font-family="sans-serif" font-weight="700">10</text>
+          </svg>
+        </button>
+
+        <!-- Time -->
+        <span class="vp-time" x-text="currentTime+' / '+duration"></span>
+
+        <!-- Spacer -->
+        <div style="flex:1"></div>
+
+        <!-- Volume -->
+        <div class="vp-vol-wrap">
+          <button class="vp-btn" @click="toggleMute()" :aria-label="muted?'Unmute':'Mute'">
+            <template x-if="muted || volume===0">
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            </template>
+            <template x-if="!muted && volume > 0">
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            </template>
+          </button>
+          <input type="range" class="vp-vol-slider" min="0" max="1" step="0.05"
+            :value="muted ? 0 : volume"
+            @input="setVolume($event.target.value)"
+            aria-label="Volume">
+        </div>
+
+        <!-- Playback speed -->
+        <div style="position:relative" x-data="{speedOpen:false}">
+          <button class="vp-btn" @click="speedOpen=!speedOpen" style="font-size:.72rem;font-weight:700;width:auto;padding:4px 6px;letter-spacing:.02em" x-text="speed+'x'"></button>
+          <div x-show="speedOpen" x-cloak @click.away="speedOpen=false"
+            style="position:absolute;bottom:calc(100% + 8px);right:0;background:#1a1a1a;border:1px solid rgba(255,255,255,.12);border-radius:8px;overflow:hidden;min-width:72px">
+            <?php foreach ([0.5, 0.75, 1, 1.25, 1.5, 2] as $s): ?>
+            <button @click="setSpeed(<?= $s ?>);speedOpen=false"
+              :class="speed===<?= $s ?>?'bg-white/20':'hover:bg-white/10'"
+              style="display:block;width:100%;text-align:center;padding:.375rem .75rem;color:#fff;font-size:.75rem;font-weight:600;border:none;cursor:pointer;transition:background .15s">
+              <?= $s ?>x
+            </button>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+        <!-- Fullscreen -->
+        <button class="vp-btn" @click="toggleFullscreen()" aria-label="Fullscreen">
+          <svg class="icon-fs-enter" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          <svg class="icon-fs-exit" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+        </button>
+
+      </div><!-- /vp-row -->
+    </div><!-- /vp-controls -->
+  </div><!-- /vp-wrap -->
+</div><!-- /modal-bg -->
+
+<script>
+function homePage() {
+    return {
+        // Player state
+        playerOpen:  false,
+        playerSrc:   '',
+        playerTitle: '',
+        playing:     false,
+        buffering:   false,
+        pct:         0,
+        buffered:    0,
+        currentTime: '0:00',
+        duration:    '0:00',
+        volume:      1,
+        muted:       false,
+        speed:       1,
+        isFullscreen:false,
+        hoverPct:    0,
+        hoverTime:   '',
+        _hideTimer:  null,
+
+        init() {
+            document.addEventListener('fullscreenchange', () => {
+                this.isFullscreen = !!document.fullscreenElement;
+            });
+        },
+
+        openPlayer(src, title) {
+            if (!src) return;
+            this.playerSrc   = src;
+            this.playerTitle = title || '';
+            this.playerOpen  = true;
+            this.$nextTick(() => {
+                const v = this.$refs.video;
+                v.src     = src;
+                v.volume  = this.volume;
+                v.muted   = this.muted;
+                v.playbackRate = this.speed;
+                v.play().catch(() => {});
+                this.playing = true;
+            });
+        },
+
+        closePlayer() {
+            const v = this.$refs.video;
+            if (v) { v.pause(); v.src = ''; }
+            this.playerOpen  = false;
+            this.playing     = false;
+            this.pct         = 0;
+            this.buffered    = 0;
+            this.currentTime = '0:00';
+            this.duration    = '0:00';
+            if (this.isFullscreen) document.exitFullscreen?.();
+        },
+
+        togglePlay() {
+            const v = this.$refs.video;
+            if (!v) return;
+            if (v.paused) { v.play(); this.playing = true; }
+            else          { v.pause(); this.playing = false; }
+        },
+
+        onTimeUpdate() {
+            const v = this.$refs.video;
+            if (!v || !v.duration) return;
+            this.pct         = (v.currentTime / v.duration) * 100;
+            this.currentTime = this.fmt(v.currentTime);
+        },
+
+        onMeta() {
+            const v = this.$refs.video;
+            this.duration = this.fmt(v.duration);
+        },
+
+        onProgress() {
+            const v = this.$refs.video;
+            if (!v.buffered.length || !v.duration) return;
+            this.buffered = (v.buffered.end(v.buffered.length - 1) / v.duration) * 100;
+        },
+
+        seek(e) {
+            const v = this.$refs.video;
+            const r = this.$refs.progress.getBoundingClientRect();
+            const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+            v.currentTime = p * v.duration;
+        },
+
+        hoverScrub(e) {
+            const v = this.$refs.video;
+            if (!v?.duration) return;
+            const r = this.$refs.progress.getBoundingClientRect();
+            const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+            this.hoverPct  = p * 100;
+            this.hoverTime = this.fmt(p * v.duration);
+        },
+
+        skip(s) {
+            const v = this.$refs.video;
+            if (!v) return;
+            v.currentTime = Math.max(0, Math.min(v.duration, v.currentTime + s));
+        },
+
+        toggleMute() {
+            const v = this.$refs.video;
+            this.muted = v.muted = !v.muted;
+        },
+
+        setVolume(val) {
+            const v = this.$refs.video;
+            this.volume = v.volume = parseFloat(val);
+            this.muted  = v.muted  = this.volume === 0;
+        },
+
+        setSpeed(s) {
+            this.speed = s;
+            if (this.$refs.video) this.$refs.video.playbackRate = s;
+        },
+
+        toggleFullscreen() {
+            const el = this.$refs.vpWrap;
+            if (!document.fullscreenElement) {
+                el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
+            } else {
+                document.exitFullscreen?.();
+            }
+        },
+
+        showControls() {
+            clearTimeout(this._hideTimer);
+            if (this.$refs.controls) this.$refs.controls.style.opacity = '1';
+        },
+        scheduleHide() {
+            if (this.playing) {
+                this._hideTimer = setTimeout(() => {
+                    if (this.$refs.controls) this.$refs.controls.style.opacity = '0';
+                }, 2000);
+            }
+        },
+
+        fmt(s) {
+            if (!s || isNaN(s)) return '0:00';
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60).toString().padStart(2, '0');
+            return m + ':' + sec;
+        }
+    };
+}
+
+function posterSlider(total) {
+    const perPage = 3;
+    return {
+        total, perPage,
+        currentPage: 0,
+        offset: 0,
+        get pages()   { return Math.ceil(this.total / this.perPage); },
+        get canPrev() { return this.currentPage > 0; },
+        get canNext() { return this.currentPage < this.pages - 1; },
+        goTo(i) {
+            this.currentPage = i;
+            this._update();
+        },
+        prev() { if (this.canPrev) { this.currentPage--; this._update(); } },
+        next() { if (this.canNext) { this.currentPage++; this._update(); } },
+        _update() {
+            // Each card width + gap; measure from DOM
+            const track = document.querySelector('.poster-track');
+            if (!track) return;
+            const card = track.children[0];
+            if (!card) return;
+            const cardW = card.offsetWidth + 16; // 16px gap
+            this.offset = this.currentPage * this.perPage * cardW;
+        }
+    };
+}
+</script>
 
 </body>
 </html>
