@@ -78,10 +78,10 @@ $pageTitle = 'Writer Submissions — Faceless Pictures 3';
     </div>
   </div>
 </nav>
-<section style="padding:5rem 1.25rem 2rem;text-align:center" class="fade-up">
-  <p style="font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.6rem">Now Open</p>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,80px);letter-spacing:.02em;line-height:.92;color:#111;margin-bottom:.75rem">WRITER<br>SUBMISSIONS</h1>
-  <p style="color:#6b7280;font-size:.9rem;max-width:380px;margin:0 auto;line-height:1.6">Read the brief. Write your scene. Record yourself. Submit your video.</p>
+<section style="padding:4.5rem 1.25rem 1.5rem;text-align:center" class="fade-up">
+  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Now Open</p>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap">WRITER SUBMISSIONS</h1>
+  <p style="color:#6b7280;font-size:.85rem;max-width:360px;margin:0 auto;line-height:1.5">Read the brief. Write your scene. Record yourself. Submit your video.</p>
 </section>
 <section style="padding:0 1.25rem 5rem">
   <div style="max-width:1200px;margin:0 auto">

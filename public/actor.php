@@ -187,10 +187,10 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 </nav>
 
 <!-- HERO -->
-<section style="padding:5.5rem 1.5rem 2rem;text-align:center">
-  <p style="font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.5rem">Auditions Now Open</p>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,7vw,76px);letter-spacing:.02em;line-height:.92;color:#111;margin-bottom:.75rem">ACTOR<br>AUDITIONS</h1>
-  <p style="color:#6b7280;font-size:.9rem;max-width:360px;margin:0 auto;line-height:1.6">Pick an audition. Read the brief. Shoot your video. Submit.</p>
+<section style="padding:4.5rem 1.5rem 1.5rem;text-align:center">
+  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Auditions Now Open</p>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap">ACTOR AUDITIONS</h1>
+  <p style="color:#6b7280;font-size:.85rem;max-width:360px;margin:0 auto;line-height:1.5">Pick an audition. Read the brief. Shoot your video. Submit.</p>
 </section>
 
 <!-- CARDS GRID -->
