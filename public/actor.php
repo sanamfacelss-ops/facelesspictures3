@@ -267,49 +267,37 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
                   @dragover.prevent="dragOver=true" @dragleave="dragOver=false"
                   @drop.prevent="handleDrop($event)" @click="$refs.vidFile.click()">
                   <input type="file" x-ref="vidFile" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="handleFile($event)">
-                  <template x-if="!file">
-                    <div>
-                      <svg style="width:28px;height:28px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                      <p style="color:#6b7280;font-size:.8rem">Drop video or <span style="color:#111;font-weight:600;text-decoration:underline">browse</span></p>
-                    </div>
-                  </template>
-                  <template x-if="file">
-                    <div style="display:flex;align-items:center;justify-content:center;gap:.625rem">
-                      <svg style="width:16px;height:16px;color:#111;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                      <span style="color:#111;font-size:.8rem;font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" x-text="file.name"></span>
-                      <button type="button" @click.stop="file=null;dragOver=false" style="color:#9ca3af;background:none;border:none;cursor:pointer;font-size:.875rem;line-height:1;flex-shrink:0">✕</button>
-                    </div>
-                  </template>
+                  <!-- Empty state -->
+                  <div x-show="!file">
+                    <svg style="width:28px;height:28px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <p style="color:#6b7280;font-size:.8rem">Drop video or <span style="color:#111;font-weight:600;text-decoration:underline">browse</span></p>
+                  </div>
+                  <!-- File selected state -->
+                  <div x-show="file" style="display:flex;align-items:center;justify-content:center;gap:.625rem">
+                    <svg style="width:16px;height:16px;color:#111;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span style="color:#111;font-size:.8rem;font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" x-text="file ? file.name : ''"></span>
+                    <button type="button" @click.stop="file=null;dragOver=false" style="color:#9ca3af;background:none;border:none;cursor:pointer;font-size:.875rem;line-height:1;flex-shrink:0">✕</button>
+                  </div>
                 </div>
                 <!-- Upload progress -->
-                <template x-if="uploading">
-                  <div style="margin-top:.5rem">
-                    <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#6b7280;margin-bottom:.2rem">
-                      <span>Uploading your video...</span><span x-text="progress+'%'"></span>
-                    </div>
-                    <div class="progress-bar"><div class="progress-fill" :style="'width:'+progress+'%'"></div></div>
+                <div x-show="uploading" style="margin-top:.5rem">
+                  <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#6b7280;margin-bottom:.2rem">
+                    <span>Uploading your video...</span><span x-text="progress+'%'"></span>
                   </div>
-                </template>
+                  <div class="progress-bar"><div class="progress-fill" :style="'width:'+progress+'%'"></div></div>
+                </div>
               </div>
 
               <!-- Errors -->
-              <template x-if="errors.length">
-                <div class="error-box">
-                  <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
-                </div>
-              </template>
+              <div x-show="errors.length" class="error-box">
+                <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
+              </div>
 
               <!-- Submit -->
               <button type="submit" class="btn-submit" :disabled="loading">
-                <template x-if="!loading">
-                  <span style="display:flex;align-items:center;gap:.4rem">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                    Submit <?= htmlspecialchars($atype) ?>
-                  </span>
-                </template>
-                <template x-if="loading">
-                  <span>Uploading...</span>
-                </template>
+                <svg x-show="!loading" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                <span x-show="!loading">Submit <?= htmlspecialchars($atype) ?></span>
+                <span x-show="loading">Uploading...</span>
               </button>
             </form>
           </div>
