@@ -103,7 +103,8 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 <nav class="fp-nav">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
     <a href="/" class="nav-logo">
-      FACELESS PICTURES <span class="nav-badge">3</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
+      <span class="nav-badge">3</span>
     </a>
     <div class="flex items-center gap-4 sm:gap-6">
       <a href="#about"    class="nav-link hidden sm:block">About</a>
@@ -116,7 +117,20 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
 <!-- ── MAIN CONTENT ── -->
 <main class="pt-[60px]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+    <!-- ══ HERO HEADLINE — centered ══ -->
+    <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
+      <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.875rem">Auditions Now Open</p>
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem">
+        NO FACE. NO CONNECTIONS. JUST TALENT.
+      </h1>
+      <p style="font-size:.95rem;color:#6b7280;margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
+        India's first anonymous film competition — no face, no connections, just raw talent.
+      </p>
+    </div>
+
+    <div class="py-10 sm:py-12">
 
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
     <p class="section-label">Now Showing — Auditions Open</p>
@@ -212,6 +226,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
     </div>
 
+    </div><!-- /poster+role section -->
   </div><!-- /max-w -->
 </main>
 

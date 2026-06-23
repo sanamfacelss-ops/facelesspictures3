@@ -21,50 +21,59 @@ tailwind.config={theme:{extend:{colors:{ink:'#0A0E1A',deep:'#111827',amber:'#E6A
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
-*{box-sizing:border-box}body{font-family:'DM Sans',sans-serif;background:#0A0E1A;color:#F0EBE0;-webkit-font-smoothing:antialiased}
-.font-display{font-family:'Bebas Neue',sans-serif;letter-spacing:.02em}[x-cloak]{display:none!important}
-.badge-dir{background:linear-gradient(135deg,#E6A817,#C8870A)}
-.badge-pitch{background:linear-gradient(135deg,#2563EB,#1D4ED8)}
-.audition-card{background:#161C2D;border:1px solid #1F2840;border-radius:16px;transition:border-color .25s,box-shadow .25s}
-.audition-card:hover{border-color:#E6A817;box-shadow:0 8px 40px rgba(230,168,23,.08)}
-.upload-zone{border:2px dashed #1F2840;border-radius:12px;transition:border-color .2s,background .2s;cursor:pointer}
-.upload-zone:hover,.upload-zone.drag{border-color:#E6A817;background:rgba(230,168,23,.04)}
-.fp-input{background:#0A0E1A;border:1px solid #1F2840;border-radius:8px;color:#F0EBE0;padding:.625rem .875rem;width:100%;font-size:15px;transition:border-color .2s}
-.fp-input:focus{outline:none;border-color:#E6A817}.fp-input::placeholder{color:#8B92A5}
-.btn-amber{background:#E6A817;color:#0A0E1A;font-weight:700;border-radius:8px;padding:.75rem 1.5rem;transition:background .2s,transform .1s}
-.btn-amber:hover{background:#F0B820}.btn-amber:active{transform:scale(.98)}.btn-amber:disabled{opacity:.5;cursor:not-allowed}
-.fp-nav{background:rgba(10,14,26,.92);backdrop-filter:blur(16px);border-bottom:1px solid #1F2840}
-.script-block{background:#0A0E1A;border:1px solid #1F2840;border-radius:10px;padding:1.25rem;font-size:.9rem;line-height:1.7;color:#C9D0E0}
-.success-box{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px}
-.error-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px}
-.progress-bar{height:4px;background:#1F2840;border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:#E6A817;border-radius:2px;transition:width .3s}
-.btn-pdf{display:inline-flex;align-items:center;gap:.4rem;background:rgba(230,168,23,.1);border:1px solid rgba(230,168,23,.25);color:#E6A817;border-radius:6px;padding:.35rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .2s}
-.btn-pdf:hover{background:rgba(230,168,23,.18)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.fade-up{animation:fadeUp .5s ease forwards}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased}
+[x-cloak]{display:none!important}
+.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb}
+.badge-dir{background:#111;color:#fff}
+.badge-pitch{background:#374151;color:#fff}
+.audition-card{background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;transition:border-color .2s,box-shadow .2s}
+.audition-card:hover{border-color:#111;box-shadow:0 6px 28px rgba(0,0,0,.07)}
+.upload-zone{border:2px dashed #d1d5db;border-radius:10px;transition:border-color .2s,background .2s;cursor:pointer}
+.upload-zone:hover,.upload-zone.drag{border-color:#111;background:#f9fafb}
+.fp-input{background:#fff;border:1.5px solid #d1d5db;border-radius:8px;color:#111;padding:.625rem .875rem;width:100%;font-size:15px;transition:border-color .2s}
+.fp-input:focus{outline:none;border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.06)}
+.fp-input::placeholder{color:#9ca3af}
+.btn-amber{background:#111;color:#fff;font-weight:700;border-radius:8px;padding:.75rem 1.5rem;border:none;transition:background .2s,transform .1s;cursor:pointer}
+.btn-amber:hover{background:#333}
+.btn-amber:active{transform:scale(.98)}
+.btn-amber:disabled{opacity:.4;cursor:not-allowed}
+.script-block{background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.25rem;font-size:.9rem;line-height:1.7;color:#374151}
+.btn-pdf{display:inline-flex;align-items:center;gap:.4rem;background:#f3f4f6;border:1px solid #e5e7eb;color:#374151;border-radius:6px;padding:.35rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-pdf:hover{background:#e5e7eb}
+.success-box{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px}
+.error-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;color:#991b1b}
+.progress-bar{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:#111;border-radius:2px;transition:width .3s}
+.text-muted,.text-warm{color:#6b7280!important}
+.text-amber{color:#374151!important}
+.border-border{border-color:#e5e7eb!important}
+label{color:#374151}
+.normal-case{color:#9ca3af!important;font-weight:400!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease forwards}
 </style>
 </head>
 <body>
 <nav class="fp-nav fixed top-0 left-0 right-0 z-50 h-14">
   <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2">
-      <span class="font-display text-[17px] text-warm">FACELESS PICTURES</span>
-      <span class="inline-flex items-center justify-center bg-amber text-ink text-[10px] font-bold w-5 h-5 rounded-full">3</span>
+    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
+      FACELESS PICTURES <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
     </a>
     <div class="flex items-center gap-4">
-      <a href="/actor"    class="text-muted text-xs hover:text-warm transition uppercase tracking-widest">Actor</a>
-      <a href="/director" class="text-amber text-xs font-semibold tracking-widest uppercase">Director</a>
-      <a href="/writer"   class="text-muted text-xs hover:text-warm transition uppercase tracking-widest">Writer</a>
+      <a href="/actor"    style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;text-decoration:none">Actor</a>
+      <a href="/director" style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#111;text-decoration:none">Director</a>
+      <a href="/writer"   style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;text-decoration:none">Writer</a>
     </div>
   </div>
 </nav>
 
 <section class="pt-24 pb-12 px-4">
   <div class="max-w-4xl mx-auto text-center fade-up">
-    <span class="inline-block bg-amber/10 text-amber text-[11px] font-semibold tracking-[3px] uppercase px-4 py-1.5 rounded-full mb-4">Now Open</span>
-    <h1 class="font-display text-[52px] sm:text-[72px] md:text-[88px] leading-none text-warm mb-4">DIRECTOR<br>AUDITIONS</h1>
-    <p class="text-muted text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
-      Same scene. Your vision. Frame it, light it, pace it — one phone, one take, one chance to show what you see.
+    <span class="inline-block bg-gray-100 text-gray-500 text-[11px] font-semibold tracking-[3px] uppercase px-4 py-1.5 rounded-full mb-4">Now Open</span>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:1rem">DIRECTOR<br>AUDITIONS</h1>
+    <p style="color:#6b7280;font-size:1rem;max-width:440px;margin:0 auto;line-height:1.65">
+      Same scene. Your vision. Frame it, light it, pace it — one phone, one take, one chance.
     </p>
   </div>
 </section>
@@ -77,8 +86,8 @@ tailwind.config={theme:{extend:{colors:{ink:'#0A0E1A',deep:'#111827',amber:'#E6A
       <div class="flex items-start gap-4 mb-6">
         <div class="badge-dir text-ink text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex-shrink-0 mt-0.5">Scene Direction</div>
         <div>
-          <h2 class="font-display text-[28px] sm:text-[36px] leading-none text-warm">SCENE DIRECTION</h2>
-          <p class="text-muted text-sm mt-1">Direct and shoot a complete scene.</p>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;color:#111">SCENE DIRECTION</h2>
+          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Direct and shoot a complete scene.</p>
         </div>
       </div>
       <div class="mb-6">
@@ -134,8 +143,8 @@ tailwind.config={theme:{extend:{colors:{ink:'#0A0E1A',deep:'#111827',amber:'#E6A
       <div class="flex items-start gap-4 mb-6">
         <div class="badge-pitch text-white text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex-shrink-0 mt-0.5">Vision Pitch</div>
         <div>
-          <h2 class="font-display text-[28px] sm:text-[36px] leading-none text-warm">VISION PITCH</h2>
-          <p class="text-muted text-sm mt-1">Pitch your creative vision on camera — no scene needed.</p>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;color:#111">VISION PITCH</h2>
+          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Pitch your creative vision on camera — no scene needed.</p>
         </div>
       </div>
       <div class="mb-6">
@@ -177,13 +186,15 @@ tailwind.config={theme:{extend:{colors:{ink:'#0A0E1A',deep:'#111827',amber:'#E6A
   </div>
 </section>
 
-<footer class="border-t border-border py-8 px-4">
-  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-muted text-sm">
-    <span class="font-display text-warm text-lg">FACELESS PICTURES <span class="text-amber">3</span></span>
-    <div class="flex gap-6">
-      <a href="/actor" class="hover:text-warm transition">Actor</a>
-      <a href="/director" class="hover:text-warm transition">Director</a>
-      <a href="/writer" class="hover:text-warm transition">Writer</a>
+<footer style="border-top:1px solid #e5e7eb;padding:2rem 1rem;background:#fff">
+  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4" style="color:#6b7280;font-size:.85rem">
+    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
+      FACELESS PICTURES <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
+    </a>
+    <div class="flex gap-5">
+      <a href="/actor"    style="color:#6b7280;text-decoration:none">Actor</a>
+      <a href="/director" style="color:#6b7280;text-decoration:none">Director</a>
+      <a href="/writer"   style="color:#6b7280;text-decoration:none">Writer</a>
     </div>
     <span>No face. Just talent.</span>
   </div>
