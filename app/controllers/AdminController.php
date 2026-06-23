@@ -1872,20 +1872,27 @@ class AdminController
             'landing_poster_url',  'landing_poster2_url', 'landing_poster3_url',
             'landing_poster4_url', 'landing_poster5_url', 'landing_poster6_url',
             'actor_script_image_url', 'song_lyrics_image_url',
+            'director_script_image_url', 'writer_script_image_url',
         ];
         $videoFields = [
             'landing_trailer_url',  'landing_trailer2_url', 'landing_trailer3_url',
             'landing_trailer4_url', 'landing_trailer5_url', 'landing_trailer6_url',
+            'actor_preview_video_url', 'song_preview_video_url',
+            'director_preview_video_url', 'writer_preview_video_url',
+        ];
+        $pdfFields = [
+            'actor_script_pdf_url', 'song_lyrics_pdf_url',
+            'director_script_pdf_url', 'writer_script_pdf_url',
         ];
         $isVideo = in_array($field, $videoFields);
         $isImage = in_array($field, $imageFields);
+        $isPdf   = in_array($field, $pdfFields);
 
-        if (!$isImage && !$isVideo) {
+        if (!$isImage && !$isVideo && !$isPdf) {
             http_response_code(422);
             echo json_encode(['error' => 'Invalid field']);
             return;
         }
-
         // Accept either 'image' or 'file' key
         $fileKey = !empty($_FILES['image']) ? 'image' : 'file';
         if (empty($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK) {
@@ -1911,6 +1918,12 @@ class AdminController
             $maxBytes = 5 * 1024 * 1024; // 5 MB
             $errMsg   = 'Only JPG, PNG, WEBP or GIF images accepted.';
             $sizeMsg  = 'Image must be under 5 MB.';
+        } elseif ($isPdf) {
+            $allowed  = ['application/pdf'];
+            $allowExt = ['pdf'];
+            $maxBytes = 20 * 1024 * 1024; // 20 MB
+            $errMsg   = 'Only PDF files accepted.';
+            $sizeMsg  = 'PDF must be under 20 MB.';
         } else {
             $allowed  = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-msvideo', 'video/mpeg', 'video/avi'];
             $allowExt = ['mp4', 'mov', 'webm', 'avi', 'mpeg'];
@@ -1950,7 +1963,7 @@ class AdminController
         $settingsModel = new \App\Models\Settings();
         $settingsModel->set($field, $publicUrl);
 
-        debug_log("Admin uploaded " . ($isVideo ? 'video' : 'image') . " for {$field}: {$publicUrl}", 'ADMIN');
+        debug_log("Admin uploaded " . ($isVideo ? 'video' : ($isPdf ? 'pdf' : 'image')) . " for {$field}: {$publicUrl}", 'ADMIN');
         echo json_encode(['success' => true, 'url' => $publicUrl, 'type' => $isVideo ? 'video' : 'image']);
     }
 
