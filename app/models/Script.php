@@ -26,8 +26,13 @@ class Script
 
     public function byCategory(string $category): array
     {
+        $cols   = $this->getColumns();
+        $select = 'id, title, content, category, difficulty, is_active, created_at';
+        foreach (['duration_hint', 'image_url', 'audition_type', 'rules'] as $col) {
+            if (in_array($col, $cols)) $select .= ', ' . $col;
+        }
         $stmt = $this->db->prepare(
-            "SELECT * FROM scripts WHERE category = ? AND is_active = 1 ORDER BY difficulty ASC, title ASC"
+            "SELECT {$select} FROM scripts WHERE category = ? AND is_active = 1 ORDER BY difficulty ASC, title ASC"
         );
         $stmt->execute([$category]);
         return $stmt->fetchAll();
@@ -35,7 +40,12 @@ class Script
 
     public function all(): array
     {
-        $stmt = $this->db->query("SELECT * FROM scripts WHERE is_active = 1 ORDER BY category, difficulty, title");
+        $cols   = $this->getColumns();
+        $select = 'id, title, content, category, difficulty, is_active, created_at, updated_at';
+        foreach (['duration_hint', 'image_url', 'audition_type', 'rules'] as $col) {
+            if (in_array($col, $cols)) $select .= ', ' . $col;
+        }
+        $stmt = $this->db->query("SELECT {$select} FROM scripts WHERE is_active = 1 ORDER BY category, difficulty, title");
         return $stmt->fetchAll();
     }
 
