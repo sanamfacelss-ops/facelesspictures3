@@ -53,21 +53,19 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     width:260px;
     min-width:260px;
     flex-shrink:0;
-    align-self:stretch;
     background:linear-gradient(160deg,#1a1a2e,#16213e,#0f3460);
     overflow:hidden;
-    min-height:400px;
+    min-height:420px;
 }
 .card-poster img{
-    position:absolute;
-    inset:0;
+    display:block;
     width:100%;
     height:100%;
+    min-height:420px;
     object-fit:cover;
     object-position:center center;
-    display:block;
 }
-.poster-ph{width:100%;height:100%;min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:2rem 1rem}
+.poster-ph{width:100%;height:100%;min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:2rem 1rem}
 .poster-badge{position:absolute;top:12px;left:12px;z-index:2;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.28rem .7rem;border-radius:20px;background:rgba(17,17,17,.85);color:#fff;border:1px solid rgba(255,255,255,.2);white-space:nowrap}
 
 /* Content area: 2 equal columns */
@@ -114,7 +112,36 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     min-width:0;
 }
 .col-divider{width:1px;background:#f0f0f0;align-self:stretch}
-.brief-clamp{max-height:100px;overflow:hidden}
+
+/* Brief: collapsed by default, details/summary for expand */
+details.brief-details summary{
+    list-style:none;
+    cursor:pointer;
+    font-size:.75rem;
+    font-weight:600;
+    color:#374151;
+    text-decoration:underline;
+    text-underline-offset:2px;
+    padding:.2rem 0;
+    margin-top:.35rem;
+    display:block;
+}
+details.brief-details summary::-webkit-details-marker{display:none}
+details.brief-details .brief-preview{
+    display:-webkit-box;
+    -webkit-line-clamp:4;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    font-size:.85rem;
+    color:#4b5563;
+    line-height:1.7;
+}
+details.brief-details[open] .brief-preview{
+    display:block;
+    -webkit-line-clamp:unset;
+}
+details.brief-details summary::before{content:'▼ '}
+details.brief-details[open] summary::before{content:'▲ '}
 .card-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.03em;color:#111;line-height:1.05}
 .dur-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .55rem;border-radius:20px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;margin-top:.35rem}
 
@@ -227,20 +254,13 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
             <?php endif; ?>
           </div>
 
-          <!-- Brief — always visible, collapses after 4 lines with read more -->
+          <!-- Brief — native details/summary dropdown, no Alpine needed -->
           <div>
             <p class="fp-label" style="margin-bottom:.4rem">The Brief</p>
-            <div style="position:relative">
-              <div :class="expanded ? '' : 'brief-clamp'">
-                <p style="font-size:.85rem;color:#4b5563;line-height:1.7;white-space:pre-line"><?= htmlspecialchars($script['content'] ?? '') ?></p>
-              </div>
-              <div x-show="!expanded" style="display:none;position:absolute;bottom:0;left:0;right:0;height:36px;background:linear-gradient(transparent,#fff)"></div>
-            </div>
-            <button @click="expanded=!expanded"
-              x-text="expanded ? '▲ Show less' : '▼ Read full brief'"
-              style="background:none;border:none;cursor:pointer;font-size:.75rem;font-weight:600;color:#374151;padding:.2rem 0;font-family:inherit;text-decoration:underline;text-underline-offset:2px;margin-top:.3rem">
-              ▼ Read full brief
-            </button>
+            <details class="brief-details">
+              <p class="brief-preview"><?= htmlspecialchars($script['content'] ?? '') ?></p>
+              <summary>Read full brief</summary>
+            </details>
           </div>
 
           <button class="btn-pdf" @click="downloadPDF()" style="align-self:flex-start">
