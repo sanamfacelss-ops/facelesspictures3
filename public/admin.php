@@ -3951,14 +3951,11 @@ if (file_exists($errorLogFile)) {
                 // Listen for script image picker selections
                 // Uses a global bridge function so child Alpine components can set parent state
                 window.setScriptImage = (url) => {
-                    console.log('[FP3] setScriptImage called with:', url, '— current scriptForm.image_url was:', this.scriptForm.image_url);
                     this.scriptForm.image_url = url;
-                    console.log('[FP3] scriptForm.image_url is now:', this.scriptForm.image_url);
                 };
                 document.addEventListener('script-image-picked', e => {
                     this.scriptForm.image_url = e.detail.url;
                 });
-                console.log('[FP3] adminDashboard init — window.setScriptImage registered');
                 
                 // Initial refresh
                 this.silentRefreshVideos();
@@ -4464,20 +4461,29 @@ if (file_exists($errorLogFile)) {
             async createScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                // Build form data — log so DevTools shows what's being sent
-                console.log('[FP3] createScript - scriptForm:', JSON.parse(JSON.stringify(this.scriptForm)));
                 Object.keys(this.scriptForm).forEach(k => {
                     formData.append(k, this.scriptForm[k] ?? '');
-                    console.log('[FP3] createScript field:', k, '=', this.scriptForm[k]);
                 });
                 try {
-                    const res = await fetch('/api/admin/scripts/create', { method: 'POST', body: formData });
-                    console.log('[FP3] createScript response status:', res.status);
+                    const res  = await fetch('/api/admin/scripts/create', { method: 'POST', body: formData });
                     const data = await res.json();
-                    console.log('[FP3] createScript response data:', data);
                     if (data.success) {
                         this.showToast('Script created successfully');
-                        setTimeout(() => location.reload(), 1000);
+                        // Add to local array without reload
+                        const newScript = {
+                            id:            data.id,
+                            title:         this.scriptForm.title,
+                            content:       this.scriptForm.content,
+                            category:      this.scriptForm.category,
+                            difficulty:    this.scriptForm.difficulty,
+                            duration_hint: this.scriptForm.duration_hint,
+                            audition_type: this.scriptForm.audition_type,
+                            image_url:     this.scriptForm.image_url,
+                            rules:         this.scriptForm.rules,
+                            is_active:     1,
+                        };
+                        this.scripts.push(newScript);
+                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' };
                     } else {
                         this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
@@ -4490,29 +4496,42 @@ if (file_exists($errorLogFile)) {
             async updateScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                // Build form data — log so DevTools shows what's being sent
-                console.log('[FP3] updateScript id:', this.editingScript, '- scriptForm:', JSON.parse(JSON.stringify(this.scriptForm)));
                 Object.keys(this.scriptForm).forEach(k => {
                     formData.append(k, this.scriptForm[k] ?? '');
-                    console.log('[FP3] updateScript field:', k, '=', this.scriptForm[k]);
                 });
                 try {
-                    const res = await fetch('/api/admin/scripts/update/' + this.editingScript, { method: 'POST', body: formData });
-                    console.log('[FP3] updateScript response status:', res.status);
+                    const res  = await fetch('/api/admin/scripts/update/' + this.editingScript, { method: 'POST', body: formData });
                     const text = await res.text();
-                    console.log('[FP3] updateScript raw response:', text);
                     let data;
-                    try { data = JSON.parse(text); } catch(pe) { data = { error: 'Server returned non-JSON: ' + text.substring(0,200) }; }
-                    console.log('[FP3] updateScript parsed data:', data);
+                    try { data = JSON.parse(text); } catch(pe) { data = { error: 'Server error: ' + text.substring(0, 200) }; }
+
                     if (data.success) {
                         this.showToast('Script updated successfully');
-                        setTimeout(() => location.reload(), 1000);
+                        // Update in local array — no page reload needed
+                        const idx = this.scripts.findIndex(s => s.id === this.editingScript);
+                        if (idx !== -1) {
+                            this.scripts[idx] = {
+                                ...this.scripts[idx],
+                                title:         this.scriptForm.title,
+                                content:       this.scriptForm.content,
+                                category:      this.scriptForm.category,
+                                difficulty:    this.scriptForm.difficulty,
+                                duration_hint: this.scriptForm.duration_hint,
+                                audition_type: this.scriptForm.audition_type,
+                                image_url:     this.scriptForm.image_url,
+                                rules:         this.scriptForm.rules,
+                            };
+                            // Trigger Alpine reactivity
+                            this.scripts = [...this.scripts];
+                        }
+                        this.editingScript = null;
+                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' };
                     } else {
-                        this.showToast(data.errors?.join(', ') || data.error || 'Update failed — check console', 'error');
+                        this.showToast(data.errors?.join(', ') || data.error || 'Update failed', 'error');
                     }
                 } catch (e) {
-                    console.error('[FP3] updateScript fetch error:', e);
-                    this.showToast('Network error — check console', 'error');
+                    console.error('[FP3] updateScript error:', e);
+                    this.showToast('Network error', 'error');
                 }
             },
             
@@ -5239,13 +5258,8 @@ if (file_exists($errorLogFile)) {
             },
 
             selectFromGallery(url) {
-                console.log('[FP3] selectFromGallery url:', url);
-                console.log('[FP3] window.setScriptImage exists:', typeof window.setScriptImage);
                 if (typeof window.setScriptImage === 'function') {
                     window.setScriptImage(url);
-                    console.log('[FP3] setScriptImage called — scriptForm.image_url should now be:', url);
-                } else {
-                    console.error('[FP3] window.setScriptImage NOT defined — image will not save!');
                 }
             },
 
