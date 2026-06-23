@@ -19,8 +19,15 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // Serve uploaded files (uploads folder is outside public)
 if (preg_match('/^uploads\/(.+)$/', $uri, $matches)) {
-    $filename = basename($matches[1]); // Sanitize - only filename, no paths
-    $filePath = UPLOAD_PATH . '/' . $filename;
+    // Allow one subdirectory level (e.g. uploads/settings/file.png)
+    $relativePath = $matches[1];
+    // Security: only allow alphanumeric, dash, underscore, dot, and one slash
+    if (!preg_match('/^[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-\.]+$|^[a-zA-Z0-9_\-\.]+$/', $relativePath)) {
+        http_response_code(400);
+        echo 'Invalid path';
+        exit;
+    }
+    $filePath = UPLOAD_PATH . '/' . $relativePath;
     
     if (file_exists($filePath) && is_file($filePath)) {
         // Get MIME type
@@ -158,7 +165,8 @@ $routes = [
     'api/admin/submissions/{id}/delete'  => [AdminController::class, 'deleteSubmission',   'POST'],
 
     // Landing page / audition brief settings save
-    'api/admin/settings/landing'         => [AdminController::class, 'saveLandingSetting', 'POST'],
+    'api/admin/settings/landing'         => [AdminController::class, 'saveLandingSetting',  'POST'],
+    'api/admin/settings/upload-image'    => [AdminController::class, 'uploadSettingImage',  'POST'],
 
     // Moderation API
     'api/moderation/pending' => [ModerationController::class, 'pendingList', 'GET'],

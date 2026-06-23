@@ -2858,19 +2858,65 @@ if (file_exists($errorLogFile)) {
                             <!-- SECTION: Brand -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Brand</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Logo Image URL</label>
-                                        <input type="url" x-model="form.site_logo_url" placeholder="https://cdn.example.com/logo.png"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 focus:border-dark/30 transition">
-                                        <p class="text-[11px] text-dark/30 mt-1">Transparent PNG recommended. Shows in nav &amp; footer on all pages.</p>
-                                    </div>
-                                    <div x-show="form.site_logo_url" style="display:none">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Preview</label>
-                                        <div class="border border-dark/10 rounded-lg px-4 py-3 bg-gray-50 flex items-center gap-3">
-                                            <img :src="form.site_logo_url" alt="Logo preview" style="height:32px;width:auto;max-width:180px;object-fit:contain" @error="$el.style.display='none'">
-                                            <span class="text-[11px] text-dark/30">Live preview</span>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <!-- Logo uploader -->
+                                    <div x-data="imageUploader('site_logo_url', '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>')">
+                                        <label class="block text-xs font-medium text-dark/60 mb-2">Logo Image</label>
+                                        <div
+                                            class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
+                                            :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                            style="min-height:120px"
+                                            @dragover.prevent="dragging=true"
+                                            @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)"
+                                            @click="$refs.imgInput.click()">
+                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+
+                                            <!-- Empty state -->
+                                            <template x-if="!preview && !uploading">
+                                                <div class="flex flex-col items-center justify-center gap-2 p-6 text-center">
+                                                    <svg class="w-8 h-8 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                    <p class="text-[12px] text-dark/40 font-medium">Drop image or <span class="text-dark underline">click to browse</span></p>
+                                                    <p class="text-[11px] text-dark/25">PNG · JPG · WEBP · max 5 MB</p>
+                                                </div>
+                                            </template>
+
+                                            <!-- Uploading state -->
+                                            <template x-if="uploading">
+                                                <div class="flex flex-col items-center justify-center gap-3 p-6">
+                                                    <div class="w-full bg-dark/10 rounded-full h-1.5 overflow-hidden">
+                                                        <div class="h-full bg-dark rounded-full transition-all" :style="'width:'+progress+'%'"></div>
+                                                    </div>
+                                                    <p class="text-[12px] text-dark/40" x-text="progress+'% uploaded'"></p>
+                                                </div>
+                                            </template>
+
+                                            <!-- Preview state -->
+                                            <template x-if="preview && !uploading">
+                                                <div class="flex items-center gap-4 p-4">
+                                                    <img :src="preview" alt="Logo preview" style="height:48px;max-width:160px;object-fit:contain;background:#f9fafb;border-radius:6px;padding:4px">
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-[12px] font-medium text-dark truncate" x-text="filename || 'Logo uploaded'"></p>
+                                                        <p class="text-[11px] text-green-600 mt-0.5">✓ Saved</p>
+                                                    </div>
+                                                    <button type="button" @click.stop="clearImage()" class="text-dark/30 hover:text-dark/60 transition">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    </button>
+                                                </div>
+                                            </template>
                                         </div>
+                                        <template x-if="uploadError">
+                                            <p class="text-[11px] text-red-500 mt-1.5" x-text="uploadError"></p>
+                                        </template>
+                                        <p class="text-[11px] text-dark/30 mt-1.5">Transparent PNG looks best. Displays in nav &amp; footer on all pages.</p>
+                                    </div>
+
+                                    <!-- Logo URL (manual fallback) -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-2">Or paste Logo URL directly</label>
+                                        <input type="url" x-model="form.site_logo_url" placeholder="https://..."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Use this if your logo is hosted externally.</p>
                                     </div>
                                 </div>
                             </div>
@@ -2883,7 +2929,7 @@ if (file_exists($errorLogFile)) {
                                         <label class="block text-xs font-medium text-dark/60 mb-1.5">Main Headline</label>
                                         <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <p class="text-[11px] text-dark/30 mt-1">Displayed in large Bebas Neue font, centered below the nav.</p>
+                                        <p class="text-[11px] text-dark/30 mt-1">Large centered text on homepage.</p>
                                     </div>
                                     <div class="md:col-span-2">
                                         <label class="block text-xs font-medium text-dark/60 mb-1.5">Tagline / Subtitle</label>
@@ -2897,25 +2943,76 @@ if (file_exists($errorLogFile)) {
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Film Poster Cards (3 slots)</p>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                                    <?php foreach ([
+                                    <?php
+                                    $posterSlots = [
                                         ['Poster 1', 'landing_poster_url', 'landing_poster_title', 'landing_trailer_url'],
                                         ['Poster 2', 'landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url'],
                                         ['Poster 3', 'landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url'],
-                                    ] as $p): ?>
-                                    <div class="bg-dark/[.025] rounded-xl p-4 space-y-3">
+                                    ];
+                                    foreach ($posterSlots as $p):
+                                    $currentUrl = $settingsModel->get($p[1], '');
+                                    ?>
+                                    <div class="bg-dark/[.025] rounded-xl p-4 space-y-3" x-data="imageUploader('<?= $p[1] ?>', '<?= addslashes(htmlspecialchars($currentUrl)) ?>')">
                                         <p class="text-xs font-semibold text-dark/50"><?= $p[0] ?></p>
+
+                                        <!-- Poster image uploader -->
                                         <div>
-                                            <label class="block text-[11px] text-dark/40 mb-1">Poster Image URL</label>
-                                            <input type="url" x-model="form.<?= $p[1] ?>" placeholder="https://..."
-                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                            <label class="block text-[11px] text-dark/40 mb-1.5">Poster Image</label>
+                                            <div
+                                                class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-white"
+                                                :class="dragging ? 'border-dark' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                style="aspect-ratio:2/3;max-height:200px"
+                                                @dragover.prevent="dragging=true"
+                                                @dragleave.prevent="dragging=false"
+                                                @drop.prevent="onDrop($event)"
+                                                @click="$refs.imgInput.click()">
+                                                <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+
+                                                <template x-if="!preview && !uploading">
+                                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-3 text-center">
+                                                        <svg class="w-7 h-7 text-dark/15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                        <p class="text-[11px] text-dark/30">Drop or click</p>
+                                                    </div>
+                                                </template>
+
+                                                <template x-if="uploading">
+                                                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 bg-white">
+                                                        <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden">
+                                                            <div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div>
+                                                        </div>
+                                                        <p class="text-[11px] text-dark/40" x-text="progress+'%'"></p>
+                                                    </div>
+                                                </template>
+
+                                                <template x-if="preview && !uploading">
+                                                    <div class="absolute inset-0">
+                                                        <img :src="preview" alt="Poster" style="width:100%;height:100%;object-fit:cover">
+                                                        <div class="absolute top-1.5 right-1.5">
+                                                            <button type="button" @click.stop="clearImage()" class="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition">
+                                                                <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                            </button>
+                                                        </div>
+                                                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
+                                                            <p class="text-[10px] text-white/80 font-medium truncate" x-text="filename || 'Uploaded'"></p>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <template x-if="uploadError">
+                                                <p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p>
+                                            </template>
                                         </div>
+
+                                        <!-- Film title -->
                                         <div>
                                             <label class="block text-[11px] text-dark/40 mb-1">Film Title</label>
                                             <input type="text" x-model="form.<?= $p[2] ?>" placeholder="Film name..."
                                                 class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         </div>
+
+                                        <!-- Trailer URL -->
                                         <div>
-                                            <label class="block text-[11px] text-dark/40 mb-1">Trailer URL (YouTube or MP4)</label>
+                                            <label class="block text-[11px] text-dark/40 mb-1">Trailer URL</label>
                                             <input type="url" x-model="form.<?= $p[3] ?>" placeholder="https://youtube.com/..."
                                                 class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         </div>
@@ -4782,6 +4879,93 @@ if (file_exists($errorLogFile)) {
         };
     }
 
+    // Image uploader component for settings fields
+    function imageUploader(fieldKey, initialUrl) {
+        return {
+            fieldKey,
+            preview:     initialUrl || null,
+            filename:    initialUrl ? initialUrl.split('/').pop() : '',
+            dragging:    false,
+            uploading:   false,
+            progress:    0,
+            uploadError: '',
+
+            onDrop(e) {
+                this.dragging = false;
+                const f = e.dataTransfer?.files?.[0];
+                if (f) this.upload(f);
+            },
+            onFile(e) {
+                const f = e.target.files?.[0];
+                if (f) this.upload(f);
+            },
+            clearImage() {
+                this.preview  = null;
+                this.filename = '';
+                this.uploadError = '';
+                // Also clear the parent form binding
+                const ev = new CustomEvent('image-cleared', { detail: { field: this.fieldKey } });
+                document.dispatchEvent(ev);
+            },
+            upload(file) {
+                const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+                if (!allowed.includes(file.type)) {
+                    this.uploadError = 'Only JPG, PNG, WEBP or GIF accepted.';
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    this.uploadError = 'Image must be under 5 MB.';
+                    return;
+                }
+
+                this.uploading   = true;
+                this.progress    = 0;
+                this.uploadError = '';
+
+                // Show local preview immediately
+                const reader = new FileReader();
+                reader.onload = e => { this.preview = e.target.result; };
+                reader.readAsDataURL(file);
+
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const fd   = new FormData();
+                fd.append('csrf_token', csrf);
+                fd.append('field',      this.fieldKey);
+                fd.append('image',      file);
+
+                const xhr = new XMLHttpRequest();
+                xhr.upload.onprogress = e => {
+                    if (e.lengthComputable) this.progress = Math.round(e.loaded / e.total * 100);
+                };
+                xhr.onload = () => {
+                    this.uploading = false;
+                    try {
+                        const r = JSON.parse(xhr.responseText);
+                        if (r.success) {
+                            this.preview  = r.url;
+                            this.filename = r.url.split('/').pop();
+                            // Update the parent landingSettings form
+                            const ev = new CustomEvent('image-uploaded', {
+                                detail: { field: this.fieldKey, url: r.url }
+                            });
+                            document.dispatchEvent(ev);
+                        } else {
+                            this.uploadError = r.error || 'Upload failed.';
+                        }
+                    } catch(err) {
+                        this.uploadError = 'Server error. Try again.';
+                    }
+                };
+                xhr.onerror = () => {
+                    this.uploading   = false;
+                    this.uploadError = 'Network error. Try again.';
+                };
+                xhr.open('POST', '/api/admin/settings/upload-image');
+                xhr.send(fd);
+            }
+        };
+    }
+
     // Landing page settings panel
     function landingSettings() {
         return {
@@ -4801,6 +4985,19 @@ if (file_exists($errorLogFile)) {
                 landing_poster3_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_title',''))) ?>',
                 landing_trailer3_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer3_url',''))) ?>',
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
+            },
+            init() {
+                // Sync uploaded image URLs back into the form
+                document.addEventListener('image-uploaded', e => {
+                    if (this.form.hasOwnProperty(e.detail.field)) {
+                        this.form[e.detail.field] = e.detail.url;
+                    }
+                });
+                document.addEventListener('image-cleared', e => {
+                    if (this.form.hasOwnProperty(e.detail.field)) {
+                        this.form[e.detail.field] = '';
+                    }
+                });
             },
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;
