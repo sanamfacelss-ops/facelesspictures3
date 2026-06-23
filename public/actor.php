@@ -65,8 +65,8 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
 .script-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.10);transform:translateY(-2px)}
 
 /* POSTER TOP */
-.card-poster{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);overflow:hidden;flex-shrink:0}
-.card-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.card-poster{position:relative;aspect-ratio:2/3;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);overflow:hidden;flex-shrink:0}
+.card-poster img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
 .card-poster-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
 .poster-badge{position:absolute;top:10px;left:10px;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;border-radius:20px;color:#fff;backdrop-filter:blur(8px)}
 .badge-dialog{background:rgba(17,17,17,.8);border:1px solid rgba(255,255,255,.2)}

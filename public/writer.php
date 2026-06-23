@@ -31,8 +31,8 @@ $pageTitle = 'Writer Submissions — Faceless Pictures 3';
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
 .script-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);border:1px solid #e5e7eb;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}
 .script-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.10);transform:translateY(-2px)}
-.card-poster{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);overflow:hidden;flex-shrink:0}
-.card-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.card-poster{position:relative;aspect-ratio:2/3;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);overflow:hidden;flex-shrink:0}
+.card-poster img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
 .card-poster-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
 .poster-badge{position:absolute;top:10px;left:10px;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;border-radius:20px;color:#fff;backdrop-filter:blur(8px);background:rgba(17,17,17,.8);border:1px solid rgba(255,255,255,.2)}
 .diff-pip{position:absolute;top:10px;right:10px;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .55rem;border-radius:10px}
