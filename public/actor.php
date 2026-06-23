@@ -92,14 +92,24 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     .card-poster{
         width:100% !important;
         min-width:0 !important;
-        height:260px !important;
+        /* Use aspect-ratio so image shows fully without cutting */
+        height:auto !important;
         min-height:0 !important;
+        aspect-ratio:16/9;
+    }
+    .card-poster img{
+        width:100%;
+        height:100%;
+        min-height:0 !important;
+        object-fit:cover;
+        object-position:center center;
     }
     .card-body{ grid-template-columns:1fr; }
     .card-col + .card-col{ border-left:none; border-top:1px solid #f0f0f0; }
 }
 @media(max-width:480px){
     .form2{ grid-template-columns:1fr !important; }
+    .card-poster{ aspect-ratio:4/3; }
 }
 
 /* 3-column content grid */
@@ -113,35 +123,39 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 }
 .col-divider{width:1px;background:#f0f0f0;align-self:stretch}
 
-/* Brief: collapsed by default, details/summary for expand */
+/* Brief: first 3 lines always visible, details/summary for the rest */
 details.brief-details summary{
     list-style:none;
     cursor:pointer;
-    font-size:.75rem;
-    font-weight:600;
-    color:#374151;
-    text-decoration:underline;
-    text-underline-offset:2px;
-    padding:.2rem 0;
-    margin-top:.35rem;
-    display:block;
+    font-size:.78rem;
+    font-weight:700;
+    color:#111;
+    background:#f3f4f6;
+    border:1.5px solid #e5e7eb;
+    border-radius:8px;
+    padding:.4rem .875rem;
+    margin-top:.5rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    transition:background .2s,border-color .2s;
+    font-family:inherit;
+    letter-spacing:.01em;
 }
 details.brief-details summary::-webkit-details-marker{display:none}
-details.brief-details .brief-preview{
-    display:-webkit-box;
-    -webkit-line-clamp:4;
-    -webkit-box-orient:vertical;
-    overflow:hidden;
+details.brief-details summary:hover{background:#e5e7eb;border-color:#d1d5db}
+details.brief-details .brief-more{
     font-size:.85rem;
     color:#4b5563;
-    line-height:1.7;
+    line-height:1.72;
+    padding-top:.6rem;
+    border-top:1px solid #f0f0f0;
+    margin-top:.5rem;
+    animation:briefSlide .3s ease;
 }
-details.brief-details[open] .brief-preview{
-    display:block;
-    -webkit-line-clamp:unset;
-}
-details.brief-details summary::before{content:'▼ '}
-details.brief-details[open] summary::before{content:'▲ '}
+@keyframes briefSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+details.brief-details summary .arr{transition:transform .25s ease;display:inline-block}
+details.brief-details[open] summary .arr{transform:rotate(180deg)}
 .card-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.03em;color:#111;line-height:1.05}
 .dur-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .55rem;border-radius:20px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;margin-top:.35rem}
 
@@ -254,13 +268,27 @@ details.brief-details[open] summary::before{content:'▲ '}
             <?php endif; ?>
           </div>
 
-          <!-- Brief — native details/summary dropdown, no Alpine needed -->
+          <!-- Brief — script name + preview always visible, expand for full -->
           <div>
-            <p class="fp-label" style="margin-bottom:.4rem">The Brief</p>
+            <p class="fp-label" style="margin-bottom:.35rem">The Brief</p>
+            <?php
+              // Show first 120 chars as preview, rest in details
+              $briefFull    = $script['content'] ?? '';
+              $briefPreview = mb_substr($briefFull, 0, 160);
+              $briefRest    = mb_strlen($briefFull) > 160 ? mb_substr($briefFull, 160) : '';
+            ?>
+            <!-- Always-visible: script title + brief start -->
+            <p style="font-size:.78rem;font-weight:700;color:#111;margin-bottom:.3rem;letter-spacing:.01em"><?= htmlspecialchars($script['title'] ?? '') ?></p>
+            <p style="font-size:.85rem;color:#4b5563;line-height:1.7"><?= htmlspecialchars($briefPreview) ?><?= $briefRest ? '<span style="color:#9ca3af">…</span>' : '' ?></p>
+            <!-- Read more: shows the rest -->
+            <?php if ($briefRest): ?>
             <details class="brief-details">
-              <p class="brief-preview"><?= htmlspecialchars($script['content'] ?? '') ?></p>
-              <summary>Read full brief</summary>
+              <summary>
+                <span class="arr">▾</span> Read full brief
+              </summary>
+              <div class="brief-more"><?= nl2br(htmlspecialchars($briefRest)) ?></div>
             </details>
+            <?php endif; ?>
           </div>
 
           <button class="btn-pdf" @click="downloadPDF()" style="align-self:flex-start">
