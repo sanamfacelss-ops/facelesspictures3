@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../app/config/config.php';
 
 if (!is_admin()) redirect('/dashboard');
@@ -3232,182 +3232,10 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
-                            <!-- SECTION: Actor Page Media -->
-                            <div class="mb-6">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Actor Page — Media &amp; Links</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div x-data="videoUploader('actor_preview_video_url','<?= addslashes(htmlspecialchars($settingsModel->get('actor_preview_video_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Dialog Preview Video</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.vidInput.click()">
-                                            <input type="file" x-ref="vidInput" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><svg class="w-6 h-6 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><p class="text-[11px] text-dark/40">Upload dialog preview video</p><p class="text-[10px] text-dark/25">MP4 · MOV · WEBM</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div><p class="text-[11px] text-dark/40" x-text="progress+'%'"></p></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2.5"><div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="flex-1 min-w-0"><p class="text-[12px] font-medium text-dark truncate" x-text="filename||'Video uploaded'"></p><p class="text-[10px] text-green-600">✓ Ready</p></div><button type="button" @click.stop="clearVideo()" class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 text-[11px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="videoUploader('song_preview_video_url','<?= addslashes(htmlspecialchars($settingsModel->get('song_preview_video_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Song Preview Video</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.vidInput.click()">
-                                            <input type="file" x-ref="vidInput" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><svg class="w-6 h-6 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><p class="text-[11px] text-dark/40">Upload song preview video</p><p class="text-[10px] text-dark/25">MP4 · MOV · WEBM</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div><p class="text-[11px] text-dark/40" x-text="progress+'%'"></p></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2.5"><div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="flex-1 min-w-0"><p class="text-[12px] font-medium text-dark truncate" x-text="filename||'Video uploaded'"></p><p class="text-[10px] text-green-600">✓ Ready</p></div><button type="button" @click.stop="clearVideo()" class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 text-[11px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="imageUploader('actor_script_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_image_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Dialog Script Image</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
-                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait script image</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
-                                        </div>
-                                    </div>
-                                    <div x-data="imageUploader('song_lyrics_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_image_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Song Lyrics Image</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
-                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait lyrics image</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
-                                        </div>
-                                    </div>
-                                    <div x-data="pdfUploader('actor_script_pdf_url','<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_pdf_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Script PDF — Dialog</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:70px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.pdfInput.click()">
-                                            <input type="file" x-ref="pdfInput" class="hidden" accept="application/pdf" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1 p-3 text-center"><svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-[11px] text-dark/40">Upload dialog script PDF</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-3"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2"><div class="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-red-600">PDF</div><p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p><button type="button" @click.stop="clearPdf()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="pdfUploader('song_lyrics_pdf_url','<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_pdf_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Lyrics PDF — Song</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:70px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.pdfInput.click()">
-                                            <input type="file" x-ref="pdfInput" class="hidden" accept="application/pdf" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1 p-3 text-center"><svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-[11px] text-dark/40">Upload lyrics PDF</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-3"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2"><div class="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-red-600">PDF</div><p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p><button type="button" @click.stop="clearPdf()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Song Tune YouTube URL (Get Tune button)</label>
-                                        <input type="url" x-model="form.song_tune_youtube_url" placeholder="https://youtube.com/watch?v=..."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <p class="text-[11px] text-dark/30 mt-1">YouTube or direct video URL. Opens in a popup so actors can play the tune while recording.</p>
-                            </div>
-                            </div>
-
-                            <!-- SECTION: Director Page Media -->
-                            <div class="mb-6">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Director Page — Media &amp; Links</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div x-data="videoUploader('director_preview_video_url','<?= addslashes(htmlspecialchars($settingsModel->get('director_preview_video_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Director Preview Video</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.vidInput.click()">
-                                            <input type="file" x-ref="vidInput" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><svg class="w-6 h-6 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><p class="text-[11px] text-dark/40">Upload director preview video</p><p class="text-[10px] text-dark/25">MP4 · MOV · WEBM</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div><p class="text-[11px] text-dark/40" x-text="progress+'%'"></p></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2.5"><div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="flex-1 min-w-0"><p class="text-[12px] font-medium text-dark truncate" x-text="filename||'Video uploaded'"></p><p class="text-[10px] text-green-600">✓ Ready</p></div><button type="button" @click.stop="clearVideo()" class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 text-[11px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="pdfUploader('director_script_pdf_url','<?= addslashes(htmlspecialchars($settingsModel->get('director_script_pdf_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Director Script PDF</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:70px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.pdfInput.click()">
-                                            <input type="file" x-ref="pdfInput" class="hidden" accept="application/pdf" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1 p-3 text-center"><svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-[11px] text-dark/40">Upload director script PDF</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-3"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2"><div class="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-red-600">PDF</div><p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p><button type="button" @click.stop="clearPdf()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="imageUploader('director_script_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('director_script_image_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Director Script Image</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
-                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait director script image</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- SECTION: Writer Page Media -->
-                            <div class="mb-6">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Writer Page — Media &amp; Links</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div x-data="videoUploader('writer_preview_video_url','<?= addslashes(htmlspecialchars($settingsModel->get('writer_preview_video_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Writer Preview Video</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.vidInput.click()">
-                                            <input type="file" x-ref="vidInput" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><svg class="w-6 h-6 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><p class="text-[11px] text-dark/40">Upload writer preview video</p><p class="text-[10px] text-dark/25">MP4 · MOV · WEBM</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div><p class="text-[11px] text-dark/40" x-text="progress+'%'"></p></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2.5"><div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="flex-1 min-w-0"><p class="text-[12px] font-medium text-dark truncate" x-text="filename||'Video uploaded'"></p><p class="text-[10px] text-green-600">✓ Ready</p></div><button type="button" @click.stop="clearVideo()" class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 text-[11px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="pdfUploader('writer_script_pdf_url','<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_pdf_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Writer Script PDF</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:70px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.pdfInput.click()">
-                                            <input type="file" x-ref="pdfInput" class="hidden" accept="application/pdf" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1 p-3 text-center"><svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-[11px] text-dark/40">Upload writer script PDF</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-3"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="flex items-center gap-2.5 px-3 py-2"><div class="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-red-600">PDF</div><p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p><button type="button" @click.stop="clearPdf()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button></div></template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                    </div>
-                                    <div x-data="imageUploader('writer_script_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_image_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Writer Script Image</label>
-                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
-                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
-                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait writer script image</p></div></template>
-                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
-                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
-                                        </div>
-                                    </div>
-                                </div>
+                            <!-- Media fields are now per-script — see Scripts tab -->
+                            <div class="mb-2 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+                                <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <p class="text-[12px] text-blue-700">Preview videos, script images, PDFs and song tune URLs are now managed <strong>per-script</strong>. Go to <a href="#" @click.prevent="activeTab='scripts'" class="font-semibold underline">Scripts tab</a> → Edit any script to upload its media.</p>
                             </div>
 
                             <div class="flex items-center gap-3">
@@ -5773,22 +5601,6 @@ if (file_exists($errorLogFile)) {
                 landing_poster6_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_title',''))) ?>',
                 landing_trailer6_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer6_url',''))) ?>',
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
-                // Actor page media
-                actor_preview_video_url: '<?= addslashes(htmlspecialchars($settingsModel->get('actor_preview_video_url',''))) ?>',
-                song_preview_video_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('song_preview_video_url',''))) ?>',
-                actor_script_image_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_image_url',''))) ?>',
-                song_lyrics_image_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_image_url',''))) ?>',
-                actor_script_pdf_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_pdf_url',''))) ?>',
-                song_lyrics_pdf_url:     '<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_pdf_url',''))) ?>',
-                song_tune_youtube_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('song_tune_youtube_url',''))) ?>',
-                // Director page media
-                director_preview_video_url: '<?= addslashes(htmlspecialchars($settingsModel->get('director_preview_video_url',''))) ?>',
-                director_script_image_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('director_script_image_url',''))) ?>',
-                director_script_pdf_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('director_script_pdf_url',''))) ?>',
-                // Writer page media
-                writer_preview_video_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('writer_preview_video_url',''))) ?>',
-                writer_script_image_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_image_url',''))) ?>',
-                writer_script_pdf_url:      '<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_pdf_url',''))) ?>',
             },
             init() {
                 // Sync uploaded image URLs back into the form
