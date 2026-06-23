@@ -1751,4 +1751,166 @@ class AdminController
             echo json_encode(['success' => false, 'error' => 'Error: ' . $e->getMessage()]);
         }
     }
+
+    /**
+     * Save a landing page or audition brief setting
+     * POST /api/admin/settings/landing
+     */
+    public function saveLandingSetting(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $key   = trim($_POST['key']   ?? '');
+        $value = trim($_POST['value'] ?? '');
+
+        $allowed = [
+            'landing_poster_url', 'landing_trailer_url',
+            'landing_hero_title', 'landing_hero_subtitle', 'landing_about_text',
+            'actor_dialog_script', 'actor_song_script',
+            'director_brief', 'writer_brief',
+        ];
+
+        if (!in_array($key, $allowed)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Invalid setting key']);
+            return;
+        }
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $settingsModel->set($key, $value);
+            debug_log("Admin saved landing setting: {$key}", 'ADMIN');
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_LANDING_SETTING');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save setting']);
+        }
+    }
+
+    // ==================== PUBLIC SUBMISSIONS ====================
+
+    /**
+     * List all public (guest) submissions with optional filters
+     * GET /api/admin/submissions?role=actor&status=new&search=john
+     */
+    public function listSubmissions(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $submissionModel = new \App\Models\Submission();
+
+            if (!$submissionModel->tableExists()) {
+                echo json_encode([
+                    'success'     => true,
+                    'submissions' => [],
+                    'counts'      => ['new' => 0, 'reviewed' => 0, 'shortlisted' => 0, 'rejected' => 0],
+                    'roles'       => ['actor' => 0, 'director' => 0, 'writer' => 0],
+                    'total'       => 0,
+                    'table_missing' => true,
+                ]);
+                return;
+            }
+
+            $role   = trim($_GET['role']   ?? '');
+            $status = trim($_GET['status'] ?? '');
+            $search = trim($_GET['search'] ?? '');
+
+            $submissions = $submissionModel->filter(
+                $role   ?: null,
+                $status ?: null,
+                $search ?: null
+            );
+
+            echo json_encode([
+                'success'     => true,
+                'submissions' => $submissions,
+                'counts'      => $submissionModel->countByStatus(),
+                'roles'       => $submissionModel->countByRole(),
+                'total'       => $submissionModel->totalCount(),
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_LIST_SUBMISSIONS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to load submissions: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update submission status and/or admin notes
+     * POST /api/admin/submissions/{id}/status
+     */
+    public function updateSubmission(int $id): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $status     = trim($_POST['status']      ?? '');
+        $adminNotes = trim($_POST['admin_notes'] ?? '');
+
+        $validStatuses = ['new', 'reviewed', 'shortlisted', 'rejected'];
+        if (!in_array($status, $validStatuses)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Invalid status']);
+            return;
+        }
+
+        try {
+            $submissionModel = new \App\Models\Submission();
+            $sub = $submissionModel->findById($id);
+            if (!$sub) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Submission not found']);
+                return;
+            }
+
+            $submissionModel->updateStatus($id, $status, $adminNotes ?: null);
+            debug_log("Admin updated submission #{$id} status to {$status}", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Submission updated']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_UPDATE_SUBMISSION');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update submission']);
+        }
+    }
+
+    /**
+     * Delete a submission (and its uploaded file if present)
+     * POST /api/admin/submissions/{id}/delete
+     */
+    public function deleteSubmission(int $id): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $submissionModel = new \App\Models\Submission();
+            $sub = $submissionModel->findById($id);
+            if (!$sub) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Submission not found']);
+                return;
+            }
+
+            // Delete associated file
+            if (!empty($sub['file_path'])) {
+                $filePath = UPLOAD_PATH . '/' . $sub['file_path'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                    debug_log("Deleted submission file: {$filePath}", 'ADMIN');
+                }
+            }
+
+            $submissionModel->delete($id);
+            debug_log("Admin deleted submission #{$id}", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Submission deleted']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_DELETE_SUBMISSION');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete submission']);
+        }
+    }
 }

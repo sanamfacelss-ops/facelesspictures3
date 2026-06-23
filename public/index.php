@@ -11,6 +11,7 @@ use App\Controllers\UploadController;
 use App\Controllers\ModerationController;
 use App\Controllers\AIController;
 use App\Controllers\AdminController;
+use App\Controllers\SubmissionController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
@@ -148,6 +149,17 @@ $routes = [
     // Upload API
     'api/upload' => [UploadController::class, 'store', 'POST'],
 
+    // Public guest submission API (no login required)
+    'api/submit' => [SubmissionController::class, 'store', 'POST'],
+
+    // Admin submissions API
+    'api/admin/submissions'              => [AdminController::class, 'listSubmissions',    'GET'],
+    'api/admin/submissions/{id}/status'  => [AdminController::class, 'updateSubmission',   'POST'],
+    'api/admin/submissions/{id}/delete'  => [AdminController::class, 'deleteSubmission',   'POST'],
+
+    // Landing page / audition brief settings save
+    'api/admin/settings/landing'         => [AdminController::class, 'saveLandingSetting', 'POST'],
+
     // Moderation API
     'api/moderation/pending' => [ModerationController::class, 'pendingList', 'GET'],
     'api/moderation/flagged' => [ModerationController::class, 'flaggedList', 'GET'],
@@ -249,6 +261,11 @@ $pageRoutes = [
     'creator/videos' => 'creator/videos.php',
     // Onboarding
     'onboarding' => 'onboarding.php',
+
+    // Public audition pages (no login required)
+    'actor'    => 'actor.php',
+    'director' => 'director.php',
+    'writer'   => 'writer.php',
 ];
 
 if (isset($pageRoutes[$uri])) {
