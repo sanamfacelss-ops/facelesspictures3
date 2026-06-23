@@ -1871,6 +1871,7 @@ class AdminController
             'site_logo_url',
             'landing_poster_url',  'landing_poster2_url', 'landing_poster3_url',
             'landing_poster4_url', 'landing_poster5_url', 'landing_poster6_url',
+            'actor_script_image_url', 'song_lyrics_image_url',
         ];
         $videoFields = [
             'landing_trailer_url',  'landing_trailer2_url', 'landing_trailer3_url',
@@ -1978,6 +1979,10 @@ class AdminController
             'landing_about_text',
             'actor_dialog_script', 'actor_song_script',
             'director_brief', 'writer_brief',
+            // Actor page media
+            'actor_preview_video_url', 'song_preview_video_url',
+            'actor_script_image_url',  'song_lyrics_image_url',
+            'song_tune_youtube_url',   'actor_script_pdf_url', 'song_lyrics_pdf_url',
         ];
 
         if (!in_array($key, $allowed)) {

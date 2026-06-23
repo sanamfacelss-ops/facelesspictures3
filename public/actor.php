@@ -1,17 +1,17 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
-
-$scriptModel   = new App\Models\Script();
 $settingsModel = new App\Models\Settings();
-$logoUrl       = $settingsModel->get('site_logo_url', '');
-$actorScripts  = $scriptModel->byCategory('actor');
-
-if (empty($actorScripts)) {
-    $actorScripts = [
-        ['id'=>'dialog','title'=>'Dialog Audition','content'=>$settingsModel->get('actor_dialog_script','Perform the following scene with full emotion. You receive a call that changes everything. Show shock, then resolve — all in under 90 seconds.'),'audition_type'=>'Dialog Audition','difficulty'=>'beginner','duration_hint'=>'60-90 seconds','image_url'=>'','rules'=>"Video under 3 minutes\nShoot on any device\nFace must not be visible\nClear audio required"],
-        ['id'=>'song','title'=>'Song Audition','content'=>$settingsModel->get('actor_song_script','Choose any song representing a character in transformation. Perform 60 seconds of emotional range — just your voice.'),'audition_type'=>'Song Audition','difficulty'=>'beginner','duration_hint'=>'60 seconds','image_url'=>'','rules'=>"Video under 2 minutes\nShoot on any device\nJust your voice\nClear audio required"],
-    ];
-}
+$logoUrl              = $settingsModel->get('site_logo_url', '');
+$dialogPreviewUrl     = $settingsModel->get('actor_preview_video_url', '');
+$songPreviewUrl       = $settingsModel->get('song_preview_video_url', '');
+$actorScriptImageUrl  = $settingsModel->get('actor_script_image_url', '');
+$songLyricsImageUrl   = $settingsModel->get('song_lyrics_image_url', '');
+$actorScriptPdfUrl    = $settingsModel->get('actor_script_pdf_url', '');
+$songLyricsPdfUrl     = $settingsModel->get('song_lyrics_pdf_url', '');
+$songTuneYoutubeUrl   = $settingsModel->get('song_tune_youtube_url', '');
+$actorDialogBrief     = $settingsModel->get('actor_dialog_script', 'Perform the following scene with full emotion. You receive a call that changes everything. Show shock, then resolve — all in under 90 seconds.');
+$actorSongBrief       = $settingsModel->get('actor_song_script', 'Choose any song that represents a character going through transformation. Perform a 60-second version showing emotional range — just your voice.');
+$actorRules           = "Video under 3 minutes\nShoot on any device\nFace must not be visible\nClear audio required\nNo background editing needed";
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 ?>
 <!DOCTYPE html>
@@ -29,167 +29,58 @@ $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 html,body{width:100%;overflow-x:hidden}
 body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font-smoothing:antialiased}
 [x-cloak]{display:none!important}
-
-/* ── NAV ── */
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
-
-/* ── CARD GRID: 3 columns on desktop ── */
-.cards-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:1.5rem;
-    max-width:1280px;
-    margin:0 auto;
-    padding:0 1.5rem 5rem;
-}
-@media(max-width:960px){ .cards-grid{grid-template-columns:repeat(2,1fr)} }
-@media(max-width:580px){ .cards-grid{grid-template-columns:1fr;padding:0 1rem 4rem} }
-
-/* ── VERTICAL CARD ── */
-.vcard{
-    background:#fff;
-    border:1px solid #e5e7eb;
-    border-radius:14px;
-    box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-}
-
-/* ── POSTER: image always fully visible, never cropped ── */
-.vcard-poster{
-    position:relative;
-    width:100%;
-    background:#1a1a2e;
-    /* padding-bottom creates the aspect ratio box */
-    padding-bottom:66%;
-    overflow:hidden;
-    flex-shrink:0;
-}
-.vcard-poster img{
-    position:absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    /* contain = full image always visible, never cropped */
-    object-fit:contain;
-    object-position:center center;
-    display:block;
-}
-.vcard-poster-ph{
-    position:absolute;
-    inset:0;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-}
-.vcard-badge{
-    position:absolute;top:10px;left:10px;z-index:2;
-    font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-    padding:.25rem .65rem;border-radius:20px;
-    background:rgba(17,17,17,.85);color:#fff;
-    border:1px solid rgba(255,255,255,.2);
-    white-space:nowrap;
-}
-
-/* ── CARD BODY ── */
-.vcard-body{
-    flex:1;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-}
-
-/* Section blocks inside card */
-.card-section{
-    padding:1rem 1.125rem;
-    border-bottom:1px solid #f0f0f0;
-}
-.card-section:last-child{border-bottom:none}
-
-/* Section header label */
-.section-label{
-    display:flex;
-    align-items:center;
-    gap:.5rem;
-    font-size:.62rem;
-    font-weight:800;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:#9ca3af;
-    margin-bottom:.625rem;
-}
-.section-label::before{
-    content:'';
-    display:inline-block;
-    width:3px;
-    height:11px;
-    border-radius:2px;
-    background:#111;
-    flex-shrink:0;
-}
-
-.vcard-title{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111;line-height:1.05}
-.dur-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.6rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.18rem .5rem;border-radius:20px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;margin-top:.3rem}
-
-/* Brief */
-.brief-preview{font-size:.84rem;color:#4b5563;line-height:1.72}
-.brief-extra{
-    max-height:0;overflow:hidden;
-    transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .35s ease;
-    opacity:0;font-size:.84rem;color:#4b5563;line-height:1.72;
-}
-.brief-extra.open{max-height:800px;opacity:1}
-
-.brief-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
-.brief-toggle{
-    display:inline-flex;align-items:center;gap:.25rem;
-    font-size:.72rem;font-weight:700;color:#374151;
-    background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:8px;
-    padding:.3rem .65rem;cursor:pointer;font-family:inherit;
-    transition:background .15s;white-space:nowrap;
-}
-.brief-toggle:hover{background:#e5e7eb}
-.brief-toggle .arr{display:inline-block;transition:transform .3s cubic-bezier(.4,0,.2,1);font-size:.75rem}
-.brief-toggle.open .arr{transform:rotate(180deg)}
-
-.btn-pdf{display:inline-flex;align-items:center;gap:.3rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.3rem .65rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;transition:border-color .15s;white-space:nowrap}
-.btn-pdf:hover{border-color:#111}
-
-/* Rules section — light tinted bg */
-.rules-section{background:#f9fafb}
-.rule-row{display:flex;align-items:flex-start;gap:.4rem;font-size:.78rem;color:#374151;line-height:1.5;padding:.15rem 0}
-.rule-dot{width:3px;height:3px;border-radius:50%;background:#9ca3af;flex-shrink:0;margin-top:.5rem}
-
-/* Form section */
-.fp-label{display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.28rem}
-.fp-input{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;color:#111;padding:.52rem .75rem;width:100%;font-size:.875rem;outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .2s}
-.fp-input:focus{border-color:#111;box-shadow:0 0 0 2px rgba(17,17,17,.07)}
-.fp-input::placeholder{color:#9ca3af}
-.form2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-
-/* Upload section — accent bg */
-.upload-section{background:#f9fafb}
-.upload-zone{border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;background:#fff;text-align:center;padding:.875rem .75rem;transition:border-color .2s,background .2s}
-.upload-zone:hover,.upload-zone.drag{border-color:#111;background:#f5f5f5}
-.upload-icon{display:block;margin:0 auto .4rem}
-.upload-main{color:#6b7280;font-size:.82rem}
-.upload-hint{color:#9ca3af;font-size:.72rem;margin-top:.2rem}
-
-.prog-bar{height:3px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin-top:.35rem}
-.prog-fill{height:100%;background:#111;border-radius:2px;transition:width .3s}
-.err-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;color:#991b1b;padding:.5rem .75rem;font-size:.78rem;margin-top:.4rem}
-
-/* Submit section */
-.submit-section{background:#fff}
-.btn-submit{
-    display:block;width:100%;
-    background:#111;color:#fff;
-    font-weight:700;border:none;
-    border-radius:9px;padding:.8rem;
-    font-size:.9rem;cursor:pointer;
-    text-align:center;font-family:inherit;
-    letter-spacing:.01em;
-}
-.btn-submit:hover{background:#333}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem}
+@media(max-width:768px){.brief-grid{grid-template-columns:1fr;padding:0 1rem 1.5rem}}
+.brief-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column}
+.card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
+.card-sec:last-child{border-bottom:none}
+.card-sec.tinted{background:#f9fafb}
+.sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
+.sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
+.preview-video{width:100%;display:block;background:#000;max-height:260px}
+.video-placeholder{width:100%;height:160px;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.portrait-img{width:100%;max-height:300px;object-fit:contain;background:#f3f4f6;display:block}
+.portrait-placeholder{width:100%;height:180px;background:#f3f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#9ca3af;font-size:.72rem}
+.btn-outline{display:inline-flex;align-items:center;gap:.35rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:border-color .15s,background .15s;white-space:nowrap}
+.btn-outline:hover{border-color:#111;background:#f9fafb}
+.btn-outline.disabled{opacity:.45;pointer-events:none;cursor:not-allowed}
+.btn-tune{display:inline-flex;align-items:center;gap:.35rem;background:#111;color:#fff;border:none;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
+.btn-tune:hover{background:#333}
+.btn-tune:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.rule-row{display:flex;align-items:flex-start;gap:.4rem;font-size:.78rem;color:#374151;line-height:1.55;padding:.15rem 0}
+.rule-dot{width:3px;height:3px;border-radius:50%;background:#9ca3af;flex-shrink:0;margin-top:.55rem}
+#tuneModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:1.5rem}
+#tuneModal.open{display:flex}
+.tune-box{background:#161C2D;border:1px solid #1F2840;border-radius:16px;width:100%;max-width:720px;padding:1.25rem;position:relative}
+.tune-close{position:absolute;top:.75rem;right:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.tune-close:hover{background:rgba(255,255,255,.18)}
+.tune-wrap{position:relative;width:100%;padding-bottom:56.25%;margin-top:.5rem;border-radius:8px;overflow:hidden;background:#000}
+.tune-wrap iframe,.tune-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.submit-card{background:#111;border-radius:14px;max-width:1280px;margin:0 auto 5rem;padding:2.25rem 2rem}
+@media(max-width:768px){.submit-card{margin:0 1rem 4rem;padding:1.5rem 1.25rem;border-radius:12px}}
+.fp-label-dark{display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.28rem}
+.fp-input-dark{background:#1a1a1a;border:1.5px solid #2d2d2d;border-radius:8px;color:#fff;padding:.55rem .8rem;width:100%;font-size:.875rem;outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .2s}
+.fp-input-dark:focus{border-color:#555;box-shadow:0 0 0 2px rgba(255,255,255,.07)}
+.fp-input-dark::placeholder{color:#4b5563}
+.form3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+@media(max-width:640px){.form3{grid-template-columns:1fr}}
+.divider-dark{height:1px;background:#2d2d2d;margin:1.25rem 0}
+.upload2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:580px){.upload2{grid-template-columns:1fr}}
+.uzone{border:2px dashed #2d2d2d;border-radius:10px;cursor:pointer;background:#1a1a1a;text-align:center;padding:1.25rem 1rem;transition:border-color .2s,background .2s}
+.uzone:hover,.uzone.drag{border-color:#666;background:#222}
+.uzone.has-file{border-color:#4ade80;border-style:solid;background:#0d1f0d}
+.prog-bar{height:3px;background:#2d2d2d;border-radius:2px;overflow:hidden;margin-top:.4rem}
+.prog-fill{height:100%;background:#fff;border-radius:2px;transition:width .3s}
+.err-dark{background:rgba(239,68,68,.12);border:1.5px solid rgba(239,68,68,.3);border-radius:8px;color:#fca5a5;padding:.6rem .875rem;font-size:.8rem;margin-top:.75rem}
+.btn-go{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#fff;color:#111;font-weight:700;border:none;border-radius:9px;padding:.9rem 1.5rem;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .15s;margin-top:1.25rem}
+.btn-go:hover{background:#e5e7eb}
+.btn-go:disabled{opacity:.4;cursor:not-allowed}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -198,12 +89,8 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 <nav class="fp-nav">
   <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:space-between">
     <a href="/" style="display:flex;align-items:center;gap:7px;text-decoration:none">
-      <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:30px;width:auto">
-      <?php else: ?>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
-        <span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
-      <?php endif; ?>
+      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:30px;width:auto">
+      <?php else: ?><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span><span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span><?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem;align-items:center">
       <a href="/actor"    style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#111;text-decoration:none;border-bottom:2px solid #111;padding-bottom:1px">Actor</a>
@@ -214,127 +101,165 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 </nav>
 
 <!-- HERO -->
-<section style="padding:4.5rem 1.5rem 1.5rem;text-align:center">
+<section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
   <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Auditions Now Open</p>
   <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap">ACTOR AUDITIONS</h1>
-  <p style="color:#6b7280;font-size:.85rem;max-width:360px;margin:0 auto;line-height:1.5">Pick an audition. Read the brief. Shoot your video. Submit.</p>
+  <p style="color:#6b7280;font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.55">Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.</p>
 </section>
 
-<!-- CARDS GRID -->
-<div class="cards-grid">
+<!-- TWO BRIEF CARDS -->
+<div class="brief-grid">
+<?php $ruleList = array_filter(array_map('trim', explode("\n", $actorRules))); ?>
 
-<?php foreach ($actorScripts as $i => $script):
-    $atype    = htmlspecialchars($script['audition_type'] ?? 'Audition');
-    $rules    = $script['rules'] ?? "Video under 3 minutes\nShoot on any device\nFace must not be visible\nClear audio required";
-    $ruleList = array_filter(array_map('trim', explode("\n", $rules)));
-    $scriptId = is_numeric($script['id']) ? (int)$script['id'] : 0;
-
-    $briefFull    = $script['content'] ?? '';
-    $briefPreview = mb_substr($briefFull, 0, 150);
-    $briefRest    = mb_strlen($briefFull) > 150 ? mb_substr($briefFull, 150) : '';
-    $expandId     = 'bx_' . $i;
-    $btnId        = 'bb_' . $i;
-?>
-
-  <!-- Card -->
-  <div class="vcard" x-data="auCard(<?= $scriptId ?>, '<?= addslashes($atype) ?>', 'actor', <?= json_encode($script['title'] ?? '') ?>, <?= json_encode($briefFull) ?>)">
-
-    <!-- POSTER: full image always visible, never cropped -->
-    <div class="vcard-poster">
-      <?php if (!empty($script['image_url'])): ?>
-        <img src="<?= htmlspecialchars($script['image_url']) ?>"
-             alt="<?= htmlspecialchars($script['title'] ?? '') ?>">
+  <!-- CARD 1: DIALOG BRIEF -->
+  <div class="brief-card">
+    <div class="card-sec" style="padding:0">
+      <?php if ($dialogPreviewUrl): ?>
+        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($dialogPreviewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
       <?php else: ?>
-        <div class="vcard-poster-ph">
-          <svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <span style="font-size:.58rem;color:rgba(255,255,255,.2);letter-spacing:.1em;text-transform:uppercase">Add image in Admin</span>
+        <div class="video-placeholder">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Preview video coming soon
         </div>
       <?php endif; ?>
-      <span class="vcard-badge"><?= $atype ?></span>
+    </div>
+    <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
+      <div class="sec-label">Dialog Brief</div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111">Dialog Audition</p>
+    </div>
+    <div class="card-sec" style="padding:0">
+      <?php if ($actorScriptImageUrl): ?>
+        <img src="<?= htmlspecialchars($actorScriptImageUrl) ?>" alt="Dialog script" class="portrait-img">
+      <?php else: ?>
+        <div class="portrait-placeholder">
+          <svg width="28" height="28" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Script image coming soon</span>
+        </div>
+      <?php endif; ?>
+    </div>
+    <div class="card-sec">
+      <div class="sec-label">Script</div>
+      <?php if ($actorScriptPdfUrl): ?>
+        <a href="<?= htmlspecialchars($actorScriptPdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Download Script PDF
+        </a>
+      <?php else: ?>
+        <span class="btn-outline disabled">Script PDF not available yet</span>
+      <?php endif; ?>
+    </div>
+    <div class="card-sec tinted" style="flex:1">
+      <div class="sec-label">Rules &amp; Limits</div>
+      <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
+    </div>
+  </div>
+
+  <!-- CARD 2: SONG BRIEF -->
+  <div class="brief-card">
+    <div class="card-sec" style="padding:0">
+      <?php if ($songPreviewUrl): ?>
+        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($songPreviewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+      <?php else: ?>
+        <div class="video-placeholder">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Preview video coming soon
+        </div>
+      <?php endif; ?>
+    </div>
+    <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
+      <div class="sec-label">Song Brief</div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111">Song Audition</p>
+    </div>
+    <div class="card-sec" style="padding:0">
+      <?php if ($songLyricsImageUrl): ?>
+        <img src="<?= htmlspecialchars($songLyricsImageUrl) ?>" alt="Song lyrics" class="portrait-img">
+      <?php else: ?>
+        <div class="portrait-placeholder">
+          <svg width="28" height="28" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+          <span>Lyrics image coming soon</span>
+        </div>
+      <?php endif; ?>
+    </div>
+    <div class="card-sec">
+      <div class="sec-label">Lyrics &amp; Tune</div>
+      <div class="btn-row">
+        <?php if ($songLyricsPdfUrl): ?>
+          <a href="<?= htmlspecialchars($songLyricsPdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Download Lyrics PDF
+          </a>
+        <?php else: ?>
+          <span class="btn-outline disabled">Lyrics PDF not available yet</span>
+        <?php endif; ?>
+        <button type="button" class="btn-tune <?= $songTuneYoutubeUrl ? '' : 'disabled' ?>" <?= $songTuneYoutubeUrl ? 'onclick="openTuneModal()"' : 'disabled' ?>>
+          ▶ Get Tune
+        </button>
+      </div>
+    </div>
+    <div class="card-sec tinted" style="flex:1">
+      <div class="sec-label">Rules &amp; Limits</div>
+      <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
+    </div>
+  </div>
+
+</div><!-- /brief-grid -->
+
+<!-- SUBMISSION CARD (full width, dark) -->
+<div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
+  <div class="submit-card" x-data="actorSubmit()">
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#fff;margin-bottom:.3rem">Ready to Audition? Submit Both Videos</p>
+    <p style="font-size:.85rem;color:#9ca3af;margin-bottom:1.5rem;line-height:1.55">Both dialog and song videos are required for a complete submission. One form, two videos, one chance.</p>
+
+    <!-- Contact -->
+    <div class="form3">
+      <div><label class="fp-label-dark">Name *</label><input type="text" x-model="form.name" class="fp-input-dark" placeholder="Your full name" required autocomplete="name"></div>
+      <div><label class="fp-label-dark">Email *</label><input type="email" x-model="form.email" class="fp-input-dark" placeholder="you@email.com" required autocomplete="email"></div>
+      <div><label class="fp-label-dark">Phone *</label><input type="tel" x-model="form.phone" class="fp-input-dark" placeholder="+91 98765 43210" required autocomplete="tel"></div>
     </div>
 
-    <!-- BODY -->
-    <div class="vcard-body">
+    <div class="divider-dark"></div>
 
-      <!-- SECTION 1: Title + Brief -->
-      <div class="card-section">
-        <div class="vcard-title"><?= htmlspecialchars($script['title'] ?? '') ?></div>
-        <?php if (!empty($script['duration_hint'])): ?>
-        <div><span class="dur-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span></div>
-        <?php endif; ?>
-
-        <div style="margin-top:.75rem">
-          <div class="section-label">The Brief</div>
-          <p style="font-size:.78rem;font-weight:700;color:#111;margin-bottom:.25rem"><?= htmlspecialchars($script['title'] ?? '') ?></p>
-          <p class="brief-preview"><?= htmlspecialchars($briefPreview) ?><?= $briefRest ? '<span style="color:#9ca3af"> …</span>' : '' ?></p>
-          <?php if ($briefRest): ?>
-          <div class="brief-extra" id="<?= $expandId ?>"><?= nl2br(htmlspecialchars($briefRest)) ?></div>
-          <?php endif; ?>
-          <div class="brief-actions">
-            <?php if ($briefRest): ?>
-            <button class="brief-toggle" id="<?= $btnId ?>" onclick="toggleBrief('<?= $expandId ?>','<?= $btnId ?>')">
-              <span class="arr">▾</span> Read full brief
-            </button>
-            <?php endif; ?>
-            <button class="btn-pdf" @click="downloadPDF()">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              Download PDF
-            </button>
-          </div>
+    <!-- Dual upload -->
+    <div class="upload2">
+      <div>
+        <label class="fp-label-dark" style="margin-bottom:.5rem">Dialog Audition Video *</label>
+        <div class="uzone" :class="[dragD?'drag':'',dialogFile?'has-file':'']" @click="$refs.dv.click()" @dragover.prevent="dragD=true" @dragleave="dragD=false" @drop.prevent="dropD($event)">
+          <input type="file" x-ref="dv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="dialogFile=$event.target.files[0]">
+          <svg style="width:24px;height:24px;color:#4b5563;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> dialog video</p>
+          <p style="color:#4b5563;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
+          <p x-show="dialogFile" x-text="'✓ '+(dialogFile?dialogFile.name:'')" style="display:none;color:#4ade80;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
       </div>
-
-      <!-- SECTION 2: Rules — tinted background for contrast -->
-      <div class="card-section rules-section">
-        <div class="section-label">Rules &amp; Limits</div>
-        <?php foreach ($ruleList as $r): ?>
-        <div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div>
-        <?php endforeach; ?>
-      </div>
-
-      <!-- SECTION 3: Contact form -->
-      <div class="card-section">
-        <div class="section-label">Your Details</div>
-        <div style="display:flex;flex-direction:column;gap:.5rem">
-          <div class="form2">
-            <div><label class="fp-label">Name *</label><input type="text" x-model="form.name" class="fp-input" placeholder="Full name" required autocomplete="name"></div>
-            <div><label class="fp-label">Email *</label><input type="email" x-model="form.email" class="fp-input" placeholder="you@email.com" required autocomplete="email"></div>
-          </div>
-          <div><label class="fp-label">Phone *</label><input type="tel" x-model="form.phone" class="fp-input" placeholder="+91 98765 43210" required autocomplete="tel"></div>
+      <div>
+        <label class="fp-label-dark" style="margin-bottom:.5rem">Song Audition Video *</label>
+        <div class="uzone" :class="[dragS?'drag':'',songFile?'has-file':'']" @click="$refs.sv.click()" @dragover.prevent="dragS=true" @dragleave="dragS=false" @drop.prevent="dropS($event)">
+          <input type="file" x-ref="sv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="songFile=$event.target.files[0]">
+          <svg style="width:24px;height:24px;color:#4b5563;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> song video</p>
+          <p style="color:#4b5563;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
+          <p x-show="songFile" x-text="'✓ '+(songFile?songFile.name:'')" style="display:none;color:#4ade80;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
       </div>
+    </div>
 
-      <!-- SECTION 4: Upload — tinted background -->
-      <div class="card-section upload-section">
-        <form @submit.prevent="submit()">
-          <div class="section-label">Your Video</div>
-          <div class="upload-zone" @click="$refs.vid.click()" @dragover.prevent="drag=true" @dragleave="drag=false" @drop.prevent="onDrop($event)" :class="drag?'drag':''">
-            <input type="file" x-ref="vid" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="onFile($event)">
-            <svg class="upload-icon" width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-            <p class="upload-main">Drop or <strong style="color:#111;text-decoration:underline">click to browse</strong></p>
-            <p class="upload-hint">MP4 · MOV · WEBM · max 500 MB · published to YouTube</p>
-            <p x-show="file" x-text="'✓ '+(file?file.name:'')" style="display:none;color:#111;font-size:.78rem;margin-top:.35rem;font-weight:600"></p>
-          </div>
-          <div x-show="uploading" style="display:none">
-            <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#6b7280;margin-top:.35rem;margin-bottom:.15rem"><span>Uploading…</span><span x-text="progress+'%'"></span></div>
-            <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
-          </div>
-          <div x-show="errors.length" style="display:none" class="err-box">
-            <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
-          </div>
-          <!-- Submit inside form so it works -->
-          <button type="submit" class="btn-submit" :disabled="loading" style="margin-top:.75rem">
-            Submit <?= $atype ?> →
-          </button>
-        </form>
-      </div>
+    <!-- Progress -->
+    <div x-show="loading" style="display:none;margin-top:.75rem">
+      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#9ca3af;margin-bottom:.25rem"><span>Uploading both videos…</span><span x-text="progress+'%'"></span></div>
+      <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
+    </div>
 
-    </div><!-- /vcard-body -->
-  </div><!-- /vcard -->
+    <!-- Errors -->
+    <div x-show="errors.length" style="display:none" class="err-dark">
+      <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
+    </div>
 
-<?php endforeach; ?>
-
-</div><!-- /cards-grid -->
+    <!-- Submit -->
+    <button type="button" class="btn-go" @click="submit()" :disabled="loading">
+      Submit Both Auditions →
+    </button>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1.5rem;background:#fff">
@@ -344,67 +269,92 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
       <?php else: ?><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span><span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:17px;height:17px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span><?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem">
-      <a href="/actor"    style="color:#6b7280;font-size:.8rem;text-decoration:none">Actor</a>
+      <a href="/actor" style="color:#6b7280;font-size:.8rem;text-decoration:none">Actor</a>
       <a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none">Director</a>
-      <a href="/writer"   style="color:#6b7280;font-size:.8rem;text-decoration:none">Writer</a>
+      <a href="/writer" style="color:#6b7280;font-size:.8rem;text-decoration:none">Writer</a>
     </div>
     <span style="color:#9ca3af;font-size:.75rem">No face. Just talent.</span>
   </div>
 </footer>
 
-<script>
-function toggleBrief(extraId, btnId) {
-    const el  = document.getElementById(extraId);
-    const btn = document.getElementById(btnId);
-    if (!el || !btn) return;
-    const opening = !el.classList.contains('open');
-    el.classList.toggle('open', opening);
-    btn.classList.toggle('open', opening);
-    // Update label
-    const label = btn.childNodes[btn.childNodes.length - 1];
-    if (label && label.nodeType === 3) {
-        label.textContent = opening ? ' Show less' : ' Read full brief';
-    }
-}
+<!-- TUNE MODAL -->
+<div id="tuneModal">
+  <div class="tune-box">
+    <button class="tune-close" onclick="closeTuneModal()">✕</button>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.04em;color:#fff;margin-bottom:.75rem">▶ Song Tune</p>
+    <div class="tune-wrap">
+      <iframe id="tuneIframe" src="" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen title="Song tune"></iframe>
+    </div>
+  </div>
+</div>
 
-function auCard(scriptId, auditionType, role, scriptTitle, briefContent) {
-    return {
-        scriptId, auditionType, role, scriptTitle, briefContent,
-        file: null, drag: false,
-        loading: false, uploading: false, progress: 0,
-        errors: [], form: { name: '', email: '', phone: '' },
-        onFile(e) { this.file = e.target.files[0] || null; },
-        onDrop(e) { this.drag = false; const f = e.dataTransfer.files[0]; if (f) this.file = f; },
-        downloadPDF() {
-            window._briefForPDF = { title: this.scriptTitle, auditionType: this.auditionType, content: this.briefContent };
-            if (typeof downloadBriefPDF === 'function') downloadBriefPDF();
-        },
-        async submit() {
-            this.errors = [];
-            if (!this.file) { this.errors = ['Please select a video file.']; return; }
-            this.loading = true; this.uploading = true; this.progress = 0;
-            const fd = new FormData();
-            fd.append('role', this.role);
-            fd.append('audition_type', this.auditionType);
-            fd.append('script_id', this.scriptId || '');
-            fd.append('name',  this.form.name);
-            fd.append('email', this.form.email);
-            fd.append('phone', this.form.phone);
-            fd.append('file',  this.file);
-            const xhr = new XMLHttpRequest();
-            xhr.upload.onprogress = e => { if (e.lengthComputable) this.progress = Math.round(e.loaded / e.total * 100); };
-            xhr.onload = () => {
-                this.loading = false; this.uploading = false;
-                try {
-                    const r = JSON.parse(xhr.responseText);
-                    if (xhr.status >= 200 && xhr.status < 300 && r.success) {
-                        this.form = { name: '', email: '', phone: '' }; this.file = null;
-                        if (typeof showSuccessModal === 'function') showSuccessModal(r);
-                    } else { this.errors = r.errors || [r.error || 'Submission failed.']; }
-                } catch(err) { this.errors = ['Server error. Please try again.']; }
+<script>
+var _tuneUrl = <?= json_encode($songTuneYoutubeUrl) ?>;
+
+function _embedUrl(u){
+    if(!u) return '';
+    var m=u.match(/youtu\.be\/([^?&#]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
+    m=u.match(/[?&]v=([^&#]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
+    return u;
+}
+function openTuneModal(){
+    var e=_embedUrl(_tuneUrl);
+    if(!e) return;
+    document.getElementById('tuneIframe').src=e+'?autoplay=1';
+    document.getElementById('tuneModal').style.display='flex';
+    document.body.style.overflow='hidden';
+}
+function closeTuneModal(){
+    document.getElementById('tuneIframe').src='';
+    document.getElementById('tuneModal').style.display='none';
+    document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeTuneModal();});
+document.getElementById('tuneModal').addEventListener('click',function(e){if(e.target===this)closeTuneModal();});
+
+function actorSubmit(){
+    return{
+        dialogFile:null,songFile:null,
+        loading:false,progress:0,errors:[],
+        dragD:false,dragS:false,
+        form:{name:'',email:'',phone:''},
+        dropD(e){this.dragD=false;var f=e.dataTransfer.files[0];if(f)this.dialogFile=f;},
+        dropS(e){this.dragS=false;var f=e.dataTransfer.files[0];if(f)this.songFile=f;},
+        submit(){
+            this.errors=[];
+            if(!this.form.name.trim()) this.errors.push('Name is required.');
+            if(!this.form.email.trim()) this.errors.push('Email is required.');
+            if(!this.form.phone.trim()) this.errors.push('Phone is required.');
+            if(!this.dialogFile) this.errors.push('Dialog audition video is required.');
+            if(!this.songFile)   this.errors.push('Song audition video is required.');
+            if(this.errors.length) return;
+            this.loading=true; this.progress=0;
+            var fd=new FormData();
+            fd.append('role','actor');
+            fd.append('audition_type','Actor Audition');
+            fd.append('name',this.form.name);
+            fd.append('email',this.form.email);
+            fd.append('phone',this.form.phone);
+            fd.append('dialog_video',this.dialogFile);
+            fd.append('song_video',this.songFile);
+            var self=this;
+            var xhr=new XMLHttpRequest();
+            xhr.upload.onprogress=function(e){if(e.lengthComputable)self.progress=Math.round(e.loaded/e.total*100);};
+            xhr.onload=function(){
+                self.loading=false;
+                try{
+                    var r=JSON.parse(xhr.responseText);
+                    if(xhr.status>=200&&xhr.status<300&&r.success){
+                        self.form={name:'',email:'',phone:''};
+                        self.dialogFile=null;self.songFile=null;self.errors=[];
+                        if(typeof showSuccessModal==='function') showSuccessModal(r);
+                    }else{self.errors=r.errors||[r.error||'Submission failed.'];}
+                }catch(err){self.errors=['Server error. Please try again.'];}
             };
-            xhr.onerror = () => { this.loading = false; this.uploading = false; this.errors = ['Network error.']; };
-            xhr.open('POST', '/api/submit');
+            xhr.onerror=function(){self.loading=false;self.errors=['Network error.'];};
+            xhr.open('POST','/api/submit/actor');
             xhr.send(fd);
         }
     };

@@ -32,8 +32,11 @@ class Submission
     {
         $stmt = $this->db->prepare(
             "INSERT INTO submissions 
-             (role, audition_type, name, email, phone, script_id, script_title, notes, file_path, file_type, file_size_bytes, ip_address)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+             (role, audition_type, name, email, phone, script_id, script_title, notes,
+              file_path, file_type, file_size_bytes,
+              file_path_2, file_type_2, file_size_bytes_2,
+              ip_address)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $data['role'],
@@ -41,13 +44,16 @@ class Submission
             $data['name'],
             $data['email'],
             $data['phone'],
-            $data['script_id'] ?? null,
-            $data['script_title'] ?? null,
-            $data['notes'] ?? null,
-            $data['file_path'] ?? null,
-            $data['file_type'] ?? null,
+            $data['script_id']      ?? null,
+            $data['script_title']   ?? null,
+            $data['notes']          ?? null,
+            $data['file_path']      ?? null,
+            $data['file_type']      ?? null,
             $data['file_size_bytes'] ?? null,
-            $data['ip_address'] ?? null,
+            $data['file_path_2']     ?? null,
+            $data['file_type_2']     ?? null,
+            $data['file_size_bytes_2'] ?? null,
+            $data['ip_address']     ?? null,
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -143,14 +149,24 @@ class Submission
     public function linkVideo(int $submissionId, int $videoId): bool
     {
         try {
-            // Add video_id column if it exists (migration 006 adds it)
-            $stmt = $this->db->prepare(
-                "UPDATE submissions SET video_id = ? WHERE id = ?"
-            );
+            $stmt = $this->db->prepare("UPDATE submissions SET video_id = ? WHERE id = ?");
             return $stmt->execute([$videoId, $submissionId]);
         } catch (\PDOException $e) {
-            // Column may not exist yet — non-fatal
-            debug_log("linkVideo failed (column may be missing): " . $e->getMessage(), 'SUBMISSION');
+            debug_log("linkVideo failed: " . $e->getMessage(), 'SUBMISSION');
+            return false;
+        }
+    }
+
+    /**
+     * Link the second video (song) to a submission
+     */
+    public function linkVideo2(int $submissionId, int $videoId): bool
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE submissions SET video_id_2 = ? WHERE id = ?");
+            return $stmt->execute([$videoId, $submissionId]);
+        } catch (\PDOException $e) {
+            debug_log("linkVideo2 failed: " . $e->getMessage(), 'SUBMISSION');
             return false;
         }
     }

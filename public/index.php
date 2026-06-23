@@ -157,7 +157,8 @@ $routes = [
     'api/upload' => [UploadController::class, 'store', 'POST'],
 
     // Public guest submission API (no login required)
-    'api/submit' => [SubmissionController::class, 'store', 'POST'],
+    'api/submit'       => [SubmissionController::class, 'store',       'POST'],
+    'api/submit/actor' => [SubmissionController::class, 'actorSubmit', 'POST'],
 
     // Admin submissions API
     'api/admin/submissions'              => [AdminController::class, 'listSubmissions',    'GET'],

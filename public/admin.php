@@ -3185,12 +3185,71 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- SECTION: About -->
-                            <div class="mb-6">
+                            <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">About Section</p>
                                 <div>
                                     <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text</label>
                                     <textarea x-model="form.landing_about_text" rows="3" placeholder="Describe Faceless Pictures..."
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-y"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: Actor Page Media -->
+                            <div class="mb-6">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Actor Page — Media &amp; Links</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Dialog Preview Video URL</label>
+                                        <input type="url" x-model="form.actor_preview_video_url" placeholder="https://...mp4"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Short preview/mock video shown in Dialog card. Upload via server or CDN.</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Song Preview Video URL</label>
+                                        <input type="url" x-model="form.song_preview_video_url" placeholder="https://...mp4"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Short preview/mock video shown in Song card.</p>
+                                    </div>
+                                    <div x-data="imageUploader('actor_script_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_image_url',''))) ?>')">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Dialog Script Image</label>
+                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
+                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
+                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
+                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait script image</p></div></template>
+                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
+                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
+                                        </div>
+                                    </div>
+                                    <div x-data="imageUploader('song_lyrics_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_image_url',''))) ?>')">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Song Lyrics Image</label>
+                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
+                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
+                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
+                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait lyrics image</p></div></template>
+                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
+                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Script PDF URL</label>
+                                        <input type="url" x-model="form.actor_script_pdf_url" placeholder="https://...pdf"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Lyrics PDF URL</label>
+                                        <input type="url" x-model="form.song_lyrics_pdf_url" placeholder="https://...pdf"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Song Tune YouTube URL (Get Tune button)</label>
+                                        <input type="url" x-model="form.song_tune_youtube_url" placeholder="https://youtube.com/watch?v=..."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">YouTube or direct video URL. Opens in a popup so actors can play the tune while recording.</p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -5393,6 +5452,14 @@ if (file_exists($errorLogFile)) {
                 landing_poster6_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_title',''))) ?>',
                 landing_trailer6_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer6_url',''))) ?>',
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
+                // Actor page media
+                actor_preview_video_url: '<?= addslashes(htmlspecialchars($settingsModel->get('actor_preview_video_url',''))) ?>',
+                song_preview_video_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('song_preview_video_url',''))) ?>',
+                actor_script_image_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_image_url',''))) ?>',
+                song_lyrics_image_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_image_url',''))) ?>',
+                actor_script_pdf_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_pdf_url',''))) ?>',
+                song_lyrics_pdf_url:     '<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_pdf_url',''))) ?>',
+                song_tune_youtube_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('song_tune_youtube_url',''))) ?>',
             },
             init() {
                 // Sync uploaded image URLs back into the form

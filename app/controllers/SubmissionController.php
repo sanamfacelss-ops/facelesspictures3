@@ -295,6 +295,148 @@ class SubmissionController
     }
 
     /**
+     * POST /api/submit/actor — Actor dual-video submission (dialog + song)
+     * Both videos required. Creates one submission record, two video pipeline entries.
+     */
+    public function actorSubmit(): void
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+            if ($this->isRateLimited($ip)) {
+                http_response_code(429);
+                echo json_encode(['error' => 'Too many submissions. Please try again later.']);
+                return;
+            }
+
+            $name  = strip_tags(trim($_POST['name']  ?? ''));
+            $email = trim($_POST['email'] ?? '');
+            $phone = trim($_POST['phone'] ?? '');
+
+            $errors = [];
+            if (strlen($name) < 2)                               $errors[] = 'Full name is required.';
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL))       $errors[] = 'Valid email required.';
+            if (!preg_match('/^[\d\s\+\-\(\)]{7,20}$/', $phone)) $errors[] = 'Valid phone required.';
+
+            // Both videos required
+            $dialogFile = $_FILES['dialog_video'] ?? null;
+            $songFile   = $_FILES['song_video']   ?? null;
+
+            if (!$dialogFile || $dialogFile['error'] !== UPLOAD_ERR_OK) {
+                $errors[] = 'Dialog audition video is required.';
+            }
+            if (!$songFile || $songFile['error'] !== UPLOAD_ERR_OK) {
+                $errors[] = 'Song audition video is required.';
+            }
+
+            if (!empty($errors)) {
+                http_response_code(422);
+                echo json_encode(['errors' => $errors]);
+                return;
+            }
+
+            if (!$this->submissionModel->tableExists()) {
+                http_response_code(503);
+                echo json_encode(['error' => 'Run migration 006 first.']);
+                return;
+            }
+
+            if (!is_dir(UPLOAD_PATH)) mkdir(UPLOAD_PATH, 0755, true);
+
+            // Save both files
+            $saved = [];
+            $fileMap = ['dialog_video' => $dialogFile, 'song_video' => $songFile];
+            foreach ($fileMap as $key => $file) {
+                $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                $name_file = 'sub_' . uniqid('', true) . '.' . $ext;
+                $dest = UPLOAD_PATH . '/' . $name_file;
+                if (!move_uploaded_file($file['tmp_name'], $dest)) {
+                    http_response_code(500);
+                    echo json_encode(['errors' => ['Failed to save ' . $key . '.']]);
+                    return;
+                }
+                $saved[$key] = ['path' => $name_file, 'ext' => $ext, 'size' => $file['size']];
+            }
+
+            // One submission record with both files
+            $submissionId = $this->submissionModel->create([
+                'role'             => 'actor',
+                'audition_type'    => 'Actor Audition (Dialog + Song)',
+                'name'             => $name,
+                'email'            => $email,
+                'phone'            => $phone,
+                'file_path'        => $saved['dialog_video']['path'],
+                'file_type'        => $saved['dialog_video']['ext'],
+                'file_size_bytes'  => $saved['dialog_video']['size'],
+                'file_path_2'      => $saved['song_video']['path'],
+                'file_type_2'      => $saved['song_video']['ext'],
+                'file_size_bytes_2'=> $saved['song_video']['size'],
+                'ip_address'       => $ip,
+            ]);
+
+            // Feed both videos into pipeline with correct labels
+            $season  = $this->seasonModel->getActive();
+            if (!$season) {
+                $sid = $this->seasonModel->create(['title'=>'Open Auditions','brief'=>'Public auditions.','start_date'=>date('Y-01-01'),'end_date'=>date('Y-12-31'),'status'=>'active']);
+                $season = $this->seasonModel->findById($sid);
+            }
+            $guestId = $this->getOrCreateGuestUser($name, $email, 'actor');
+
+            // Dialog video
+            try {
+                $vid1 = $this->videoModel->create([
+                    'user_id'        => $guestId,
+                    'season_id'      => $season['id'],
+                    'title'          => 'Dialog Audition — ' . $name,
+                    'content_type'   => 'actor',
+                    'file_path'      => $saved['dialog_video']['path'],
+                    'recording_mode' => 'freeform',
+                    'script_content' => 'Dialog Audition',
+                ]);
+                $this->submissionModel->linkVideo($submissionId, $vid1);
+                BackgroundProcessor::queueVideoProcessing($vid1);
+            } catch (\Throwable $e) { log_exception($e, 'ACTOR_DIALOG_PIPELINE'); }
+
+            // Song video
+            try {
+                $vid2 = $this->videoModel->create([
+                    'user_id'        => $guestId,
+                    'season_id'      => $season['id'],
+                    'title'          => 'Song Audition — ' . $name,
+                    'content_type'   => 'actor',
+                    'file_path'      => $saved['song_video']['path'],
+                    'recording_mode' => 'freeform',
+                    'script_content' => 'Song Audition',
+                ]);
+                $this->submissionModel->linkVideo2($submissionId, $vid2);
+                BackgroundProcessor::queueVideoProcessing($vid2);
+            } catch (\Throwable $e) { log_exception($e, 'ACTOR_SONG_PIPELINE'); }
+
+            log_message('info', "Actor dual submission #{$submissionId} from {$name} <{$email}>");
+
+            echo json_encode([
+                'success'        => true,
+                'id'             => $submissionId,
+                'submitter_name' => $name,
+                'submitter_email'=> $email,
+                'role'           => 'actor',
+                'audition_type'  => 'Actor Audition (Dialog + Song)',
+                'message'        => "Both auditions received! We'll be in touch at {$email}.",
+            ]);
+
+        } catch (\PDOException $e) {
+            log_exception($e, 'ACTOR_SUBMIT_DB');
+            http_response_code(500);
+            echo json_encode(['error' => 'Database error. Please try again.']);
+        } catch (\Throwable $e) {
+            log_exception($e, 'ACTOR_SUBMIT');
+            http_response_code(500);
+            echo json_encode(['error' => 'An unexpected error occurred.']);
+        }
+    }
+
+    /**
      * IP-based rate limiting — max 10 per hour
      */
     private function isRateLimited(string $ip): bool
