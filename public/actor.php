@@ -92,17 +92,15 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     .card-poster{
         width:100% !important;
         min-width:0 !important;
-        /* Use aspect-ratio so image shows fully without cutting */
         height:auto !important;
         min-height:0 !important;
-        aspect-ratio:16/9;
+        aspect-ratio:3/2;
     }
+    /* On mobile: contain so full image is always visible, no crop */
     .card-poster img{
-        width:100%;
-        height:100%;
-        min-height:0 !important;
-        object-fit:cover;
+        object-fit:contain !important;
         object-position:center center;
+        background:#1a1a2e;
     }
     .card-body{ grid-template-columns:1fr; }
     .card-col + .card-col{ border-left:none; border-top:1px solid #f0f0f0; }
@@ -123,39 +121,36 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 }
 .col-divider{width:1px;background:#f0f0f0;align-self:stretch}
 
-/* Brief: first 3 lines always visible, details/summary for the rest */
-details.brief-details summary{
-    list-style:none;
-    cursor:pointer;
-    font-size:.78rem;
-    font-weight:700;
-    color:#111;
-    background:#f3f4f6;
-    border:1.5px solid #e5e7eb;
-    border-radius:8px;
-    padding:.4rem .875rem;
-    margin-top:.5rem;
-    display:inline-flex;
-    align-items:center;
-    gap:.35rem;
-    transition:background .2s,border-color .2s;
-    font-family:inherit;
-    letter-spacing:.01em;
+/* Brief expandable — smooth slide */
+.brief-actions{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.5rem}
+.brief-expand-btn{
+    display:inline-flex;align-items:center;gap:.3rem;
+    font-size:.75rem;font-weight:700;color:#374151;
+    background:#f3f4f6;border:1.5px solid #e5e7eb;
+    border-radius:8px;padding:.35rem .75rem;
+    cursor:pointer;font-family:inherit;
+    transition:background .15s,border-color .15s;
+    white-space:nowrap;
 }
-details.brief-details summary::-webkit-details-marker{display:none}
-details.brief-details summary:hover{background:#e5e7eb;border-color:#d1d5db}
-details.brief-details .brief-more{
-    font-size:.85rem;
-    color:#4b5563;
-    line-height:1.72;
-    padding-top:.6rem;
-    border-top:1px solid #f0f0f0;
-    margin-top:.5rem;
-    animation:briefSlide .3s ease;
+.brief-expand-btn:hover{background:#e5e7eb;border-color:#d1d5db}
+.brief-expand-btn .arr{
+    display:inline-block;
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    font-size:.8rem;line-height:1;
 }
-@keyframes briefSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-details.brief-details summary .arr{transition:transform .25s ease;display:inline-block}
-details.brief-details[open] summary .arr{transform:rotate(180deg)}
+.brief-expand-btn.open .arr{transform:rotate(180deg)}
+/* The expandable section */
+.brief-extra{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+    opacity:0;
+    font-size:.85rem;color:#4b5563;line-height:1.72;
+}
+.brief-extra.open{
+    max-height:600px;
+    opacity:1;
+}
 .card-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.03em;color:#111;line-height:1.05}
 .dur-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .55rem;border-radius:20px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;margin-top:.35rem}
 
@@ -268,33 +263,37 @@ details.brief-details[open] summary .arr{transform:rotate(180deg)}
             <?php endif; ?>
           </div>
 
-          <!-- Brief — script name + preview always visible, expand for full -->
+          <!-- Brief — preview always visible, expanded content slides above actions row -->
           <div>
             <p class="fp-label" style="margin-bottom:.35rem">The Brief</p>
             <?php
-              // Show first 120 chars as preview, rest in details
               $briefFull    = $script['content'] ?? '';
               $briefPreview = mb_substr($briefFull, 0, 160);
               $briefRest    = mb_strlen($briefFull) > 160 ? mb_substr($briefFull, 160) : '';
+              $hasMore      = !empty($briefRest);
+              $briefExpandId = 'brief_' . $i;
             ?>
-            <!-- Always-visible: script title + brief start -->
-            <p style="font-size:.78rem;font-weight:700;color:#111;margin-bottom:.3rem;letter-spacing:.01em"><?= htmlspecialchars($script['title'] ?? '') ?></p>
-            <p style="font-size:.85rem;color:#4b5563;line-height:1.7"><?= htmlspecialchars($briefPreview) ?><?= $briefRest ? '<span style="color:#9ca3af">…</span>' : '' ?></p>
-            <!-- Read more: shows the rest -->
-            <?php if ($briefRest): ?>
-            <details class="brief-details">
-              <summary>
-                <span class="arr">▾</span> Read full brief
-              </summary>
-              <div class="brief-more"><?= nl2br(htmlspecialchars($briefRest)) ?></div>
-            </details>
+            <!-- Script name always shown -->
+            <p style="font-size:.78rem;font-weight:700;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($script['title'] ?? '') ?></p>
+            <!-- Preview text always shown -->
+            <p style="font-size:.85rem;color:#4b5563;line-height:1.72"><?= htmlspecialchars($briefPreview) ?><?= $hasMore ? '<span style="color:#9ca3af"> …</span>' : '' ?></p>
+            <!-- Expandable extra — slides open above actions -->
+            <?php if ($hasMore): ?>
+            <div class="brief-extra" id="<?= $briefExpandId ?>"><?= nl2br(htmlspecialchars($briefRest)) ?></div>
             <?php endif; ?>
+            <!-- Actions row: Read more + Download PDF always on same line -->
+            <div class="brief-actions">
+              <?php if ($hasMore): ?>
+              <button class="brief-expand-btn" onclick="toggleBrief('<?= $briefExpandId ?>', this)">
+                <span class="arr">▾</span> Read full brief
+              </button>
+              <?php endif; ?>
+              <button class="btn-pdf" @click="downloadPDF()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Download Brief PDF
+              </button>
+            </div>
           </div>
-
-          <button class="btn-pdf" @click="downloadPDF()" style="align-self:flex-start">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Download Brief PDF
-          </button>
 
           <div class="div"></div>
 
@@ -400,6 +399,19 @@ details.brief-details[open] summary .arr{transform:rotate(180deg)}
 </footer>
 
 <script>
+function toggleBrief(id, btn) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isOpen = el.classList.contains('open');
+    el.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+    btn.querySelector('.arr').style.transform = isOpen ? '' : 'rotate(180deg)';
+    const spans = btn.querySelectorAll('span:last-child');
+    // Update button text after arrow span
+    const textNode = [...btn.childNodes].find(n => n.nodeType === 3);
+    if (textNode) textNode.textContent = isOpen ? ' Read full brief' : ' Show less';
+}
+
 function auCard(scriptId, auditionType, role, scriptTitle, briefContent) {
     return {
         scriptId, auditionType, role, scriptTitle, briefContent,
