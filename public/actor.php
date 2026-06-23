@@ -188,8 +188,6 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
           <?php endif; ?>
           <!-- Badge -->
           <span class="poster-badge <?= $isSong ? 'badge-song' : 'badge-dialog' ?>"><?= htmlspecialchars($atype) ?></span>
-          <!-- Difficulty -->
-          <span class="diff-pip" style="background:<?= $dc['bg'] ?>;color:<?= $dc['text'] ?>;border:1px solid <?= $dc['border'] ?>"><?= ucfirst($diff) ?></span>
         </div>
 
         <!-- ── CARD BODY ── -->
@@ -202,7 +200,6 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
               <?php if ($script['duration_hint']): ?>
               <span class="meta-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span>
               <?php endif; ?>
-              <span class="meta-pill"><?= ucfirst($diff) ?></span>
             </div>
           </div>
 

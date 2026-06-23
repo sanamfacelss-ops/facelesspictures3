@@ -97,11 +97,10 @@ $pageTitle = 'Director Auditions — Faceless Pictures 3';
         <?php if(!empty($script['image_url'])): ?><img src="<?= htmlspecialchars($script['image_url']) ?>" alt="<?= htmlspecialchars($script['title']) ?>">
         <?php else: ?><div class="card-poster-placeholder"><svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><?php endif; ?>
         <span class="poster-badge"><?= htmlspecialchars($atype) ?></span>
-        <span class="diff-pip" style="background:<?= $dc['bg'] ?>;color:<?= $dc['text'] ?>;border:1px solid <?= $dc['border'] ?>"><?= ucfirst($diff) ?></span>
       </div>
       <div class="card-body">
         <div><div class="card-title"><?= htmlspecialchars($script['title']) ?></div>
-          <div class="card-meta"><?php if($script['duration_hint']): ?><span class="meta-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span><?php endif; ?><span class="meta-pill"><?= ucfirst($diff) ?></span></div>
+          <div class="card-meta"><?php if($script['duration_hint']): ?><span class="meta-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span><?php endif; ?></div>
         </div>
         <div>
           <p class="fp-label" style="margin-bottom:.375rem">The Brief</p>

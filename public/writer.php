@@ -97,10 +97,9 @@ $pageTitle = 'Writer Submissions — Faceless Pictures 3';
         <?php if(!empty($script['image_url'])): ?><img src="<?= htmlspecialchars($script['image_url']) ?>" alt="<?= htmlspecialchars($script['title']) ?>">
         <?php else: ?><div class="card-poster-placeholder"><svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><?php endif; ?>
         <span class="poster-badge"><?= htmlspecialchars($atype) ?></span>
-        <span class="diff-pip" style="background:<?= $dc['bg'] ?>;color:<?= $dc['text'] ?>;border:1px solid <?= $dc['border'] ?>"><?= ucfirst($diff) ?></span>
       </div>
       <div class="card-body">
-        <div><div class="card-title"><?= htmlspecialchars($script['title']) ?></div><div class="card-meta"><?php if($script['duration_hint']): ?><span class="meta-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span><?php endif; ?><span class="meta-pill"><?= ucfirst($diff) ?></span></div></div>
+        <div><div class="card-title"><?= htmlspecialchars($script['title']) ?></div><div class="card-meta"><?php if($script['duration_hint']): ?><span class="meta-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span><?php endif; ?></div></div>
         <div><p class="fp-label" style="margin-bottom:.375rem">The Brief</p><div class="script-text" :class="expanded?'expanded':''">  <?= nl2br(htmlspecialchars($script['content'])) ?></div><button class="read-more-btn" @click="expanded=!expanded" x-text="expanded?'Show less ↑':'Read more ↓'"></button></div>
         <div><button class="btn-pdf" @click="downloadPDF()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Download Brief PDF</button></div>
         <div class="card-divider"></div>

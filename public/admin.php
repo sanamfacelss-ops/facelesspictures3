@@ -1500,7 +1500,7 @@ if (file_exists($errorLogFile)) {
                                         <!-- Current image preview -->
                                         <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:120px">
                                             <img :src="scriptForm.image_url" class="w-full h-full object-cover">
-                                            <button type="button" @click="scriptForm.image_url=''"
+                                            <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
                                                 class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition border border-dark/10">
                                                 <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                             </button>
@@ -1555,7 +1555,7 @@ if (file_exists($errorLogFile)) {
                                             </template>
                                         </div>
 
-                                        <!-- GALLERY TAB -->
+                        <!-- GALLERY TAB -->
                                         <div x-show="pickerTab==='gallery'">
                                             <template x-if="galleryLoading">
                                                 <p class="text-[12px] text-dark/30 text-center py-4">Loading images...</p>
@@ -1568,12 +1568,8 @@ if (file_exists($errorLogFile)) {
                                                 <template x-for="img in galleryImages" :key="img.url">
                                                     <button type="button" @click="selectFromGallery(img.url)"
                                                         class="relative rounded-lg overflow-hidden border-2 transition aspect-square"
-                                                        :class="scriptForm.image_url === img.url ? 'border-dark' : 'border-transparent hover:border-dark/30'">
+                                                        :class="img.url === (window.setScriptImage && $el.closest('[x-data*=adminDashboard]') ? null : null) || false ? 'border-dark' : 'border-transparent hover:border-dark/30'">
                                                         <img :src="img.url" :alt="img.name" class="w-full h-full object-cover">
-                                                        <div x-show="scriptForm.image_url === img.url"
-                                                            class="absolute inset-0 bg-dark/40 flex items-center justify-center">
-                                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                                        </div>
                                                     </button>
                                                 </template>
                                             </div>
@@ -3953,9 +3949,12 @@ if (file_exists($errorLogFile)) {
                 this.loadYouTubeStatus();
 
                 // Listen for script image picker selections
+                // Uses a global bridge function so child Alpine components can set parent state
+                window.setScriptImage = (url) => {
+                    this.scriptForm.image_url = url;
+                };
                 document.addEventListener('script-image-picked', e => {
                     this.scriptForm.image_url = e.detail.url;
-                    window.activeScriptForm = this.scriptForm;
                 });
                 
                 // Initial refresh
@@ -4452,7 +4451,6 @@ if (file_exists($errorLogFile)) {
                     image_url:     sc.image_url      || '',
                     rules:         sc.rules          || '',
                 };
-                window.activeScriptForm = this.scriptForm;
             },
             
             cancelEditScript() {
@@ -5195,13 +5193,10 @@ if (file_exists($errorLogFile)) {
                     try {
                         const r = JSON.parse(xhr.responseText);
                         if (r.success) {
-                            // Set on parent scriptForm
-                            const form = this.$root.closest('[x-data]')?.__x?.$data;
-                            if (window.activeScriptForm) {
-                                window.activeScriptForm.image_url = r.url;
+                            // Update parent scriptForm via global bridge
+                            if (typeof window.setScriptImage === 'function') {
+                                window.setScriptImage(r.url);
                             }
-                            // Also update via Alpine's $dispatch to communicate with parent
-                            this.$dispatch('script-image-picked', { url: r.url });
                             // Refresh gallery
                             this._galleryLoaded = false;
                             this.loadGallery();
@@ -5222,10 +5217,8 @@ if (file_exists($errorLogFile)) {
             },
 
             selectFromGallery(url) {
-                this.$dispatch('script-image-picked', { url });
-                // Update scriptForm directly via parent Alpine scope
-                if (typeof scriptForm !== 'undefined') {
-                    scriptForm.image_url = url;
+                if (typeof window.setScriptImage === 'function') {
+                    window.setScriptImage(url);
                 }
             },
 
