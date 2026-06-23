@@ -58,25 +58,25 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .tune-close:hover{background:rgba(255,255,255,.18)}
 .tune-wrap{position:relative;width:100%;padding-bottom:56.25%;margin-top:.5rem;border-radius:8px;overflow:hidden;background:#000}
 .tune-wrap iframe,.tune-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
-.submit-card{background:#111;border-radius:14px;max-width:1280px;margin:0 auto 5rem;padding:2.25rem 2rem}
+.submit-card{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:14px;max-width:1280px;margin:0 auto 5rem;padding:2.25rem 2rem}
 @media(max-width:768px){.submit-card{margin:0 1rem 4rem;padding:1.5rem 1.25rem;border-radius:12px}}
 .fp-label-dark{display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.28rem}
-.fp-input-dark{background:#1a1a1a;border:1.5px solid #2d2d2d;border-radius:8px;color:#fff;padding:.55rem .8rem;width:100%;font-size:.875rem;outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .2s}
-.fp-input-dark:focus{border-color:#555;box-shadow:0 0 0 2px rgba(255,255,255,.07)}
-.fp-input-dark::placeholder{color:#4b5563}
+.fp-input-dark{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;color:#111;padding:.55rem .8rem;width:100%;font-size:.875rem;outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .2s}
+.fp-input-dark:focus{border-color:#111;box-shadow:0 0 0 2px rgba(17,17,17,.07)}
+.fp-input-dark::placeholder{color:#9ca3af}
 .form3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
 @media(max-width:640px){.form3{grid-template-columns:1fr}}
-.divider-dark{height:1px;background:#2d2d2d;margin:1.25rem 0}
+.divider-dark{height:1px;background:#e5e7eb;margin:1.25rem 0}
 .upload2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 @media(max-width:580px){.upload2{grid-template-columns:1fr}}
-.uzone{border:2px dashed #2d2d2d;border-radius:10px;cursor:pointer;background:#1a1a1a;text-align:center;padding:1.25rem 1rem;transition:border-color .2s,background .2s}
-.uzone:hover,.uzone.drag{border-color:#666;background:#222}
-.uzone.has-file{border-color:#4ade80;border-style:solid;background:#0d1f0d}
-.prog-bar{height:3px;background:#2d2d2d;border-radius:2px;overflow:hidden;margin-top:.4rem}
-.prog-fill{height:100%;background:#fff;border-radius:2px;transition:width .3s}
-.err-dark{background:rgba(239,68,68,.12);border:1.5px solid rgba(239,68,68,.3);border-radius:8px;color:#fca5a5;padding:.6rem .875rem;font-size:.8rem;margin-top:.75rem}
-.btn-go{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#fff;color:#111;font-weight:700;border:none;border-radius:9px;padding:.9rem 1.5rem;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .15s;margin-top:1.25rem}
-.btn-go:hover{background:#e5e7eb}
+.uzone{border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;background:#fff;text-align:center;padding:1.25rem 1rem;transition:border-color .2s,background .2s}
+.uzone:hover,.uzone.drag{border-color:#111;background:#f9fafb}
+.uzone.has-file{border-color:#16a34a;border-style:solid;background:#f0fdf4}
+.prog-bar{height:3px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin-top:.4rem}
+.prog-fill{height:100%;background:#111;border-radius:2px;transition:width .3s}
+.err-dark{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;color:#991b1b;padding:.6rem .875rem;font-size:.8rem;margin-top:.75rem}
+.btn-go{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.9rem 1.5rem;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .15s;margin-top:1.25rem}
+.btn-go:hover{background:#333}
 .btn-go:disabled{opacity:.4;cursor:not-allowed}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .4s ease forwards}
@@ -207,8 +207,8 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 <!-- SUBMISSION CARD (full width, dark) -->
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
   <div class="submit-card" x-data="actorSubmit()">
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#fff;margin-bottom:.3rem">Ready to Audition? Submit Both Videos</p>
-    <p style="font-size:.85rem;color:#9ca3af;margin-bottom:1.5rem;line-height:1.55">Both dialog and song videos are required for a complete submission. One form, two videos, one chance.</p>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Audition? Submit Both Videos</p>
+    <p style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem;line-height:1.55">Both dialog and song videos are required for a complete submission. One form, two videos, one chance.</p>
 
     <!-- Contact -->
     <div class="form3">
@@ -225,20 +225,20 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
         <label class="fp-label-dark" style="margin-bottom:.5rem">Dialog Audition Video *</label>
         <div class="uzone" :class="[dragD?'drag':'',dialogFile?'has-file':'']" @click="$refs.dv.click()" @dragover.prevent="dragD=true" @dragleave="dragD=false" @drop.prevent="dropD($event)">
           <input type="file" x-ref="dv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="dialogFile=$event.target.files[0]">
-          <svg style="width:24px;height:24px;color:#4b5563;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
           <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> dialog video</p>
-          <p style="color:#4b5563;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
-          <p x-show="dialogFile" x-text="'✓ '+(dialogFile?dialogFile.name:'')" style="display:none;color:#4ade80;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
+          <p style="color:#9ca3af;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
+          <p x-show="dialogFile" x-text="'✓ '+(dialogFile?dialogFile.name:'')" style="display:none;color:#16a34a;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
       </div>
       <div>
         <label class="fp-label-dark" style="margin-bottom:.5rem">Song Audition Video *</label>
         <div class="uzone" :class="[dragS?'drag':'',songFile?'has-file':'']" @click="$refs.sv.click()" @dragover.prevent="dragS=true" @dragleave="dragS=false" @drop.prevent="dropS($event)">
           <input type="file" x-ref="sv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="songFile=$event.target.files[0]">
-          <svg style="width:24px;height:24px;color:#4b5563;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
           <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> song video</p>
-          <p style="color:#4b5563;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
-          <p x-show="songFile" x-text="'✓ '+(songFile?songFile.name:'')" style="display:none;color:#4ade80;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
+          <p style="color:#9ca3af;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
+          <p x-show="songFile" x-text="'✓ '+(songFile?songFile.name:'')" style="display:none;color:#16a34a;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
       </div>
     </div>
