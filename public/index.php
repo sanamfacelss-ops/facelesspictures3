@@ -167,6 +167,8 @@ $routes = [
     // Landing page / audition brief settings save
     'api/admin/settings/landing'         => [AdminController::class, 'saveLandingSetting',  'POST'],
     'api/admin/settings/upload-image'    => [AdminController::class, 'uploadSettingImage',  'POST'],
+    'api/admin/media/images'             => [AdminController::class, 'listUploadedImages',  'GET'],
+    'api/admin/media/upload-script-image' => [AdminController::class, 'uploadScriptImage', 'POST'],
 
     // Moderation API
     'api/moderation/pending' => [ModerationController::class, 'pendingList', 'GET'],

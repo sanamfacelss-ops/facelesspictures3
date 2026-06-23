@@ -1764,6 +1764,98 @@ class AdminController
     }
 
     /**
+     * List all uploaded images available in the media library
+     * GET /api/admin/media/images
+     */
+    public function listUploadedImages(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin()) return;
+
+        $images = [];
+
+        // Scan uploads/settings/
+        $settingsDir = UPLOAD_PATH . '/settings';
+        if (is_dir($settingsDir)) {
+            foreach (glob($settingsDir . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) as $file) {
+                $filename = basename($file);
+                $images[] = [
+                    'url'  => '/uploads/settings/' . $filename,
+                    'name' => $filename,
+                    'size' => filesize($file),
+                    'date' => filemtime($file),
+                ];
+            }
+        }
+
+        // Scan uploads/ root for images (script cover images uploaded directly)
+        foreach (glob(UPLOAD_PATH . '/*.{jpg,jpeg,png,webp,gif}', GLOB_BRACE) as $file) {
+            $filename = basename($file);
+            $images[] = [
+                'url'  => '/uploads/' . $filename,
+                'name' => $filename,
+                'size' => filesize($file),
+                'date' => filemtime($file),
+            ];
+        }
+
+        // Sort newest first
+        usort($images, fn($a, $b) => $b['date'] - $a['date']);
+
+        echo json_encode(['success' => true, 'images' => $images, 'count' => count($images)]);
+    }
+
+    /**
+     * Upload an image specifically for a script card poster
+     * POST /api/admin/media/upload-script-image
+     * Returns the public URL
+     */
+    public function uploadScriptImage(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            $msgs = [UPLOAD_ERR_INI_SIZE=>'File too large.',UPLOAD_ERR_PARTIAL=>'Upload incomplete.',UPLOAD_ERR_NO_FILE=>'No file.'];
+            http_response_code(422);
+            echo json_encode(['error' => $msgs[$_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE] ?? 'Upload error.']);
+            return;
+        }
+
+        $file     = $_FILES['image'];
+        $allowed  = ['image/jpeg','image/png','image/webp','image/gif'];
+        $allowExt = ['jpg','jpeg','png','webp','gif'];
+        $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($file['type'], $allowed) || !in_array($ext, $allowExt)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Only JPG, PNG, WEBP or GIF accepted.']);
+            return;
+        }
+        if ($file['size'] > 5 * 1024 * 1024) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Image must be under 5 MB.']);
+            return;
+        }
+
+        $settingsDir = UPLOAD_PATH . '/settings';
+        if (!is_dir($settingsDir)) mkdir($settingsDir, 0755, true);
+
+        $filename = 'script_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $dest     = $settingsDir . '/' . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $dest)) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save image.']);
+            return;
+        }
+
+        $url = '/uploads/settings/' . $filename;
+        debug_log("Admin uploaded script image: {$url}", 'ADMIN');
+        echo json_encode(['success' => true, 'url' => $url, 'name' => $filename]);
+    }
+
+    /**
      * Upload an image or video for a settings field (logo, poster, trailer)
      * POST /api/admin/settings/upload-image
      * Returns the public URL of the saved file.

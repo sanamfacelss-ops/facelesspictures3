@@ -1494,10 +1494,92 @@ if (file_exists($errorLogFile)) {
                                         <input type="text" x-model="scriptForm.audition_type" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="Dialog Audition / Song Audition / Scene Direction…">
                                         <p class="text-[11px] text-dark/30 mt-1">Shown as the badge on the script card</p>
                                     </div>
-                                    <div>
-                                        <label class="block text-[12px] text-dark/50 mb-1">Card Poster Image URL</label>
-                                        <input type="url" x-model="scriptForm.image_url" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="https://...">
-                                        <p class="text-[11px] text-dark/30 mt-1">16:9 image shown at top of the audition card</p>
+                                    <div x-data="scriptImagePicker()" x-init="init()">
+                                        <label class="block text-[12px] text-dark/50 mb-1.5">Card Poster Image</label>
+
+                                        <!-- Current image preview -->
+                                        <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:120px">
+                                            <img :src="scriptForm.image_url" class="w-full h-full object-cover">
+                                            <button type="button" @click="scriptForm.image_url=''"
+                                                class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition border border-dark/10">
+                                                <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Tabs: Upload / Gallery -->
+                                        <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[12px]">
+                                            <button type="button" @click="pickerTab='upload'"
+                                                :class="pickerTab==='upload' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
+                                                class="flex-1 py-2 font-medium transition flex items-center justify-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                                Upload New
+                                            </button>
+                                            <button type="button" @click="pickerTab='gallery'; loadGallery()"
+                                                :class="pickerTab==='gallery' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
+                                                class="flex-1 py-2 font-medium transition flex items-center justify-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                Pick Existing
+                                                <span x-show="galleryImages.length" class="bg-white/20 text-white text-[10px] px-1.5 py-0.5 rounded-full" x-text="galleryImages.length"></span>
+                                            </button>
+                                        </div>
+
+                                        <!-- UPLOAD TAB -->
+                                        <div x-show="pickerTab==='upload'">
+                                            <div
+                                                class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
+                                                :class="uploadDragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                                style="min-height:90px"
+                                                @dragover.prevent="uploadDragging=true"
+                                                @dragleave.prevent="uploadDragging=false"
+                                                @drop.prevent="onDrop($event)"
+                                                @click="$refs.imgPick.click()">
+                                                <input type="file" x-ref="imgPick" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                                <template x-if="!uploadProgress && !uploadError">
+                                                    <div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center">
+                                                        <svg class="w-7 h-7 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                        <p class="text-[12px] text-dark/40">Drop image or <span class="text-dark underline cursor-pointer">browse</span></p>
+                                                        <p class="text-[11px] text-dark/25">PNG · JPG · WEBP · max 5 MB</p>
+                                                    </div>
+                                                </template>
+                                                <template x-if="uploadProgress > 0 && uploadProgress < 100">
+                                                    <div class="flex flex-col items-center justify-center gap-2 p-4">
+                                                        <div class="w-full bg-dark/10 rounded-full h-1.5 overflow-hidden">
+                                                            <div class="h-full bg-dark rounded-full transition-all" :style="'width:'+uploadProgress+'%'"></div>
+                                                        </div>
+                                                        <p class="text-[11px] text-dark/40" x-text="uploadProgress+'% uploading...'"></p>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <template x-if="uploadError">
+                                                <p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p>
+                                            </template>
+                                        </div>
+
+                                        <!-- GALLERY TAB -->
+                                        <div x-show="pickerTab==='gallery'">
+                                            <template x-if="galleryLoading">
+                                                <p class="text-[12px] text-dark/30 text-center py-4">Loading images...</p>
+                                            </template>
+                                            <template x-if="!galleryLoading && galleryImages.length === 0">
+                                                <p class="text-[12px] text-dark/30 text-center py-4">No uploaded images yet. Upload one first.</p>
+                                            </template>
+                                            <div x-show="!galleryLoading && galleryImages.length > 0"
+                                                class="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto rounded-xl border border-dark/10 p-2 bg-dark/[.015]">
+                                                <template x-for="img in galleryImages" :key="img.url">
+                                                    <button type="button" @click="selectFromGallery(img.url)"
+                                                        class="relative rounded-lg overflow-hidden border-2 transition aspect-square"
+                                                        :class="scriptForm.image_url === img.url ? 'border-dark' : 'border-transparent hover:border-dark/30'">
+                                                        <img :src="img.url" :alt="img.name" class="w-full h-full object-cover">
+                                                        <div x-show="scriptForm.image_url === img.url"
+                                                            class="absolute inset-0 bg-dark/40 flex items-center justify-center">
+                                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                        </div>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-[11px] text-dark/30 mt-1.5">16:9 image shown at top of the audition card</p>
                                     </div>
                                     <div>
                                         <label class="block text-[12px] text-dark/50 mb-1">Rules &amp; Limits</label>
@@ -3869,6 +3951,12 @@ if (file_exists($errorLogFile)) {
                 
                 // Load YouTube status
                 this.loadYouTubeStatus();
+
+                // Listen for script image picker selections
+                document.addEventListener('script-image-picked', e => {
+                    this.scriptForm.image_url = e.detail.url;
+                    window.activeScriptForm = this.scriptForm;
+                });
                 
                 // Initial refresh
                 this.silentRefreshVideos();
@@ -4364,6 +4452,7 @@ if (file_exists($errorLogFile)) {
                     image_url:     sc.image_url      || '',
                     rules:         sc.rules          || '',
                 };
+                window.activeScriptForm = this.scriptForm;
             },
             
             cancelEditScript() {
@@ -5049,6 +5138,109 @@ if (file_exists($errorLogFile)) {
                 };
                 xhr.open('POST', '/api/admin/settings/upload-image');
                 xhr.send(fd);
+            }
+        };
+    }
+
+    // Script card image picker — upload new or pick from existing uploaded images
+    function scriptImagePicker() {
+        return {
+            pickerTab:     'upload',
+            uploadDragging:false,
+            uploadProgress:0,
+            uploadError:   '',
+            galleryImages: [],
+            galleryLoading:false,
+            _galleryLoaded:false,
+
+            init() {
+                // Preload gallery in background
+                this.loadGallery();
+            },
+
+            onDrop(e) {
+                this.uploadDragging = false;
+                const f = e.dataTransfer?.files?.[0];
+                if (f) this.upload(f);
+            },
+            onFile(e) {
+                const f = e.target.files?.[0];
+                if (f) this.upload(f);
+            },
+
+            upload(file) {
+                const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+                if (!allowed.includes(file.type)) {
+                    this.uploadError = 'Only JPG, PNG, WEBP or GIF accepted.';
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    this.uploadError = 'Image must be under 5 MB.';
+                    return;
+                }
+                this.uploadError   = '';
+                this.uploadProgress = 1;
+
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const fd   = new FormData();
+                fd.append('csrf_token', csrf);
+                fd.append('image', file);
+
+                const xhr = new XMLHttpRequest();
+                xhr.upload.onprogress = e => {
+                    if (e.lengthComputable) this.uploadProgress = Math.round(e.loaded / e.total * 100);
+                };
+                xhr.onload = () => {
+                    this.uploadProgress = 0;
+                    try {
+                        const r = JSON.parse(xhr.responseText);
+                        if (r.success) {
+                            // Set on parent scriptForm
+                            const form = this.$root.closest('[x-data]')?.__x?.$data;
+                            if (window.activeScriptForm) {
+                                window.activeScriptForm.image_url = r.url;
+                            }
+                            // Also update via Alpine's $dispatch to communicate with parent
+                            this.$dispatch('script-image-picked', { url: r.url });
+                            // Refresh gallery
+                            this._galleryLoaded = false;
+                            this.loadGallery();
+                            this.pickerTab = 'gallery';
+                        } else {
+                            this.uploadError = r.error || 'Upload failed.';
+                        }
+                    } catch(err) {
+                        this.uploadError = 'Server error. Try again.';
+                    }
+                };
+                xhr.onerror = () => {
+                    this.uploadProgress = 0;
+                    this.uploadError = 'Network error.';
+                };
+                xhr.open('POST', '/api/admin/media/upload-script-image');
+                xhr.send(fd);
+            },
+
+            selectFromGallery(url) {
+                this.$dispatch('script-image-picked', { url });
+                // Update scriptForm directly via parent Alpine scope
+                if (typeof scriptForm !== 'undefined') {
+                    scriptForm.image_url = url;
+                }
+            },
+
+            async loadGallery() {
+                if (this._galleryLoaded) return;
+                this.galleryLoading = true;
+                try {
+                    const res  = await fetch('/api/admin/media/images');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.galleryImages  = data.images;
+                        this._galleryLoaded = true;
+                    }
+                } catch(e) { /* silent */ }
+                this.galleryLoading = false;
             }
         };
     }
