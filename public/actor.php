@@ -92,74 +92,101 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 /* ── CARD BODY ── */
 .vcard-body{
     flex:1;
-    padding:1.125rem;
+    padding:0;
     display:flex;
     flex-direction:column;
-    gap:.75rem;
 }
 
-.vcard-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.03em;color:#111;line-height:1.05}
+/* Section blocks inside card */
+.card-section{
+    padding:1rem 1.125rem;
+    border-bottom:1px solid #f0f0f0;
+}
+.card-section:last-child{border-bottom:none}
+
+/* Section header label */
+.section-label{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    font-size:.62rem;
+    font-weight:800;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#9ca3af;
+    margin-bottom:.625rem;
+}
+.section-label::before{
+    content:'';
+    display:inline-block;
+    width:3px;
+    height:11px;
+    border-radius:2px;
+    background:#111;
+    flex-shrink:0;
+}
+
+.vcard-title{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111;line-height:1.05}
 .dur-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.6rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.18rem .5rem;border-radius:20px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;margin-top:.3rem}
 
 /* Brief */
-.brief-preview{font-size:.84rem;color:#4b5563;line-height:1.7}
+.brief-preview{font-size:.84rem;color:#4b5563;line-height:1.72}
 .brief-extra{
     max-height:0;overflow:hidden;
     transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .35s ease;
-    opacity:0;font-size:.84rem;color:#4b5563;line-height:1.7;
+    opacity:0;font-size:.84rem;color:#4b5563;line-height:1.72;
 }
 .brief-extra.open{max-height:800px;opacity:1}
 
-/* Brief actions row */
-.brief-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.4rem}
+.brief-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
 .brief-toggle{
     display:inline-flex;align-items:center;gap:.25rem;
-    font-size:.73rem;font-weight:700;color:#374151;
+    font-size:.72rem;font-weight:700;color:#374151;
     background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:8px;
-    padding:.32rem .7rem;cursor:pointer;font-family:inherit;
+    padding:.3rem .65rem;cursor:pointer;font-family:inherit;
     transition:background .15s;white-space:nowrap;
 }
 .brief-toggle:hover{background:#e5e7eb}
 .brief-toggle .arr{display:inline-block;transition:transform .3s cubic-bezier(.4,0,.2,1);font-size:.75rem}
 .brief-toggle.open .arr{transform:rotate(180deg)}
 
-.btn-pdf{display:inline-flex;align-items:center;gap:.3rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.32rem .7rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;transition:border-color .15s;white-space:nowrap}
+.btn-pdf{display:inline-flex;align-items:center;gap:.3rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.3rem .65rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;transition:border-color .15s;white-space:nowrap}
 .btn-pdf:hover{border-color:#111}
 
-/* Divider */
-.div{height:1px;background:#f0f0f0}
-
-/* Rules */
-.rule-row{display:flex;align-items:flex-start;gap:.4rem;font-size:.76rem;color:#374151;line-height:1.5;padding:.1rem 0}
+/* Rules section — light tinted bg */
+.rules-section{background:#f9fafb}
+.rule-row{display:flex;align-items:flex-start;gap:.4rem;font-size:.78rem;color:#374151;line-height:1.5;padding:.15rem 0}
 .rule-dot{width:3px;height:3px;border-radius:50%;background:#9ca3af;flex-shrink:0;margin-top:.5rem}
 
-/* Form */
+/* Form section */
 .fp-label{display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.28rem}
 .fp-input{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;color:#111;padding:.52rem .75rem;width:100%;font-size:.875rem;outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .2s}
 .fp-input:focus{border-color:#111;box-shadow:0 0 0 2px rgba(17,17,17,.07)}
 .fp-input::placeholder{color:#9ca3af}
 .form2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
 
-/* Upload */
-.upload-zone{border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;background:#fafafa;text-align:center;padding:.875rem .75rem;transition:border-color .2s,background .2s}
+/* Upload section — accent bg */
+.upload-section{background:#f9fafb}
+.upload-zone{border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;background:#fff;text-align:center;padding:.875rem .75rem;transition:border-color .2s,background .2s}
 .upload-zone:hover,.upload-zone.drag{border-color:#111;background:#f5f5f5}
 .upload-icon{display:block;margin:0 auto .4rem}
 .upload-main{color:#6b7280;font-size:.82rem}
 .upload-hint{color:#9ca3af;font-size:.72rem;margin-top:.2rem}
 
-/* Progress */
 .prog-bar{height:3px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin-top:.35rem}
 .prog-fill{height:100%;background:#111;border-radius:2px;transition:width .3s}
-.err-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;color:#991b1b;padding:.5rem .75rem;font-size:.78rem}
+.err-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;color:#991b1b;padding:.5rem .75rem;font-size:.78rem;margin-top:.4rem}
 
-/* Submit */
+/* Submit section */
+.submit-section{background:#fff}
 .btn-submit{
     display:block;width:100%;
     background:#111;color:#fff;
     font-weight:700;border:none;
-    border-radius:9px;padding:.75rem;
+    border-radius:9px;padding:.8rem;
     font-size:.9rem;cursor:pointer;
     text-align:center;font-family:inherit;
+    letter-spacing:.01em;
 }
 .btn-submit:hover{background:#333}
 .btn-submit:disabled{opacity:.5;cursor:not-allowed}
@@ -229,85 +256,78 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     <!-- BODY -->
     <div class="vcard-body">
 
-      <!-- Title + duration -->
-      <div>
+      <!-- SECTION 1: Title + Brief -->
+      <div class="card-section">
         <div class="vcard-title"><?= htmlspecialchars($script['title'] ?? '') ?></div>
         <?php if (!empty($script['duration_hint'])): ?>
         <div><span class="dur-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span></div>
         <?php endif; ?>
-      </div>
 
-      <!-- Brief: preview + expand + actions always same row -->
-      <div>
-        <p class="fp-label" style="margin-bottom:.3rem">The Brief</p>
-        <p style="font-size:.78rem;font-weight:700;color:#111;margin-bottom:.25rem"><?= htmlspecialchars($script['title'] ?? '') ?></p>
-        <p class="brief-preview"><?= htmlspecialchars($briefPreview) ?><?= $briefRest ? '<span style="color:#9ca3af"> …</span>' : '' ?></p>
-        <!-- Expandable rest — slides in above action row -->
-        <?php if ($briefRest): ?>
-        <div class="brief-extra" id="<?= $expandId ?>"><?= nl2br(htmlspecialchars($briefRest)) ?></div>
-        <?php endif; ?>
-        <!-- Action row: always same line -->
-        <div class="brief-actions">
+        <div style="margin-top:.75rem">
+          <div class="section-label">The Brief</div>
+          <p style="font-size:.78rem;font-weight:700;color:#111;margin-bottom:.25rem"><?= htmlspecialchars($script['title'] ?? '') ?></p>
+          <p class="brief-preview"><?= htmlspecialchars($briefPreview) ?><?= $briefRest ? '<span style="color:#9ca3af"> …</span>' : '' ?></p>
           <?php if ($briefRest): ?>
-          <button class="brief-toggle" id="<?= $btnId ?>" onclick="toggleBrief('<?= $expandId ?>','<?= $btnId ?>')">
-            <span class="arr">▾</span> Read full brief
-          </button>
+          <div class="brief-extra" id="<?= $expandId ?>"><?= nl2br(htmlspecialchars($briefRest)) ?></div>
           <?php endif; ?>
-          <button class="btn-pdf" @click="downloadPDF()">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Download PDF
-          </button>
+          <div class="brief-actions">
+            <?php if ($briefRest): ?>
+            <button class="brief-toggle" id="<?= $btnId ?>" onclick="toggleBrief('<?= $expandId ?>','<?= $btnId ?>')">
+              <span class="arr">▾</span> Read full brief
+            </button>
+            <?php endif; ?>
+            <button class="btn-pdf" @click="downloadPDF()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Download PDF
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="div"></div>
-
-      <!-- Rules -->
-      <div>
-        <p class="fp-label" style="margin-bottom:.35rem">Rules &amp; Limits</p>
+      <!-- SECTION 2: Rules — tinted background for contrast -->
+      <div class="card-section rules-section">
+        <div class="section-label">Rules &amp; Limits</div>
         <?php foreach ($ruleList as $r): ?>
         <div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div>
         <?php endforeach; ?>
       </div>
 
-      <div class="div"></div>
-
-      <!-- Form -->
-      <form @submit.prevent="submit()">
-        <p class="fp-label" style="margin-bottom:.5rem">Your Details</p>
+      <!-- SECTION 3: Contact form -->
+      <div class="card-section">
+        <div class="section-label">Your Details</div>
         <div style="display:flex;flex-direction:column;gap:.5rem">
           <div class="form2">
             <div><label class="fp-label">Name *</label><input type="text" x-model="form.name" class="fp-input" placeholder="Full name" required autocomplete="name"></div>
             <div><label class="fp-label">Email *</label><input type="email" x-model="form.email" class="fp-input" placeholder="you@email.com" required autocomplete="email"></div>
           </div>
           <div><label class="fp-label">Phone *</label><input type="tel" x-model="form.phone" class="fp-input" placeholder="+91 98765 43210" required autocomplete="tel"></div>
+        </div>
+      </div>
 
-          <div class="div"></div>
-
-          <!-- Upload -->
-          <div>
-            <label class="fp-label">Video * <span style="text-transform:none;font-weight:400;color:#9ca3af;letter-spacing:0;font-size:.68rem">MP4 MOV WEBM · max 500 MB</span></label>
-            <div class="upload-zone" @click="$refs.vid.click()" @dragover.prevent="drag=true" @dragleave="drag=false" @drop.prevent="onDrop($event)" :class="drag?'drag':''">
-              <input type="file" x-ref="vid" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="onFile($event)">
-              <svg class="upload-icon" width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-              <p class="upload-main">Drop or <strong style="color:#111;text-decoration:underline">click to browse</strong></p>
-              <p class="upload-hint">Shoot on any phone · published to YouTube</p>
-              <p x-show="file" x-text="'✓ '+(file?file.name:'')" style="display:none;color:#111;font-size:.78rem;margin-top:.35rem;font-weight:600"></p>
-            </div>
-            <div x-show="uploading" style="display:none">
-              <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#6b7280;margin-top:.35rem;margin-bottom:.15rem"><span>Uploading…</span><span x-text="progress+'%'"></span></div>
-              <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
-            </div>
+      <!-- SECTION 4: Upload — tinted background -->
+      <div class="card-section upload-section">
+        <form @submit.prevent="submit()">
+          <div class="section-label">Your Video</div>
+          <div class="upload-zone" @click="$refs.vid.click()" @dragover.prevent="drag=true" @dragleave="drag=false" @drop.prevent="onDrop($event)" :class="drag?'drag':''">
+            <input type="file" x-ref="vid" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="onFile($event)">
+            <svg class="upload-icon" width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <p class="upload-main">Drop or <strong style="color:#111;text-decoration:underline">click to browse</strong></p>
+            <p class="upload-hint">MP4 · MOV · WEBM · max 500 MB · published to YouTube</p>
+            <p x-show="file" x-text="'✓ '+(file?file.name:'')" style="display:none;color:#111;font-size:.78rem;margin-top:.35rem;font-weight:600"></p>
           </div>
-
-          <!-- Errors -->
+          <div x-show="uploading" style="display:none">
+            <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#6b7280;margin-top:.35rem;margin-bottom:.15rem"><span>Uploading…</span><span x-text="progress+'%'"></span></div>
+            <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
+          </div>
           <div x-show="errors.length" style="display:none" class="err-box">
             <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
           </div>
-
-          <button type="submit" class="btn-submit" :disabled="loading">Submit <?= $atype ?> →</button>
-        </div>
-      </form>
+          <!-- Submit inside form so it works -->
+          <button type="submit" class="btn-submit" :disabled="loading" style="margin-top:.75rem">
+            Submit <?= $atype ?> →
+          </button>
+        </form>
+      </div>
 
     </div><!-- /vcard-body -->
   </div><!-- /vcard -->
