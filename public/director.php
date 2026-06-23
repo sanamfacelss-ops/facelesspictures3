@@ -27,6 +27,9 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
 .brief-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:640px;margin:0 auto;padding:0 1.5rem 1.75rem}
 @media(max-width:768px){.brief-grid{padding:0 1rem 1.5rem}}
+/* Side-by-side layout responsive */
+.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+@media(max-width:860px){.side-by-side{grid-template-columns:1fr}}
 .brief-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column}
 .card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
 .card-sec:last-child{border-bottom:none}
@@ -90,8 +93,10 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
   <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($directorBrief) ?></p>
 </section>
 
-<!-- SINGLE BRIEF CARD -->
-<div class="brief-grid">
+<!-- BRIEF CARD + SUBMISSION — side by side on desktop -->
+<div class="side-by-side" style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
+  <!-- LEFT: Brief card -->
+  <div>
 <?php $ruleList = array_filter(array_map('trim', explode("\n", $directorRules))); ?>
 
   <div class="brief-card">
@@ -136,13 +141,13 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     </div>
   </div>
 
-</div><!-- /brief-grid -->
+</div><!-- /brief-card -->
+</div><!-- /left col -->
 
-<!-- SUBMISSION CARD (full width, dark) -->
-<div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
-  <div class="submit-card" x-data="directorSubmit()">
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Direct? Submit Your Scene</p>
-    <p style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem;line-height:1.55">Cast your actor, give them the script, shoot the scene, and upload your video.</p>
+  <!-- RIGHT: SUBMISSION CARD -->
+  <div class="submit-card" style="margin:0" x-data="directorSubmit()">
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Direct? Submit Your Scene</p>
+    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55">Cast your actor, give them the script, shoot the scene, and upload your video.</p>
 
     <!-- Contact -->
     <div class="form3">
@@ -180,8 +185,8 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     <button type="button" class="btn-go" @click="submit()" :disabled="loading">
       Submit Director Scene →
     </button>
-  </div>
-</div>
+  </div><!-- /submit-card -->
+</div><!-- /side-by-side grid -->
 
 <!-- FOOTER -->
 <footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1.5rem;background:#fff">
