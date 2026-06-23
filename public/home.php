@@ -4,6 +4,9 @@ $settingsModel = new App\Models\Settings();
 
 $trailerUrl  = $settingsModel->get('landing_trailer_url', '');
 $aboutText   = $settingsModel->get('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
+$logoUrl     = $settingsModel->get('site_logo_url', '');
+$siteTagline = $settingsModel->get('site_tagline', "India's first anonymous film competition — no face, no connections, just raw talent.");
+$heroHeadline = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
 
 // Up to 3 poster slots — admin sets these in Settings tab
 $posters = [
@@ -103,8 +106,12 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 <nav class="fp-nav">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
     <a href="/" class="nav-logo">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
-      <span class="nav-badge">3</span>
+      <?php if ($logoUrl): ?>
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:32px;width:auto">
+      <?php else: ?>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
+        <span class="nav-badge">3</span>
+      <?php endif; ?>
     </a>
     <div class="flex items-center gap-4 sm:gap-6">
       <a href="#about"    class="nav-link hidden sm:block">About</a>
@@ -123,10 +130,10 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
       <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.875rem">Auditions Now Open</p>
       <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem">
-        NO FACE. NO CONNECTIONS. JUST TALENT.
+        <?= htmlspecialchars($heroHeadline) ?>
       </h1>
       <p style="font-size:.95rem;color:#6b7280;margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
-        India's first anonymous film competition — no face, no connections, just raw talent.
+        <?= htmlspecialchars($siteTagline) ?>
       </p>
     </div>
 
@@ -257,8 +264,12 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 <footer class="fp-footer">
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
     <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px">
-      FACELESS PICTURES
-      <span style="background:#fff;color:#111;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
+      <?php if ($logoUrl): ?>
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:28px;width:auto;filter:brightness(10)">
+      <?php else: ?>
+        FACELESS PICTURES
+        <span style="background:#fff;color:#111;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
+      <?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center">
       <a href="/actor"    style="color:#9ca3af;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'">Actors</a>

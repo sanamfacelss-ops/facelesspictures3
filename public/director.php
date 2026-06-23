@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
 
-$settingsModel  = new App\Models\Settings();
-$directorBrief  = $settingsModel->get('director_brief',
+$settingsModel = new App\Models\Settings();
+$directorBrief = $settingsModel->get('director_brief',
     'You have one actor, one phone camera, and a single location. Shoot a 60-second scene that tells a complete emotional story. Include your framing choices in your submission notes.');
 
+$logoUrl   = $settingsModel->get('site_logo_url', '');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
 ?>
 <!DOCTYPE html>
@@ -16,53 +17,51 @@ $pageTitle = 'Director Auditions — Faceless Pictures 3';
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config={theme:{extend:{colors:{ink:'#0A0E1A',deep:'#111827',amber:'#E6A817',warm:'#F0EBE0',muted:'#8B92A5',panel:'#161C2D',border:'#1F2840'},fontFamily:{display:['Bebas Neue','sans-serif'],body:['DM Sans','sans-serif']}}}}
-</script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased}
 [x-cloak]{display:none!important}
-.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb}
-.badge-dir{background:#111;color:#fff}
-.badge-pitch{background:#374151;color:#fff}
+.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
+.badge-dir{background:#111;color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .75rem;border-radius:20px;display:inline-block}
+.badge-pitch{background:#374151;color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .75rem;border-radius:20px;display:inline-block}
 .audition-card{background:#fff;border:1.5px solid #e5e7eb;border-radius:14px;transition:border-color .2s,box-shadow .2s}
-.audition-card:hover{border-color:#111;box-shadow:0 6px 28px rgba(0,0,0,.07)}
+.audition-card:hover{border-color:#d1d5db;box-shadow:0 4px 20px rgba(0,0,0,.05)}
 .upload-zone{border:2px dashed #d1d5db;border-radius:10px;transition:border-color .2s,background .2s;cursor:pointer}
 .upload-zone:hover,.upload-zone.drag{border-color:#111;background:#f9fafb}
-.fp-input{background:#fff;border:1.5px solid #d1d5db;border-radius:8px;color:#111;padding:.625rem .875rem;width:100%;font-size:15px;transition:border-color .2s}
-.fp-input:focus{outline:none;border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.06)}
+.fp-input{background:#fff;border:1.5px solid #d1d5db;border-radius:8px;color:#111;padding:.65rem .875rem;width:100%;font-size:.9375rem;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none}
+.fp-input:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.07)}
 .fp-input::placeholder{color:#9ca3af}
-.btn-amber{background:#111;color:#fff;font-weight:700;border-radius:8px;padding:.75rem 1.5rem;border:none;transition:background .2s,transform .1s;cursor:pointer}
-.btn-amber:hover{background:#333}
-.btn-amber:active{transform:scale(.98)}
-.btn-amber:disabled{opacity:.4;cursor:not-allowed}
+.fp-label{display:block;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#374151;margin-bottom:.4rem}
+.btn-amber,.btn-main{background:#111;color:#fff;font-weight:700;border-radius:8px;padding:.75rem 1.5rem;border:none;font-size:.9375rem;cursor:pointer;transition:background .2s,transform .1s;display:inline-flex;align-items:center;gap:.4rem}
+.btn-amber:hover,.btn-main:hover{background:#333}
+.btn-amber:disabled,.btn-main:disabled{opacity:.4;cursor:not-allowed}
 .script-block{background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:1.25rem;font-size:.9rem;line-height:1.7;color:#374151}
-.btn-pdf{display:inline-flex;align-items:center;gap:.4rem;background:#f3f4f6;border:1px solid #e5e7eb;color:#374151;border-radius:6px;padding:.35rem .75rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-pdf{display:inline-flex;align-items:center;gap:.4rem;background:#f3f4f6;border:1px solid #e5e7eb;color:#374151;border-radius:6px;padding:.35rem .7rem;font-size:.72rem;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap}
 .btn-pdf:hover{background:#e5e7eb}
-.success-box{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px}
+.success-box{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;color:#166534}
 .error-box{background:#fef2f2;border:1.5px solid #fecaca;border-radius:10px;color:#991b1b}
 .progress-bar{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;background:#111;border-radius:2px;transition:width .3s}
-.text-muted,.text-warm{color:#6b7280!important}
-.text-amber{color:#374151!important}
-.border-border{border-color:#e5e7eb!important}
-label{color:#374151}
-.normal-case{color:#9ca3af!important;font-weight:400!important}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .5s ease forwards}
+.sec-label{font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#9ca3af}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .45s ease forwards}
 </style>
 </head>
 <body>
-<nav class="fp-nav fixed top-0 left-0 right-0 z-50 h-14">
-  <div class="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
-      FACELESS PICTURES <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
+<nav class="fp-nav">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+    <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px">
+      <?php if ($logoUrl): ?>
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:32px;width:auto">
+      <?php else: ?>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
+        <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
+      <?php endif; ?>
     </a>
-    <div class="flex items-center gap-4">
+    <div style="display:flex;align-items:center;gap:1.25rem">
       <a href="/actor"    style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;text-decoration:none">Actor</a>
-      <a href="/director" style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#111;text-decoration:none">Director</a>
+      <a href="/director" style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#111;text-decoration:none;border-bottom:2px solid #111;padding-bottom:2px">Director</a>
       <a href="/writer"   style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;text-decoration:none">Writer</a>
     </div>
   </div>
@@ -186,17 +185,22 @@ label{color:#374151}
   </div>
 </section>
 
-<footer style="border-top:1px solid #e5e7eb;padding:2rem 1rem;background:#fff">
-  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4" style="color:#6b7280;font-size:.85rem">
-    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
-      FACELESS PICTURES <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
+<footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1rem;background:#fff">
+  <div class="max-w-5xl mx-auto" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem">
+    <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+      <?php if ($logoUrl): ?>
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:28px;width:auto">
+      <?php else: ?>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
+        <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
+      <?php endif; ?>
     </a>
-    <div class="flex gap-5">
-      <a href="/actor"    style="color:#6b7280;text-decoration:none">Actor</a>
-      <a href="/director" style="color:#6b7280;text-decoration:none">Director</a>
-      <a href="/writer"   style="color:#6b7280;text-decoration:none">Writer</a>
+    <div style="display:flex;gap:1.25rem">
+      <a href="/actor"    style="color:#6b7280;font-size:.8rem;text-decoration:none">Actor</a>
+      <a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none">Director</a>
+      <a href="/writer"   style="color:#6b7280;font-size:.8rem;text-decoration:none">Writer</a>
     </div>
-    <span>No face. Just talent.</span>
+    <span style="color:#9ca3af;font-size:.75rem">No face. Just talent.</span>
   </div>
 </footer>
 

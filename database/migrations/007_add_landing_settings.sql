@@ -2,6 +2,9 @@
 -- Run with: php database/run-migrations.php
 
 INSERT IGNORE INTO settings (setting_key, setting_value, setting_type, description) VALUES
+('site_logo_url',         '', 'text', 'Site logo image URL — shown in nav on all pages'),
+('landing_headline',      'NO FACE. NO CONNECTIONS. JUST TALENT.', 'text', 'Main hero headline on homepage'),
+('site_tagline',          'India is first anonymous film competition — no face, no connections, just raw talent.', 'text', 'Tagline shown below headline'),
 ('landing_poster_url',    '', 'text', 'Poster 1 image URL'),
 ('landing_poster_title',  'Faceless Pictures 3', 'text', 'Poster 1 title shown on card'),
 ('landing_trailer_url',   '', 'text', 'Poster 1 trailer URL (YouTube or MP4)'),

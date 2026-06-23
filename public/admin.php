@@ -2841,61 +2841,110 @@ if (file_exists($errorLogFile)) {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 
                         <!-- Landing Page Settings -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5 md:col-span-2 lg:col-span-3" x-data="landingSettings()">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-                                Landing Page Settings
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 1 — Image URL</label>
-                                    <input type="url" x-model="form.landing_poster_url" placeholder="https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 1 — Trailer URL</label>
-                                    <input type="url" x-model="form.landing_trailer_url" placeholder="https://youtube.com/..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                    <p class="text-[11px] text-dark/30 mt-1">YouTube URL or direct MP4 — opens in trailer modal on poster click</p>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 1 — Title</label>
-                                    <input type="text" x-model="form.landing_poster_title" placeholder="Faceless Pictures 3" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 2 — Image URL</label>
-                                    <input type="url" x-model="form.landing_poster2_url" placeholder="https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 2 — Trailer URL</label>
-                                    <input type="url" x-model="form.landing_trailer2_url" placeholder="https://youtube.com/..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 2 — Title</label>
-                                    <input type="text" x-model="form.landing_poster2_title" placeholder="Film Title" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 3 — Image URL</label>
-                                    <input type="url" x-model="form.landing_poster3_url" placeholder="https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 3 — Trailer URL</label>
-                                    <input type="url" x-model="form.landing_trailer3_url" placeholder="https://youtube.com/..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 3 — Title</label>
-                                    <input type="text" x-model="form.landing_poster3_title" placeholder="Film Title" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                </div>
-                                <div class="md:col-span-2 lg:col-span-3">
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">About Text</label>
-                                    <textarea x-model="form.landing_about_text" rows="3" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-6 md:col-span-2 lg:col-span-3" x-data="landingSettings()">
+                            <div class="flex items-center justify-between mb-5">
+                                <h3 class="font-semibold text-dark flex items-center gap-2 text-[15px]">
+                                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                                    Landing Page &amp; Site Settings
+                                </h3>
+                                <div class="flex items-center gap-3">
+                                    <span x-show="saved" class="text-green-600 text-sm font-medium flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Saved
+                                    </span>
+                                    <a href="/" target="_blank" class="text-dark/40 text-xs hover:text-dark transition">Preview site →</a>
                                 </div>
                             </div>
-                            <div class="mt-4 flex items-center gap-3">
-                                <button @click="saveLandingSettings()" class="bg-dark text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-dark/80 transition" :disabled="saving">
-                                    <span x-show="!saving">Save Landing Page</span>
+
+                            <!-- SECTION: Brand -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Brand</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Logo Image URL</label>
+                                        <input type="url" x-model="form.site_logo_url" placeholder="https://cdn.example.com/logo.png"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 focus:border-dark/30 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Transparent PNG recommended. Shows in nav &amp; footer on all pages.</p>
+                                    </div>
+                                    <div x-show="form.site_logo_url" style="display:none">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Preview</label>
+                                        <div class="border border-dark/10 rounded-lg px-4 py-3 bg-gray-50 flex items-center gap-3">
+                                            <img :src="form.site_logo_url" alt="Logo preview" style="height:32px;width:auto;max-width:180px;object-fit:contain" @error="$el.style.display='none'">
+                                            <span class="text-[11px] text-dark/30">Live preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: Hero / Headline -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Hero Section</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Main Headline</label>
+                                        <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Displayed in large Bebas Neue font, centered below the nav.</p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Tagline / Subtitle</label>
+                                        <input type="text" x-model="form.site_tagline" placeholder="India's first anonymous film competition..."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: Posters -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Film Poster Cards (3 slots)</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                    <?php foreach ([
+                                        ['Poster 1', 'landing_poster_url', 'landing_poster_title', 'landing_trailer_url'],
+                                        ['Poster 2', 'landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url'],
+                                        ['Poster 3', 'landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url'],
+                                    ] as $p): ?>
+                                    <div class="bg-dark/[.025] rounded-xl p-4 space-y-3">
+                                        <p class="text-xs font-semibold text-dark/50"><?= $p[0] ?></p>
+                                        <div>
+                                            <label class="block text-[11px] text-dark/40 mb-1">Poster Image URL</label>
+                                            <input type="url" x-model="form.<?= $p[1] ?>" placeholder="https://..."
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-dark/40 mb-1">Film Title</label>
+                                            <input type="text" x-model="form.<?= $p[2] ?>" placeholder="Film name..."
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-dark/40 mb-1">Trailer URL (YouTube or MP4)</label>
+                                            <input type="url" x-model="form.<?= $p[3] ?>" placeholder="https://youtube.com/..."
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: About -->
+                            <div class="mb-6">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">About Section</p>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text</label>
+                                    <textarea x-model="form.landing_about_text" rows="3" placeholder="Describe Faceless Pictures..."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-y"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <button @click="saveLandingSettings()"
+                                    class="bg-dark text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-dark/80 transition flex items-center gap-2"
+                                    :disabled="saving">
+                                    <svg x-show="saving" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                    <span x-show="!saving">Save All Settings</span>
                                     <span x-show="saving">Saving...</span>
                                 </button>
-                                <span x-show="saved" class="text-green-600 text-sm font-medium">✓ Saved</span>
-                                <a href="/" target="_blank" class="text-dark/40 text-sm hover:text-dark transition">Preview →</a>
+                                <span x-show="saved" x-transition class="text-green-600 text-sm font-medium flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Saved successfully
+                                </span>
                             </div>
                         </div>
 
@@ -4739,6 +4788,9 @@ if (file_exists($errorLogFile)) {
             saving: false, saved: false,
             csrf: document.querySelector('meta[name="csrf-token"]')?.content || '',
             form: {
+                site_logo_url:         '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>',
+                landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
+                site_tagline:          <?= json_encode($settingsModel->get('site_tagline',"India's first anonymous film competition — no face, no connections, just raw talent.")) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
                 landing_trailer_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer_url',''))) ?>',
