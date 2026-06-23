@@ -1410,47 +1410,10 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== SCRIPTS TAB ==================== -->
                 <div x-show="activeTab === 'scripts'" x-cloak>
-                    <!-- Guide Editor Section -->
-                    <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5 mb-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                            <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                <span class="hidden sm:inline">Role Guides (Shown on Create Screen)</span>
-                                <span class="sm:hidden">Role Guides</span>
-                            </h3>
-                            <div class="flex gap-2 overflow-x-auto pb-1">
-                                <button @click="guideTab = 'actor'" :class="guideTab === 'actor' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition whitespace-nowrap">🎭 Actor</button>
-                                <button @click="guideTab = 'director'" :class="guideTab === 'director' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition whitespace-nowrap">🎬 Director</button>
-                                <button @click="guideTab = 'writer'" :class="guideTab === 'writer' ? 'bg-crimson text-white' : 'bg-cream text-dark/60'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition whitespace-nowrap">✍️ Writer</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Actor Guide -->
-                        <div x-show="guideTab === 'actor'" x-cloak>
-                            <textarea x-model="guides.actor" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for actors..."></textarea>
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
-                                <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
-                                <button @click="saveGuide('actor')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition w-full sm:w-auto">Save Actor Guide</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Director Guide -->
-                        <div x-show="guideTab === 'director'" x-cloak>
-                            <textarea x-model="guides.director" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for directors..."></textarea>
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
-                                <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
-                                <button @click="saveGuide('director')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition w-full sm:w-auto">Save Director Guide</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Writer Guide -->
-                        <div x-show="guideTab === 'writer'" x-cloak>
-                            <textarea x-model="guides.writer" rows="5" class="w-full border border-dark/10 rounded-lg px-4 py-3 text-[13px] focus:outline-none focus:border-crimson resize-none font-mono" placeholder="Guide text for writers..."></textarea>
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
-                                <p class="text-[11px] text-dark/40">Use **text** for bold. New lines create paragraphs.</p>
-                                <button @click="saveGuide('writer')" class="bg-crimson text-white px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition w-full sm:w-auto">Save Writer Guide</button>
-                            </div>
-                        </div>
+                    <!-- Info banner: briefs moved to Settings -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 flex items-start gap-3">
+                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-[12px] text-blue-700">Dialog briefs, song brief, director brief and writer brief are now managed under <a href="#" @click.prevent="activeTab='settings'" class="font-semibold underline">Settings → Audition Briefs</a>. Scripts here are additional optional scripts attached to cards.</p>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1477,17 +1440,9 @@ if (file_exists($errorLogFile)) {
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block text-[12px] text-dark/50 mb-1">Difficulty</label>
-                                            <select x-model="scriptForm.difficulty" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
-                                                <option value="beginner">Beginner</option>
-                                                <option value="intermediate">Intermediate</option>
-                                                <option value="advanced">Advanced</option>
-                                            </select>
+                                            <label class="block text-[12px] text-dark/50 mb-1">Duration Hint</label>
+                                            <input type="text" x-model="scriptForm.duration_hint" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="60-90 seconds">
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[12px] text-dark/50 mb-1">Duration Hint</label>
-                                        <input type="text" x-model="scriptForm.duration_hint" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="60-90 seconds">
                                     </div>
                                     <div>
                                         <label class="block text-[12px] text-dark/50 mb-1">Audition Type Label</label>
@@ -1607,14 +1562,23 @@ if (file_exists($errorLogFile)) {
                                     <template x-for="sc in filteredScripts" :key="sc.id">
                                         <div class="p-4 hover:bg-cream/30 transition">
                                             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                                                        <h4 class="font-medium text-dark truncate text-[13px] md:text-[14px]" x-text="sc.title"></h4>
-                                                        <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-dark/5 text-dark/50" x-text="sc.category"></span>
-                                                        <span class="text-[9px] px-1.5 py-0.5 rounded-full" :class="{'bg-green-100 text-green-700': sc.difficulty === 'beginner', 'bg-amber-100 text-amber-700': sc.difficulty === 'intermediate', 'bg-red-100 text-red-700': sc.difficulty === 'advanced'}" x-text="sc.difficulty"></span>
+                                                <div class="flex gap-3 flex-1 min-w-0">
+                                                    <!-- Script image thumbnail -->
+                                                    <div x-show="sc.image_url" class="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-dark/5 border border-dark/10">
+                                                        <img :src="sc.image_url" class="w-full h-full object-cover">
                                                     </div>
-                                                    <p class="text-[12px] text-dark/50 line-clamp-2" x-text="sc.content"></p>
-                                                    <p class="text-[10px] text-dark/30 mt-1" x-show="sc.duration_hint" x-text="'⏱ ' + sc.duration_hint"></p>
+                                                    <div x-show="!sc.image_url" class="w-12 h-16 rounded-lg flex-shrink-0 bg-dark/5 border border-dashed border-dark/15 flex items-center justify-center">
+                                                        <svg class="w-4 h-4 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                                            <h4 class="font-medium text-dark truncate text-[13px] md:text-[14px]" x-text="sc.title"></h4>
+                                                            <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-dark/5 text-dark/50 capitalize" x-text="sc.category"></span>
+                                                            <span x-show="sc.audition_type" class="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200" x-text="sc.audition_type"></span>
+                                                        </div>
+                                                        <p class="text-[12px] text-dark/50 line-clamp-2" x-text="sc.content"></p>
+                                                        <p class="text-[10px] text-dark/30 mt-1" x-show="sc.duration_hint" x-text="'⏱ ' + sc.duration_hint"></p>
+                                                    </div>
                                                 </div>
                                                 <div class="flex items-center gap-2 flex-shrink-0">
                                                     <button @click="editScript(sc)" class="text-[11px] text-dark/50 hover:text-crimson">Edit</button>
