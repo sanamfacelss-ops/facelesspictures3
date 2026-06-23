@@ -93,10 +93,9 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 
 <!-- BRIEF CARD + SUBMISSION — side by side on desktop -->
 <div class="side-by-side" style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
-  <!-- LEFT: Brief card -->
-  <div>
 <?php $ruleList = array_filter(array_map('trim', explode("\n", $writerRules))); ?>
 
+  <!-- LEFT: Brief card (direct grid child) -->
   <div class="brief-card">
     <div class="card-sec" style="padding:0">
       <?php if ($writerPreviewUrl): ?>
@@ -137,12 +136,9 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
       <div class="sec-label">Rules &amp; Limits</div>
       <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
     </div>
-  </div>
+  </div><!-- /brief-card — end left col -->
 
-</div><!-- /brief-card -->
-</div><!-- /left col -->
-
-  <!-- RIGHT: SUBMISSION CARD -->
+  <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
   <div class="submit-card" style="margin:0" x-data="writerSubmit()">
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Write? Submit Your Continuation</p>
     <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55">Read the given script, write what happens next, then record yourself narrating it on camera.</p>
