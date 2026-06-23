@@ -1983,6 +1983,10 @@ class AdminController
             'actor_preview_video_url', 'song_preview_video_url',
             'actor_script_image_url',  'song_lyrics_image_url',
             'song_tune_youtube_url',   'actor_script_pdf_url', 'song_lyrics_pdf_url',
+            // Director page media
+            'director_preview_video_url', 'director_script_image_url', 'director_script_pdf_url',
+            // Writer page media
+            'writer_preview_video_url',   'writer_script_image_url',   'writer_script_pdf_url',
         ];
 
         if (!in_array($key, $allowed)) {

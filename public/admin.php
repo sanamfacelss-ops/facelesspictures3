@@ -3249,6 +3249,67 @@ if (file_exists($errorLogFile)) {
                                         <input type="url" x-model="form.song_tune_youtube_url" placeholder="https://youtube.com/watch?v=..."
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         <p class="text-[11px] text-dark/30 mt-1">YouTube or direct video URL. Opens in a popup so actors can play the tune while recording.</p>
+                            </div>
+                            </div>
+
+                            <!-- SECTION: Director Page Media -->
+                            <div class="mb-6">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Director Page — Media &amp; Links</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Director Preview Video URL</label>
+                                        <input type="url" x-model="form.director_preview_video_url" placeholder="https://...mp4"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Short preview/mock video shown at top of director brief card.</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Director Script PDF URL</label>
+                                        <input type="url" x-model="form.director_script_pdf_url" placeholder="https://...pdf"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">PDF download link for the director script.</p>
+                                    </div>
+                                    <div x-data="imageUploader('director_script_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('director_script_image_url',''))) ?>')">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Director Script Image</label>
+                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
+                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
+                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
+                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait director script image</p></div></template>
+                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
+                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: Writer Page Media -->
+                            <div class="mb-6">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Writer Page — Media &amp; Links</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Writer Preview Video URL</label>
+                                        <input type="url" x-model="form.writer_preview_video_url" placeholder="https://...mp4"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Short preview/mock video shown at top of writer brief card.</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Writer Script PDF URL</label>
+                                        <input type="url" x-model="form.writer_script_pdf_url" placeholder="https://...pdf"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">PDF download link for the writer script.</p>
+                                    </div>
+                                    <div x-data="imageUploader('writer_script_image_url','<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_image_url',''))) ?>')">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Writer Script Image</label>
+                                        <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-dark/[.02]"
+                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30'"
+                                            style="min-height:80px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)" @click="$refs.imgInput.click()">
+                                            <input type="file" x-ref="imgInput" class="hidden" accept="image/jpeg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                            <template x-if="!preview&&!uploading"><div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center"><p class="text-[11px] text-dark/40">Upload portrait writer script image</p></div></template>
+                                            <template x-if="uploading"><div class="flex flex-col items-center justify-center gap-2 p-4"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
+                                            <template x-if="preview&&!uploading"><div class="relative"><img :src="preview" class="w-full max-h-24 object-contain"><button type="button" @click.stop="clearImage()" class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow text-xs">✕</button></div></template>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -5460,6 +5521,14 @@ if (file_exists($errorLogFile)) {
                 actor_script_pdf_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('actor_script_pdf_url',''))) ?>',
                 song_lyrics_pdf_url:     '<?= addslashes(htmlspecialchars($settingsModel->get('song_lyrics_pdf_url',''))) ?>',
                 song_tune_youtube_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('song_tune_youtube_url',''))) ?>',
+                // Director page media
+                director_preview_video_url: '<?= addslashes(htmlspecialchars($settingsModel->get('director_preview_video_url',''))) ?>',
+                director_script_image_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('director_script_image_url',''))) ?>',
+                director_script_pdf_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('director_script_pdf_url',''))) ?>',
+                // Writer page media
+                writer_preview_video_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('writer_preview_video_url',''))) ?>',
+                writer_script_image_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_image_url',''))) ?>',
+                writer_script_pdf_url:      '<?= addslashes(htmlspecialchars($settingsModel->get('writer_script_pdf_url',''))) ?>',
             },
             init() {
                 // Sync uploaded image URLs back into the form
