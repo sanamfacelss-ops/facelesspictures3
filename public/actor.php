@@ -46,14 +46,36 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     border-radius:14px;
     box-shadow:0 2px 8px rgba(0,0,0,.06);
     overflow:hidden;
+    align-items:stretch;
 }
-@media(max-width:680px){
+@media(max-width:900px){
     .script-card{ flex-direction:column; }
-    .card-poster{ width:100% !important; min-width:0 !important; height:200px; }
-    .card-poster img{ height:200px; }
-    .card-content{ padding:1rem; }
+    .card-poster{ width:100% !important; min-width:0 !important; height:280px !important; min-height:0 !important; }
+    .card-poster img{ height:280px; }
+    .card-cols{ grid-template-columns:1fr !important; }
+    .form2{ grid-template-columns:1fr 1fr; }
+}
+@media(max-width:520px){
     .form2{ grid-template-columns:1fr; }
 }
+
+/* 3-column content grid */
+.card-cols{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:1rem;
+    padding:1.375rem;
+    flex:1;
+    min-width:0;
+}
+.col-divider{width:1px;background:#f0f0f0;align-self:stretch}
+
+.brief-text{font-size:.84rem;color:#4b5563;line-height:1.65;white-space:pre-line}
+/* Brief expandable */
+.brief-collapsed{max-height:120px;overflow:hidden;position:relative}
+.brief-collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,#fff)}
+.brief-expanded{max-height:none;overflow:visible}
+.brief-expanded::after{display:none}
 
 .card-poster{
     position:relative;
@@ -65,7 +87,7 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
     overflow:hidden;
     min-height:300px;
 }
-.card-poster img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.card-poster img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 .poster-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:2rem 1rem;min-height:300px}
 .poster-badge{position:absolute;top:10px;left:10px;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .65rem;border-radius:20px;background:rgba(17,17,17,.85);color:#fff;border:1px solid rgba(255,255,255,.18)}
 
@@ -76,7 +98,6 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 
 .brief-text{font-size:.84rem;color:#4b5563;line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .brief-text.expanded{display:block}
-.read-btn{background:none;border:none;cursor:pointer;font-size:.73rem;font-weight:600;color:#111;text-decoration:underline;text-underline-offset:2px;padding:0;margin-top:.2rem;font-family:inherit}
 
 .btn-pdf{display:inline-flex;align-items:center;gap:.35rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:border-color .2s}
 .btn-pdf:hover{border-color:#111}
@@ -174,45 +195,52 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
         <span class="poster-badge"><?= $atype ?></span>
       </div>
 
-      <!-- CONTENT -->
-      <div class="card-content" x-data="auCard(<?= $scriptId ?>, '<?= addslashes($atype) ?>', 'actor', <?= json_encode($script['title'] ?? '') ?>, <?= json_encode($script['content'] ?? '') ?>)">
+      <!-- CONTENT: 3 columns -->
+      <div class="card-cols" x-data="auCard(<?= $scriptId ?>, '<?= addslashes($atype) ?>', 'actor', <?= json_encode($script['title'] ?? '') ?>, <?= json_encode($script['content'] ?? '') ?>)">
 
-        <!-- Title + duration -->
-        <div>
-          <div class="card-title"><?= htmlspecialchars($script['title'] ?? '') ?></div>
-          <?php if (!empty($script['duration_hint'])): ?>
-          <div><span class="dur-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span></div>
-          <?php endif; ?>
-        </div>
+        <!-- COL 1: Script info -->
+        <div style="display:flex;flex-direction:column;gap:.75rem">
 
-        <!-- Brief -->
-        <div>
-          <p class="fp-label" style="margin-bottom:.35rem">The Brief</p>
-          <p class="brief-text" :class="expanded ? 'expanded' : ''"><?= nl2br(htmlspecialchars($script['content'] ?? '')) ?></p>
-          <button class="read-btn" @click="expanded = !expanded" x-text="expanded ? 'Show less ↑' : 'Read more ↓'">Read more ↓</button>
-        </div>
+          <!-- Title + duration -->
+          <div>
+            <div class="card-title"><?= htmlspecialchars($script['title'] ?? '') ?></div>
+            <?php if (!empty($script['duration_hint'])): ?>
+            <div><span class="dur-pill">⏱ <?= htmlspecialchars($script['duration_hint']) ?></span></div>
+            <?php endif; ?>
+          </div>
 
-        <!-- PDF -->
-        <button class="btn-pdf" @click="downloadPDF()">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Download Brief PDF
-        </button>
+          <!-- Brief — always visible, with expand/collapse -->
+          <div>
+            <p class="fp-label" style="margin-bottom:.35rem">The Brief</p>
+            <div :class="expanded ? 'brief-expanded' : 'brief-collapsed'" style="position:relative">
+              <p class="brief-text"><?= nl2br(htmlspecialchars($script['content'] ?? '')) ?></p>
+            </div>
+            <button class="read-btn" @click="expanded = !expanded" x-text="expanded ? '▲ Show less' : '▼ Read more'">▼ Read more</button>
+          </div>
 
-        <div class="div"></div>
+          <!-- PDF -->
+          <button class="btn-pdf" @click="downloadPDF()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Download Brief PDF
+          </button>
 
-        <!-- Rules -->
-        <div>
-          <p class="fp-label" style="margin-bottom:.4rem">Rules &amp; Limits</p>
-          <?php foreach ($ruleList as $r): ?>
-          <div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div>
-          <?php endforeach; ?>
-        </div>
+          <div class="div"></div>
 
-        <div class="div"></div>
+          <!-- Rules -->
+          <div>
+            <p class="fp-label" style="margin-bottom:.4rem">Rules &amp; Limits</p>
+            <?php foreach ($ruleList as $r): ?>
+            <div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div>
+            <?php endforeach; ?>
+          </div>
 
-        <!-- Form -->
-        <form @submit.prevent="submit()">
-          <p class="fp-label" style="margin-bottom:.5rem">Your Details</p>
+        </div><!-- /col 1 -->
+
+        <div class="col-divider"></div>
+
+        <!-- COL 2: Contact form -->
+        <form @submit.prevent="submit()" id="form_<?= $cardId ?>">
+          <p class="fp-label" style="margin-bottom:.6rem">Your Details</p>
           <div style="display:flex;flex-direction:column;gap:.55rem">
             <div class="form2">
               <div>
@@ -228,46 +256,49 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
               <label class="fp-label">Phone *</label>
               <input type="tel" x-model="form.phone" class="fp-input" placeholder="+91 98765 43210" required autocomplete="tel">
             </div>
-
-            <div class="div"></div>
-
-            <!-- Upload zone — ALL descriptive text is plain HTML, never inside x-show -->
-            <div>
-              <label class="fp-label">Your Video * <span style="text-transform:none;font-weight:400;color:#9ca3af;letter-spacing:0">MP4 MOV WEBM · max 500 MB</span></label>
-              <div class="upload-zone"
-                @click="$refs.vid.click()"
-                @dragover.prevent="drag=true"
-                @dragleave="drag=false"
-                @drop.prevent="onDrop($event)"
-                :class="drag?'drag':''">
-                <input type="file" x-ref="vid" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="onFile($event)">
-                <svg class="upload-icon" width="24" height="24" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                <p class="upload-main">Drop video or <strong style="color:#111;text-decoration:underline">click to browse</strong></p>
-                <p class="upload-hint">Shoot on any phone · published to YouTube after approval</p>
-                <p x-show="file" x-text="'✓ ' + (file ? file.name : '')" style="display:none;color:#111;font-size:.8rem;margin-top:.4rem;font-weight:600"></p>
-              </div>
-              <!-- Progress -->
-              <div x-show="uploading" style="display:none;margin-top:.4rem">
-                <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#6b7280;margin-bottom:.2rem">
-                  <span>Uploading…</span><span x-text="progress + '%'"></span>
-                </div>
-                <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
-              </div>
-            </div>
-
-            <!-- Errors -->
-            <div x-show="errors.length" style="display:none" class="err-box">
-              <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
-            </div>
-
-            <!-- Submit: plain text, no Alpine wrapping -->
-            <button type="submit" class="btn-submit" :disabled="loading">
-              Submit <?= $atype ?> →
-            </button>
           </div>
-        </form>
+        </form><!-- /col 2 -->
 
-      </div><!-- /card-content -->
+        <div class="col-divider"></div>
+
+        <!-- COL 3: Upload + Submit -->
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <label class="fp-label">Your Video * <span style="text-transform:none;font-weight:400;color:#9ca3af;letter-spacing:0">MP4 MOV WEBM · max 500 MB</span></label>
+          <div class="upload-zone"
+            @click="$refs.vid.click()"
+            @dragover.prevent="drag=true"
+            @dragleave="drag=false"
+            @drop.prevent="onDrop($event)"
+            :class="drag?'drag':''">
+            <input type="file" x-ref="vid" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="onFile($event)">
+            <svg class="upload-icon" width="24" height="24" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <p class="upload-main">Drop video or <strong style="color:#111;text-decoration:underline">click to browse</strong></p>
+            <p class="upload-hint">Shoot on any phone · published to YouTube after approval</p>
+            <p x-show="file" x-text="'✓ ' + (file ? file.name : '')" style="display:none;color:#111;font-size:.8rem;margin-top:.4rem;font-weight:600"></p>
+          </div>
+
+          <!-- Progress -->
+          <div x-show="uploading" style="display:none">
+            <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#6b7280;margin-bottom:.2rem">
+              <span>Uploading…</span><span x-text="progress + '%'"></span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
+          </div>
+
+          <!-- Errors -->
+          <div x-show="errors.length" style="display:none" class="err-box">
+            <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
+          </div>
+
+          <!-- Submit triggers the form in col 2 -->
+          <button type="submit" form="form_<?= $cardId ?>" class="btn-submit" :disabled="loading">
+            Submit <?= $atype ?> →
+          </button>
+
+          <p style="font-size:.68rem;color:#9ca3af;text-align:center;line-height:1.5">Video reviewed by AI then published to YouTube</p>
+        </div><!-- /col 3 -->
+
+      </div><!-- /card-cols -->
     </div><!-- /script-card -->
 
 <?php endforeach; ?>
