@@ -1489,6 +1489,21 @@ if (file_exists($errorLogFile)) {
                                         <label class="block text-[12px] text-dark/50 mb-1">Duration Hint</label>
                                         <input type="text" x-model="scriptForm.duration_hint" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="60-90 seconds">
                                     </div>
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Audition Type Label</label>
+                                        <input type="text" x-model="scriptForm.audition_type" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="Dialog Audition / Song Audition / Scene Direction…">
+                                        <p class="text-[11px] text-dark/30 mt-1">Shown as the badge on the script card</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Card Poster Image URL</label>
+                                        <input type="url" x-model="scriptForm.image_url" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="https://...">
+                                        <p class="text-[11px] text-dark/30 mt-1">16:9 image shown at top of the audition card</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Rules &amp; Limits</label>
+                                        <textarea x-model="scriptForm.rules" rows="5" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson resize-y" placeholder="One rule per line:&#10;Video under 3 minutes&#10;Shoot on any device&#10;Face must not be visible&#10;Clear audio required"></textarea>
+                                        <p class="text-[11px] text-dark/30 mt-1">One rule per line — shown as bullet list on the card</p>
+                                    </div>
                                     <div class="flex gap-2">
                                         <button type="submit" class="flex-1 bg-crimson text-white py-2.5 rounded-lg text-[13px] font-medium hover:bg-crimson/90 transition" x-text="editingScript ? 'Update Script' : 'Create Script'"></button>
                                         <template x-if="editingScript">
@@ -3799,7 +3814,7 @@ if (file_exists($errorLogFile)) {
             newSeason: { title: '', brief: '', start_date: '', end_date: '', status: 'active' },
             
             // Scripts
-            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '' },
+            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' },
             editingScript: null,
             
             // Guides
@@ -4340,17 +4355,20 @@ if (file_exists($errorLogFile)) {
             editScript(sc) {
                 this.editingScript = sc.id;
                 this.scriptForm = {
-                    title: sc.title,
-                    content: sc.content,
-                    category: sc.category,
-                    difficulty: sc.difficulty,
-                    duration_hint: sc.duration_hint || ''
+                    title:         sc.title,
+                    content:       sc.content,
+                    category:      sc.category,
+                    difficulty:    sc.difficulty,
+                    duration_hint: sc.duration_hint  || '',
+                    audition_type: sc.audition_type  || '',
+                    image_url:     sc.image_url      || '',
+                    rules:         sc.rules          || '',
                 };
             },
             
             cancelEditScript() {
                 this.editingScript = null;
-                this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '' };
+                this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' };
             },
             
             async createScript() {

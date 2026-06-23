@@ -66,11 +66,14 @@ class AdminController
         
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
-        $title = trim($_POST['title'] ?? '');
-        $content = trim($_POST['content'] ?? '');
-        $category = trim($_POST['category'] ?? '');
-        $difficulty = trim($_POST['difficulty'] ?? 'beginner');
+        $title       = trim($_POST['title']         ?? '');
+        $content     = trim($_POST['content']       ?? '');
+        $category    = trim($_POST['category']      ?? '');
+        $difficulty  = trim($_POST['difficulty']    ?? 'beginner');
         $durationHint = trim($_POST['duration_hint'] ?? '');
+        $auditionType = trim($_POST['audition_type'] ?? '');
+        $imageUrl    = trim($_POST['image_url']     ?? '');
+        $rules       = trim($_POST['rules']         ?? '');
 
         $errors = [];
         if (strlen($title) < 2) $errors[] = 'Title is required';
@@ -86,11 +89,14 @@ class AdminController
 
         try {
             $id = $this->scriptModel->create([
-                'title' => $title,
-                'content' => $content,
-                'category' => $category,
-                'difficulty' => $difficulty,
+                'title'        => $title,
+                'content'      => $content,
+                'category'     => $category,
+                'difficulty'   => $difficulty,
                 'duration_hint' => $durationHint ?: null,
+                'audition_type' => $auditionType ?: null,
+                'image_url'    => $imageUrl ?: null,
+                'rules'        => $rules ?: null,
             ]);
 
             debug_log("Admin created script ID: $id", 'ADMIN');
@@ -108,14 +114,16 @@ class AdminController
     public function updateScript(int $id): void
     {
         header('Content-Type: application/json');
-        
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
-        $title = trim($_POST['title'] ?? '');
-        $content = trim($_POST['content'] ?? '');
-        $category = trim($_POST['category'] ?? '');
-        $difficulty = trim($_POST['difficulty'] ?? 'beginner');
+        $title        = trim($_POST['title']         ?? '');
+        $content      = trim($_POST['content']       ?? '');
+        $category     = trim($_POST['category']      ?? '');
+        $difficulty   = trim($_POST['difficulty']    ?? 'beginner');
         $durationHint = trim($_POST['duration_hint'] ?? '');
+        $auditionType = trim($_POST['audition_type'] ?? '');
+        $imageUrl     = trim($_POST['image_url']     ?? '');
+        $rules        = trim($_POST['rules']         ?? '');
 
         $errors = [];
         if (strlen($title) < 2) $errors[] = 'Title is required';
@@ -131,11 +139,14 @@ class AdminController
 
         try {
             $this->scriptModel->update($id, [
-                'title' => $title,
-                'content' => $content,
-                'category' => $category,
-                'difficulty' => $difficulty,
+                'title'        => $title,
+                'content'      => $content,
+                'category'     => $category,
+                'difficulty'   => $difficulty,
                 'duration_hint' => $durationHint ?: null,
+                'audition_type' => $auditionType ?: null,
+                'image_url'    => $imageUrl ?: null,
+                'rules'        => $rules ?: null,
             ]);
 
             debug_log("Admin updated script ID: $id", 'ADMIN');

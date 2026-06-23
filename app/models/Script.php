@@ -42,7 +42,7 @@ class Script
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO scripts (title, content, category, difficulty, duration_hint) VALUES (?, ?, ?, ?, ?)"
+            "INSERT INTO scripts (title, content, category, difficulty, duration_hint, image_url, audition_type, rules) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $data['title'],
@@ -50,6 +50,9 @@ class Script
             $data['category'],
             $data['difficulty'] ?? 'beginner',
             $data['duration_hint'] ?? null,
+            $data['image_url']     ?? null,
+            $data['audition_type'] ?? null,
+            $data['rules']         ?? null,
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -57,7 +60,7 @@ class Script
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare(
-            "UPDATE scripts SET title = ?, content = ?, category = ?, difficulty = ?, duration_hint = ? WHERE id = ?"
+            "UPDATE scripts SET title = ?, content = ?, category = ?, difficulty = ?, duration_hint = ?, image_url = ?, audition_type = ?, rules = ? WHERE id = ?"
         );
         return $stmt->execute([
             $data['title'],
@@ -65,6 +68,9 @@ class Script
             $data['category'],
             $data['difficulty'] ?? 'beginner',
             $data['duration_hint'] ?? null,
+            $data['image_url']     ?? null,
+            $data['audition_type'] ?? null,
+            $data['rules']         ?? null,
             $id,
         ]);
     }
