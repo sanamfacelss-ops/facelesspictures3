@@ -170,6 +170,7 @@ $routes = [
     'api/admin/settings/upload-image'    => [AdminController::class, 'uploadSettingImage',  'POST'],
     'api/admin/media/images'             => [AdminController::class, 'listUploadedImages',  'GET'],
     'api/admin/media/upload-script-image' => [AdminController::class, 'uploadScriptImage', 'POST'],
+    'api/admin/media/upload-script-file'  => [AdminController::class, 'uploadScriptFile',  'POST'],
 
     // Moderation API
     'api/moderation/pending' => [ModerationController::class, 'pendingList', 'GET'],

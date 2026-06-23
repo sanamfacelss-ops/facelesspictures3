@@ -1532,6 +1532,80 @@ if (file_exists($errorLogFile)) {
 
                                         <p class="text-[11px] text-dark/30 mt-1.5">16:9 image shown at top of the audition card</p>
                                     </div>
+
+                                    <!-- Preview Video per script -->
+                                    <div x-data="scriptVideoUploader()">
+                                        <label class="block text-[12px] text-dark/50 mb-1.5">Mock / Preview Video</label>
+                                        <div class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
+                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                            style="min-height:72px"
+                                            @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
+                                            <input type="file" x-ref="vidPick" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
+                                            <template x-if="!preview&&!uploading">
+                                                <div class="flex flex-col items-center justify-center gap-1.5 p-3 text-center">
+                                                    <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                    <p class="text-[11px] text-dark/40">Upload mock/preview video</p>
+                                                    <p class="text-[10px] text-dark/25">MP4 · MOV · WEBM · max 500 MB</p>
+                                                </div>
+                                            </template>
+                                            <template x-if="uploading">
+                                                <div class="flex flex-col items-center justify-center gap-2 p-3">
+                                                    <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div>
+                                                    <p class="text-[11px] text-dark/40" x-text="progress+'%'"></p>
+                                                </div>
+                                            </template>
+                                            <template x-if="preview&&!uploading">
+                                                <div class="flex items-center gap-2 px-3 py-2">
+                                                    <div class="w-7 h-7 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-3.5 h-3.5 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                                                    <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'Video uploaded'"></p>
+                                                    <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                        <p class="text-[11px] text-dark/30 mt-1">Shown as the top video on the public script card</p>
+                                    </div>
+
+                                    <!-- Script PDF per script -->
+                                    <div x-data="scriptPdfUploader()">
+                                        <label class="block text-[12px] text-dark/50 mb-1.5">Script / Lyrics PDF</label>
+                                        <div class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
+                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                            style="min-height:64px"
+                                            @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)" @click="$refs.pdfPick.click()">
+                                            <input type="file" x-ref="pdfPick" class="hidden" accept="application/pdf" @change="onFile($event)">
+                                            <template x-if="!preview&&!uploading">
+                                                <div class="flex flex-col items-center justify-center gap-1 p-3 text-center">
+                                                    <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                    <p class="text-[11px] text-dark/40">Upload script/lyrics PDF</p>
+                                                </div>
+                                            </template>
+                                            <template x-if="uploading">
+                                                <div class="flex items-center justify-center gap-2 p-3"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div>
+                                            </template>
+                                            <template x-if="preview&&!uploading">
+                                                <div class="flex items-center gap-2 px-3 py-2">
+                                                    <div class="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center text-[10px] font-bold text-red-600 flex-shrink-0">PDF</div>
+                                                    <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p>
+                                                    <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                        <p class="text-[11px] text-dark/30 mt-1">Users can download this from the script card</p>
+                                    </div>
+
+                                    <!-- Tune YouTube URL (song scripts only) -->
+                                    <div>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Song Tune YouTube URL <span class="text-[10px] text-dark/30">(Song Audition only)</span></label>
+                                        <input type="url" x-model="scriptForm.tune_youtube_url"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
+                                            placeholder="https://youtube.com/watch?v=...">
+                                        <p class="text-[11px] text-dark/30 mt-1">Opens in a popup so actors can hear the tune while recording</p>
+                                    </div>
+
                                     <div>
                                         <label class="block text-[12px] text-dark/50 mb-1">Rules &amp; Limits</label>
                                         <textarea x-model="scriptForm.rules" rows="5" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson resize-y" placeholder="One rule per line:&#10;Video under 3 minutes&#10;Shoot on any device&#10;Face must not be visible&#10;Clear audio required"></textarea>
@@ -4098,6 +4172,15 @@ if (file_exists($errorLogFile)) {
                 document.addEventListener('script-image-picked', e => {
                     this.scriptForm.image_url = e.detail.url;
                 });
+
+                // Bridge for per-script video uploader
+                window.setScriptVideo = (url) => {
+                    this.scriptForm.preview_video_url = url;
+                };
+                // Bridge for per-script PDF uploader
+                window.setScriptPdf = (url) => {
+                    this.scriptForm.script_pdf_url = url;
+                };
                 
                 // Initial refresh
                 this.silentRefreshVideos();
@@ -4584,20 +4667,28 @@ if (file_exists($errorLogFile)) {
             editScript(sc) {
                 this.editingScript = sc.id;
                 this.scriptForm = {
-                    title:         sc.title,
-                    content:       sc.content,
-                    category:      sc.category,
-                    difficulty:    sc.difficulty,
-                    duration_hint: sc.duration_hint  || '',
-                    audition_type: sc.audition_type  || '',
-                    image_url:     sc.image_url      || '',
-                    rules:         sc.rules          || '',
+                    title:             sc.title,
+                    content:           sc.content,
+                    category:          sc.category,
+                    difficulty:        sc.difficulty,
+                    duration_hint:     sc.duration_hint      || '',
+                    audition_type:     sc.audition_type      || '',
+                    image_url:         sc.image_url          || '',
+                    preview_video_url: sc.preview_video_url  || '',
+                    script_pdf_url:    sc.script_pdf_url     || '',
+                    tune_youtube_url:  sc.tune_youtube_url   || '',
+                    rules:             sc.rules              || '',
                 };
+                // Sync uploader previews via global bridge
+                if (typeof window.setScriptVideo === 'function') window.setScriptVideo(sc.preview_video_url || '');
+                if (typeof window.setScriptPdf   === 'function') window.setScriptPdf(sc.script_pdf_url || '');
             },
             
             cancelEditScript() {
                 this.editingScript = null;
-                this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' };
+                this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' };
+                if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
+                if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
             },
             
             async createScript() {
@@ -4613,19 +4704,25 @@ if (file_exists($errorLogFile)) {
                         this.showToast('Script created successfully');
                         // Add to local array without reload
                         const newScript = {
-                            id:            data.id,
-                            title:         this.scriptForm.title,
-                            content:       this.scriptForm.content,
-                            category:      this.scriptForm.category,
-                            difficulty:    this.scriptForm.difficulty,
-                            duration_hint: this.scriptForm.duration_hint,
-                            audition_type: this.scriptForm.audition_type,
-                            image_url:     this.scriptForm.image_url,
-                            rules:         this.scriptForm.rules,
-                            is_active:     1,
+                            id:                data.id,
+                            title:             this.scriptForm.title,
+                            content:           this.scriptForm.content,
+                            category:          this.scriptForm.category,
+                            difficulty:        this.scriptForm.difficulty,
+                            duration_hint:     this.scriptForm.duration_hint,
+                            audition_type:     this.scriptForm.audition_type,
+                            image_url:         this.scriptForm.image_url,
+                            preview_video_url: this.scriptForm.preview_video_url,
+                            script_pdf_url:    this.scriptForm.script_pdf_url,
+                            tune_youtube_url:  this.scriptForm.tune_youtube_url,
+                            rules:             this.scriptForm.rules,
+                            is_active:         1,
                         };
                         this.scripts.push(newScript);
-                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' };
+                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' };
+                        if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
+                        if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
+                        if (typeof window.setScriptImage === 'function') window.setScriptImage('');
                     } else {
                         this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
@@ -4654,20 +4751,26 @@ if (file_exists($errorLogFile)) {
                         if (idx !== -1) {
                             this.scripts[idx] = {
                                 ...this.scripts[idx],
-                                title:         this.scriptForm.title,
-                                content:       this.scriptForm.content,
-                                category:      this.scriptForm.category,
-                                difficulty:    this.scriptForm.difficulty,
-                                duration_hint: this.scriptForm.duration_hint,
-                                audition_type: this.scriptForm.audition_type,
-                                image_url:     this.scriptForm.image_url,
-                                rules:         this.scriptForm.rules,
+                                title:             this.scriptForm.title,
+                                content:           this.scriptForm.content,
+                                category:          this.scriptForm.category,
+                                difficulty:        this.scriptForm.difficulty,
+                                duration_hint:     this.scriptForm.duration_hint,
+                                audition_type:     this.scriptForm.audition_type,
+                                image_url:         this.scriptForm.image_url,
+                                preview_video_url: this.scriptForm.preview_video_url,
+                                script_pdf_url:    this.scriptForm.script_pdf_url,
+                                tune_youtube_url:  this.scriptForm.tune_youtube_url,
+                                rules:             this.scriptForm.rules,
                             };
                             // Trigger Alpine reactivity
                             this.scripts = [...this.scripts];
                         }
                         this.editingScript = null;
-                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' };
+                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' };
+                        if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
+                        if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
+                        if (typeof window.setScriptImage === 'function') window.setScriptImage('');
                     } else {
                         this.showToast(data.errors?.join(', ') || data.error || 'Update failed', 'error');
                     }
@@ -5463,7 +5566,100 @@ if (file_exists($errorLogFile)) {
         };
     }
 
-    // Video uploader component for trailer fields
+    // Per-script video uploader — uploads to /api/admin/media/upload-script-file, bridges to scriptForm.preview_video_url
+    function scriptVideoUploader() {
+        return {
+            preview: window._scriptVideoPreview || null,
+            filename: window._scriptVideoPreview ? window._scriptVideoPreview.split('/').pop() : '',
+            dragging: false, uploading: false, progress: 0, uploadError: '',
+            init() {
+                // Accept updates from parent (editScript sets window.setScriptVideo)
+                window.setScriptVideo = (url) => {
+                    this.preview  = url || null;
+                    this.filename = url ? url.split('/').pop() : '';
+                    if (typeof window._adminDashboard !== 'undefined') window._adminDashboard.scriptForm.preview_video_url = url;
+                };
+            },
+            onDrop(e){ this.dragging=false; const f=e.dataTransfer?.files?.[0]; if(f) this.upload(f); },
+            onFile(e){ const f=e.target.files?.[0]; if(f) this.upload(f); },
+            clear(){
+                this.preview=null; this.filename=''; this.uploadError='';
+                if(typeof window.setScriptVideo==='function') window.setScriptVideo('');
+            },
+            upload(file){
+                const allowed=['video/mp4','video/quicktime','video/webm'];
+                const ext=file.name.split('.').pop().toLowerCase();
+                if(!allowed.includes(file.type)&&!['mp4','mov','webm'].includes(ext)){
+                    this.uploadError='Only MP4, MOV or WEBM accepted.'; return;
+                }
+                if(file.size>500*1024*1024){this.uploadError='Video must be under 500 MB.'; return;}
+                this.uploading=true; this.progress=0; this.uploadError=''; this.preview='uploading';
+                const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';
+                const fd=new FormData();
+                fd.append('csrf_token',csrf); fd.append('file',file);
+                const xhr=new XMLHttpRequest();
+                xhr.upload.onprogress=e=>{if(e.lengthComputable)this.progress=Math.round(e.loaded/e.total*100);};
+                xhr.onload=()=>{
+                    this.uploading=false;
+                    try{
+                        const r=JSON.parse(xhr.responseText);
+                        if(r.success){
+                            this.preview=r.url; this.filename=r.url.split('/').pop();
+                            if(typeof window.setScriptVideo==='function') window.setScriptVideo(r.url);
+                        }else{this.uploadError=r.error||'Upload failed.'; this.preview=null;}
+                    }catch(e){this.uploadError='Server error.'; this.preview=null;}
+                };
+                xhr.onerror=()=>{this.uploading=false; this.preview=null; this.uploadError='Network error.';};
+                xhr.open('POST','/api/admin/media/upload-script-file'); xhr.send(fd);
+            }
+        };
+    }
+
+    // Per-script PDF uploader — uploads to /api/admin/media/upload-script-file, bridges to scriptForm.script_pdf_url
+    function scriptPdfUploader() {
+        return {
+            preview: null, filename: '', dragging: false, uploading: false, progress: 0, uploadError: '',
+            init() {
+                window.setScriptPdf = (url) => {
+                    this.preview  = url || null;
+                    this.filename = url ? url.split('/').pop() : '';
+                    if (typeof window._adminDashboard !== 'undefined') window._adminDashboard.scriptForm.script_pdf_url = url;
+                };
+            },
+            onDrop(e){ this.dragging=false; const f=e.dataTransfer?.files?.[0]; if(f) this.upload(f); },
+            onFile(e){ const f=e.target.files?.[0]; if(f) this.upload(f); },
+            clear(){
+                this.preview=null; this.filename=''; this.uploadError='';
+                if(typeof window.setScriptPdf==='function') window.setScriptPdf('');
+            },
+            upload(file){
+                if(file.type!=='application/pdf'&&!file.name.endsWith('.pdf')){
+                    this.uploadError='Only PDF files accepted.'; return;
+                }
+                if(file.size>20*1024*1024){this.uploadError='PDF must be under 20 MB.'; return;}
+                this.uploading=true; this.progress=0; this.uploadError='';
+                const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';
+                const fd=new FormData();
+                fd.append('csrf_token',csrf); fd.append('file',file);
+                const xhr=new XMLHttpRequest();
+                xhr.upload.onprogress=e=>{if(e.lengthComputable)this.progress=Math.round(e.loaded/e.total*100);};
+                xhr.onload=()=>{
+                    this.uploading=false;
+                    try{
+                        const r=JSON.parse(xhr.responseText);
+                        if(r.success){
+                            this.preview=r.url; this.filename=r.url.split('/').pop();
+                            if(typeof window.setScriptPdf==='function') window.setScriptPdf(r.url);
+                        }else{this.uploadError=r.error||'Upload failed.';}
+                    }catch(e){this.uploadError='Server error.';}
+                };
+                xhr.onerror=()=>{this.uploading=false; this.uploadError='Network error.';};
+                xhr.open('POST','/api/admin/media/upload-script-file'); xhr.send(fd);
+            }
+        };
+    }
+
+    // Video uploader component for trailer fields (global settings)
     function videoUploader(fieldKey, initialUrl) {
         return {
             fieldKey,

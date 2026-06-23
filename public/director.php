@@ -1,12 +1,11 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
-$logoUrl              = $settingsModel->get('site_logo_url', '');
-$directorPreviewUrl   = $settingsModel->get('director_preview_video_url', '');
-$directorScriptImageUrl = $settingsModel->get('director_script_image_url', '');
-$directorScriptPdfUrl   = $settingsModel->get('director_script_pdf_url', '');
-$directorBrief        = $settingsModel->get('director_brief', 'You have one actor, one phone camera, and a single location. Cast an actor (friend/family), give them the script, and shoot the scene. Show us your directorial vision.');
-$directorRules        = "Face MUST be visible for actor on camera\nClear audio required — no muffled voices\nShoot on any device\nVideo under 5 minutes\nInclude your own direction notes in submission";
+$scriptModel   = new App\Models\Script();
+
+$logoUrl         = $settingsModel->get('site_logo_url', '');
+$directorBrief   = $settingsModel->get('director_brief', 'You have one actor, one phone camera, and a single location. Cast an actor, give them the script, and shoot the scene.');
+$directorScripts = $scriptModel->byCategory('director');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
 ?>
 <!DOCTYPE html>
@@ -95,13 +94,25 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 
 <!-- BRIEF CARD + SUBMISSION — side by side on desktop -->
 <div class="side-by-side" style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
-<?php $ruleList = array_filter(array_map('trim', explode("\n", $directorRules))); ?>
 
-  <!-- LEFT: Brief card (direct grid child) -->
+<?php
+// Pick first director script (or show placeholder)
+$sc = !empty($directorScripts) ? $directorScripts[0] : null;
+$previewUrl  = $sc['preview_video_url'] ?? '';
+$scriptImage = $sc['image_url']         ?? '';
+$pdfUrl      = $sc['script_pdf_url']    ?? '';
+$rulesTxt    = $sc['rules'] ?? "Face MUST be visible for actor on camera\nClear audio required — no muffled voices\nShoot on any device\nVideo under 5 minutes";
+$cardTitle   = $sc ? htmlspecialchars($sc['title']) : 'Scene Direction';
+$audType     = $sc ? htmlspecialchars($sc['audition_type'] ?? 'Director Brief') : 'Director Brief';
+$brief       = $sc ? htmlspecialchars($sc['content'] ?: $directorBrief) : htmlspecialchars($directorBrief);
+$ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
+?>
+
+  <!-- LEFT: Brief card -->
   <div class="brief-card">
     <div class="card-sec" style="padding:0">
-      <?php if ($directorPreviewUrl): ?>
-        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($directorPreviewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+      <?php if ($previewUrl): ?>
+        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
       <?php else: ?>
         <div class="video-placeholder">
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -110,23 +121,19 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
       <?php endif; ?>
     </div>
     <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
-      <div class="sec-label">Director Brief</div>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111">Scene Direction</p>
+      <div class="sec-label"><?= $audType ?></div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111"><?= $cardTitle ?></p>
+      <p style="font-size:.78rem;color:#6b7280;margin-top:.3rem;line-height:1.5"><?= $brief ?></p>
     </div>
+    <?php if ($scriptImage): ?>
     <div class="card-sec" style="padding:0">
-      <?php if ($directorScriptImageUrl): ?>
-        <img src="<?= htmlspecialchars($directorScriptImageUrl) ?>" alt="Director script" class="portrait-img">
-      <?php else: ?>
-        <div class="portrait-placeholder">
-          <svg width="28" height="28" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <span>Script image coming soon</span>
-        </div>
-      <?php endif; ?>
+      <img src="<?= htmlspecialchars($scriptImage) ?>" alt="Director script" class="portrait-img">
     </div>
+    <?php endif; ?>
     <div class="card-sec">
       <div class="sec-label">Script</div>
-      <?php if ($directorScriptPdfUrl): ?>
-        <a href="<?= htmlspecialchars($directorScriptPdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
+      <?php if ($pdfUrl): ?>
+        <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           Download Script PDF
         </a>
@@ -138,7 +145,7 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
       <div class="sec-label">Rules &amp; Limits</div>
       <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
     </div>
-  </div><!-- /brief-card — end left col -->
+  </div><!-- /brief-card -->
 
   <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
   <div class="submit-card" style="margin:0" x-data="directorSubmit()">

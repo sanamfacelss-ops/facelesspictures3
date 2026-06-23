@@ -28,7 +28,7 @@ class Script
     {
         $cols   = $this->getColumns();
         $select = 'id, title, content, category, difficulty, is_active, created_at';
-        foreach (['duration_hint', 'image_url', 'audition_type', 'rules'] as $col) {
+        foreach (['duration_hint', 'image_url', 'preview_video_url', 'script_pdf_url', 'tune_youtube_url', 'audition_type', 'rules'] as $col) {
             if (in_array($col, $cols)) $select .= ', ' . $col;
         }
         $stmt = $this->db->prepare(
@@ -42,7 +42,7 @@ class Script
     {
         $cols   = $this->getColumns();
         $select = 'id, title, content, category, difficulty, is_active, created_at, updated_at';
-        foreach (['duration_hint', 'image_url', 'audition_type', 'rules'] as $col) {
+        foreach (['duration_hint', 'image_url', 'preview_video_url', 'script_pdf_url', 'tune_youtube_url', 'audition_type', 'rules'] as $col) {
             if (in_array($col, $cols)) $select .= ', ' . $col;
         }
         $stmt = $this->db->query("SELECT {$select} FROM scripts WHERE is_active = 1 ORDER BY category, difficulty, title");
@@ -68,6 +68,18 @@ class Script
         if (in_array('image_url', $cols)) {
             $columns[] = 'image_url';
             $values[]  = $data['image_url'] ?? null;
+        }
+        if (in_array('preview_video_url', $cols)) {
+            $columns[] = 'preview_video_url';
+            $values[]  = $data['preview_video_url'] ?? null;
+        }
+        if (in_array('script_pdf_url', $cols)) {
+            $columns[] = 'script_pdf_url';
+            $values[]  = $data['script_pdf_url'] ?? null;
+        }
+        if (in_array('tune_youtube_url', $cols)) {
+            $columns[] = 'tune_youtube_url';
+            $values[]  = $data['tune_youtube_url'] ?? null;
         }
         if (in_array('audition_type', $cols)) {
             $columns[] = 'audition_type';
@@ -106,6 +118,18 @@ class Script
         if (in_array('image_url', $cols)) {
             $sets[]   = 'image_url = ?';
             $values[] = $data['image_url'] ?? null;
+        }
+        if (in_array('preview_video_url', $cols)) {
+            $sets[]   = 'preview_video_url = ?';
+            $values[] = $data['preview_video_url'] ?? null;
+        }
+        if (in_array('script_pdf_url', $cols)) {
+            $sets[]   = 'script_pdf_url = ?';
+            $values[] = $data['script_pdf_url'] ?? null;
+        }
+        if (in_array('tune_youtube_url', $cols)) {
+            $sets[]   = 'tune_youtube_url = ?';
+            $values[] = $data['tune_youtube_url'] ?? null;
         }
         if (in_array('audition_type', $cols)) {
             $sets[]   = 'audition_type = ?';

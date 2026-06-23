@@ -66,14 +66,17 @@ class AdminController
         
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
-        $title       = trim($_POST['title']         ?? '');
-        $content     = trim($_POST['content']       ?? '');
-        $category    = trim($_POST['category']      ?? '');
-        $difficulty  = trim($_POST['difficulty']    ?? 'beginner');
-        $durationHint = trim($_POST['duration_hint'] ?? '');
-        $auditionType = trim($_POST['audition_type'] ?? '');
-        $imageUrl    = trim($_POST['image_url']     ?? '');
-        $rules       = trim($_POST['rules']         ?? '');
+        $title            = trim($_POST['title']             ?? '');
+        $content          = trim($_POST['content']           ?? '');
+        $category         = trim($_POST['category']          ?? '');
+        $difficulty       = trim($_POST['difficulty']        ?? 'beginner');
+        $durationHint     = trim($_POST['duration_hint']     ?? '');
+        $auditionType     = trim($_POST['audition_type']     ?? '');
+        $imageUrl         = trim($_POST['image_url']         ?? '');
+        $previewVideoUrl  = trim($_POST['preview_video_url'] ?? '');
+        $scriptPdfUrl     = trim($_POST['script_pdf_url']    ?? '');
+        $tuneYoutubeUrl   = trim($_POST['tune_youtube_url']  ?? '');
+        $rules            = trim($_POST['rules']             ?? '');
 
         $errors = [];
         if (strlen($title) < 2) $errors[] = 'Title is required';
@@ -89,14 +92,17 @@ class AdminController
 
         try {
             $id = $this->scriptModel->create([
-                'title'        => $title,
-                'content'      => $content,
-                'category'     => $category,
-                'difficulty'   => $difficulty,
-                'duration_hint' => $durationHint ?: null,
-                'audition_type' => $auditionType ?: null,
-                'image_url'    => $imageUrl ?: null,
-                'rules'        => $rules ?: null,
+                'title'             => $title,
+                'content'           => $content,
+                'category'          => $category,
+                'difficulty'        => $difficulty,
+                'duration_hint'     => $durationHint ?: null,
+                'audition_type'     => $auditionType ?: null,
+                'image_url'         => $imageUrl ?: null,
+                'preview_video_url' => $previewVideoUrl ?: null,
+                'script_pdf_url'    => $scriptPdfUrl ?: null,
+                'tune_youtube_url'  => $tuneYoutubeUrl ?: null,
+                'rules'             => $rules ?: null,
             ]);
 
             debug_log("Admin created script ID: $id", 'ADMIN');
@@ -123,6 +129,9 @@ class AdminController
         $durationHint = trim($_POST['duration_hint'] ?? '');
         $auditionType = trim($_POST['audition_type'] ?? '');
         $imageUrl     = trim($_POST['image_url']     ?? '');
+        $previewVideoUrl = trim($_POST['preview_video_url'] ?? '');
+        $scriptPdfUrl    = trim($_POST['script_pdf_url']    ?? '');
+        $tuneYoutubeUrl  = trim($_POST['tune_youtube_url']  ?? '');
         $rules        = trim($_POST['rules']         ?? '');
 
         $errors = [];
@@ -139,14 +148,17 @@ class AdminController
 
         try {
             $this->scriptModel->update($id, [
-                'title'        => $title,
-                'content'      => $content,
-                'category'     => $category,
-                'difficulty'   => $difficulty,
-                'duration_hint' => $durationHint ?: null,
-                'audition_type' => $auditionType ?: null,
-                'image_url'    => $imageUrl ?: null,
-                'rules'        => $rules ?: null,
+                'title'             => $title,
+                'content'           => $content,
+                'category'          => $category,
+                'difficulty'        => $difficulty,
+                'duration_hint'     => $durationHint ?: null,
+                'audition_type'     => $auditionType ?: null,
+                'image_url'         => $imageUrl ?: null,
+                'preview_video_url' => $previewVideoUrl ?: null,
+                'script_pdf_url'    => $scriptPdfUrl ?: null,
+                'tune_youtube_url'  => $tuneYoutubeUrl ?: null,
+                'rules'             => $rules ?: null,
             ]);
 
             debug_log("Admin updated script ID: $id", 'ADMIN');
@@ -1803,6 +1815,61 @@ class AdminController
         usort($images, fn($a, $b) => $b['date'] - $a['date']);
 
         echo json_encode(['success' => true, 'images' => $images, 'count' => count($images)]);
+    }
+
+    /**
+     * Upload a video or PDF for a script card
+     * POST /api/admin/media/upload-script-file
+     */
+    public function uploadScriptFile(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            $msgs = [UPLOAD_ERR_INI_SIZE=>'File too large.',UPLOAD_ERR_PARTIAL=>'Upload incomplete.',UPLOAD_ERR_NO_FILE=>'No file.'];
+            http_response_code(422);
+            echo json_encode(['error' => $msgs[$_FILES['file']['error'] ?? UPLOAD_ERR_NO_FILE] ?? 'Upload error.']);
+            return;
+        }
+
+        $file = $_FILES['file'];
+        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        $videoTypes = ['video/mp4','video/quicktime','video/webm','video/x-msvideo','video/mpeg'];
+        $videoExts  = ['mp4','mov','webm','avi','mpeg'];
+        $isPdf      = ($file['type'] === 'application/pdf' || $ext === 'pdf');
+        $isVideo    = (in_array($file['type'], $videoTypes) || in_array($ext, $videoExts));
+
+        if (!$isPdf && !$isVideo) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Only MP4/MOV/WEBM video or PDF accepted.']);
+            return;
+        }
+
+        $maxBytes = $isVideo ? 500 * 1024 * 1024 : 20 * 1024 * 1024;
+        if ($file['size'] > $maxBytes) {
+            http_response_code(422);
+            echo json_encode(['error' => $isVideo ? 'Video must be under 500 MB.' : 'PDF must be under 20 MB.']);
+            return;
+        }
+
+        $settingsDir = UPLOAD_PATH . '/settings';
+        if (!is_dir($settingsDir)) mkdir($settingsDir, 0755, true);
+
+        $prefix   = $isVideo ? 'script_video_' : 'script_pdf_';
+        $filename = $prefix . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $dest     = $settingsDir . '/' . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $dest)) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save file.']);
+            return;
+        }
+
+        $url = '/uploads/settings/' . $filename;
+        debug_log("Admin uploaded script " . ($isVideo ? 'video' : 'pdf') . ": {$url}", 'ADMIN');
+        echo json_encode(['success' => true, 'url' => $url, 'type' => $isVideo ? 'video' : 'pdf']);
     }
 
     /**

@@ -1,17 +1,26 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
-$logoUrl              = $settingsModel->get('site_logo_url', '');
-$dialogPreviewUrl     = $settingsModel->get('actor_preview_video_url', '');
-$songPreviewUrl       = $settingsModel->get('song_preview_video_url', '');
-$actorScriptImageUrl  = $settingsModel->get('actor_script_image_url', '');
-$songLyricsImageUrl   = $settingsModel->get('song_lyrics_image_url', '');
-$actorScriptPdfUrl    = $settingsModel->get('actor_script_pdf_url', '');
-$songLyricsPdfUrl     = $settingsModel->get('song_lyrics_pdf_url', '');
-$songTuneYoutubeUrl   = $settingsModel->get('song_tune_youtube_url', '');
-$actorDialogBrief     = $settingsModel->get('actor_dialog_script', 'Perform the following scene with full emotion. You receive a call that changes everything. Show shock, then resolve — all in under 90 seconds.');
-$actorSongBrief       = $settingsModel->get('actor_song_script', 'Choose any song that represents a character going through transformation. Perform a 60-second version showing emotional range — just your voice.');
-$actorRules           = "Video under 3 minutes\nShoot on any device\nFace must not be visible\nClear audio required\nNo background editing needed";
+$scriptModel   = new App\Models\Script();
+
+$logoUrl = $settingsModel->get('site_logo_url', '');
+
+// Load all actor scripts (dialog + song)
+$actorScripts = $scriptModel->byCategory('actor');
+
+// Fallback global settings (used only if no scripts uploaded yet)
+$globalDialogBrief = $settingsModel->get('actor_dialog_script', 'Perform the following scene with full emotion.');
+$globalSongBrief   = $settingsModel->get('actor_song_script', 'Perform a 60-second song showing emotional range.');
+
+// Split scripts by audition_type: dialog vs song
+$dialogScripts = array_values(array_filter($actorScripts, fn($s) => stripos($s['audition_type'] ?? '', 'song') === false));
+$songScripts   = array_values(array_filter($actorScripts, fn($s) => stripos($s['audition_type'] ?? '', 'song') !== false));
+
+// If no song scripts, put all in dialog
+if (empty($songScripts) && !empty($dialogScripts)) {
+    // keep as is — two columns both dialog if needed
+}
+
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 ?>
 <!DOCTYPE html>
@@ -107,15 +116,27 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
   <p style="color:#6b7280;font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.55">Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.</p>
 </section>
 
-<!-- TWO BRIEF CARDS -->
+<!-- TWO BRIEF CARDS (Dialog + Song) -->
 <div class="brief-grid">
-<?php $ruleList = array_filter(array_map('trim', explode("\n", $actorRules))); ?>
 
-  <!-- CARD 1: DIALOG BRIEF -->
+<?php
+// Helper to render a script brief card
+function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = false): void {
+    $previewUrl  = $sc['preview_video_url'] ?? '';
+    $imageUrl    = $sc['image_url']         ?? '';
+    $pdfUrl      = $sc['script_pdf_url']    ?? '';
+    $tuneUrl     = $sc['tune_youtube_url']  ?? '';
+    $title       = htmlspecialchars($sc['title']);
+    $audType     = htmlspecialchars($sc['audition_type'] ?? ($isSong ? 'Song Audition' : 'Dialog Audition'));
+    $brief       = htmlspecialchars($sc['content'] ?: $fallbackBrief);
+    $rulesRaw    = $sc['rules'] ?? "Video under 3 minutes\nFace must not be visible\nClear audio required";
+    $ruleList    = array_filter(array_map('trim', explode("\n", $rulesRaw)));
+    $dataId      = (int)$sc['id'];
+?>
   <div class="brief-card">
     <div class="card-sec" style="padding:0">
-      <?php if ($dialogPreviewUrl): ?>
-        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($dialogPreviewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+      <?php if ($previewUrl): ?>
+        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
       <?php else: ?>
         <div class="video-placeholder">
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -124,76 +145,29 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
       <?php endif; ?>
     </div>
     <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
-      <div class="sec-label">Dialog Brief</div>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111">Dialog Audition</p>
+      <div class="sec-label"><?= $audType ?></div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111"><?= $title ?></p>
+      <p style="font-size:.78rem;color:#6b7280;margin-top:.3rem;line-height:1.5"><?= $brief ?></p>
     </div>
+    <?php if ($imageUrl): ?>
     <div class="card-sec" style="padding:0">
-      <?php if ($actorScriptImageUrl): ?>
-        <img src="<?= htmlspecialchars($actorScriptImageUrl) ?>" alt="Dialog script" class="portrait-img">
-      <?php else: ?>
-        <div class="portrait-placeholder">
-          <svg width="28" height="28" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <span>Script image coming soon</span>
-        </div>
-      <?php endif; ?>
+      <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>" class="portrait-img">
     </div>
+    <?php endif; ?>
     <div class="card-sec">
-      <div class="sec-label">Script</div>
-      <?php if ($actorScriptPdfUrl): ?>
-        <a href="<?= htmlspecialchars($actorScriptPdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Download Script PDF
-        </a>
-      <?php else: ?>
-        <span class="btn-outline disabled">Script PDF not available yet</span>
-      <?php endif; ?>
-    </div>
-    <div class="card-sec tinted" style="flex:1">
-      <div class="sec-label">Rules &amp; Limits</div>
-      <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
-    </div>
-  </div>
-
-  <!-- CARD 2: SONG BRIEF -->
-  <div class="brief-card">
-    <div class="card-sec" style="padding:0">
-      <?php if ($songPreviewUrl): ?>
-        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($songPreviewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
-      <?php else: ?>
-        <div class="video-placeholder">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Preview video coming soon
-        </div>
-      <?php endif; ?>
-    </div>
-    <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
-      <div class="sec-label">Song Brief</div>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111">Song Audition</p>
-    </div>
-    <div class="card-sec" style="padding:0">
-      <?php if ($songLyricsImageUrl): ?>
-        <img src="<?= htmlspecialchars($songLyricsImageUrl) ?>" alt="Song lyrics" class="portrait-img">
-      <?php else: ?>
-        <div class="portrait-placeholder">
-          <svg width="28" height="28" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-          <span>Lyrics image coming soon</span>
-        </div>
-      <?php endif; ?>
-    </div>
-    <div class="card-sec">
-      <div class="sec-label">Lyrics &amp; Tune</div>
+      <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Tune' : 'Script' ?></div>
       <div class="btn-row">
-        <?php if ($songLyricsPdfUrl): ?>
-          <a href="<?= htmlspecialchars($songLyricsPdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
+        <?php if ($pdfUrl): ?>
+          <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Download Lyrics PDF
+            <?= $isSong ? 'Download Lyrics PDF' : 'Download Script PDF' ?>
           </a>
         <?php else: ?>
-          <span class="btn-outline disabled">Lyrics PDF not available yet</span>
+          <span class="btn-outline disabled"><?= $isSong ? 'Lyrics' : 'Script' ?> PDF not available yet</span>
         <?php endif; ?>
-        <button type="button" class="btn-tune <?= $songTuneYoutubeUrl ? '' : 'disabled' ?>" <?= $songTuneYoutubeUrl ? 'onclick="openTuneModal()"' : 'disabled' ?>>
-          ▶ Get Tune
-        </button>
+        <?php if ($isSong): ?>
+          <button type="button" class="btn-tune <?= $tuneUrl ? '' : 'disabled' ?>" <?= $tuneUrl ? 'onclick="openTuneModal('.json_encode($tuneUrl).')"' : 'disabled' ?>>▶ Get Tune</button>
+        <?php endif; ?>
       </div>
     </div>
     <div class="card-sec tinted" style="flex:1">
@@ -201,6 +175,24 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
       <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
     </div>
   </div>
+<?php
+}
+
+// Render dialog scripts
+if (!empty($dialogScripts)) {
+    foreach ($dialogScripts as $sc) renderActorBriefCard($sc, $globalDialogBrief, false);
+} else {
+    // Fallback placeholder card
+    echo '<div class="brief-card"><div class="card-sec"><div class="sec-label">Dialog Audition</div><p style="color:#6b7280;font-size:.85rem">' . htmlspecialchars($globalDialogBrief) . '</p></div></div>';
+}
+
+// Render song scripts
+if (!empty($songScripts)) {
+    foreach ($songScripts as $sc) renderActorBriefCard($sc, $globalSongBrief, true);
+} else {
+    echo '<div class="brief-card"><div class="card-sec"><div class="sec-label">Song Audition</div><p style="color:#6b7280;font-size:.85rem">' . htmlspecialchars($globalSongBrief) . '</p></div></div>';
+}
+?>
 
 </div><!-- /brief-grid -->
 
@@ -289,18 +281,19 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 </div>
 
 <script>
-var _tuneUrl = <?= json_encode($songTuneYoutubeUrl) ?>;
-
 function _embedUrl(u){
     if(!u) return '';
     var m=u.match(/youtu\.be\/([^?&#]+)/);
     if(m) return 'https://www.youtube.com/embed/'+m[1];
     m=u.match(/[?&]v=([^&#]+)/);
     if(m) return 'https://www.youtube.com/embed/'+m[1];
+    // YouTube Shorts
+    m=u.match(/\/shorts\/([^?&#]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
     return u;
 }
-function openTuneModal(){
-    var e=_embedUrl(_tuneUrl);
+function openTuneModal(url){
+    var e=_embedUrl(url);
     if(!e) return;
     document.getElementById('tuneIframe').src=e+'?autoplay=1';
     document.getElementById('tuneModal').style.display='flex';
