@@ -1753,7 +1753,7 @@ class AdminController
     }
 
     /**
-     * Upload an image for a settings field (logo, poster, etc.)
+     * Upload an image or video for a settings field (logo, poster, trailer)
      * POST /api/admin/settings/upload-image
      * Returns the public URL of the saved file.
      */
@@ -1763,48 +1763,70 @@ class AdminController
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
         $field = trim($_POST['field'] ?? '');
-        $allowedFields = [
+
+        $imageFields = [
             'site_logo_url',
-            'landing_poster_url', 'landing_poster2_url', 'landing_poster3_url',
+            'landing_poster_url',  'landing_poster2_url', 'landing_poster3_url',
             'landing_poster4_url', 'landing_poster5_url', 'landing_poster6_url',
         ];
-        if (!in_array($field, $allowedFields)) {
+        $videoFields = [
+            'landing_trailer_url',  'landing_trailer2_url', 'landing_trailer3_url',
+            'landing_trailer4_url', 'landing_trailer5_url', 'landing_trailer6_url',
+        ];
+        $isVideo = in_array($field, $videoFields);
+        $isImage = in_array($field, $imageFields);
+
+        if (!$isImage && !$isVideo) {
             http_response_code(422);
             echo json_encode(['error' => 'Invalid field']);
             return;
         }
 
-        if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        // Accept either 'image' or 'file' key
+        $fileKey = !empty($_FILES['image']) ? 'image' : 'file';
+        if (empty($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK) {
             $msgs = [
                 UPLOAD_ERR_INI_SIZE  => 'File too large (server limit).',
                 UPLOAD_ERR_FORM_SIZE => 'File too large.',
-                UPLOAD_ERR_PARTIAL   => 'Upload incomplete.',
+                UPLOAD_ERR_PARTIAL   => 'Upload incomplete — please try again.',
                 UPLOAD_ERR_NO_FILE   => 'No file received.',
+                UPLOAD_ERR_CANT_WRITE => 'Server cannot write file.',
             ];
-            $code = $_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE;
+            $code = $_FILES[$fileKey]['error'] ?? UPLOAD_ERR_NO_FILE;
             http_response_code(422);
             echo json_encode(['error' => $msgs[$code] ?? 'Upload error.']);
             return;
         }
 
-        $file     = $_FILES['image'];
-        $allowed  = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        $allowExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-        $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $maxBytes = 5 * 1024 * 1024; // 5 MB
+        $file = $_FILES[$fileKey];
+        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-        if (!in_array($file['type'], $allowed) || !in_array($ext, $allowExt)) {
+        if ($isImage) {
+            $allowed  = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            $allowExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $maxBytes = 5 * 1024 * 1024; // 5 MB
+            $errMsg   = 'Only JPG, PNG, WEBP or GIF images accepted.';
+            $sizeMsg  = 'Image must be under 5 MB.';
+        } else {
+            $allowed  = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-msvideo', 'video/mpeg', 'video/avi'];
+            $allowExt = ['mp4', 'mov', 'webm', 'avi', 'mpeg'];
+            $maxBytes = 500 * 1024 * 1024; // 500 MB
+            $errMsg   = 'Only MP4, MOV, or WEBM video files accepted.';
+            $sizeMsg  = 'Video must be under 500 MB.';
+        }
+
+        if (!in_array($file['type'], $allowed) && !in_array($ext, $allowExt)) {
             http_response_code(422);
-            echo json_encode(['error' => 'Only JPG, PNG, WEBP or GIF images accepted.']);
+            echo json_encode(['error' => $errMsg]);
             return;
         }
         if ($file['size'] > $maxBytes) {
             http_response_code(422);
-            echo json_encode(['error' => 'Image must be under 5 MB.']);
+            echo json_encode(['error' => $sizeMsg]);
             return;
         }
 
-        // Save to uploads/settings/ directory
+        // Save to uploads/settings/
         $settingsDir = UPLOAD_PATH . '/settings';
         if (!is_dir($settingsDir)) {
             mkdir($settingsDir, 0755, true);
@@ -1815,19 +1837,17 @@ class AdminController
 
         if (!move_uploaded_file($file['tmp_name'], $dest)) {
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to save image. Check server permissions.']);
+            echo json_encode(['error' => 'Failed to save file. Check server permissions.']);
             return;
         }
 
-        // Build public URL
         $publicUrl = '/uploads/settings/' . $filename;
 
-        // Save URL to settings
         $settingsModel = new \App\Models\Settings();
         $settingsModel->set($field, $publicUrl);
 
-        debug_log("Admin uploaded image for {$field}: {$publicUrl}", 'ADMIN');
-        echo json_encode(['success' => true, 'url' => $publicUrl]);
+        debug_log("Admin uploaded " . ($isVideo ? 'video' : 'image') . " for {$field}: {$publicUrl}", 'ADMIN');
+        echo json_encode(['success' => true, 'url' => $publicUrl, 'type' => $isVideo ? 'video' : 'image']);
     }
 
     /**
