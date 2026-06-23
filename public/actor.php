@@ -60,58 +60,81 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
 /* NAV */
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
 
-/* SCRIPT CARD */
-.script-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);border:1px solid #e5e7eb;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}
-.script-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.10);transform:translateY(-2px)}
+/* SCRIPT CARD — horizontal split: poster left, content right */
+.script-card{
+    background:#fff;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 20px rgba(0,0,0,.06);
+    border:1px solid #e5e7eb;
+    display:flex;
+    flex-direction:row;
+    transition:box-shadow .25s;
+}
+.script-card:hover{box-shadow:0 4px 28px rgba(0,0,0,.10)}
 
-/* POSTER TOP */
-.card-poster{position:relative;aspect-ratio:2/3;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);overflow:hidden;flex-shrink:0}
+/* POSTER — left column, fixed width, full height */
+.card-poster{
+    position:relative;
+    width:200px;
+    min-width:200px;
+    background:linear-gradient(160deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);
+    overflow:hidden;
+    flex-shrink:0;
+}
 .card-poster img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
-.card-poster-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
-.poster-badge{position:absolute;top:10px;left:10px;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;border-radius:20px;color:#fff;backdrop-filter:blur(8px)}
-.badge-dialog{background:rgba(17,17,17,.8);border:1px solid rgba(255,255,255,.2)}
-.badge-song{background:rgba(88,80,236,.85);border:1px solid rgba(255,255,255,.2)}
-.diff-pip{position:absolute;top:10px;right:10px;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .55rem;border-radius:10px}
+.card-poster-placeholder{width:100%;height:100%;min-height:320px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.poster-badge{position:absolute;top:10px;left:8px;font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .6rem;border-radius:20px;color:#fff;backdrop-filter:blur(8px)}
+.badge-dialog{background:rgba(17,17,17,.85);border:1px solid rgba(255,255,255,.2)}
+.badge-song{background:rgba(88,80,236,.9);border:1px solid rgba(255,255,255,.2)}
 
-/* CARD BODY */
-.card-body{padding:1.125rem 1.25rem;flex:1;display:flex;flex-direction:column;gap:.875rem}
+/* CARD BODY — right column, scrollable */
+.card-body{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:.625rem;
+    padding:1.125rem 1.25rem;
+    overflow-y:auto;
+    max-height:580px;
+}
 
-/* SCRIPT TITLE + META */
-.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.03em;color:#111;line-height:1.05}
-.card-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
-.meta-pill{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .55rem;border-radius:8px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.03em;color:#111;line-height:1.05}
+.card-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-top:.2rem}
+.meta-pill{font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .5rem;border-radius:6px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
 
-/* SCRIPT CONTENT — Read More */
-.script-text{font-size:.825rem;color:#4b5563;line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:all .3s}
-.script-text.expanded{display:block;-webkit-line-clamp:unset}
-.read-more-btn{font-size:.72rem;font-weight:600;color:#111;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin-top:.15rem;display:inline-flex;align-items:center;gap:.25rem}
+/* Brief — clamped, expand on click */
+.script-text{font-size:.8rem;color:#4b5563;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.script-text.expanded{display:block}
+.read-more-btn{font-size:.7rem;font-weight:600;color:#111;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;margin-top:.1rem}
 
-/* RULES */
-.rules-block{background:#f9fafb;border-radius:8px;padding:.75rem;border:1px solid #f0f0f0}
-.rule-item{display:flex;align-items:flex-start;gap:.5rem;font-size:.75rem;color:#374151;line-height:1.4;padding:.2rem 0}
-.rule-dot{width:4px;height:4px;border-radius:50%;background:#9ca3af;flex-shrink:0;margin-top:.4rem}
+/* Rules */
+.rules-block{background:#f9fafb;border-radius:8px;padding:.625rem;border:1px solid #f0f0f0}
+.rule-item{display:flex;align-items:flex-start;gap:.4rem;font-size:.72rem;color:#374151;line-height:1.4;padding:.15rem 0}
+.rule-dot{width:3px;height:3px;border-radius:50%;background:#9ca3af;flex-shrink:0;margin-top:.45rem}
 
-/* DIVIDER */
-.card-divider{height:1px;background:#f0f0f0;margin:0 -.125rem}
+.card-divider{height:1px;background:#f0f0f0}
 
-/* PDF DOWNLOAD */
-.btn-pdf{display:inline-flex;align-items:center;gap:.375rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.5rem .875rem;font-size:.75rem;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s;white-space:nowrap}
-.btn-pdf:hover{border-color:#111;background:#f9fafb}
-.btn-pdf svg{width:13px;height:13px;flex-shrink:0}
+/* PDF btn */
+.btn-pdf{display:inline-flex;align-items:center;gap:.3rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:7px;padding:.4rem .7rem;font-size:.72rem;font-weight:600;cursor:pointer;transition:border-color .2s;white-space:nowrap}
+.btn-pdf:hover{border-color:#111}
+.btn-pdf svg{width:12px;height:12px;flex-shrink:0}
 
 /* FORM INPUTS */
-.fp-label{display:block;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.3rem}
-.fp-input{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;color:#111;padding:.55rem .8rem;width:100%;font-size:.875rem;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none}
-.fp-input:focus{border-color:#111;box-shadow:0 0 0 3px rgba(17,17,17,.06)}
+.fp-label{display:block;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:.25rem}
+.fp-input{background:#fff;border:1.5px solid #e5e7eb;border-radius:7px;color:#111;padding:.5rem .75rem;width:100%;font-size:.875rem;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none}
+.fp-input:focus{border-color:#111;box-shadow:0 0 0 2px rgba(17,17,17,.06)}
 .fp-input::placeholder{color:#9ca3af}
 
 /* UPLOAD ZONE */
-.upload-zone{border:2px dashed #d1d5db;border-radius:10px;transition:border-color .2s,background .2s;cursor:pointer;background:#fafafa}
+.upload-zone{border:2px dashed #d1d5db;border-radius:8px;transition:border-color .2s,background .2s;cursor:pointer;background:#fafafa}
 .upload-zone:hover,.upload-zone.drag{border-color:#111;background:#f9fafb}
 .upload-zone.has-file{border-color:#111;border-style:solid;background:#f9fafb}
 
 /* SUBMIT BTN */
-.btn-submit{background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.8rem 1.5rem;font-size:.9rem;cursor:pointer;width:100%;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:.25rem}
+.btn-submit{background:#111;color:#fff !important;font-weight:700;border:none;border-radius:8px;padding:.7rem 1.25rem;font-size:.875rem;cursor:pointer;width:100%;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:.25rem}
+.btn-submit *{color:#fff !important}
 .btn-submit:hover{background:#333}
 .btn-submit:disabled{opacity:.4;cursor:not-allowed}
 
@@ -159,7 +182,7 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
 <!-- SCRIPT CARDS GRID -->
 <section style="padding:0 1.25rem 5rem">
   <div style="max-width:1200px;margin:0 auto">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem">
+    <div style="display:flex;flex-direction:column;gap:1.5rem">
 
     <?php foreach ($actorScripts as $i => $script):
         $atype    = $script['audition_type'] ?? ($script['category'] === 'actor' ? 'Dialog Audition' : 'Audition');
@@ -236,9 +259,9 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
 
           <!-- Contact Form -->
           <div>
-            <p class="fp-label" style="margin-bottom:.625rem">Your Details</p>
-            <form @submit.prevent="submit" style="display:flex;flex-direction:column;gap:.625rem">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.625rem">
+            <p class="fp-label" style="margin-bottom:.4rem">Your Details</p>
+            <form @submit.prevent="submit" style="display:flex;flex-direction:column;gap:.4rem">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
                 <div>
                   <label class="fp-label">Name *</label>
                   <input type="text" x-model="form.name" class="fp-input" placeholder="Full name" required autocomplete="name">
@@ -252,52 +275,44 @@ body{font-family:'DM Sans',sans-serif;background:#f8f8f8;color:#111;-webkit-font
                 <label class="fp-label">Phone *</label>
                 <input type="tel" x-model="form.phone" class="fp-input" placeholder="+91 98765 43210" required autocomplete="tel">
               </div>
-              <div>
-                <label class="fp-label">Notes <span style="text-transform:none;font-weight:400;color:#9ca3af">(optional)</span></label>
-                <textarea x-model="form.notes" class="fp-input" rows="2" placeholder="Anything you'd like us to know..." style="resize:vertical"></textarea>
-              </div>
 
-              <div class="card-divider"></div>
+              <div class="card-divider" style="margin:.2rem 0"></div>
 
-              <!-- Upload Zone -->
+              <!-- Upload Zone — compact -->
               <div>
-                <label class="fp-label">Your Video *</label>
-                <p style="font-size:.7rem;color:#9ca3af;margin-bottom:.5rem">Shoot on any phone · MP4 MOV WEBM · max 500 MB · published to YouTube after approval</p>
-                <div class="upload-zone" style="padding:1.25rem;text-align:center" :class="[dragOver?'drag':'', file?'has-file':'']"
+                <label class="fp-label">Upload Your Video * <span style="text-transform:none;font-weight:400;color:#9ca3af;font-size:.65rem">· MP4 MOV WEBM · max 500 MB</span></label>
+                <div class="upload-zone" style="padding:.75rem;text-align:center" :class="[dragOver?'drag':'', file?'has-file':'']"
                   @dragover.prevent="dragOver=true" @dragleave="dragOver=false"
                   @drop.prevent="handleDrop($event)" @click="$refs.vidFile.click()">
                   <input type="file" x-ref="vidFile" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="handleFile($event)">
-                  <!-- Empty state -->
-                  <div x-show="!file">
-                    <svg style="width:28px;height:28px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                    <p style="color:#6b7280;font-size:.8rem">Drop video or <span style="color:#111;font-weight:600;text-decoration:underline">browse</span></p>
+                  <div x-show="!file" style="display:flex;align-items:center;justify-content:center;gap:.5rem">
+                    <svg style="width:16px;height:16px;color:#9ca3af;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <span style="color:#6b7280;font-size:.78rem">Drop video or <span style="color:#111;font-weight:600;text-decoration:underline">browse</span></span>
                   </div>
-                  <!-- File selected state -->
-                  <div x-show="file" style="display:flex;align-items:center;justify-content:center;gap:.625rem">
-                    <svg style="width:16px;height:16px;color:#111;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    <span style="color:#111;font-size:.8rem;font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" x-text="file ? file.name : ''"></span>
-                    <button type="button" @click.stop="file=null;dragOver=false" style="color:#9ca3af;background:none;border:none;cursor:pointer;font-size:.875rem;line-height:1;flex-shrink:0">✕</button>
+                  <div x-show="file" style="display:flex;align-items:center;justify-content:center;gap:.5rem">
+                    <svg style="width:14px;height:14px;color:#111;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span style="color:#111;font-size:.78rem;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" x-text="file ? file.name : ''"></span>
+                    <button type="button" @click.stop="file=null" style="color:#9ca3af;background:none;border:none;cursor:pointer;font-size:.875rem;flex-shrink:0">✕</button>
                   </div>
                 </div>
-                <!-- Upload progress -->
-                <div x-show="uploading" style="margin-top:.5rem">
-                  <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#6b7280;margin-bottom:.2rem">
-                    <span>Uploading your video...</span><span x-text="progress+'%'"></span>
+                <div x-show="uploading" style="margin-top:.3rem">
+                  <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#6b7280;margin-bottom:.15rem">
+                    <span>Uploading...</span><span x-text="progress+'%'"></span>
                   </div>
                   <div class="progress-bar"><div class="progress-fill" :style="'width:'+progress+'%'"></div></div>
                 </div>
               </div>
 
               <!-- Errors -->
-              <div x-show="errors.length" class="error-box">
+              <div x-show="errors.length" class="error-box" style="padding:.5rem .75rem;font-size:.78rem">
                 <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
               </div>
 
               <!-- Submit -->
               <button type="submit" class="btn-submit" :disabled="loading">
-                <svg x-show="!loading" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                <span x-show="!loading">Submit <?= htmlspecialchars($atype) ?></span>
-                <span x-show="loading">Uploading...</span>
+                <svg x-show="!loading" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                <span x-show="!loading" style="color:#fff;font-weight:700">Submit <?= htmlspecialchars($atype) ?></span>
+                <span x-show="loading" style="color:#fff">Uploading...</span>
               </button>
             </form>
           </div>
