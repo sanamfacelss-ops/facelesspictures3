@@ -41,38 +41,92 @@ class Script
 
     public function create(array $data): int
     {
-        $stmt = $this->db->prepare(
-            "INSERT INTO scripts (title, content, category, difficulty, duration_hint, image_url, audition_type, rules) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        $stmt->execute([
+        $cols = $this->getColumns();
+
+        $columns = ['title', 'content', 'category', 'difficulty'];
+        $values  = [
             $data['title'],
             $data['content'],
             $data['category'],
             $data['difficulty'] ?? 'beginner',
-            $data['duration_hint'] ?? null,
-            $data['image_url']     ?? null,
-            $data['audition_type'] ?? null,
-            $data['rules']         ?? null,
-        ]);
+        ];
+
+        if (in_array('duration_hint', $cols) && isset($data['duration_hint'])) {
+            $columns[] = 'duration_hint';
+            $values[]  = $data['duration_hint'] ?: null;
+        }
+        if (in_array('image_url', $cols)) {
+            $columns[] = 'image_url';
+            $values[]  = $data['image_url'] ?? null;
+        }
+        if (in_array('audition_type', $cols)) {
+            $columns[] = 'audition_type';
+            $values[]  = $data['audition_type'] ?? null;
+        }
+        if (in_array('rules', $cols)) {
+            $columns[] = 'rules';
+            $values[]  = $data['rules'] ?? null;
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+        $columnStr    = implode(', ', $columns);
+
+        $stmt = $this->db->prepare("INSERT INTO scripts ({$columnStr}) VALUES ({$placeholders})");
+        $stmt->execute($values);
         return (int) $this->db->lastInsertId();
     }
 
     public function update(int $id, array $data): bool
     {
-        $stmt = $this->db->prepare(
-            "UPDATE scripts SET title = ?, content = ?, category = ?, difficulty = ?, duration_hint = ?, image_url = ?, audition_type = ?, rules = ? WHERE id = ?"
-        );
-        return $stmt->execute([
+        $cols = $this->getColumns();
+
+        // Always-present fields
+        $sets   = ['title = ?', 'content = ?', 'category = ?', 'difficulty = ?'];
+        $values = [
             $data['title'],
             $data['content'],
             $data['category'],
             $data['difficulty'] ?? 'beginner',
-            $data['duration_hint'] ?? null,
-            $data['image_url']     ?? null,
-            $data['audition_type'] ?? null,
-            $data['rules']         ?? null,
-            $id,
-        ]);
+        ];
+
+        if (in_array('duration_hint', $cols)) {
+            $sets[]   = 'duration_hint = ?';
+            $values[] = $data['duration_hint'] ?? null;
+        }
+        if (in_array('image_url', $cols)) {
+            $sets[]   = 'image_url = ?';
+            $values[] = $data['image_url'] ?? null;
+        }
+        if (in_array('audition_type', $cols)) {
+            $sets[]   = 'audition_type = ?';
+            $values[] = $data['audition_type'] ?? null;
+        }
+        if (in_array('rules', $cols)) {
+            $sets[]   = 'rules = ?';
+            $values[] = $data['rules'] ?? null;
+        }
+
+        $values[] = $id;
+        $sql = 'UPDATE scripts SET ' . implode(', ', $sets) . ' WHERE id = ?';
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($values);
+    }
+
+    /**
+     * Get list of columns in the scripts table (cached)
+     */
+    private function getColumns(): array
+    {
+        static $columns = null;
+        if ($columns === null) {
+            try {
+                $stmt    = $this->db->query('DESCRIBE scripts');
+                $columns = array_column($stmt->fetchAll(), 'Field');
+            } catch (\Exception $e) {
+                $columns = ['id', 'title', 'content', 'category', 'difficulty', 'duration_hint', 'is_active'];
+            }
+        }
+        return $columns;
     }
 
     public function delete(int $id): bool
