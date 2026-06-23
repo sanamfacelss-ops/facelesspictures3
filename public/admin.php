@@ -3951,11 +3951,14 @@ if (file_exists($errorLogFile)) {
                 // Listen for script image picker selections
                 // Uses a global bridge function so child Alpine components can set parent state
                 window.setScriptImage = (url) => {
+                    console.log('[FP3] setScriptImage called with:', url, '— current scriptForm.image_url was:', this.scriptForm.image_url);
                     this.scriptForm.image_url = url;
+                    console.log('[FP3] scriptForm.image_url is now:', this.scriptForm.image_url);
                 };
                 document.addEventListener('script-image-picked', e => {
                     this.scriptForm.image_url = e.detail.url;
                 });
+                console.log('[FP3] adminDashboard init — window.setScriptImage registered');
                 
                 // Initial refresh
                 this.silentRefreshVideos();
@@ -4461,10 +4464,17 @@ if (file_exists($errorLogFile)) {
             async createScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                Object.keys(this.scriptForm).forEach(k => formData.append(k, this.scriptForm[k]));
+                // Build form data — log so DevTools shows what's being sent
+                console.log('[FP3] createScript - scriptForm:', JSON.parse(JSON.stringify(this.scriptForm)));
+                Object.keys(this.scriptForm).forEach(k => {
+                    formData.append(k, this.scriptForm[k] ?? '');
+                    console.log('[FP3] createScript field:', k, '=', this.scriptForm[k]);
+                });
                 try {
                     const res = await fetch('/api/admin/scripts/create', { method: 'POST', body: formData });
+                    console.log('[FP3] createScript response status:', res.status);
                     const data = await res.json();
+                    console.log('[FP3] createScript response data:', data);
                     if (data.success) {
                         this.showToast('Script created successfully');
                         setTimeout(() => location.reload(), 1000);
@@ -4472,25 +4482,37 @@ if (file_exists($errorLogFile)) {
                         this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
                     }
                 } catch (e) {
+                    console.error('[FP3] createScript error:', e);
                     this.showToast('Failed to create script', 'error');
                 }
             },
-            
+
             async updateScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                Object.keys(this.scriptForm).forEach(k => formData.append(k, this.scriptForm[k]));
+                // Build form data — log so DevTools shows what's being sent
+                console.log('[FP3] updateScript id:', this.editingScript, '- scriptForm:', JSON.parse(JSON.stringify(this.scriptForm)));
+                Object.keys(this.scriptForm).forEach(k => {
+                    formData.append(k, this.scriptForm[k] ?? '');
+                    console.log('[FP3] updateScript field:', k, '=', this.scriptForm[k]);
+                });
                 try {
                     const res = await fetch('/api/admin/scripts/update/' + this.editingScript, { method: 'POST', body: formData });
-                    const data = await res.json();
+                    console.log('[FP3] updateScript response status:', res.status);
+                    const text = await res.text();
+                    console.log('[FP3] updateScript raw response:', text);
+                    let data;
+                    try { data = JSON.parse(text); } catch(pe) { data = { error: 'Server returned non-JSON: ' + text.substring(0,200) }; }
+                    console.log('[FP3] updateScript parsed data:', data);
                     if (data.success) {
                         this.showToast('Script updated successfully');
                         setTimeout(() => location.reload(), 1000);
                     } else {
-                        this.showToast(data.errors?.join(', ') || data.error || 'Failed', 'error');
+                        this.showToast(data.errors?.join(', ') || data.error || 'Update failed — check console', 'error');
                     }
                 } catch (e) {
-                    this.showToast('Failed to update script', 'error');
+                    console.error('[FP3] updateScript fetch error:', e);
+                    this.showToast('Network error — check console', 'error');
                 }
             },
             
@@ -5217,8 +5239,13 @@ if (file_exists($errorLogFile)) {
             },
 
             selectFromGallery(url) {
+                console.log('[FP3] selectFromGallery url:', url);
+                console.log('[FP3] window.setScriptImage exists:', typeof window.setScriptImage);
                 if (typeof window.setScriptImage === 'function') {
                     window.setScriptImage(url);
+                    console.log('[FP3] setScriptImage called — scriptForm.image_url should now be:', url);
+                } else {
+                    console.error('[FP3] window.setScriptImage NOT defined — image will not save!');
                 }
             },
 
