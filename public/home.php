@@ -5,7 +5,9 @@ $settingsModel = new App\Models\Settings();
 $aboutText    = $settingsModel->get('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
 $logoUrl      = $settingsModel->get('site_logo_url', '');
 $siteTagline  = $settingsModel->get('site_tagline', "India's first anonymous film competition — no face, no connections, just raw talent.");
-$heroHeadline = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
+$heroHeadline     = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
+$rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star in 3 Clicks');
+$rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
 
 // Up to 6 poster slots
 $posterKeys = [
@@ -266,43 +268,50 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
-    <p class="section-label">Choose Your Role</p>
+    <div style="text-align:center;margin-bottom:2rem;padding-top:.5rem">
+      <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem">Choose Your Role</p>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.625rem">
+        <?= htmlspecialchars($rolesHeading) ?>
+      </h2>
+      <p style="font-size:.9rem;color:#6b7280;max-width:400px;margin:0 auto;line-height:1.6">
+        <?= htmlspecialchars($rolesSubheading) ?>
+      </p>
+    </div>
     <div class="grid grid-cols-3 gap-4 sm:gap-6">
 
       <!-- ACTOR -->
       <div class="role-card">
         <div class="role-icon">🎭</div>
         <p class="role-name">ACTOR</p>
-        <p class="role-desc">Perform on camera. Face hidden.<br>Talent front and centre.</p>
+        <p class="role-desc">Shoot your scene on camera.<br>Face hidden. Talent only.</p>
         <div class="role-badges">
-          <span class="badge">Dialog Audition</span>
-          <span class="badge">Song Audition</span>
+          <span class="badge">Dialog</span>
+          <span class="badge">Song</span>
         </div>
-        <a href="/actor" class="btn-black">Audition Now →</a>
+        <a href="/actor" class="btn-black">Shoot &amp; Submit →</a>
       </div>
 
       <!-- DIRECTOR -->
       <div class="role-card">
         <div class="role-icon">🎬</div>
         <p class="role-name">DIRECTOR</p>
-        <p class="role-desc">Same scene, your vision.<br>Frame it and make it yours.</p>
+        <p class="role-desc">Shoot your scene your way.<br>One phone. One take. Your vision.</p>
         <div class="role-badges">
           <span class="badge">Scene Direction</span>
-          <span class="badge">Vision Pitch</span>
+          <span class="badge">Pitch</span>
         </div>
-        <a href="/director" class="btn-black">Submit Now →</a>
+        <a href="/director" class="btn-black">Shoot &amp; Submit →</a>
       </div>
 
       <!-- WRITER -->
       <div class="role-card">
         <div class="role-icon">✍️</div>
         <p class="role-name">WRITER</p>
-        <p class="role-desc">We give you Scene 1.<br>You write what happens next.</p>
+        <p class="role-desc">Read your script on camera.<br>Your words. Your voice. One video.</p>
         <div class="role-badges">
-          <span class="badge">Script Submission</span>
           <span class="badge">Script Reading</span>
         </div>
-        <a href="/writer" class="btn-black">Submit Now →</a>
+        <a href="/writer" class="btn-black">Shoot &amp; Submit →</a>
       </div>
 
     </div>

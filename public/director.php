@@ -72,7 +72,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <span class="inline-block bg-gray-100 text-gray-500 text-[11px] font-semibold tracking-[3px] uppercase px-4 py-1.5 rounded-full mb-4">Now Open</span>
     <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:1rem">DIRECTOR<br>AUDITIONS</h1>
     <p style="color:#6b7280;font-size:1rem;max-width:440px;margin:0 auto;line-height:1.65">
-      Same scene. Your vision. Frame it, light it, pace it — one phone, one take, one chance.
+      Pick your format. Read the brief. Shoot your video. Submit.
     </p>
   </div>
 </section>
@@ -86,7 +86,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div class="badge-dir text-ink text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex-shrink-0 mt-0.5">Scene Direction</div>
         <div>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;color:#111">SCENE DIRECTION</h2>
-          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Direct and shoot a complete scene.</p>
+          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Read the brief. Shoot your scene. Submit.</p>
         </div>
       </div>
       <div class="mb-6">
@@ -143,7 +143,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div class="badge-pitch text-white text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex-shrink-0 mt-0.5">Vision Pitch</div>
         <div>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;color:#111">VISION PITCH</h2>
-          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Pitch your creative vision on camera — no scene needed.</p>
+          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Read the brief. Shoot your pitch video. Submit.</p>
         </div>
       </div>
       <div class="mb-6">

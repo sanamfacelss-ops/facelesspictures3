@@ -72,7 +72,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <span class="inline-block bg-gray-100 text-gray-500 text-[11px] font-semibold tracking-[3px] uppercase px-4 py-1.5 rounded-full mb-4">Now Open</span>
     <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:1rem">WRITER<br>SUBMISSIONS</h1>
     <p style="color:#6b7280;font-size:1rem;max-width:440px;margin:0 auto;line-height:1.65">
-      We give you Scene 1. You write what happens next. Great scripts become great films.
+      Read the brief. Write your scene. Record yourself reading it. Submit your video.
     </p>
   </div>
 </section>
@@ -86,7 +86,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div class="badge-script text-white text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex-shrink-0 mt-0.5">Script Submission</div>
         <div>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;color:#111">SCRIPT SUBMISSION</h2>
-          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Write Scene 2. Submit as a video reading.</p>
+          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Read the brief. Write your scene. Record yourself reading it. Submit your video.</p>
         </div>
       </div>
       <div class="mb-6">
@@ -108,7 +108,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div><label class="block text-[11px] font-semibold uppercase tracking-widest text-muted mb-1.5">Notes <span class="normal-case font-normal">(optional)</span></label><textarea x-model="form.notes" class="fp-input" rows="2" placeholder="Your approach to Scene 2, genre choices, tone..."></textarea></div>
         <div>
           <label class="block text-[11px] font-semibold uppercase tracking-widest text-muted mb-1.5">Upload Script Reading Video <span class="text-amber">*</span></label>
-          <p class="text-[11px] text-muted mb-2 opacity-60">Required · Record yourself reading your script · MP4, MOV, WEBM · max 500 MB · will be published to YouTube</p>
+          <p class="text-[11px] text-muted mb-2 opacity-60">Shoot on any phone · MP4 MOV WEBM · max 500 MB · published to YouTube after approval</p>
           <div class="upload-zone p-6 text-center" :class="dragOver?'drag':''" @dragover.prevent="dragOver=true" @dragleave="dragOver=false" @drop.prevent="handleDrop($event)" @click="$refs.file1.click()">
             <input type="file" x-ref="file1" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="handleFile($event)">
             <template x-if="!file"><div><svg class="w-8 h-8 text-muted mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-muted text-sm">Drop video or <span class="text-amber">click to browse</span></p><p class="text-muted text-xs mt-1">MP4 · MOV · WEBM · max 500 MB</p></div></template>
@@ -131,7 +131,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div class="badge-reading text-ink text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex-shrink-0 mt-0.5">Script Reading</div>
         <div>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em;color:#111">SCRIPT READING</h2>
-          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Perform a reading of your original work on camera.</p>
+          <p style="color:#6b7280;font-size:.85rem;margin-top:.2rem">Read your original work on camera. Shoot your video. Submit.</p>
         </div>
       </div>
       <div class="mb-6">
@@ -153,7 +153,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div><label class="block text-[11px] font-semibold uppercase tracking-widest text-muted mb-1.5">About Your Work <span class="normal-case font-normal">(optional)</span></label><textarea x-model="form.notes" class="fp-input" rows="2" placeholder="Title of the piece, genre, what inspired it..."></textarea></div>
         <div>
           <label class="block text-[11px] font-semibold uppercase tracking-widest text-muted mb-1.5">Upload Reading Video <span class="text-amber">*</span></label>
-          <p class="text-[11px] text-muted mb-2 opacity-60">Required · MP4, MOV, WEBM · max 500 MB · will be published to YouTube</p>
+          <p class="text-[11px] text-muted mb-2 opacity-60">Shoot on any phone · MP4 MOV WEBM · max 500 MB · published to YouTube after approval</p>
           <div class="upload-zone p-6 text-center" :class="dragOver?'drag':''" @dragover.prevent="dragOver=true" @dragleave="dragOver=false" @drop.prevent="handleDrop($event)" @click="$refs.file2.click()">
             <input type="file" x-ref="file2" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="handleFile($event)">
             <template x-if="!file"><div><svg class="w-8 h-8 text-muted mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg><p class="text-muted text-sm">Drop video or <span class="text-amber">click to browse</span></p><p class="text-muted text-xs mt-1">MP4 · MOV · WEBM · max 500 MB</p></div></template>

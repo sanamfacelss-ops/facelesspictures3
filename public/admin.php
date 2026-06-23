@@ -2939,6 +2939,24 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- SECTION: Role Cards -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards Section (below posters)</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Heading</label>
+                                        <input type="text" x-model="form.landing_roles_heading" placeholder="Become a Star in 3 Clicks"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Big bold heading above the Actor / Director / Writer cards.</p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Subheading</label>
+                                        <input type="text" x-model="form.landing_roles_subheading" placeholder="Pick your role. Shoot your video. Submit. That's it."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- SECTION: Posters -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Film Poster Cards (3 slots)</p>
@@ -5110,6 +5128,8 @@ if (file_exists($errorLogFile)) {
                 site_logo_url:         '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>',
                 landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
                 site_tagline:          <?= json_encode($settingsModel->get('site_tagline',"India's first anonymous film competition — no face, no connections, just raw talent.")) ?>,
+                landing_roles_heading:    <?= json_encode($settingsModel->get('landing_roles_heading','Become a Star in 3 Clicks')) ?>,
+                landing_roles_subheading: <?= json_encode($settingsModel->get('landing_roles_subheading',"Pick your role. Shoot your video. Submit. That's it.")) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
                 landing_trailer_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer_url',''))) ?>',

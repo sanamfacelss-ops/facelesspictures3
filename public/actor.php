@@ -92,7 +92,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   <div class="max-w-5xl mx-auto text-center fade-up">
     <span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:.35rem 1rem;border-radius:20px;margin-bottom:1rem">Auditions Now Open</span>
     <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,96px);letter-spacing:.02em;line-height:.92;color:#111;margin-bottom:.875rem">ACTOR<br>AUDITIONS</h1>
-    <p style="color:#6b7280;font-size:1rem;max-width:420px;margin:0 auto;line-height:1.65">No face. Just raw talent. Pick your audition type, read the brief, upload your take.</p>
+    <p style="color:#6b7280;font-size:1rem;max-width:420px;margin:0 auto;line-height:1.65">Pick your audition type. Read the brief. Shoot your video. Submit.</p>
   </div>
 </section>
 
@@ -106,7 +106,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <span class="badge-dialog">Dialog Audition</span>
         <div>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,4vw,32px);letter-spacing:.02em;color:#111;line-height:1">DIALOG AUDITION</h2>
-          <p style="color:#6b7280;font-size:.8rem;margin-top:.2rem">Perform the scene. Show us your emotional range.</p>
+          <p style="color:#6b7280;font-size:.8rem;margin-top:.2rem">Read the brief. Shoot your video. Submit.</p>
         </div>
       </div>
 
@@ -169,7 +169,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
               <div>
                 <svg style="width:32px;height:32px;color:#9ca3af;margin:0 auto .5rem" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                 <p style="color:#6b7280;font-size:.875rem">Drop video or <span style="color:#111;font-weight:600">click to browse</span></p>
-                <p style="color:#9ca3af;font-size:.75rem;margin-top:.25rem">MP4 · MOV · WEBM · max 500 MB</p>
+                <p style="color:#9ca3af;font-size:.75rem;margin-top:.25rem">Shoot on any phone · MP4 MOV WEBM · max 500 MB</p>
               </div>
             </template>
             <template x-if="file">
@@ -207,7 +207,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <span class="badge-song">Song Audition</span>
         <div>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,4vw,32px);letter-spacing:.02em;color:#111;line-height:1">SONG AUDITION</h2>
-          <p style="color:#6b7280;font-size:.8rem;margin-top:.2rem">Let your voice tell the story.</p>
+          <p style="color:#6b7280;font-size:.8rem;margin-top:.2rem">Read the brief. Shoot your video. Submit.</p>
         </div>
       </div>
       <div style="margin-bottom:1.25rem">

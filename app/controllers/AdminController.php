@@ -1865,6 +1865,7 @@ class AdminController
         $allowed = [
             'site_logo_url',
             'landing_headline', 'site_tagline',
+            'landing_roles_heading', 'landing_roles_subheading',
             'landing_poster_url',   'landing_poster_title',  'landing_trailer_url',
             'landing_poster2_url',  'landing_poster2_title', 'landing_trailer2_url',
             'landing_poster3_url',  'landing_poster3_title', 'landing_trailer3_url',
