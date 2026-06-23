@@ -2848,24 +2848,43 @@ if (file_exists($errorLogFile)) {
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster Image URL</label>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 1 — Image URL</label>
                                     <input type="url" x-model="form.landing_poster_url" placeholder="https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                    <p class="text-[11px] text-dark/30 mt-1">Direct image URL for the movie poster on the homepage</p>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Trailer Video URL</label>
-                                    <input type="url" x-model="form.landing_trailer_url" placeholder="https://youtube.com/... or https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                    <p class="text-[11px] text-dark/30 mt-1">YouTube URL or direct MP4 URL for the trailer modal</p>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 1 — Trailer URL</label>
+                                    <input type="url" x-model="form.landing_trailer_url" placeholder="https://youtube.com/..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                    <p class="text-[11px] text-dark/30 mt-1">YouTube URL or direct MP4 — opens in trailer modal on poster click</p>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Hero Headline</label>
-                                    <textarea x-model="form.landing_hero_title" rows="3" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30" placeholder="One line per row — 3rd line turns amber"></textarea>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 1 — Title</label>
+                                    <input type="text" x-model="form.landing_poster_title" placeholder="Faceless Pictures 3" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">Hero Subtitle</label>
-                                    <textarea x-model="form.landing_hero_subtitle" rows="3" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 2 — Image URL</label>
+                                    <input type="url" x-model="form.landing_poster2_url" placeholder="https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
                                 </div>
-                                <div class="md:col-span-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 2 — Trailer URL</label>
+                                    <input type="url" x-model="form.landing_trailer2_url" placeholder="https://youtube.com/..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 2 — Title</label>
+                                    <input type="text" x-model="form.landing_poster2_title" placeholder="Film Title" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 3 — Image URL</label>
+                                    <input type="url" x-model="form.landing_poster3_url" placeholder="https://..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 3 — Trailer URL</label>
+                                    <input type="url" x-model="form.landing_trailer3_url" placeholder="https://youtube.com/..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">Poster 3 — Title</label>
+                                    <input type="text" x-model="form.landing_poster3_title" placeholder="Film Title" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                </div>
+                                <div class="md:col-span-2 lg:col-span-3">
                                     <label class="block text-xs font-medium text-dark/50 mb-1">About Text</label>
                                     <textarea x-model="form.landing_about_text" rows="3" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
                                 </div>
@@ -4720,11 +4739,16 @@ if (file_exists($errorLogFile)) {
             saving: false, saved: false,
             csrf: document.querySelector('meta[name="csrf-token"]')?.content || '',
             form: {
-                landing_poster_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
-                landing_trailer_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer_url',''))) ?>',
-                landing_hero_title:   <?= json_encode($settingsModel->get('landing_hero_title',"NO FACE.\nNO CONNECTIONS.\nJUST TALENT.")) ?>,
-                landing_hero_subtitle:<?= json_encode($settingsModel->get('landing_hero_subtitle',"India's first anonymous film competition.")) ?>,
-                landing_about_text:   <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
+                landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
+                landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
+                landing_trailer_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer_url',''))) ?>',
+                landing_poster2_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster2_url',''))) ?>',
+                landing_poster2_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster2_title',''))) ?>',
+                landing_trailer2_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer2_url',''))) ?>',
+                landing_poster3_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_url',''))) ?>',
+                landing_poster3_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_title',''))) ?>',
+                landing_trailer3_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer3_url',''))) ?>',
+                landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
             },
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;

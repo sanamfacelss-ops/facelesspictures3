@@ -1765,8 +1765,10 @@ class AdminController
         $value = trim($_POST['value'] ?? '');
 
         $allowed = [
-            'landing_poster_url', 'landing_trailer_url',
-            'landing_hero_title', 'landing_hero_subtitle', 'landing_about_text',
+            'landing_poster_url',   'landing_poster_title',  'landing_trailer_url',
+            'landing_poster2_url',  'landing_poster2_title', 'landing_trailer2_url',
+            'landing_poster3_url',  'landing_poster3_title', 'landing_trailer3_url',
+            'landing_about_text',
             'actor_dialog_script', 'actor_song_script',
             'director_brief', 'writer_brief',
         ];
