@@ -48,25 +48,28 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000}
-/* 9:16 video — full card width, ratio enforced, no bars */
-.preview-video-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden}
-.preview-video-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
-/* 9:16 video/image section — full width, ratio locked, capped on tall screens */
-.media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;max-height:min(177.78vw,520px)}
-.media-9-16 video,.media-9-16 iframe,.media-9-16 img{width:100%;height:100%;object-fit:cover;display:block;border:0}
+/* 9:16 media container — full card width, capped height, NO side bars */
+.media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;max-height:min(177.78vw,520px);position:relative}
+/* local video: cover fill */
+.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}
+/* YouTube iframe: scale up 16:9 iframe to fill 9:16 box — scale factor = 16/9 ÷ 9/16 = 256/81 ≈ 3.16 */
+.media-9-16 iframe{position:absolute;top:50%;left:50%;width:316%;height:316%;transform:translate(-50%,-50%);border:0;display:block;pointer-events:auto}
+/* image: cover fill */
+.media-9-16 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}
 /* placeholder inside 9:16 box */
-.media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;min-height:200px}
+.media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+/* Overlapping audition type badge */
+.media-badge{position:absolute;top:.75rem;left:.75rem;z-index:4;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:.3rem .65rem;border-radius:20px;border:1px solid rgba(255,255,255,.18);pointer-events:none}
 /* Custom video player for local files */
 .pv-wrap{position:relative;width:100%;overflow:hidden}
-.pv-wrap video{width:100%;height:100%;object-fit:cover;display:block}
-.pv-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);transition:background .2s}
+.pv-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);transition:background .2s;z-index:2}
 .pv-wrap:hover .pv-overlay{background:rgba(0,0,0,.38)}
 .pv-play{width:60px;height:60px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:transform .2s,background .2s}
 .pv-wrap:hover .pv-play{transform:scale(1.08);background:rgba(255,255,255,.28)}
 .pv-play svg{width:26px;height:26px;color:#fff;margin-left:4px}
 .pv-playing .pv-overlay{opacity:0}
 .pv-playing:hover .pv-overlay{opacity:1}
-.pv-bar{position:absolute;bottom:0;left:0;right:0;padding:.5rem .75rem .6rem;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);display:flex;flex-direction:column;gap:.35rem;opacity:0;transition:opacity .2s}
+.pv-bar{position:absolute;bottom:0;left:0;right:0;padding:.5rem .75rem .6rem;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);display:flex;flex-direction:column;gap:.35rem;opacity:0;transition:opacity .2s;z-index:3}
 .pv-wrap:hover .pv-bar{opacity:1}
 .pv-progress{height:3px;background:rgba(255,255,255,.25);border-radius:2px;cursor:pointer;position:relative}
 .pv-progress:hover{height:5px}
@@ -77,8 +80,8 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
 /* 9:16 script image — full card width, no bars */
-.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;max-height:min(177.78vw,520px);background:#f3f4f6}
-.portrait-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;max-height:min(177.78vw,520px);background:#f3f4f6;position:relative}
+.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 @media(max-width:768px){
   /* on mobile keep the same — already full width */
 }
@@ -182,15 +185,15 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
   <div class="brief-card">
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
-        <!-- YouTube embed -->
         <div class="media-9-16">
+          <span class="media-badge"><?= $audType ?></span>
           <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
             allowfullscreen title="<?= $title ?> preview"></iframe>
         </div>
       <?php elseif ($previewUrl): ?>
-        <!-- Local file — custom inline player -->
         <div class="media-9-16 pv-wrap" id="<?= $uid ?>" onclick="pvToggle('<?= $uid ?>')" style="cursor:pointer">
+          <span class="media-badge"><?= $audType ?></span>
           <video id="<?= $uid ?>_v" preload="metadata" playsinline
             ontimeupdate="pvTimeUpdate('<?= $uid ?>')"
             onended="pvEnded('<?= $uid ?>')"
@@ -220,13 +223,13 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
         </div>
       <?php else: ?>
         <div class="media-9-16 placeholder-bg">
+          <span class="media-badge"><?= $audType ?></span>
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           Preview video coming soon
         </div>
       <?php endif; ?>
     </div>
     <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
-      <div class="sec-label"><?= $audType ?></div>
       <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111"><?= $title ?></p>
       <p style="font-size:.78rem;color:#6b7280;margin-top:.3rem;line-height:1.5"><?= $brief ?></p>
     </div>
