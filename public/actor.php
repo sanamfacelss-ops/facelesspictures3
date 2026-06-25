@@ -78,9 +78,9 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn:hover{opacity:1}
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
-/* 9:16 script image — full card width, full height, no bars */
-.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;background:#f3f4f6;position:relative}
-.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* 9:16 script image — contain so full script text is readable, white bg */
+.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;background:#fff;position:relative;border-top:1px solid #f0f0f0}
+.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#fff}
 @media(max-width:768px){
   /* on mobile keep the same — already full width */
 }
