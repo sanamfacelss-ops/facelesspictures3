@@ -51,9 +51,32 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 /* 9:16 video — full card width, ratio enforced, no bars */
 .preview-video-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden}
 .preview-video-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+/* 9:16 YouTube embed */
+.preview-yt-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden}
+.preview-yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;display:block}
 /* 9:16 placeholder */
 .video-placeholder{width:100%;position:relative;padding-bottom:177.78%;background:#1a1a2e}
 .video-placeholder-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+/* Custom video player for local files */
+.pv-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden;cursor:pointer}
+.pv-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+.pv-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);transition:background .2s}
+.pv-wrap:hover .pv-overlay{background:rgba(0,0,0,.38)}
+.pv-play{width:60px;height:60px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:transform .2s,background .2s}
+.pv-wrap:hover .pv-play{transform:scale(1.08);background:rgba(255,255,255,.28)}
+.pv-play svg{width:26px;height:26px;color:#fff;margin-left:4px}
+.pv-playing .pv-overlay{opacity:0}
+.pv-playing:hover .pv-overlay{opacity:1}
+.pv-bar{position:absolute;bottom:0;left:0;right:0;padding:.5rem .75rem .6rem;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);display:flex;flex-direction:column;gap:.35rem;opacity:0;transition:opacity .2s}
+.pv-wrap:hover .pv-bar{opacity:1}
+.pv-progress{height:3px;background:rgba(255,255,255,.25);border-radius:2px;cursor:pointer;position:relative}
+.pv-progress:hover{height:5px;margin-top:-1px}
+.pv-played{height:100%;background:#fff;border-radius:2px;pointer-events:none}
+.pv-row{display:flex;align-items:center;gap:.5rem}
+.pv-btn{background:none;border:none;cursor:pointer;color:#fff;opacity:.85;padding:2px;display:flex;align-items:center;transition:opacity .15s}
+.pv-btn:hover{opacity:1}
+.pv-btn svg{width:18px;height:18px}
+.pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
 /* 9:16 script image — full card width, no bars */
 .portrait-img-wrap{width:100%;position:relative;padding-bottom:177.78%;overflow:hidden;background:#f3f4f6}
 .portrait-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -131,6 +154,17 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 
 <?php
 // Helper to render a script brief card
+function isYouTubeUrl(string $url): bool {
+    return (bool)preg_match('/youtu(\.be|be\.com)/i', $url);
+}
+
+function getYouTubeEmbed(string $url): string {
+    if (preg_match('/youtu\.be\/([^?&#]+)/', $url, $m)) return 'https://www.youtube.com/embed/' . $m[1];
+    if (preg_match('/[?&]v=([^&#]+)/', $url, $m))       return 'https://www.youtube.com/embed/' . $m[1];
+    if (preg_match('/\/shorts\/([^?&#]+)/', $url, $m))  return 'https://www.youtube.com/embed/' . $m[1];
+    return $url;
+}
+
 function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = false): void {
     $previewUrl  = $sc['preview_video_url'] ?? '';
     $imageUrl    = $sc['image_url']         ?? '';
@@ -142,12 +176,49 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     $rulesRaw    = $sc['rules'] ?? "Video under 3 minutes\nFace must not be visible\nClear audio required";
     $ruleList    = array_filter(array_map('trim', explode("\n", $rulesRaw)));
     $dataId      = (int)$sc['id'];
+    $isYT        = $previewUrl && isYouTubeUrl($previewUrl);
+    $embedUrl    = $isYT ? getYouTubeEmbed($previewUrl) : '';
+    $uid         = 'pv_' . $dataId . '_' . ($isSong ? 's' : 'd');
 ?>
   <div class="brief-card">
     <div class="card-sec" style="padding:0">
-      <?php if ($previewUrl): ?>
-        <div class="preview-video-wrap">
-          <video controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+      <?php if ($previewUrl && $isYT): ?>
+        <!-- YouTube embed -->
+        <div class="preview-yt-wrap">
+          <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
+            allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+            allowfullscreen title="<?= $title ?> preview"></iframe>
+        </div>
+      <?php elseif ($previewUrl): ?>
+        <!-- Local file — custom inline player -->
+        <div class="pv-wrap" id="<?= $uid ?>" onclick="pvToggle('<?= $uid ?>')">
+          <video id="<?= $uid ?>_v" preload="metadata" playsinline
+            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"
+            ontimeupdate="pvTimeUpdate('<?= $uid ?>')"
+            onended="pvEnded('<?= $uid ?>')"
+            onloadedmetadata="pvMeta('<?= $uid ?>')">
+            <source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">
+          </video>
+          <div class="pv-overlay">
+            <div class="pv-play" id="<?= $uid ?>_btn">
+              <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <div class="pv-bar">
+            <div class="pv-progress" id="<?= $uid ?>_prog" onclick="pvSeek(event,'<?= $uid ?>')">
+              <div class="pv-played" id="<?= $uid ?>_played" style="width:0%"></div>
+            </div>
+            <div class="pv-row">
+              <button class="pv-btn" onclick="pvToggle('<?= $uid ?>');event.stopPropagation()">
+                <svg id="<?= $uid ?>_icon_play" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="<?= $uid ?>_icon_pause" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              </button>
+              <button class="pv-btn" onclick="pvToggleMute('<?= $uid ?>');event.stopPropagation()" title="Mute/Unmute">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+              </button>
+              <span class="pv-time" id="<?= $uid ?>_time">0:00 / 0:00</span>
+            </div>
+          </div>
         </div>
       <?php else: ?>
         <div class="video-placeholder">
@@ -307,6 +378,42 @@ function _embedUrl(u){
     m=u.match(/\/shorts\/([^?&#]+)/);
     if(m) return 'https://www.youtube.com/embed/'+m[1];
     return u;
+}
+
+// ── Inline preview player helpers ──
+function pvFmt(s){if(!s||isNaN(s))return'0:00';var m=Math.floor(s/60);return m+':'+(Math.floor(s%60)+'').padStart(2,'0');}
+function pvToggle(id){
+    var v=document.getElementById(id+'_v');if(!v)return;
+    var w=document.getElementById(id);
+    if(v.paused){v.play();w.classList.add('pv-playing');}
+    else{v.pause();w.classList.remove('pv-playing');}
+    document.getElementById(id+'_icon_play').style.display=v.paused?'':'none';
+    document.getElementById(id+'_icon_pause').style.display=v.paused?'none':'';
+}
+function pvEnded(id){
+    var w=document.getElementById(id);w&&w.classList.remove('pv-playing');
+    var ip=document.getElementById(id+'_icon_play');var ipa=document.getElementById(id+'_icon_pause');
+    if(ip)ip.style.display='';if(ipa)ipa.style.display='none';
+}
+function pvTimeUpdate(id){
+    var v=document.getElementById(id+'_v');if(!v||!v.duration)return;
+    var pct=(v.currentTime/v.duration*100).toFixed(1)+'%';
+    var p=document.getElementById(id+'_played');if(p)p.style.width=pct;
+    var t=document.getElementById(id+'_time');if(t)t.textContent=pvFmt(v.currentTime)+' / '+pvFmt(v.duration);
+}
+function pvMeta(id){
+    var v=document.getElementById(id+'_v');
+    var t=document.getElementById(id+'_time');if(t&&v)t.textContent='0:00 / '+pvFmt(v.duration);
+}
+function pvSeek(e,id){
+    e.stopPropagation();
+    var v=document.getElementById(id+'_v');if(!v)return;
+    var r=document.getElementById(id+'_prog').getBoundingClientRect();
+    var p=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    v.currentTime=p*v.duration;
+}
+function pvToggleMute(id){
+    var v=document.getElementById(id+'_v');if(v)v.muted=!v.muted;
 }
 function openTuneModal(url){
     var e=_embedUrl(url);

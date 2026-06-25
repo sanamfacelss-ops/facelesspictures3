@@ -1536,8 +1536,68 @@ if (file_exists($errorLogFile)) {
                                     <!-- Preview Video per script -->
                                     <div x-data="scriptVideoUploader()">
                                         <label class="block text-[12px] text-dark/50 mb-1.5">Mock / Preview Video</label>
-                                        <div class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
-                                            :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                        <!-- Mode tabs -->
+                                        <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[12px]">
+                                            <button type="button" @click="mode='upload'"
+                                                :class="mode==='upload'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'"
+                                                class="flex-1 py-1.5 font-medium transition flex items-center justify-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                                Upload File
+                                            </button>
+                                            <button type="button" @click="mode='youtube'"
+                                                :class="mode==='youtube'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'"
+                                                class="flex-1 py-1.5 font-medium transition flex items-center justify-center gap-1">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                YouTube URL
+                                            </button>
+                                        </div>
+                                        <!-- Upload mode -->
+                                        <div x-show="mode==='upload'">
+                                            <div class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
+                                                :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                                style="min-height:64px"
+                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
+                                                @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
+                                                <input type="file" x-ref="vidPick" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
+                                                <template x-if="!preview&&!uploading">
+                                                    <div class="flex flex-col items-center justify-center gap-1.5 p-3 text-center">
+                                                        <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                        <p class="text-[11px] text-dark/40">Upload mock/preview video</p>
+                                                        <p class="text-[10px] text-dark/25">MP4 · MOV · WEBM · max 500 MB</p>
+                                                    </div>
+                                                </template>
+                                                <template x-if="uploading">
+                                                    <div class="flex flex-col items-center justify-center gap-2 p-3">
+                                                        <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div>
+                                                        <p class="text-[11px] text-dark/40" x-text="progress+'%'"></p>
+                                                    </div>
+                                                </template>
+                                                <template x-if="preview&&!uploading&&!isYoutube(preview)">
+                                                    <div class="flex items-center gap-2 px-3 py-2">
+                                                        <div class="w-7 h-7 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-3.5 h-3.5 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                                                        <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'Video uploaded'"></p>
+                                                        <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                        </div>
+                                        <!-- YouTube URL mode -->
+                                        <div x-show="mode==='youtube'">
+                                            <div class="flex gap-2 items-center">
+                                                <input type="url" x-model="ytUrl" @input="onYtInput()"
+                                                    class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson"
+                                                    placeholder="https://youtube.com/watch?v=... or youtu.be/...">
+                                                <button type="button" x-show="ytUrl" @click="clearYt()"
+                                                    class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[11px] flex-shrink-0">✕</button>
+                                            </div>
+                                            <div x-show="ytUrl && isYoutube(ytUrl)" class="mt-2 rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:9/16;max-height:180px">
+                                                <iframe :src="ytEmbedUrl(ytUrl)+'?mute=1'" class="w-full h-full" frameborder="0" allowfullscreen title="Preview"></iframe>
+                                            </div>
+                                            <p x-show="ytUrl && !isYoutube(ytUrl)" class="text-[11px] text-red-500 mt-1">Please enter a valid YouTube URL</p>
+                                        </div>
+                                        <p class="text-[11px] text-dark/30 mt-1">Shown as the top video on the public script card</p>
+                                    </div>
                                             style="min-height:72px"
                                             @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
                                             @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
@@ -5443,14 +5503,43 @@ if (file_exists($errorLogFile)) {
     // Per-script video uploader — uploads to /api/admin/media/upload-script-file, bridges to scriptForm.preview_video_url
     function scriptVideoUploader() {
         return {
-            preview: window._scriptVideoPreview || null,
-            filename: window._scriptVideoPreview ? window._scriptVideoPreview.split('/').pop() : '',
+            mode: 'upload', // 'upload' | 'youtube'
+            preview: null, filename: '',
+            ytUrl: '',
             dragging: false, uploading: false, progress: 0, uploadError: '',
+            isYoutube(url) {
+                if (!url) return false;
+                return /youtu(\.be|be\.com)/.test(url);
+            },
+            ytEmbedUrl(url) {
+                if (!url) return '';
+                var m = url.match(/youtu\.be\/([^?&#]+)/);
+                if (m) return 'https://www.youtube.com/embed/' + m[1];
+                m = url.match(/[?&]v=([^&#]+)/);
+                if (m) return 'https://www.youtube.com/embed/' + m[1];
+                m = url.match(/\/shorts\/([^?&#]+)/);
+                if (m) return 'https://www.youtube.com/embed/' + m[1];
+                return url;
+            },
+            onYtInput() {
+                // Clear any uploaded file when a YouTube URL is set
+                if (this.ytUrl && this.isYoutube(this.ytUrl)) {
+                    this.preview = null; this.filename = '';
+                    if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = this.ytUrl;
+                } else if (!this.ytUrl) {
+                    if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = '';
+                }
+            },
+            clearYt() {
+                this.ytUrl = '';
+                if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = '';
+            },
             init() {
-                // Accept updates from parent (editScript sets window.setScriptVideo)
                 window.setScriptVideo = (url) => {
-                    this.preview  = url || null;
-                    this.filename = url ? url.split('/').pop() : '';
+                    this.preview = url && !this.isYoutube(url) ? url : null;
+                    this.filename = url && !this.isYoutube(url) ? url.split('/').pop() : '';
+                    this.ytUrl = url && this.isYoutube(url) ? url : '';
+                    this.mode = url && this.isYoutube(url) ? 'youtube' : 'upload';
                     if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = url || '';
                 };
             },
@@ -5459,7 +5548,6 @@ if (file_exists($errorLogFile)) {
             clear(){
                 this.preview=null; this.filename=''; this.uploadError='';
                 if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = '';
-                this.preview=null; this.filename='';
             },
             upload(file){
                 const allowed=['video/mp4','video/quicktime','video/webm'];
@@ -5468,6 +5556,8 @@ if (file_exists($errorLogFile)) {
                     this.uploadError='Only MP4, MOV or WEBM accepted.'; return;
                 }
                 if(file.size>500*1024*1024){this.uploadError='Video must be under 500 MB.'; return;}
+                // Clear YouTube URL when uploading a file
+                this.ytUrl = '';
                 this.uploading=true; this.progress=0; this.uploadError=''; this.preview='uploading';
                 const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';
                 const fd=new FormData();
