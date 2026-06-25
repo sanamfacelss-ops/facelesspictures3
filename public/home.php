@@ -185,11 +185,8 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   .poster-slide-card{width:calc(100% - 1rem)!important}
 }
 
-/* Poster: grid on mobile/tablet, grid/slider on desktop */
-/* Mobile grid — 2 cols, last item centered if odd count */
-.poster-snap-scroll{display:none!important}
-.poster-mobile-grid{display:none;grid-template-columns:1fr 1fr;gap:1rem}
-.poster-mobile-grid .poster-last-odd{grid-column:1/-1;max-width:calc(50% - .5rem);margin:0 auto;width:100%}
+/* Poster: 1-col grid on mobile/tablet, grid/slider on desktop */
+.poster-mobile-grid{display:none;grid-template-columns:1fr;gap:1rem}
 .poster-desktop-grid{display:none;gap:1rem 1.25rem}
 @media(max-width:1023px){
   .poster-mobile-grid{display:grid}
@@ -260,10 +257,10 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     }
     ?>
 
-    <!-- MOBILE: 2-col grid, last item centered if odd -->
+    <!-- MOBILE: 1-col grid, one poster at a time full width -->
     <div class="poster-mobile-grid" style="margin-bottom:3.5rem">
-      <?php $total = count($posters); foreach ($posters as $i => $p): $isLastOdd = ($total % 2 === 1) && ($i === $total - 1); ?>
-      <div class="<?= $isLastOdd ? 'poster-last-odd' : '' ?>"><?= posterCard($p) ?></div>
+      <?php foreach ($posters as $p): ?>
+      <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
     </div>
 
