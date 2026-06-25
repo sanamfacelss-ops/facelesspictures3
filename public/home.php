@@ -212,7 +212,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
     <!-- ══ HERO HEADLINE — centered ══ -->
     <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
         <?= htmlspecialchars($heroHeadline) ?>
       </h1>
       <p style="font-size:.95rem;color:#6b7280;margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
