@@ -5778,8 +5778,6 @@ if (file_exists($errorLogFile)) {
                 this.saving = false; this.saved = true;
                 setTimeout(() => this.saved = false, 2500);
             }
-                setTimeout(() => this.saved = false, 2500);
-            }
         };
     }
     </script>
