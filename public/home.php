@@ -160,10 +160,18 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 #fp-no-trailer-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;font-size:.8rem;font-weight:600;padding:.6rem 1.25rem;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:500;white-space:nowrap;display:flex;align-items:center;gap:.5rem}
 #fp-no-trailer-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* Poster play hint — always visible on touch/mobile */
+@media(hover:none){
+  .play-overlay{opacity:1!important;background:rgba(0,0,0,.18)!important}
+  .play-circle{opacity:.85}
+}
+/* Subtle persistent play badge on posters with trailers */
+.poster-play-hint{position:absolute;bottom:.6rem;right:.6rem;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .6rem;display:flex;align-items:center;gap:.3rem;pointer-events:none;z-index:3}
+.poster-play-hint svg{width:12px;height:12px;fill:#fff;flex-shrink:0}
+.poster-play-hint span{font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;white-space:nowrap}
+
 /* FOOTER */
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
-
-/* MOBILE */
 @media(max-width:639px){
   .poster-grid{grid-template-columns:1fr 1fr!important}
   .role-cards-grid{grid-template-columns:1fr!important}
@@ -248,6 +256,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
           <?php endif; ?>
           <?php if ($hasTrailer): ?>
           <div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+          <div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div>
           <?php else: ?>
           <div class="play-overlay" style="cursor:default" onclick="return false;"><div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem"><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg><span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span></div></div>
           <?php endif; ?>
@@ -270,7 +279,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
             style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
           <?php else: ?>style="cursor:default"<?php endif; ?>>
           <?php if ($p['url']): ?><img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy"><?php else: ?><div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div><?php endif; ?>
-          <?php if ($hasTrailer): ?><div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><?php else: ?><div class="play-overlay" style="cursor:default" onclick="return false;"><div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span></div></div><?php endif; ?>
+          <?php if ($hasTrailer): ?><div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div><?php else: ?><div class="play-overlay" style="cursor:default" onclick="return false;"><div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span></div></div><?php endif; ?>
           <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
         </div>
       </div>
