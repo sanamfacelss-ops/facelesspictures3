@@ -192,7 +192,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 </div><!-- /side-by-side grid -->
 
 <!-- FOOTER -->
-<footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1.5rem;background:#fff">
+<footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1.5rem;background:#f3f4f6">
   <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem">
     <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none">
       <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:44px;width:auto">

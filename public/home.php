@@ -161,7 +161,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 #fp-no-trailer-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* FOOTER */
-.fp-footer{background:#111;color:#fff;padding:2.5rem 1rem}
+.fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
 
 /* MOBILE */
 @media(max-width:639px){
@@ -366,21 +366,21 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 <!-- ── FOOTER ── -->
 <footer class="fp-footer">
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px">
+    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:44px;width:auto;filter:brightness(10)">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:44px;width:auto">
       <?php else: ?>
         FACELESS PICTURES
-        <span style="background:#fff;color:#111;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
+        <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
       <?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center">
-      <a href="/actor"    style="color:#9ca3af;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'">Actors</a>
-      <a href="/director" style="color:#9ca3af;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'">Directors</a>
-      <a href="/writer"   style="color:#9ca3af;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'">Writers</a>
-      <a href="#about"    style="color:#9ca3af;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9ca3af'">About</a>
+      <a href="/actor"    style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">Actors</a>
+      <a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">Directors</a>
+      <a href="/writer"   style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">Writers</a>
+      <a href="#about"    style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">About</a>
     </div>
-    <p style="color:#4b5563;font-size:.75rem">© <?= date('Y') ?> Faceless Pictures. All rights reserved.</p>
+    <p style="color:#9ca3af;font-size:.75rem">© <?= date('Y') ?> Faceless Pictures. All rights reserved.</p>
   </div>
 </footer>
 
