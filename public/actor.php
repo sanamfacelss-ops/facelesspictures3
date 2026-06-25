@@ -48,24 +48,17 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000}
-/* 9:16 video wrapper — max-height capped, width derives from ratio */
-.preview-video-wrap{width:100%;background:#000;overflow:hidden;display:flex;justify-content:center}
-.preview-video-inner{position:relative;height:460px;width:calc(460px * (9/16));background:#000;overflow:hidden;flex-shrink:0}
-.preview-video-inner video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
-/* 9:16 placeholder same dimensions */
-.video-placeholder{width:100%;background:#1a1a2e;display:flex;justify-content:center}
-.video-placeholder-inner{height:460px;width:calc(460px * (9/16));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
-/* 9:16 script image wrapper */
-.portrait-img-wrap{width:100%;background:#f3f4f6;display:flex;justify-content:center}
-.portrait-img-inner{position:relative;height:460px;width:calc(460px * (9/16));overflow:hidden;flex-shrink:0}
-.portrait-img-inner img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+/* 9:16 video — full card width, ratio enforced, no bars */
+.preview-video-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden}
+.preview-video-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+/* 9:16 placeholder */
+.video-placeholder{width:100%;position:relative;padding-bottom:177.78%;background:#1a1a2e}
+.video-placeholder-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+/* 9:16 script image — full card width, no bars */
+.portrait-img-wrap{width:100%;position:relative;padding-bottom:177.78%;overflow:hidden;background:#f3f4f6}
+.portrait-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
 @media(max-width:768px){
-  .preview-video-inner,.video-placeholder-inner,.portrait-img-inner{height:auto;width:100%}
-  .preview-video-inner{padding-bottom:177.78%;position:relative}
-  .preview-video-inner video{position:absolute;top:0;left:0}
-  .video-placeholder-inner{height:220px;width:100%}
-  .portrait-img-inner{padding-bottom:177.78%;position:relative}
-  .portrait-img-inner img{position:absolute;top:0;left:0}
+  /* on mobile keep the same — already full width */
 }
 .portrait-placeholder{width:100%;height:180px;background:#f3f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#9ca3af;font-size:.72rem}
 .btn-outline{display:inline-flex;align-items:center;gap:.35rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:border-color .15s,background .15s;white-space:nowrap}
@@ -154,9 +147,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl): ?>
         <div class="preview-video-wrap">
-          <div class="preview-video-inner">
-            <video controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
-          </div>
+          <video controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
         </div>
       <?php else: ?>
         <div class="video-placeholder">
@@ -175,9 +166,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <?php if ($imageUrl): ?>
     <div class="card-sec" style="padding:0">
       <div class="portrait-img-wrap">
-        <div class="portrait-img-inner">
-          <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
-        </div>
+        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
       </div>
     </div>
     <?php endif; ?>
