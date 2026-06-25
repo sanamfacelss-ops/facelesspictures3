@@ -1,7 +1,15 @@
 ﻿<?php
 require_once __DIR__ . '/../app/config/config.php';
 
-if (!is_admin()) redirect('/login');
+if (!is_admin()) {
+    if (!headers_sent()) {
+        header('Location: /login');
+        exit;
+    }
+    // Fallback if headers already sent
+    echo '<script>window.location.href="/login";</script>';
+    exit;
+}
 
 // Load models and data
 $videoModel = new App\Models\Video();
