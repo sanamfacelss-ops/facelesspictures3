@@ -51,15 +51,14 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 /* 9:16 video — full card width, ratio enforced, no bars */
 .preview-video-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden}
 .preview-video-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
-/* 9:16 YouTube embed */
-.preview-yt-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden}
-.preview-yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;display:block}
-/* 9:16 placeholder */
-.video-placeholder{width:100%;position:relative;padding-bottom:177.78%;background:#1a1a2e}
-.video-placeholder-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+/* 9:16 video/image section — full width, ratio locked, capped on tall screens */
+.media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;max-height:min(177.78vw,520px)}
+.media-9-16 video,.media-9-16 iframe,.media-9-16 img{width:100%;height:100%;object-fit:cover;display:block;border:0}
+/* placeholder inside 9:16 box */
+.media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;min-height:200px}
 /* Custom video player for local files */
-.pv-wrap{width:100%;position:relative;padding-bottom:177.78%;background:#000;overflow:hidden;cursor:pointer}
-.pv-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+.pv-wrap{position:relative;width:100%;overflow:hidden}
+.pv-wrap video{width:100%;height:100%;object-fit:cover;display:block}
 .pv-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);transition:background .2s}
 .pv-wrap:hover .pv-overlay{background:rgba(0,0,0,.38)}
 .pv-play{width:60px;height:60px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:transform .2s,background .2s}
@@ -70,7 +69,7 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-bar{position:absolute;bottom:0;left:0;right:0;padding:.5rem .75rem .6rem;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);display:flex;flex-direction:column;gap:.35rem;opacity:0;transition:opacity .2s}
 .pv-wrap:hover .pv-bar{opacity:1}
 .pv-progress{height:3px;background:rgba(255,255,255,.25);border-radius:2px;cursor:pointer;position:relative}
-.pv-progress:hover{height:5px;margin-top:-1px}
+.pv-progress:hover{height:5px}
 .pv-played{height:100%;background:#fff;border-radius:2px;pointer-events:none}
 .pv-row{display:flex;align-items:center;gap:.5rem}
 .pv-btn{background:none;border:none;cursor:pointer;color:#fff;opacity:.85;padding:2px;display:flex;align-items:center;transition:opacity .15s}
@@ -78,8 +77,8 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
 /* 9:16 script image — full card width, no bars */
-.portrait-img-wrap{width:100%;position:relative;padding-bottom:177.78%;overflow:hidden;background:#f3f4f6}
-.portrait-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;max-height:min(177.78vw,520px);background:#f3f4f6}
+.portrait-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 @media(max-width:768px){
   /* on mobile keep the same — already full width */
 }
@@ -184,16 +183,15 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
         <!-- YouTube embed -->
-        <div class="preview-yt-wrap">
+        <div class="media-9-16">
           <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
             allowfullscreen title="<?= $title ?> preview"></iframe>
         </div>
       <?php elseif ($previewUrl): ?>
         <!-- Local file — custom inline player -->
-        <div class="pv-wrap" id="<?= $uid ?>" onclick="pvToggle('<?= $uid ?>')">
+        <div class="media-9-16 pv-wrap" id="<?= $uid ?>" onclick="pvToggle('<?= $uid ?>')" style="cursor:pointer">
           <video id="<?= $uid ?>_v" preload="metadata" playsinline
-            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"
             ontimeupdate="pvTimeUpdate('<?= $uid ?>')"
             onended="pvEnded('<?= $uid ?>')"
             onloadedmetadata="pvMeta('<?= $uid ?>')">
@@ -221,11 +219,9 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
           </div>
         </div>
       <?php else: ?>
-        <div class="video-placeholder">
-          <div class="video-placeholder-inner">
-            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            Preview video coming soon
-          </div>
+        <div class="media-9-16 placeholder-bg">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Preview video coming soon
         </div>
       <?php endif; ?>
     </div>
@@ -240,8 +236,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
         <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
       </div>
     </div>
-    <?php endif; ?>
-    <div class="card-sec">
+    <?php endif; ?>    <div class="card-sec">
       <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Tune' : 'Script' ?></div>
       <div class="btn-row">
         <?php if ($pdfUrl): ?>
