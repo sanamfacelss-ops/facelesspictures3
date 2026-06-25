@@ -212,8 +212,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
     <!-- ══ HERO HEADLINE — centered ══ -->
     <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
-      <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.875rem">Auditions Now Open</p>
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,5.5vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,5vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
         <?= htmlspecialchars($heroHeadline) ?>
       </h1>
       <p style="font-size:.95rem;color:#6b7280;margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
