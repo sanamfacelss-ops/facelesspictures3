@@ -78,10 +78,11 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn:hover{opacity:1}
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
-/* 9:16 script image — contain so full script text is readable, white bg — clickable for lightbox */
-.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;background:#fff;position:relative;border-top:1px solid #f0f0f0;cursor:zoom-in}
-.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#fff}
-.portrait-img-wrap:hover::after{content:'🔍';position:absolute;bottom:.6rem;right:.6rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;padding:.25rem .5rem;border-radius:6px;pointer-events:none}
+/* 9:16 script image — natural height, no padding, image drives the size */
+.portrait-img-wrap{width:100%;background:#fff;border-top:1px solid #f0f0f0;cursor:zoom-in;display:block;line-height:0;position:relative}
+.portrait-img-wrap img{width:100%;height:auto;display:block;background:#fff}
+.portrait-img-wrap::after{content:'🔍  Tap to zoom';position:absolute;bottom:.6rem;right:.6rem;background:rgba(0,0,0,.55);color:#fff;font-size:.65rem;padding:.2rem .5rem;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .2s}
+.portrait-img-wrap:hover::after{opacity:1}
 /* Image Lightbox */
 #imgLightbox{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.95);align-items:center;justify-content:center;touch-action:none}
 #imgLightbox.open{display:flex}
