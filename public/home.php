@@ -185,15 +185,18 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   .poster-slide-card{width:calc(100% - 1rem)!important}
 }
 
-/* Poster: grid on mobile/tablet, slider on desktop */
-.poster-mobile-grid{display:none;grid-template-columns:repeat(2,1fr);gap:1rem}
-.poster-desktop-only{display:block}
+/* Poster: horizontal scroll snap on mobile (all counts), grid/slider on desktop */
+.poster-snap-scroll{display:none;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:.75rem;scrollbar-width:none}
+.poster-snap-scroll::-webkit-scrollbar{display:none}
+.poster-snap-item{flex-shrink:0;width:72vw;max-width:260px;scroll-snap-align:center}
+.poster-desktop-grid{display:none;gap:1rem 1.25rem}
 @media(max-width:1023px){
-  .poster-mobile-grid{display:grid}
-  .poster-desktop-only{display:none!important}
+  .poster-snap-scroll{display:flex}
+  .poster-desktop-grid,.poster-desktop-only{display:none!important}
 }
-@media(max-width:479px){
-  .poster-mobile-grid{grid-template-columns:1fr 1fr}
+@media(min-width:1024px){
+  .poster-snap-scroll{display:none!important}
+  .poster-desktop-grid{display:grid}
 }
 </style>
 </head>
@@ -238,77 +241,48 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
 
-    <?php if ($posterCount <= 3): ?>
-    <!-- 3 or fewer: simple grid — always grid -->
-    <div class="poster-grid" style="display:grid;grid-template-columns:repeat(<?= $posterCount ?>,1fr);gap:1rem 1.25rem;margin-bottom:3.5rem">
-
-      <?php foreach ($posters as $p):
+    <?php
+    // Build the poster card HTML as a reusable string
+    function posterCard(array $p): string {
         $hasTrailer = !empty($p['trailer']);
-      ?>
-      <div>
-        <div class="poster-card"
-          <?php if ($hasTrailer): ?>
-            style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
-          <?php else: ?>
-            style="cursor:default"
-          <?php endif; ?>>
-          <?php if ($p['url']): ?>
-            <img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy">
-          <?php else: ?>
-            <div class="poster-empty">
-              <svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-              <span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span>
-            </div>
-          <?php endif; ?>
-          <?php if ($hasTrailer): ?>
-          <div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
-          <div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div>
-          <?php else: ?>
-          <div class="poster-play-hint" style="border-color:rgba(255,255,255,.15)"><span style="color:rgba(255,255,255,.65)">Trailer Coming Soon</span></div>
-          <?php endif; ?>
-          <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
-        </div>
-      </div>
-      <?php endforeach; ?>
+        $img = $p['url']
+            ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="lazy">'
+            : '<div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div>';
+        $overlay = $hasTrailer
+            ? '<div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div>'
+            : '<div class="poster-play-hint" style="border-color:rgba(255,255,255,.15)"><span style="color:rgba(255,255,255,.65)">Trailer Coming Soon</span></div>';
+        $title = $p['title'] ? '<div class="poster-title-bar">'.htmlspecialchars($p['title']).'</div>' : '';
+        $attr = $hasTrailer
+            ? 'style="cursor:pointer" @click="openPlayer(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\' )"'
+            : 'style="cursor:default"';
+        return '<div class="poster-card" '.$attr.'>'.$img.$overlay.$title.'</div>';
+    }
+    ?>
 
+    <!-- MOBILE: horizontal scroll snap — works for any count, no orphan issues -->
+    <div class="poster-snap-scroll" style="margin-bottom:3.5rem">
+      <?php foreach ($posters as $p): ?>
+      <div class="poster-snap-item"><?= posterCard($p) ?></div>
+      <?php endforeach; ?>
     </div>
 
+    <!-- DESKTOP: grid ≤3, slider ≥4 -->
+    <?php if ($posterCount <= 3): ?>
+    <div class="poster-desktop-grid" style="grid-template-columns:repeat(<?= $posterCount ?>,1fr);margin-bottom:3.5rem">
+      <?php foreach ($posters as $p): ?>
+      <div><?= posterCard($p) ?></div>
+      <?php endforeach; ?>
+    </div>
     <?php else: ?>
-    <!-- 4+: grid on mobile/tablet, slider on desktop -->
-
-    <!-- MOBILE/TABLET GRID (hidden on desktop) -->
-    <div class="poster-mobile-grid" style="margin-bottom:3.5rem">
-      <?php foreach ($posters as $p): $hasTrailer = !empty($p['trailer']); ?>
-      <div>
-        <div class="poster-card"
-          <?php if ($hasTrailer): ?>
-            style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
-          <?php else: ?>style="cursor:default"<?php endif; ?>>
-          <?php if ($p['url']): ?><img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy"><?php else: ?><div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div><?php endif; ?>
-          <?php if ($hasTrailer): ?><div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div><?php else: ?><div class="poster-play-hint" style="border-color:rgba(255,255,255,.15)"><span style="color:rgba(255,255,255,.65)">Trailer Coming Soon</span></div><?php endif; ?>
-          <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
-        </div>
-      </div>
-      <?php endforeach; ?>
-    </div>
-
-    <!-- DESKTOP SLIDER (hidden on mobile/tablet) -->
     <div class="poster-slider poster-desktop-only" style="margin-bottom:3.5rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
       <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       </button>
       <div style="overflow:hidden">
         <div class="poster-track" :style="'transform:translateX(-'+offset+'px)'">
-          <?php foreach ($posters as $p): $hasTrailer = !empty($p['trailer']); ?>
+          <?php foreach ($posters as $p): ?>
           <div style="flex-shrink:0;width:calc((100% - 2rem) / 3)" class="poster-slide-card">
-            <div class="poster-card"
-              <?php if ($hasTrailer): ?>
-                style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
-              <?php else: ?>style="cursor:default"<?php endif; ?>>
-              <?php if ($p['url']): ?><img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy"><?php else: ?><div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div><?php endif; ?>
-              <?php if ($hasTrailer): ?><div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div><?php else: ?><div class="poster-play-hint" style="border-color:rgba(255,255,255,.15)"><span style="color:rgba(255,255,255,.65)">Trailer Coming Soon</span></div><?php endif; ?>
-              <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
-            </div>
+            <?= posterCard($p) ?>
           </div>
           <?php endforeach; ?>
         </div>
@@ -322,7 +296,6 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         </template>
       </div>
     </div>
-
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
