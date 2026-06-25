@@ -297,7 +297,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
           <span class="badge">Dialog</span>
           <span class="badge">Song</span>
         </div>
-        <a href="/actor" class="btn-black">Shoot &amp; Submit →</a>
+        <a href="/actor" class="btn-black">Click Here →</a>
       </div>
 
       <!-- DIRECTOR -->
@@ -309,7 +309,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
           <span class="badge">Scene Direction</span>
           <span class="badge">Pitch</span>
         </div>
-        <a href="/director" class="btn-black">Shoot &amp; Submit →</a>
+        <a href="/director" class="btn-black">Click Here →</a>
       </div>
 
       <!-- WRITER -->
@@ -320,7 +320,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <div class="role-badges">
           <span class="badge">Script Reading</span>
         </div>
-        <a href="/writer" class="btn-black">Shoot &amp; Submit →</a>
+        <a href="/writer" class="btn-black">Click Here →</a>
       </div>
 
     </div>

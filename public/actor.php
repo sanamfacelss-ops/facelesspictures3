@@ -47,9 +47,13 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .card-sec.tinted{background:#f9fafb}
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
-.preview-video{width:100%;display:block;background:#000;max-height:260px}
-.video-placeholder{width:100%;height:160px;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
-.portrait-img{width:100%;max-height:300px;object-fit:contain;background:#f3f4f6;display:block}
+.preview-video{width:100%;display:block;background:#000}
+.preview-video-wrap{position:relative;width:100%;padding-bottom:177.78%;background:#000;overflow:hidden}
+.preview-video-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
+.video-placeholder{width:100%;padding-bottom:177.78%;position:relative;background:#1a1a2e}
+.video-placeholder-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.portrait-img-wrap{position:relative;width:100%;padding-bottom:177.78%;overflow:hidden;background:#f3f4f6}
+.portrait-img-wrap img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
 .portrait-placeholder{width:100%;height:180px;background:#f3f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#9ca3af;font-size:.72rem}
 .btn-outline{display:inline-flex;align-items:center;gap:.35rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:border-color .15s,background .15s;white-space:nowrap}
 .btn-outline:hover{border-color:#111;background:#f9fafb}
@@ -136,11 +140,15 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
   <div class="brief-card">
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl): ?>
-        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+        <div class="preview-video-wrap">
+          <video controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+        </div>
       <?php else: ?>
         <div class="video-placeholder">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Preview video coming soon
+          <div class="video-placeholder-inner">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Preview video coming soon
+          </div>
         </div>
       <?php endif; ?>
     </div>
@@ -151,7 +159,9 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <?php if ($imageUrl): ?>
     <div class="card-sec" style="padding:0">
-      <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>" class="portrait-img">
+      <div class="portrait-img-wrap">
+        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
+      </div>
     </div>
     <?php endif; ?>
     <div class="card-sec">
