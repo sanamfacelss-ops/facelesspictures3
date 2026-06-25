@@ -93,13 +93,13 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 #lb-img-wrap.dragging{cursor:grabbing}
 #lb-img{max-width:100%;max-height:100%;display:block;transform-origin:center center;transition:transform .15s ease;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .portrait-placeholder{width:100%;height:180px;background:#f3f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#9ca3af;font-size:.72rem}
-.btn-outline{display:inline-flex;align-items:center;gap:.35rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:border-color .15s,background .15s;white-space:nowrap}
-.btn-outline:hover{border-color:#111;background:#f9fafb}
-.btn-outline.disabled{opacity:.45;pointer-events:none;cursor:not-allowed}
-.btn-tune{display:inline-flex;align-items:center;gap:.35rem;background:#111;color:#fff;border:none;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
-.btn-tune:hover{background:#333}
-.btn-tune:disabled{opacity:.45;cursor:not-allowed}
-.btn-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.btn-outline{display:flex;align-items:center;justify-content:center;gap:.5rem;background:#fff;border:2px solid #111;color:#111;border-radius:9px;padding:.7rem 1rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:background .15s,color .15s;white-space:nowrap;width:100%}
+.btn-outline:hover{background:#111;color:#fff}
+.btn-outline.disabled{opacity:.4;pointer-events:none;cursor:not-allowed;border-color:#d1d5db;color:#9ca3af}
+.btn-tune{display:flex;align-items:center;justify-content:center;gap:.5rem;background:#f59e0b;color:#fff;border:none;border-radius:9px;padding:.7rem 1rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap;width:100%}
+.btn-tune:hover{background:#d97706}
+.btn-tune:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{display:flex;flex-direction:column;gap:.625rem}
 .rule-row{display:flex;align-items:flex-start;gap:.4rem;font-size:.78rem;color:#374151;line-height:1.55;padding:.15rem 0}
 .rule-dot{width:3px;height:3px;border-radius:50%;background:#9ca3af;flex-shrink:0;margin-top:.55rem}
 #tuneModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:1.5rem}
@@ -251,14 +251,20 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <div class="btn-row">
         <?php if ($pdfUrl): ?>
           <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             <?= $isSong ? 'Download Lyrics PDF' : 'Download Script PDF' ?>
           </a>
         <?php else: ?>
-          <span class="btn-outline disabled"><?= $isSong ? 'Lyrics' : 'Script' ?> PDF not available yet</span>
+          <span class="btn-outline disabled">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <?= $isSong ? 'Lyrics' : 'Script' ?> PDF not available yet
+          </span>
         <?php endif; ?>
         <?php if ($isSong): ?>
-          <button type="button" class="btn-tune <?= $tuneUrl ? '' : 'disabled' ?>" <?= $tuneUrl ? 'onclick="openTuneModal(' . htmlspecialchars(json_encode($tuneUrl), ENT_QUOTES) . ')"' : 'disabled' ?>>▶ Get Tune</button>
+          <button type="button" class="btn-tune <?= $tuneUrl ? '' : 'disabled' ?>" <?= $tuneUrl ? 'onclick="openTuneModal(' . htmlspecialchars(json_encode($tuneUrl), ENT_QUOTES) . ')"' : 'disabled' ?>>
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            ▶ Get Tune
+          </button>
         <?php endif; ?>
       </div>
     </div>
