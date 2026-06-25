@@ -37,6 +37,8 @@ define('LOG_PATH', BASE_PATH . '/logs');
 // Session settings
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.gc_maxlifetime', (int)(($_ENV['SESSION_LIFETIME'] ?? getenv('SESSION_LIFETIME') ?: 120) * 60));
+    ini_set('session.cookie_httponly', '1');
+    ini_set('session.cookie_samesite', 'Lax');
     session_start();
 }
 

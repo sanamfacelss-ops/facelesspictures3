@@ -5747,7 +5747,7 @@ if (file_exists($errorLogFile)) {
                     fd.append('csrf_token', csrf);
                     fd.append('key', key);
                     fd.append('value', value);
-                    await fetch('/api/admin/settings/landing', {method:'POST', body: fd});
+                    await fetch('/api/admin/settings/landing', {method:'POST', body: fd, credentials: 'same-origin'});
                 }
                 this.saving = false; this.saved = true;
                 setTimeout(() => this.saved = false, 2500);
@@ -5773,9 +5773,11 @@ if (file_exists($errorLogFile)) {
                     fd.append('csrf_token', csrf);
                     fd.append('key', key);
                     fd.append('value', value);
-                    await fetch('/api/admin/settings/landing', {method:'POST', body: fd});
+                    await fetch('/api/admin/settings/landing', {method:'POST', body: fd, credentials: 'same-origin'});
                 }
                 this.saving = false; this.saved = true;
+                setTimeout(() => this.saved = false, 2500);
+            }
                 setTimeout(() => this.saved = false, 2500);
             }
         };
