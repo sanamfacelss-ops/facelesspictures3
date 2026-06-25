@@ -169,10 +169,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 .poster-play-hint{position:absolute;bottom:.75rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:.32rem .8rem;display:flex;align-items:center;gap:.35rem;pointer-events:none;z-index:3;white-space:nowrap}
 .poster-play-hint svg{width:10px;height:10px;fill:#fff;flex-shrink:0}
 .poster-play-hint span{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.9)}
-/* Desktop: hide badge, show hover overlay only */
-@media(hover:hover){
-  .poster-play-hint{display:none}
-}
+/* Badge always visible on all devices */
 /* Mobile/touch: hide big dark overlay, show badge only */
 @media(hover:none){
   .play-overlay{opacity:0!important;pointer-events:none}
