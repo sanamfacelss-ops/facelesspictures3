@@ -4064,6 +4064,7 @@ if (file_exists($errorLogFile)) {
                 // Uses a global bridge function so child Alpine components can set parent state
                 window.setScriptImage = (url) => {
                     this.scriptForm.image_url = url;
+                    if (window._adminDashboard) window._adminDashboard.scriptForm.image_url = url || '';
                 };
                 document.addEventListener('script-image-picked', e => {
                     this.scriptForm.image_url = e.detail.url;
@@ -4578,6 +4579,7 @@ if (file_exists($errorLogFile)) {
                 // Sync uploader previews via global bridge
                 if (typeof window.setScriptVideo === 'function') window.setScriptVideo(sc.preview_video_url || '');
                 if (typeof window.setScriptPdf   === 'function') window.setScriptPdf(sc.script_pdf_url || '');
+                if (typeof window.setScriptImage === 'function') window.setScriptImage(sc.image_url || '');
             },
             
             cancelEditScript() {
@@ -4590,8 +4592,10 @@ if (file_exists($errorLogFile)) {
             async createScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                Object.keys(this.scriptForm).forEach(k => {
-                    formData.append(k, this.scriptForm[k] ?? '');
+                // Always read from _adminDashboard to get latest uploader values
+                const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
+                Object.keys(form).forEach(k => {
+                    formData.append(k, form[k] ?? '');
                 });
                 try {
                     const res  = await fetch('/api/admin/scripts/create', { method: 'POST', body: formData });
@@ -4631,8 +4635,10 @@ if (file_exists($errorLogFile)) {
             async updateScript() {
                 const formData = new FormData();
                 formData.append('csrf_token', this.csrf);
-                Object.keys(this.scriptForm).forEach(k => {
-                    formData.append(k, this.scriptForm[k] ?? '');
+                // Always read from _adminDashboard to get latest uploader values
+                const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
+                Object.keys(form).forEach(k => {
+                    formData.append(k, form[k] ?? '');
                 });
                 try {
                     const res  = await fetch('/api/admin/scripts/update/' + this.editingScript, { method: 'POST', body: formData });
