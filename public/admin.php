@@ -4012,6 +4012,7 @@ if (file_exists($errorLogFile)) {
             csrf: '<?= csrf_token() ?>',
             
             init() {
+                window._adminDashboard = this;
                 window.addEventListener('resize', () => {
                     this.sidebarCollapsed = window.innerWidth < 1024;
                 });
@@ -5450,14 +5451,15 @@ if (file_exists($errorLogFile)) {
                 window.setScriptVideo = (url) => {
                     this.preview  = url || null;
                     this.filename = url ? url.split('/').pop() : '';
-                    if (typeof window._adminDashboard !== 'undefined') window._adminDashboard.scriptForm.preview_video_url = url;
+                    if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = url || '';
                 };
             },
             onDrop(e){ this.dragging=false; const f=e.dataTransfer?.files?.[0]; if(f) this.upload(f); },
             onFile(e){ const f=e.target.files?.[0]; if(f) this.upload(f); },
             clear(){
                 this.preview=null; this.filename=''; this.uploadError='';
-                if(typeof window.setScriptVideo==='function') window.setScriptVideo('');
+                if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = '';
+                this.preview=null; this.filename='';
             },
             upload(file){
                 const allowed=['video/mp4','video/quicktime','video/webm'];
@@ -5478,7 +5480,7 @@ if (file_exists($errorLogFile)) {
                         const r=JSON.parse(xhr.responseText);
                         if(r.success){
                             this.preview=r.url; this.filename=r.url.split('/').pop();
-                            if(typeof window.setScriptVideo==='function') window.setScriptVideo(r.url);
+                            if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = r.url;
                         }else{this.uploadError=r.error||'Upload failed.'; this.preview=null;}
                     }catch(e){this.uploadError='Server error.'; this.preview=null;}
                 };
@@ -5496,14 +5498,14 @@ if (file_exists($errorLogFile)) {
                 window.setScriptPdf = (url) => {
                     this.preview  = url || null;
                     this.filename = url ? url.split('/').pop() : '';
-                    if (typeof window._adminDashboard !== 'undefined') window._adminDashboard.scriptForm.script_pdf_url = url;
+                    if (window._adminDashboard) window._adminDashboard.scriptForm.script_pdf_url = url || '';
                 };
             },
             onDrop(e){ this.dragging=false; const f=e.dataTransfer?.files?.[0]; if(f) this.upload(f); },
             onFile(e){ const f=e.target.files?.[0]; if(f) this.upload(f); },
             clear(){
                 this.preview=null; this.filename=''; this.uploadError='';
-                if(typeof window.setScriptPdf==='function') window.setScriptPdf('');
+                if (window._adminDashboard) window._adminDashboard.scriptForm.script_pdf_url = '';
             },
             upload(file){
                 if(file.type!=='application/pdf'&&!file.name.endsWith('.pdf')){
@@ -5522,7 +5524,7 @@ if (file_exists($errorLogFile)) {
                         const r=JSON.parse(xhr.responseText);
                         if(r.success){
                             this.preview=r.url; this.filename=r.url.split('/').pop();
-                            if(typeof window.setScriptPdf==='function') window.setScriptPdf(r.url);
+                            if (window._adminDashboard) window._adminDashboard.scriptForm.script_pdf_url = r.url;
                         }else{this.uploadError=r.error||'Upload failed.';}
                     }catch(e){this.uploadError='Server error.';}
                 };
