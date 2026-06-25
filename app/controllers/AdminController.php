@@ -2148,6 +2148,9 @@ class AdminController
     }
 
     // ==================== PUBLIC SUBMISSIONS ====================
+
+    /**
+     * List all public (guest) submissions with optional filters
      * GET /api/admin/submissions?role=actor&status=new&search=john
      */
     public function listSubmissions(): void
