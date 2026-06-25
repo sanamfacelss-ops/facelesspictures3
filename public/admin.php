@@ -1,7 +1,7 @@
 ﻿<?php
 require_once __DIR__ . '/../app/config/config.php';
 
-if (!is_admin()) redirect('/dashboard');
+if (!is_admin()) redirect('/login');
 
 // Load models and data
 $videoModel = new App\Models\Video();
@@ -1596,34 +1596,6 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                             <p x-show="ytUrl && !isYoutube(ytUrl)" class="text-[11px] text-red-500 mt-1">Please enter a valid YouTube URL</p>
                                         </div>
-                                        <p class="text-[11px] text-dark/30 mt-1">Shown as the top video on the public script card</p>
-                                    </div>
-                                            style="min-height:72px"
-                                            @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                            @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
-                                            <input type="file" x-ref="vidPick" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
-                                            <template x-if="!preview&&!uploading">
-                                                <div class="flex flex-col items-center justify-center gap-1.5 p-3 text-center">
-                                                    <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                                    <p class="text-[11px] text-dark/40">Upload mock/preview video</p>
-                                                    <p class="text-[10px] text-dark/25">MP4 · MOV · WEBM · max 500 MB</p>
-                                                </div>
-                                            </template>
-                                            <template x-if="uploading">
-                                                <div class="flex flex-col items-center justify-center gap-2 p-3">
-                                                    <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div>
-                                                    <p class="text-[11px] text-dark/40" x-text="progress+'%'"></p>
-                                                </div>
-                                            </template>
-                                            <template x-if="preview&&!uploading">
-                                                <div class="flex items-center gap-2 px-3 py-2">
-                                                    <div class="w-7 h-7 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-3.5 h-3.5 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-                                                    <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'Video uploaded'"></p>
-                                                    <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
-                                                </div>
-                                            </template>
-                                        </div>
-                                        <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
                                         <p class="text-[11px] text-dark/30 mt-1">Shown as the top video on the public script card</p>
                                     </div>
 
@@ -5522,12 +5494,13 @@ if (file_exists($errorLogFile)) {
                 return url;
             },
             onYtInput() {
+                // Always write current ytUrl to scriptForm so it gets saved
+                if (window._adminDashboard) {
+                    window._adminDashboard.scriptForm.preview_video_url = this.ytUrl || '';
+                }
                 // Clear any uploaded file when a YouTube URL is set
-                if (this.ytUrl && this.isYoutube(this.ytUrl)) {
+                if (this.ytUrl) {
                     this.preview = null; this.filename = '';
-                    if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = this.ytUrl;
-                } else if (!this.ytUrl) {
-                    if (window._adminDashboard) window._adminDashboard.scriptForm.preview_video_url = '';
                 }
             },
             clearYt() {
