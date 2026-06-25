@@ -266,6 +266,14 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <div class="sec-label">Rules &amp; Limits</div>
       <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
     </div>
+    <div class="card-sec" style="padding:.875rem 1.125rem">
+      <a href="#submit-form" onclick="document.getElementById('submit-form').scrollIntoView({behavior:'smooth'});return false;"
+        style="display:flex;align-items:center;justify-content:center;gap:.45rem;width:100%;background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.8rem 1.25rem;font-size:.85rem;cursor:pointer;text-decoration:none;font-family:inherit;letter-spacing:.01em;transition:background .15s"
+        onmouseover="this.style.background='#333'" onmouseout="this.style.background='#111'">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+        I'm Ready to Upload →
+      </a>
+    </div>
   </div>
 <?php
 }
@@ -290,7 +298,7 @@ if (!empty($songScripts)) {
 
 <!-- SUBMISSION CARD (full width, dark) -->
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
-  <div class="submit-card" x-data="actorSubmit()">
+  <div class="submit-card" id="submit-form" x-data="actorSubmit()">
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Audition? Submit Both Videos</p>
     <p style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem;line-height:1.55">Both dialog and song videos are required for a complete submission. One form, two videos, one chance.</p>
 
