@@ -48,14 +48,14 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000}
-/* 9:16 media container — full card width, capped height, NO side bars */
+/* 9:16 media container — full card width, capped height, video fully visible (no crop) */
 .media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;max-height:min(177.78vw,520px);position:relative}
-/* local video: cover fill */
-.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}
-/* YouTube iframe: scale up 16:9 iframe to fill 9:16 box — scale factor = 16/9 ÷ 9/16 = 256/81 ≈ 3.16 */
-.media-9-16 iframe{position:absolute;top:50%;left:50%;width:316%;height:316%;transform:translate(-50%,-50%);border:0;display:block;pointer-events:auto}
-/* image: cover fill */
-.media-9-16 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}
+/* local video: contain — show full video, no crop */
+.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;border:0;background:#000}
+/* YouTube iframe: natural 16:9 inside 9:16 container — centred, no scale */
+.media-9-16 iframe{position:absolute;top:50%;left:50%;width:100%;height:56.25%;transform:translateY(-50%) translateX(-50%);border:0;display:block}
+/* image: contain — show full image, no crop */
+.media-9-16 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;border:0;background:#f3f4f6}
 /* placeholder inside 9:16 box */
 .media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
 /* Overlapping audition type badge */
@@ -79,9 +79,9 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn:hover{opacity:1}
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
-/* 9:16 script image — full card width, no bars */
+/* 9:16 script image — full card width, full image visible */
 .portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;max-height:min(177.78vw,520px);background:#f3f4f6;position:relative}
-.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
 @media(max-width:768px){
   /* on mobile keep the same — already full width */
 }
