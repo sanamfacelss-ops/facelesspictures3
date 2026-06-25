@@ -170,6 +170,17 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   .poster-slider{padding:0 16px!important}
   .poster-slide-card{width:calc(100% - 1rem)!important}
 }
+
+/* Poster: grid on mobile/tablet, slider on desktop */
+.poster-mobile-grid{display:none;grid-template-columns:repeat(2,1fr);gap:1rem}
+.poster-desktop-only{display:block}
+@media(max-width:1023px){
+  .poster-mobile-grid{display:grid}
+  .poster-desktop-only{display:none!important}
+}
+@media(max-width:479px){
+  .poster-mobile-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 
@@ -202,7 +213,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <!-- ══ HERO HEADLINE — centered ══ -->
     <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
       <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.875rem">Auditions Now Open</p>
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,5.5vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
         <?= htmlspecialchars($heroHeadline) ?>
       </h1>
       <p style="font-size:.95rem;color:#6b7280;margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
@@ -213,32 +224,21 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <div class="py-10 sm:py-12">
 
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
-    <p class="section-label">Now Showing</p>
 
     <?php if ($posterCount <= 3): ?>
-    <!-- 3 or fewer: simple grid -->
+    <!-- 3 or fewer: simple grid — always grid -->
     <div class="poster-grid" style="display:grid;grid-template-columns:repeat(<?= $posterCount ?>,1fr);gap:1rem 1.25rem;margin-bottom:3.5rem">
-    <?php else: ?>
-    <!-- 4+ on desktop: slider -->
-    <div class="poster-slider" style="margin-bottom:3.5rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
-      <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-      </button>
-      <div style="overflow:hidden">
-        <div class="poster-track" :style="'transform:translateX(-'+offset+'px)'">
-    <?php endif; ?>
 
       <?php foreach ($posters as $p):
         $hasTrailer = !empty($p['trailer']);
       ?>
-      <div style="flex-shrink:0;width:<?= $posterCount > 3 ? 'calc((100% - 2rem) / 3)' : 'auto' ?>" class="<?= $posterCount > 3 ? 'poster-slide-card' : '' ?>">
+      <div>
         <div class="poster-card"
           <?php if ($hasTrailer): ?>
             style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
           <?php else: ?>
             style="cursor:default"
           <?php endif; ?>>
-
           <?php if ($p['url']): ?>
             <img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy">
           <?php else: ?>
@@ -247,34 +247,57 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
               <span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span>
             </div>
           <?php endif; ?>
-
           <?php if ($hasTrailer): ?>
-          <div class="play-overlay">
-            <div class="play-circle">
-              <svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
+          <div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
           <?php else: ?>
-          <!-- No trailer: show subtle badge on hover -->
-          <div class="play-overlay" style="cursor:default" onclick="return false;">
-            <div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem">
-              <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg>
-              <span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span>
-            </div>
-          </div>
+          <div class="play-overlay" style="cursor:default" onclick="return false;"><div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem"><svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg><span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span></div></div>
           <?php endif; ?>
-
-          <?php if ($p['title']): ?>
-          <div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div>
-          <?php endif; ?>
+          <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
         </div>
       </div>
       <?php endforeach; ?>
 
-    <?php if ($posterCount <= 3): ?>
     </div>
+
     <?php else: ?>
-        </div><!-- /poster-track -->
+    <!-- 4+: grid on mobile/tablet, slider on desktop -->
+
+    <!-- MOBILE/TABLET GRID (hidden on desktop) -->
+    <div class="poster-mobile-grid" style="margin-bottom:3.5rem">
+      <?php foreach ($posters as $p): $hasTrailer = !empty($p['trailer']); ?>
+      <div>
+        <div class="poster-card"
+          <?php if ($hasTrailer): ?>
+            style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
+          <?php else: ?>style="cursor:default"<?php endif; ?>>
+          <?php if ($p['url']): ?><img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy"><?php else: ?><div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div><?php endif; ?>
+          <?php if ($hasTrailer): ?><div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><?php else: ?><div class="play-overlay" style="cursor:default" onclick="return false;"><div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span></div></div><?php endif; ?>
+          <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <!-- DESKTOP SLIDER (hidden on mobile/tablet) -->
+    <div class="poster-slider poster-desktop-only" style="margin-bottom:3.5rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
+      <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div style="overflow:hidden">
+        <div class="poster-track" :style="'transform:translateX(-'+offset+'px)'">
+          <?php foreach ($posters as $p): $hasTrailer = !empty($p['trailer']); ?>
+          <div style="flex-shrink:0;width:calc((100% - 2rem) / 3)" class="poster-slide-card">
+            <div class="poster-card"
+              <?php if ($hasTrailer): ?>
+                style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
+              <?php else: ?>style="cursor:default"<?php endif; ?>>
+              <?php if ($p['url']): ?><img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy"><?php else: ?><div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div><?php endif; ?>
+              <?php if ($hasTrailer): ?><div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><?php else: ?><div class="play-overlay" style="cursor:default" onclick="return false;"><div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem"><span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span></div></div><?php endif; ?>
+              <?php if ($p['title']): ?><div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div><?php endif; ?>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
       </div>
       <button class="slider-btn next" @click="next()" x-show="canNext" x-cloak aria-label="Next">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -284,7 +307,8 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
           <div class="slider-dot" :class="i===currentPage?'active':''" @click="goTo(i)"></div>
         </template>
       </div>
-    </div><!-- /poster-slider -->
+    </div>
+
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
