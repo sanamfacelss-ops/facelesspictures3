@@ -159,6 +159,17 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 /* NO-TRAILER TOAST */
 #fp-no-trailer-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;font-size:.8rem;font-weight:600;padding:.6rem 1.25rem;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:500;white-space:nowrap;display:flex;align-items:center;gap:.5rem}
 #fp-no-trailer-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* FOOTER */
+.fp-footer{background:#111;color:#fff;padding:2.5rem 1rem}
+
+/* MOBILE */
+@media(max-width:639px){
+  .poster-grid{grid-template-columns:1fr 1fr!important}
+  .role-cards-grid{grid-template-columns:1fr!important}
+  .poster-slider{padding:0 16px!important}
+  .poster-slide-card{width:calc(100% - 1rem)!important}
+}
 </style>
 </head>
 
@@ -206,7 +217,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 
     <?php if ($posterCount <= 3): ?>
     <!-- 3 or fewer: simple grid -->
-    <div style="display:grid;grid-template-columns:repeat(<?= $posterCount ?>,1fr);gap:1rem 1.25rem;margin-bottom:3.5rem">
+    <div class="poster-grid" style="display:grid;grid-template-columns:repeat(<?= $posterCount ?>,1fr);gap:1rem 1.25rem;margin-bottom:3.5rem">
     <?php else: ?>
     <!-- 4+ on desktop: slider -->
     <div class="poster-slider" style="margin-bottom:3.5rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
@@ -220,7 +231,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
       <?php foreach ($posters as $p):
         $hasTrailer = !empty($p['trailer']);
       ?>
-      <div style="flex-shrink:0;width:<?= $posterCount > 3 ? 'calc((100% - 2rem) / 3)' : 'auto' ?>">
+      <div style="flex-shrink:0;width:<?= $posterCount > 3 ? 'calc((100% - 2rem) / 3)' : 'auto' ?>" class="<?= $posterCount > 3 ? 'poster-slide-card' : '' ?>">
         <div class="poster-card"
           <?php if ($hasTrailer): ?>
             style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
@@ -286,7 +297,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <?= htmlspecialchars($rolesSubheading) ?>
       </p>
     </div>
-    <div class="grid grid-cols-3 gap-4 sm:gap-6">
+    <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6">
 
       <!-- ACTOR -->
       <div class="role-card">
@@ -663,9 +674,10 @@ function homePage() {
 }
 
 function posterSlider(total) {
-    const perPage = 3;
+    const perPage = window.innerWidth < 640 ? 1 : 3;
     return {
-        total, perPage,
+        total,
+        perPage: window.innerWidth < 640 ? 1 : 3,
         currentPage: 0,
         offset: 0,
         get pages()   { return Math.ceil(this.total / this.perPage); },
@@ -682,7 +694,6 @@ function posterSlider(total) {
             if (!track) return;
             const card = track.children[0];
             if (!card) return;
-            // Use actual rendered card width + gap (16px)
             const style = window.getComputedStyle(track);
             const gap = parseFloat(style.gap) || 16;
             const cardW = card.getBoundingClientRect().width + gap;

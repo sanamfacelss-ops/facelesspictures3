@@ -78,12 +78,19 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn:hover{opacity:1}
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
-/* 9:16 script image — contain so full script text is readable, white bg */
-.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;background:#fff;position:relative;border-top:1px solid #f0f0f0}
+/* 9:16 script image — contain so full script text is readable, white bg — clickable for lightbox */
+.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;background:#fff;position:relative;border-top:1px solid #f0f0f0;cursor:zoom-in}
 .portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;background:#fff}
-@media(max-width:768px){
-  /* on mobile keep the same — already full width */
-}
+.portrait-img-wrap:hover::after{content:'🔍';position:absolute;bottom:.6rem;right:.6rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;padding:.25rem .5rem;border-radius:6px;pointer-events:none}
+/* Image Lightbox */
+#imgLightbox{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.95);align-items:center;justify-content:center;touch-action:none}
+#imgLightbox.open{display:flex}
+#imgLightbox .lb-close{position:absolute;top:1rem;right:1rem;width:40px;height:40px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .2s}
+#imgLightbox .lb-close:hover{background:rgba(255,255,255,.24)}
+#imgLightbox .lb-hint{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.65rem;color:rgba(255,255,255,.4);letter-spacing:.06em;text-transform:uppercase;pointer-events:none;white-space:nowrap}
+#lb-img-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:grab}
+#lb-img-wrap.dragging{cursor:grabbing}
+#lb-img{max-width:100%;max-height:100%;display:block;transform-origin:center center;transition:transform .15s ease;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .portrait-placeholder{width:100%;height:180px;background:#f3f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#9ca3af;font-size:.72rem}
 .btn-outline{display:inline-flex;align-items:center;gap:.35rem;background:#fff;border:1.5px solid #e5e7eb;color:#374151;border-radius:8px;padding:.42rem .825rem;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;transition:border-color .15s,background .15s;white-space:nowrap}
 .btn-outline:hover{border-color:#111;background:#f9fafb}
@@ -146,7 +153,7 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 <!-- HERO -->
 <section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
   <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Auditions Now Open</p>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap">ACTOR AUDITIONS</h1>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem">ACTOR AUDITIONS</h1>
   <p style="color:#6b7280;font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.55">Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.</p>
 </section>
 
@@ -234,7 +241,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <?php if ($imageUrl): ?>
     <div class="card-sec" style="padding:0">
-      <div class="portrait-img-wrap">
+      <div class="portrait-img-wrap" onclick="openImgLightbox('<?= addslashes(htmlspecialchars($imageUrl)) ?>')">
         <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
       </div>
     </div>
@@ -473,6 +480,138 @@ function actorSubmit(){
     };
 }
 </script>
+<!-- IMAGE LIGHTBOX -->
+<div id="imgLightbox" role="dialog" aria-modal="true" aria-label="Script image viewer">
+  <button class="lb-close" onclick="closeImgLightbox()" aria-label="Close">✕</button>
+  <div id="lb-img-wrap">
+    <img id="lb-img" src="" alt="Script image">
+  </div>
+  <p class="lb-hint">Pinch or scroll to zoom · Drag to pan · Esc to close</p>
+</div>
+
+<script>
+// ── Image Lightbox with pinch-zoom (mobile) + scroll-zoom (desktop) + drag-to-pan ──
+(function(){
+  var lb=document.getElementById('imgLightbox');
+  var wrap=document.getElementById('lb-img-wrap');
+  var img=document.getElementById('lb-img');
+  var scale=1, minScale=1, maxScale=5;
+  var tx=0, ty=0;
+  var dragging=false, lastX=0, lastY=0;
+  // Pinch state
+  var initDist=0, initScale=1;
+  var initMidX=0, initMidY=0;
+  var initTx=0, initTy=0;
+
+  window.openImgLightbox = function(src) {
+    img.src = src;
+    scale=1; tx=0; ty=0;
+    applyTransform();
+    lb.classList.add('open');
+    document.body.style.overflow='hidden';
+    img.onload = function(){ minScale=1; };
+  };
+  window.closeImgLightbox = function() {
+    lb.classList.remove('open');
+    document.body.style.overflow='';
+    img.src='';
+  };
+
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') window.closeImgLightbox(); });
+  lb.addEventListener('click', function(e){ if(e.target===lb||e.target===wrap) window.closeImgLightbox(); });
+
+  function applyTransform() {
+    img.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
+  }
+  function clampPan() {
+    var r = wrap.getBoundingClientRect();
+    var iw = img.naturalWidth || img.offsetWidth;
+    var ih = img.naturalHeight || img.offsetHeight;
+    var sw = iw * scale; var sh = ih * scale;
+    var maxTx = Math.max(0, (sw - r.width) / 2);
+    var maxTy = Math.max(0, (sh - r.height) / 2);
+    tx = Math.max(-maxTx, Math.min(maxTx, tx));
+    ty = Math.max(-maxTy, Math.min(maxTy, ty));
+  }
+
+  // Desktop scroll-to-zoom
+  wrap.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = e.deltaY > 0 ? -0.15 : 0.15;
+    scale = Math.max(minScale, Math.min(maxScale, scale + delta));
+    if (scale === minScale) { tx=0; ty=0; }
+    clampPan();
+    applyTransform();
+  }, { passive: false });
+
+  // Desktop drag-to-pan
+  wrap.addEventListener('mousedown', function(e) {
+    if (scale <= 1) return;
+    dragging=true; lastX=e.clientX; lastY=e.clientY;
+    wrap.classList.add('dragging');
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    tx += e.clientX - lastX; ty += e.clientY - lastY;
+    lastX=e.clientX; lastY=e.clientY;
+    clampPan(); applyTransform();
+  });
+  document.addEventListener('mouseup', function() {
+    dragging=false; wrap.classList.remove('dragging');
+  });
+
+  // Mobile pinch-to-zoom + drag-to-pan
+  wrap.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      // Pinch start
+      e.preventDefault();
+      var t1=e.touches[0], t2=e.touches[1];
+      initDist = Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY);
+      initScale = scale;
+      initMidX = (t1.clientX+t2.clientX)/2;
+      initMidY = (t1.clientY+t2.clientY)/2;
+      initTx = tx; initTy = ty;
+    } else if (e.touches.length === 1 && scale > 1) {
+      // Pan start
+      dragging=true; lastX=e.touches[0].clientX; lastY=e.touches[0].clientY;
+    }
+  }, { passive: false });
+
+  wrap.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (e.touches.length === 2) {
+      var t1=e.touches[0], t2=e.touches[1];
+      var dist = Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY);
+      scale = Math.max(minScale, Math.min(maxScale, initScale * (dist / initDist)));
+      if (scale === minScale) { tx=0; ty=0; }
+      clampPan(); applyTransform();
+    } else if (e.touches.length === 1 && dragging) {
+      tx += e.touches[0].clientX - lastX;
+      ty += e.touches[0].clientY - lastY;
+      lastX=e.touches[0].clientX; lastY=e.touches[0].clientY;
+      clampPan(); applyTransform();
+    }
+  }, { passive: false });
+
+  wrap.addEventListener('touchend', function(e) {
+    if (e.touches.length < 2) dragging = false;
+  });
+
+  // Double-tap to zoom in/out on mobile
+  var lastTap = 0;
+  wrap.addEventListener('touchend', function(e) {
+    var now = Date.now();
+    if (now - lastTap < 300) {
+      scale = scale > 1 ? minScale : 2.5;
+      if (scale === minScale) { tx=0; ty=0; }
+      clampPan(); applyTransform();
+    }
+    lastTap = now;
+  });
+})();
+</script>
+
 <?php require_once __DIR__ . '/partials/submission-shared.php'; ?>
 </body>
 </html>
