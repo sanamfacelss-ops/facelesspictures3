@@ -72,7 +72,7 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 <nav class="fp-nav">
   <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:space-between">
     <a href="/" style="display:flex;align-items:center;gap:7px;text-decoration:none">
-      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:30px;width:auto">
+      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:44px;width:auto">
       <?php else: ?><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span><span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span><?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem;align-items:center">
@@ -192,7 +192,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 <footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1.5rem;background:#fff">
   <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem">
     <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none">
-      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:26px;width:auto">
+      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:36px;width:auto">
       <?php else: ?><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span><span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:17px;height:17px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span><?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem">

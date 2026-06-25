@@ -150,14 +150,15 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 .slider-btn{position:absolute;top:50%;transform:translateY(-60%);width:36px;height:36px;background:#fff;border:1px solid #e5e7eb;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,.12);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:box-shadow .2s,background .2s}
 .slider-btn:hover{background:#f9fafb;box-shadow:0 4px 16px rgba(0,0,0,.16)}
 .slider-btn svg{width:16px;height:16px;color:#374151}
-.slider-btn.prev{left:-18px}
-.slider-btn.next{right:-18px}
+.slider-btn.prev{left:0}
+.slider-btn.next{right:0}
 .slider-dots{display:flex;justify-content:center;gap:.4rem;margin-top:.75rem}
 .slider-dot{width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s,width .2s;cursor:pointer}
 .slider-dot.active{background:#111;width:16px;border-radius:3px}
 
-/* FOOTER */
-.fp-footer{background:#111;color:#fff;padding:2.5rem 1rem}
+/* NO-TRAILER TOAST */
+#fp-no-trailer-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;font-size:.8rem;font-weight:600;padding:.6rem 1.25rem;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:500;white-space:nowrap;display:flex;align-items:center;gap:.5rem}
+#fp-no-trailer-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 
@@ -168,7 +169,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   <div class="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
     <a href="/" class="nav-logo">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:32px;width:auto">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:44px;width:auto">
       <?php else: ?>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
         <span class="nav-badge">3</span>
@@ -201,14 +202,14 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     <div class="py-10 sm:py-12">
 
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
-    <p class="section-label">Now Showing — Auditions Open</p>
+    <p class="section-label">Now Showing</p>
 
     <?php if ($posterCount <= 3): ?>
     <!-- 3 or fewer: simple grid -->
     <div style="display:grid;grid-template-columns:repeat(<?= $posterCount ?>,1fr);gap:1rem 1.25rem;margin-bottom:3.5rem">
     <?php else: ?>
     <!-- 4+ on desktop: slider -->
-    <div class="poster-slider" style="margin-bottom:3.5rem;overflow:hidden;padding:0 4px" x-data="posterSlider(<?= $posterCount ?>)">
+    <div class="poster-slider" style="margin-bottom:3.5rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
       <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       </button>
@@ -219,9 +220,13 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
       <?php foreach ($posters as $p):
         $hasTrailer = !empty($p['trailer']);
       ?>
-      <div style="flex-shrink:0;width:<?= $posterCount > 3 ? 'calc((100% / 3.2))' : 'auto' ?>">
+      <div style="flex-shrink:0;width:<?= $posterCount > 3 ? 'calc((100% - 2rem) / 3)' : 'auto' ?>">
         <div class="poster-card"
-          <?= $hasTrailer ? 'style="cursor:pointer" @click="openPlayer(\'' . addslashes(htmlspecialchars($p['trailer'])) . '\',\'' . addslashes(htmlspecialchars($p['title'])) . '\')"' : 'style="cursor:default"' ?>>
+          <?php if ($hasTrailer): ?>
+            style="cursor:pointer" @click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')"
+          <?php else: ?>
+            style="cursor:default"
+          <?php endif; ?>>
 
           <?php if ($p['url']): ?>
             <img src="<?= htmlspecialchars($p['url']) ?>" alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" loading="lazy">
@@ -238,16 +243,20 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
               <svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
           </div>
+          <?php else: ?>
+          <!-- No trailer: show subtle badge on hover -->
+          <div class="play-overlay" style="cursor:default" onclick="return false;">
+            <div style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:.35rem .75rem;display:flex;align-items:center;gap:.4rem">
+              <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg>
+              <span style="font-size:.65rem;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Trailer Coming Soon</span>
+            </div>
+          </div>
           <?php endif; ?>
 
           <?php if ($p['title']): ?>
           <div class="poster-title-bar"><?= htmlspecialchars($p['title']) ?></div>
           <?php endif; ?>
         </div>
-        <a href="/actor" class="btn-black" style="margin-top:.625rem">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-          Audition for this film
-        </a>
       </div>
       <?php endforeach; ?>
 
@@ -348,7 +357,7 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
     <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:6px">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:28px;width:auto;filter:brightness(10)">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:36px;width:auto;filter:brightness(10)">
       <?php else: ?>
         FACELESS PICTURES
         <span style="background:#fff;color:#111;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
@@ -524,7 +533,16 @@ function homePage() {
         },
 
         openPlayer(src, title) {
-            if (!src) return;
+            if (!src || src.trim() === '') {
+                // No trailer set — show a gentle toast instead of silently doing nothing
+                const toast = document.getElementById('fp-no-trailer-toast');
+                if (toast) {
+                    toast.classList.add('show');
+                    clearTimeout(toast._t);
+                    toast._t = setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+                return;
+            }
             this.playerSrc   = src;
             this.playerTitle = title || '';
             this.playerOpen  = true;
@@ -660,17 +678,24 @@ function posterSlider(total) {
         prev() { if (this.canPrev) { this.currentPage--; this._update(); } },
         next() { if (this.canNext) { this.currentPage++; this._update(); } },
         _update() {
-            // Each card width + gap; measure from DOM
             const track = document.querySelector('.poster-track');
             if (!track) return;
             const card = track.children[0];
             if (!card) return;
-            const cardW = card.offsetWidth + 16; // 16px gap
+            // Use actual rendered card width + gap (16px)
+            const style = window.getComputedStyle(track);
+            const gap = parseFloat(style.gap) || 16;
+            const cardW = card.getBoundingClientRect().width + gap;
             this.offset = this.currentPage * this.perPage * cardW;
         }
     };
 }
 </script>
+<!-- NO-TRAILER TOAST -->
+<div id="fp-no-trailer-toast">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>
+  Trailer not available yet
+</div>
 
 </body>
 </html>
