@@ -185,17 +185,18 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   .poster-slide-card{width:calc(100% - 1rem)!important}
 }
 
-/* Poster: horizontal scroll snap on mobile (all counts), grid/slider on desktop */
-.poster-snap-scroll{display:none;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:.75rem;scrollbar-width:none}
-.poster-snap-scroll::-webkit-scrollbar{display:none}
-.poster-snap-item{flex-shrink:0;width:72vw;max-width:260px;scroll-snap-align:center}
+/* Poster: grid on mobile/tablet, grid/slider on desktop */
+/* Mobile grid — 2 cols, last item centered if odd count */
+.poster-snap-scroll{display:none!important}
+.poster-mobile-grid{display:none;grid-template-columns:1fr 1fr;gap:1rem}
+.poster-mobile-grid .poster-last-odd{grid-column:1/-1;max-width:calc(50% - .5rem);margin:0 auto;width:100%}
 .poster-desktop-grid{display:none;gap:1rem 1.25rem}
 @media(max-width:1023px){
-  .poster-snap-scroll{display:flex}
+  .poster-mobile-grid{display:grid}
   .poster-desktop-grid,.poster-desktop-only{display:none!important}
 }
 @media(min-width:1024px){
-  .poster-snap-scroll{display:none!important}
+  .poster-mobile-grid{display:none!important}
   .poster-desktop-grid{display:grid}
 }
 </style>
@@ -259,10 +260,10 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     }
     ?>
 
-    <!-- MOBILE: horizontal scroll snap — works for any count, no orphan issues -->
-    <div class="poster-snap-scroll" style="margin-bottom:3.5rem">
-      <?php foreach ($posters as $p): ?>
-      <div class="poster-snap-item"><?= posterCard($p) ?></div>
+    <!-- MOBILE: 2-col grid, last item centered if odd -->
+    <div class="poster-mobile-grid" style="margin-bottom:3.5rem">
+      <?php $total = count($posters); foreach ($posters as $i => $p): $isLastOdd = ($total % 2 === 1) && ($i === $total - 1); ?>
+      <div class="<?= $isLastOdd ? 'poster-last-odd' : '' ?>"><?= posterCard($p) ?></div>
       <?php endforeach; ?>
     </div>
 
