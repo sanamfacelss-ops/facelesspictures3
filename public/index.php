@@ -31,16 +31,18 @@ if (preg_match('/^uploads\/(.+)$/', $uri, $matches)) {
     
     if (file_exists($filePath) && is_file($filePath)) {
         // Get MIME type
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION));
         $mimeTypes = [
-            'mp4' => 'video/mp4',
+            'mp4'  => 'video/mp4',
             'webm' => 'video/webm',
-            'mov' => 'video/quicktime',
-            'avi' => 'video/x-msvideo',
-            'jpg' => 'image/jpeg',
+            'mov'  => 'video/quicktime',
+            'avi'  => 'video/x-msvideo',
+            'jpg'  => 'image/jpeg',
             'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'gif' => 'image/gif',
+            'png'  => 'image/png',
+            'gif'  => 'image/gif',
+            'webp' => 'image/webp',
+            'pdf'  => 'application/pdf',
         ];
         $mime = $mimeTypes[$ext] ?? 'application/octet-stream';
         
@@ -190,6 +192,7 @@ $routes = [
     'api/admin/scripts/create' => [AdminController::class, 'createScript', 'POST'],
     'api/admin/scripts/update/{id}' => [AdminController::class, 'updateScript', 'POST'],
     'api/admin/scripts/delete/{id}' => [AdminController::class, 'deleteScript', 'POST'],
+    'api/admin/run-migrations' => [AdminController::class, 'runMigrations', 'POST'],
     'api/admin/seasons/create' => [AdminController::class, 'createSeason', 'POST'],
     'api/admin/seasons/update/{id}' => [AdminController::class, 'updateSeason', 'POST'],
     'api/admin/users/delete/{id}' => [AdminController::class, 'deleteUser', 'POST'],

@@ -2971,6 +2971,34 @@ if (file_exists($errorLogFile)) {
                 <div x-show="activeTab === 'settings'" x-cloak>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 
+                        <!-- Database Migrations -->
+                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-6 md:col-span-2 lg:col-span-3" x-data="{migRunning:false,migResult:null}">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-semibold text-dark flex items-center gap-2 text-[15px]">
+                                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                                    Database Migrations
+                                </h3>
+                                <button @click="migRunning=true;migResult=null;(function(){const csrf=document.querySelector('meta[name=\\'csrf-token\\']')?.content||'';const fd=new FormData();fd.append('csrf_token',csrf);fetch('/api/admin/run-migrations',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{migResult=d;migRunning=false;}).catch(e=>{migResult={error:e.message};migRunning=false;});})()"
+                                    :disabled="migRunning"
+                                    class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition disabled:opacity-50 flex items-center gap-1.5">
+                                    <svg x-show="migRunning" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                    <span x-text="migRunning ? 'Running…' : 'Run Pending Migrations'"></span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-dark/40 mb-3">Apply any pending SQL migrations to the database. Safe to run multiple times — already-applied migrations are skipped.</p>
+                            <div x-show="migResult" class="rounded-lg p-3 text-xs font-mono" :class="migResult?.error ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-800'">
+                                <template x-if="migResult?.error"><span x-text="'Error: '+migResult.error"></span></template>
+                                <template x-if="migResult?.success">
+                                    <div>
+                                        <div x-show="migResult.ran?.length" x-text="'✓ Applied: '+migResult.ran.join(', ')"></div>
+                                        <div x-show="migResult.skipped?.length" class="text-green-600" x-text="'— Skipped (already applied): '+migResult.skipped.join(', ')"></div>
+                                        <div x-show="migResult.errors?.length" class="text-red-600" x-text="'✗ Errors: '+migResult.errors.join(' | ')"></div>
+                                        <div x-show="!migResult.ran?.length && !migResult.errors?.length" class="text-green-700 font-semibold">All migrations already up to date ✓</div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
                         <!-- Landing Page Settings -->
                         <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-6 md:col-span-2 lg:col-span-3" x-data="landingSettings()">
                             <div class="flex items-center justify-between mb-5">
@@ -3936,7 +3964,7 @@ if (file_exists($errorLogFile)) {
             newSeason: { title: '', brief: '', start_date: '', end_date: '', status: 'active' },
             
             // Scripts
-            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', rules: '' },
+            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' },
             editingScript: null,
             
             // Guides

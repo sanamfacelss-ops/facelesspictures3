@@ -2087,10 +2087,67 @@ class AdminController
         }
     }
 
-    // ==================== PUBLIC SUBMISSIONS ====================
-
     /**
-     * List all public (guest) submissions with optional filters
+     * Run pending database migrations
+     * POST /api/admin/run-migrations
+     */
+    public function runMigrations(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $this->db->exec("CREATE TABLE IF NOT EXISTS migrations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                filename VARCHAR(255) NOT NULL UNIQUE,
+                applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+
+            $applied = $this->db->query("SELECT filename FROM migrations")->fetchAll(PDO::FETCH_COLUMN);
+            $applied = array_flip($applied);
+
+            $migrationDir = __DIR__ . '/../../database/migrations';
+            $files = glob($migrationDir . '/*.sql');
+            sort($files);
+
+            $ran = [];
+            $skipped = [];
+            $errors = [];
+
+            foreach ($files as $file) {
+                $filename = basename($file);
+                if (isset($applied[$filename])) {
+                    $skipped[] = $filename;
+                    continue;
+                }
+                $sql = file_get_contents($file);
+                $statements = array_filter(array_map('trim', explode(';', $sql)), fn($s) => !empty($s));
+                try {
+                    foreach ($statements as $statement) {
+                        $this->db->exec($statement);
+                    }
+                    $this->db->prepare("INSERT INTO migrations (filename) VALUES (?)")->execute([$filename]);
+                    $ran[] = $filename;
+                    debug_log("Migration applied: {$filename}", 'ADMIN');
+                } catch (\Exception $e) {
+                    $errors[] = "{$filename}: " . $e->getMessage();
+                }
+            }
+
+            echo json_encode([
+                'success' => true,
+                'ran'     => $ran,
+                'skipped' => $skipped,
+                'errors'  => $errors,
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_RUN_MIGRATIONS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Migration failed: ' . $e->getMessage()]);
+        }
+    }
+
+    // ==================== PUBLIC SUBMISSIONS ====================
      * GET /api/admin/submissions?role=actor&status=new&search=john
      */
     public function listSubmissions(): void
