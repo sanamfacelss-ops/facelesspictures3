@@ -165,10 +165,15 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   .play-overlay{opacity:1!important;background:rgba(0,0,0,.18)!important}
   .play-circle{opacity:.85}
 }
-/* Subtle persistent play badge on posters with trailers */
-.poster-play-hint{position:absolute;bottom:.6rem;right:.6rem;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.25rem .6rem;display:flex;align-items:center;gap:.3rem;pointer-events:none;z-index:3}
-.poster-play-hint svg{width:12px;height:12px;fill:#fff;flex-shrink:0}
-.poster-play-hint span{font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;white-space:nowrap}
+/* Poster play hint — centered bottom badge, poster fully visible */
+.poster-play-hint{position:absolute;bottom:.75rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:.32rem .8rem;display:flex;align-items:center;gap:.35rem;pointer-events:none;z-index:3;white-space:nowrap}
+.poster-play-hint svg{width:10px;height:10px;fill:#fff;flex-shrink:0}
+.poster-play-hint span{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.9)}
+/* On touch: hide big dark overlay — only badge shows, poster stays fully visible */
+@media(hover:none){
+  .play-overlay{opacity:0!important;pointer-events:none}
+  .poster-card:active .play-overlay{opacity:1!important;pointer-events:auto}
+}
 
 /* FOOTER */
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
