@@ -48,17 +48,16 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000}
-/* 9:16 media container — full card width, capped height, video fully visible (no crop) */
-.media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;max-height:min(177.78vw,520px);position:relative}
-/* local video: contain — show full video, no crop */
-.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;border:0;background:#000}
-/* YouTube iframe: natural 16:9 inside 9:16 container — centred, no scale */
-.media-9-16 iframe{position:absolute;top:50%;left:50%;width:100%;height:56.25%;transform:translateY(-50%) translateX(-50%);border:0;display:block}
-/* image: contain — show full image, no crop */
-.media-9-16 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;border:0;background:#f3f4f6}
+/* 9:16 media container — full card width, full height, video always 9:16 fills perfectly */
+.media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;position:relative}
+/* local video: fill — video is always 9:16 */
+.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;border:0;background:#000}
+/* YouTube iframe: fill the box — video is always 9:16 short */
+.media-9-16 iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+/* image: cover fill — poster is always 9:16 */
+.media-9-16 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}
 /* placeholder inside 9:16 box */
-.media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
-/* Overlapping audition type badge */
+.media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}/* Overlapping audition type badge */
 .media-badge{position:absolute;top:.75rem;left:.75rem;z-index:4;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:.3rem .65rem;border-radius:20px;border:1px solid rgba(255,255,255,.18);pointer-events:none}
 /* Custom video player for local files */
 .pv-wrap{position:relative;width:100%;overflow:hidden}
@@ -79,9 +78,9 @@ body{font-family:'DM Sans',sans-serif;background:#f9fafb;color:#111;-webkit-font
 .pv-btn:hover{opacity:1}
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
-/* 9:16 script image — full card width, full image visible */
-.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;max-height:min(177.78vw,520px);background:#f3f4f6;position:relative}
-.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+/* 9:16 script image — full card width, full height, no bars */
+.portrait-img-wrap{width:100%;overflow:hidden;aspect-ratio:9/16;background:#f3f4f6;position:relative}
+.portrait-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 @media(max-width:768px){
   /* on mobile keep the same — already full width */
 }
