@@ -192,8 +192,18 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     $embedUrl    = $isYT ? getYouTubeEmbed($previewUrl) : '';
     $uid         = 'pv_' . $dataId . '_' . ($isSong ? 's' : 'd');
 
-    // Multiple tune URLs — newline-separated
-    $tuneUrls = $isSong ? array_values(array_filter(array_map('trim', explode("\n", $tuneRaw)))) : [];
+    // Multiple tune entries — each line is "label|url" or just "url"
+    $tuneUrls = [];
+    if ($isSong && !empty($tuneRaw)) {
+        foreach (array_filter(array_map('trim', explode("\n", $tuneRaw))) as $line) {
+            $sep = strpos($line, '|');
+            if ($sep !== false) {
+                $tuneUrls[] = ['label' => trim(substr($line, 0, $sep)), 'url' => trim(substr($line, $sep + 1))];
+            } else {
+                $tuneUrls[] = ['label' => '', 'url' => $line];
+            }
+        }
+    }
 
     // Card heading from script title, subheading from script content (brief)
     $cardHeading    = !empty($sc['title'])   ? strtoupper($sc['title'])   : ($isSong ? 'SONG AUDITION'     : 'DIALOGUE AUDITION');
@@ -259,12 +269,14 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Song' : 'Script' ?></div>
       <div class="btn-row">
         <?php if ($isSong && !empty($tuneUrls)): ?>
-          <?php foreach ($tuneUrls as $idx => $tuneUrl): ?>
+          <?php foreach ($tuneUrls as $idx => $tune): ?>
+            <?php if (!empty($tune['url'])): ?>
             <button type="button" class="btn-tune"
-              onclick="openTuneModal(<?= htmlspecialchars(json_encode($tuneUrl), ENT_QUOTES) ?>)">
+              onclick="openTuneModal(<?= htmlspecialchars(json_encode($tune['url']), ENT_QUOTES) ?>)">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <?= count($tuneUrls) > 1 ? 'Get Song ' . ($idx + 1) : 'Get Song' ?>
+              <?= htmlspecialchars(!empty($tune['label']) ? $tune['label'] : 'Get Song') ?>
             </button>
+            <?php endif; ?>
           <?php endforeach; ?>
         <?php endif; ?>
         <?php if ($pdfUrl): ?>
