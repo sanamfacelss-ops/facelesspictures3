@@ -1648,26 +1648,50 @@ if (file_exists($errorLogFile)) {
                                         <p class="text-[11px] text-dark/30 mt-1">Users can download this from the script card</p>
                                     </div>
 
-                                    <!-- Song Tune URLs (song scripts only) — up to 3 -->
-                                    <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak>
-                                        <label class="block text-[12px] text-dark/50 mb-2">Song YouTube URLs <span class="text-[10px] text-dark/30">(up to 3 — each becomes a "Get Song" button)</span></label>
+                                    <!-- Song URLs (song scripts only) — unlimited, dynamic -->
+                                    <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak
+                                         x-data="{
+                                            get urls() {
+                                                return scriptForm.tune_youtube_url
+                                                    ? scriptForm.tune_youtube_url.split('\n').map(s=>s.trim()).filter(Boolean)
+                                                    : [''];
+                                            },
+                                            setUrls(arr) {
+                                                scriptForm.tune_youtube_url = arr.filter(s=>s.trim()).join('\n');
+                                            },
+                                            updateUrl(idx, val) {
+                                                let arr = this.urls; arr[idx] = val; this.setUrls(arr);
+                                            },
+                                            addUrl() {
+                                                let arr = this.urls; arr.push(''); this.setUrls(arr); scriptForm.tune_youtube_url = arr.join('\n');
+                                            },
+                                            removeUrl(idx) {
+                                                let arr = this.urls; arr.splice(idx,1); if(arr.length===0) arr=[''];
+                                                scriptForm.tune_youtube_url = arr.join('\n');
+                                            }
+                                         }">
+                                        <label class="block text-[12px] text-dark/50 mb-2">Song YouTube URLs <span class="text-[10px] text-dark/30">(each becomes a "Get Song" button)</span></label>
                                         <div class="space-y-2">
-                                            <div>
-                                                <input type="url" x-model="scriptForm.tune_youtube_url_1"
-                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
-                                                    placeholder="Song 1 — https://youtu.be/...">
-                                            </div>
-                                            <div>
-                                                <input type="url" x-model="scriptForm.tune_youtube_url_2"
-                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
-                                                    placeholder="Song 2 (optional) — https://youtu.be/...">
-                                            </div>
-                                            <div>
-                                                <input type="url" x-model="scriptForm.tune_youtube_url_3"
-                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
-                                                    placeholder="Song 3 (optional) — https://youtu.be/...">
-                                            </div>
+                                            <template x-for="(url, idx) in urls" :key="idx">
+                                                <div class="flex gap-2 items-center">
+                                                    <input type="url"
+                                                        :value="url"
+                                                        @input="updateUrl(idx, $event.target.value)"
+                                                        class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
+                                                        placeholder="https://youtu.be/...">
+                                                    <button type="button" @click="removeUrl(idx)"
+                                                        x-show="urls.length > 1"
+                                                        class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    </button>
+                                                </div>
+                                            </template>
                                         </div>
+                                        <button type="button" @click="addUrl()"
+                                            class="mt-2 flex items-center gap-1.5 text-[12px] text-dark/50 hover:text-dark transition">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                            Add another song link
+                                        </button>
                                         <p class="text-[11px] text-dark/30 mt-1">Opens in popup so actors can hear the song while recording</p>
                                     </div>
 
@@ -4643,11 +4667,6 @@ if (file_exists($errorLogFile)) {
                     tune_youtube_url:  sc.tune_youtube_url   || '',
                     rules:             sc.rules              || '',
                 };
-                // Split tune URLs back into 3 fields
-                const tuneLines = (sc.tune_youtube_url || '').split('\n').map(s => s.trim()).filter(Boolean);
-                this.scriptForm.tune_youtube_url_1 = tuneLines[0] || '';
-                this.scriptForm.tune_youtube_url_2 = tuneLines[1] || '';
-                this.scriptForm.tune_youtube_url_3 = tuneLines[2] || '';
                 // Sync uploader previews via global bridge
                 if (typeof window.setScriptVideo === 'function') window.setScriptVideo(sc.preview_video_url || '');
                 if (typeof window.setScriptPdf   === 'function') window.setScriptPdf(sc.script_pdf_url || '');
@@ -4666,12 +4685,9 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 // Always read from _adminDashboard to get latest uploader values
                 const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
-                // Combine 3 tune URL fields into newline-separated tune_youtube_url
-                const combinedTune = [form.tune_youtube_url_1, form.tune_youtube_url_2, form.tune_youtube_url_3]
-                    .map(s => (s||'').trim()).filter(Boolean).join('\n');
+                // tune_youtube_url is already newline-separated (written directly by the dynamic list)
                 Object.keys(form).forEach(k => {
                     if (k === 'tune_youtube_url_1' || k === 'tune_youtube_url_2' || k === 'tune_youtube_url_3') return;
-                    if (k === 'tune_youtube_url') { formData.append(k, combinedTune); return; }
                     formData.append(k, form[k] ?? '');
                 });
                 try {
@@ -4714,12 +4730,9 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 // Always read from _adminDashboard to get latest uploader values
                 const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
-                // Combine 3 tune URL fields into newline-separated tune_youtube_url
-                const combinedTune = [form.tune_youtube_url_1, form.tune_youtube_url_2, form.tune_youtube_url_3]
-                    .map(s => (s||'').trim()).filter(Boolean).join('\n');
+                // tune_youtube_url is already newline-separated (written directly by the dynamic list)
                 Object.keys(form).forEach(k => {
                     if (k === 'tune_youtube_url_1' || k === 'tune_youtube_url_2' || k === 'tune_youtube_url_3') return;
-                    if (k === 'tune_youtube_url') { formData.append(k, combinedTune); return; }
                     formData.append(k, form[k] ?? '');
                 });
                 try {
