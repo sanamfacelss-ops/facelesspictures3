@@ -40,7 +40,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 [x-cloak]{display:none!important}
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
 .brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem}
-@media(max-width:768px){.brief-grid{grid-template-columns:1fr;padding:0 1rem 1.5rem}}
+.brief-grid>.brief-card:last-child:nth-child(odd){grid-column:1/-1}
+@media(max-width:768px){.brief-grid{grid-template-columns:1fr;padding:0 1rem 1.5rem}
+.brief-grid>.brief-card:last-child:nth-child(odd){grid-column:auto}}
 .brief-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column}
 .card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
 .card-sec:last-child{border-bottom:none}
