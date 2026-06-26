@@ -193,13 +193,15 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     // Multiple tune URLs — newline-separated
     $tuneUrls = $isSong ? array_values(array_filter(array_map('trim', explode("\n", $tuneRaw)))) : [];
 
-    // Card heading: use script title if set, otherwise fallback to audition type
-    $cardHeading = !empty($sc['title']) ? strtoupper($sc['title']) : ($isSong ? 'SONG AUDITION' : 'DIALOGUE AUDITION');
+    // Card heading from script title, subheading from script content (brief)
+    $cardHeading    = !empty($sc['title'])   ? strtoupper($sc['title'])   : ($isSong ? 'SONG AUDITION'     : 'DIALOGUE AUDITION');
+    $cardSubheading = !empty($sc['content']) ? $sc['content']             : ($isSong ? $fallbackBrief       : $fallbackBrief);
 ?>
   <div class="brief-card">
-    <!-- Card heading — editable via script title in admin -->
-    <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem .875rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1"><?= htmlspecialchars($cardHeading) ?></p>
+    <!-- Card heading + subheading — both admin-editable via Scripts tab -->
+    <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1;margin-bottom:.35rem"><?= htmlspecialchars($cardHeading) ?></p>
+      <p style="font-size:.75rem;color:rgba(255,255,255,.6);line-height:1.5"><?= htmlspecialchars($cardSubheading) ?></p>
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
@@ -294,19 +296,14 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
 <?php
 }
 
-// Render dialog scripts
+// Render dialog scripts — only if scripts exist
 if (!empty($dialogScripts)) {
     foreach ($dialogScripts as $sc) renderActorBriefCard($sc, $globalDialogBrief, false);
-} else {
-    // Fallback placeholder card
-    echo '<div class="brief-card"><div class="card-sec"><div class="sec-label">Dialog Audition</div><p style="color:#6b7280;font-size:.85rem">' . htmlspecialchars($globalDialogBrief) . '</p></div></div>';
 }
 
-// Render song scripts
+// Render song scripts — only if scripts exist
 if (!empty($songScripts)) {
     foreach ($songScripts as $sc) renderActorBriefCard($sc, $globalSongBrief, true);
-} else {
-    echo '<div class="brief-card"><div class="card-sec"><div class="sec-label">Song Audition</div><p style="color:#6b7280;font-size:.85rem">' . htmlspecialchars($globalSongBrief) . '</p></div></div>';
 }
 ?>
 
