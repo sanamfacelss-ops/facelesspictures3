@@ -275,6 +275,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <div class="sec-label">Rules &amp; Limits</div>
       <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
     </div>
+    <?php if ($isSong): ?>
     <div class="card-sec" style="padding:.875rem 1.125rem">
       <a href="#submit-form" onclick="document.getElementById('submit-form').scrollIntoView({behavior:'smooth'});return false;"
         style="display:flex;align-items:center;justify-content:center;gap:.45rem;width:100%;background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.8rem 1.25rem;font-size:.85rem;cursor:pointer;text-decoration:none;font-family:inherit;letter-spacing:.01em;transition:background .15s"
@@ -283,6 +284,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
         I'm Ready to Upload →
       </a>
     </div>
+    <?php endif; ?>
   </div>
 <?php
 }
