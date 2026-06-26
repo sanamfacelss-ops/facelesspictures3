@@ -110,6 +110,11 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
   <!-- LEFT: Brief card -->
   <div class="brief-card">
+    <!-- Card heading -->
+    <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem .875rem">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1;margin-bottom:.3rem">DIRECTOR AUDITION</p>
+      <p style="font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.5">Cast an actor, shoot the scene on camera. One phone, one take, your vision.</p>
+    </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl): ?>
         <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>

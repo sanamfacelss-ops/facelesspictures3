@@ -2057,6 +2057,9 @@ class AdminController
             'landing_poster5_url',  'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label',
             'landing_poster6_url',  'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label',
             'landing_about_text',
+            'manifesto_heading', 'manifesto_subheading',
+            'manifesto_video1_url', 'manifesto_video2_url', 'manifesto_video3_url',
+            'manifesto_video4_url', 'manifesto_video5_url', 'manifesto_video6_url',
             'actor_dialog_script', 'actor_song_script',
             'director_brief', 'writer_brief',
             // Actor page media

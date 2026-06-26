@@ -9,6 +9,15 @@ $heroHeadline     = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECT
 $rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star in 3 Clicks');
 $rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
 
+// Manifesto video slider (up to 6 YouTube URLs)
+$manifestoHeading    = $settingsModel->get('manifesto_heading', 'OUR MANIFESTO');
+$manifestoSubheading = $settingsModel->get('manifesto_subheading', 'What Faceless Pictures 3 stands for.');
+$manifestoVideos = [];
+for ($i = 1; $i <= 6; $i++) {
+    $url = $settingsModel->get('manifesto_video' . $i . '_url', '');
+    if ($url) $manifestoVideos[] = $url;
+}
+
 // Up to 6 poster slots
 $posterKeys = [
     ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label'],
@@ -180,6 +189,26 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 /* FOOTER */
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
+
+/* MANIFESTO SLIDER */
+.manifesto-section{padding:3rem 0 2.5rem;border-bottom:1px solid #e5e7eb}
+.manifesto-slider{position:relative;overflow:hidden}
+.manifesto-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
+.manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#000;position:relative;
+  width:calc((100% - 2 * 1.25rem) / 3)} /* desktop: 3 per row */
+@media(max-width:1023px){.manifesto-slide{width:100%}} /* mobile/tablet: 1 per row */
+/* 16:9 YouTube embed inside each slide */
+.manifesto-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;cursor:pointer}
+.manifesto-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none}
+.manifesto-embed img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.manifesto-play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);transition:background .2s;z-index:2}
+.manifesto-slide:hover .manifesto-play-overlay{background:rgba(0,0,0,.45)}
+.manifesto-play-circle{width:52px;height:52px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:transform .2s,background .2s}
+.manifesto-slide:hover .manifesto-play-circle{transform:scale(1.1);background:rgba(255,255,255,.25)}
+.manifesto-play-circle svg{width:22px;height:22px;fill:#fff;margin-left:3px}
+.manifesto-dots{display:flex;justify-content:center;gap:.4rem;margin-top:.875rem}
+.manifesto-dot{width:6px;height:6px;border-radius:50%;background:#d1d5db;cursor:pointer;transition:background .2s,width .2s}
+.manifesto-dot.active{background:#111;width:16px;border-radius:3px}
 @media(max-width:639px){
   .poster-grid{grid-template-columns:1fr 1fr!important}
   .role-cards-grid{grid-template-columns:1fr!important}
@@ -297,6 +326,59 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
       <div class="slider-dots">
         <template x-for="i in pages" :key="i">
           <div class="slider-dot" :class="i===currentPage?'active':''" @click="goTo(i)"></div>
+        </template>
+      </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- ══ MANIFESTO VIDEO SLIDER ══ -->
+    <?php if (!empty($manifestoVideos)): ?>
+    <div class="manifesto-section" x-data="manifestoSlider(<?= count($manifestoVideos) ?>)">
+      <div style="text-align:center;margin-bottom:1.75rem">
+        <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.5rem">Watch</p>
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem">
+          <?= htmlspecialchars($manifestoHeading) ?>
+        </h2>
+        <?php if ($manifestoSubheading): ?>
+        <p style="font-size:.85rem;color:#6b7280;max-width:400px;margin:0 auto;line-height:1.6"><?= htmlspecialchars($manifestoSubheading) ?></p>
+        <?php endif; ?>
+      </div>
+      <div class="manifesto-slider">
+        <div class="manifesto-track" :style="'transform:translateX(-'+offset+'px)'"
+          x-ref="track">>
+          <?php foreach ($manifestoVideos as $idx => $mvUrl):
+            // Extract YouTube video ID for thumbnail + embed
+            $mvId = '';
+            if (preg_match('/youtu\.be\/([^?&#]+)/', $mvUrl, $mm)) $mvId = $mm[1];
+            elseif (preg_match('/[?&]v=([^&#]+)/', $mvUrl, $mm)) $mvId = $mm[1];
+            elseif (preg_match('/\/shorts\/([^?&#]+)/', $mvUrl, $mm)) $mvId = $mm[1];
+            $mvEmbed = $mvId ? 'https://www.youtube.com/embed/' . $mvId : '';
+            $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/hqdefault.jpg' : '';
+          ?>
+          <div class="manifesto-slide">
+            <div class="manifesto-embed"
+              @click="openManifestoPlayer(<?= htmlspecialchars(json_encode($mvUrl), ENT_QUOTES) ?>)"
+              <?php if ($mvThumb): ?>
+                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="Video <?= $idx+1 ?>"
+                  style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+              <?php elseif ($mvEmbed): ?>
+                <iframe src="<?= htmlspecialchars($mvEmbed) ?>?rel=0&modestbranding=1&mute=1"
+                  allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+                  allowfullscreen title="Manifesto video <?= $idx+1 ?>"></iframe>
+              <?php endif; ?>
+              <div class="manifesto-play-overlay">
+                <div class="manifesto-play-circle">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <div class="manifesto-dots">
+        <template x-for="i in totalPages" :key="i">
+          <div class="manifesto-dot" :class="i-1===currentPage?'active':''" @click="goTo(i-1)"></div>
         </template>
       </div>
     </div>
@@ -716,6 +798,79 @@ function posterSlider(total) {
         }
     };
 }
+
+function manifestoSlider(total) {
+    const perPage = () => window.innerWidth >= 1024 ? 3 : 1;
+    return {
+        currentPage: 0,
+        autoTimer: null,
+        get totalPages() { return Math.ceil(total / perPage()); },
+        get offset() {
+            // Calculate pixel offset: each "page" moves by perPage slides
+            const wrap = document.querySelector('.manifesto-slider');
+            if (!wrap) return 0;
+            const pp = perPage();
+            const gap = 20; // 1.25rem gap
+            const slideW = (wrap.offsetWidth - (pp - 1) * gap) / pp;
+            return this.currentPage * pp * (slideW + gap);
+        },
+        init() {
+            this.startAuto();
+            window.addEventListener('resize', () => { this.goTo(0); });
+        },
+        goTo(page) {
+            const tp = this.totalPages;
+            this.currentPage = ((page % tp) + tp) % tp;
+        },
+        next() { this.goTo(this.currentPage + 1); },
+        startAuto() {
+            this.autoTimer = setInterval(() => this.next(), 4500);
+        },
+        openManifestoPlayer(url) {
+            document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url } }));
+        }
+    };
+}
+</script>
+
+<!-- ══ MANIFESTO YOUTUBE MODAL ══ -->
+<div id="fp-manifesto-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:250;align-items:center;justify-content:center;padding:1rem">
+  <div style="position:relative;width:100%;max-width:960px;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.8)">
+    <button onclick="fpCloseManifesto()" aria-label="Close"
+      style="position:absolute;top:.75rem;right:.75rem;width:36px;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;z-index:10;backdrop-filter:blur(4px)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div style="position:relative;padding-bottom:56.25%;height:0">
+      <iframe id="fp-manifesto-iframe" src="" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen
+        style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+    </div>
+  </div>
+</div>
+<script>
+function fpYtEmbed(u){
+    if(!u)return'';
+    var m;
+    m=u.match(/youtu\.be\/([^?&#]+)/);if(m)return'https://www.youtube.com/embed/'+m[1];
+    m=u.match(/[?&]v=([^&#]+)/);if(m)return'https://www.youtube.com/embed/'+m[1];
+    m=u.match(/\/shorts\/([^?&#]+)/);if(m)return'https://www.youtube.com/embed/'+m[1];
+    return u;
+}
+document.addEventListener('fp-open-yt', function(e){
+    var modal = document.getElementById('fp-manifesto-modal');
+    var iframe = document.getElementById('fp-manifesto-iframe');
+    iframe.src = fpYtEmbed(e.detail.url) + '?autoplay=1&rel=0';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+});
+function fpCloseManifesto(){
+    document.getElementById('fp-manifesto-iframe').src = '';
+    document.getElementById('fp-manifesto-modal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+document.getElementById('fp-manifesto-modal').addEventListener('click', function(e){
+    if(e.target === this) fpCloseManifesto();
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') fpCloseManifesto(); });
 </script>
 <!-- NO-TRAILER TOAST -->
 <div id="fp-no-trailer-toast">
