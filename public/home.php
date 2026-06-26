@@ -195,13 +195,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .manifesto-section{padding:3rem 0 2.5rem;border-bottom:1px solid #e5e7eb}
 .manifesto-slider{position:relative;overflow:hidden}
 .manifesto-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
-.manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#000;position:relative;
+.manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#fff;position:relative;
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
   width:calc((100% - 2 * 1.25rem) / 3)} /* desktop: 3 per row */
 @media(max-width:1023px){.manifesto-slide{width:100%}} /* mobile/tablet: 1 per row */
 /* 16:9 YouTube embed inside each slide */
 .manifesto-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;cursor:pointer}
 .manifesto-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none}
 .manifesto-embed img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.manifesto-title{padding:.55rem .75rem;background:#fff;font-size:.78rem;font-weight:600;color:#111;line-height:1.4;border-top:1px solid #f0f0f0}
 .manifesto-play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);transition:background .2s;z-index:2}
 .manifesto-slide:hover .manifesto-play-overlay{background:rgba(0,0,0,.45)}
 .manifesto-play-circle{width:52px;height:52px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:transform .2s,background .2s}
@@ -375,7 +377,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
               </div>
             </div>
             <?php if ($mvTitle): ?>
-            <div style="padding:.6rem .75rem;background:#fff;font-size:.78rem;font-weight:600;color:#111;line-height:1.4"><?= htmlspecialchars($mvTitle) ?></div>
+            <div class="manifesto-title"><?= htmlspecialchars($mvTitle) ?></div>
             <?php endif; ?>
           </div>
           <?php endforeach; ?>
