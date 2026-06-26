@@ -193,10 +193,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 /* MANIFESTO SLIDER */
 .manifesto-section{padding:3rem 0 2.5rem;border-bottom:1px solid #e5e7eb}
-.manifesto-slider{position:relative;overflow:hidden}
+.manifesto-slider{position:relative;overflow:visible;padding-bottom:.5rem}
 .manifesto-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
 .manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#fff;position:relative;
-  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  box-shadow:0 2px 16px rgba(0,0,0,.10);
   width:calc((100% - 2 * 1.25rem) / 3)} /* desktop: 3 per row */
 @media(max-width:1023px){.manifesto-slide{width:100%}} /* mobile/tablet: 1 per row */
 /* 16:9 YouTube embed inside each slide */
@@ -347,6 +347,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
       </div>
       <div class="manifesto-slider">
+        <div style="overflow:hidden;margin:-4px;padding:4px">
         <div class="manifesto-track" :style="'transform:translateX(-'+offset+'px)'">
           <?php foreach ($manifestoVideos as $idx => $mv):
             $mvUrl   = $mv['url'];
@@ -381,8 +382,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
             <?php endif; ?>
           </div>
           <?php endforeach; ?>
-        </div>
-      </div>
+        </div><!-- /manifesto-track -->
+        </div><!-- /clip wrapper -->
+      </div><!-- /manifesto-slider -->
       <div class="manifesto-dots">
         <template x-for="i in totalPages" :key="i">
           <div class="manifesto-dot" :class="i-1===currentPage?'active':''" @click="goTo(i-1)"></div>
