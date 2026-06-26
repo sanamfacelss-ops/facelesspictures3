@@ -256,14 +256,14 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <?php endif; ?>
     <div class="card-sec">
-      <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Tune' : 'Script' ?></div>
+      <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Song' : 'Script' ?></div>
       <div class="btn-row">
         <?php if ($isSong && !empty($tuneUrls)): ?>
           <?php foreach ($tuneUrls as $idx => $tuneUrl): ?>
             <button type="button" class="btn-tune"
               onclick="openTuneModal(<?= htmlspecialchars(json_encode($tuneUrl), ENT_QUOTES) ?>)">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <?= count($tuneUrls) > 1 ? 'Tune ' . ($idx + 1) : 'Get Tune' ?>
+              <?= count($tuneUrls) > 1 ? 'Get Song ' . ($idx + 1) : 'Get Song' ?>
             </button>
           <?php endforeach; ?>
         <?php endif; ?>
@@ -385,7 +385,7 @@ if (!empty($songScripts)) {
 <div id="tuneModal">
   <div class="tune-box">
     <button class="tune-close" onclick="closeTuneModal()">✕</button>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.04em;color:#fff;margin-bottom:.75rem">▶ Song Tune</p>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.04em;color:#fff;margin-bottom:.75rem">▶ Song</p>
     <div class="tune-wrap">
       <iframe id="tuneIframe" src="" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen title="Song tune"></iframe>
     </div>

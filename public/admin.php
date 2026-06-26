@@ -1441,7 +1441,9 @@ if (file_exists($errorLogFile)) {
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label class="block text-[12px] text-dark/50 mb-1">Category</label>
-                                            <select x-model="scriptForm.category" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                            <select x-model="scriptForm.category"
+                                                @change="if(scriptForm.category!=='actor') scriptForm.audition_type=(scriptForm.category==='director'?'Director Audition':'Writer Submission')"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
                                                 <option value="actor">Actor</option>
                                                 <option value="director">Director</option>
                                                 <option value="writer">Writer</option>
@@ -1453,9 +1455,18 @@ if (file_exists($errorLogFile)) {
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-[12px] text-dark/50 mb-1">Audition Type Label</label>
-                                        <input type="text" x-model="scriptForm.audition_type" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="Dialog Audition / Song Audition / Scene Direction…">
-                                        <p class="text-[11px] text-dark/30 mt-1">Shown as the badge on the script card</p>
+                                        <label class="block text-[12px] text-dark/50 mb-1">Audition Type</label>
+                                        <template x-if="scriptForm.category === 'actor'">
+                                            <select x-model="scriptForm.audition_type" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                                <option value="Dialog Audition">Dialog Audition</option>
+                                                <option value="Song Audition">Song Audition</option>
+                                            </select>
+                                        </template>
+                                        <template x-if="scriptForm.category !== 'actor'">
+                                            <input type="text" :value="scriptForm.category === 'director' ? 'Director Audition' : 'Writer Submission'" readonly
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] bg-dark/[.03] text-dark/50 cursor-not-allowed">
+                                        </template>
+                                        <p class="text-[11px] text-dark/30 mt-1">Actor: choose dialog or song. Director/Writer: fixed automatically.</p>
                                     </div>
                                     <div x-data="scriptImagePicker()" x-init="init()">
                                         <label class="block text-[12px] text-dark/50 mb-1.5">Card Poster Image</label>
@@ -1637,13 +1648,27 @@ if (file_exists($errorLogFile)) {
                                         <p class="text-[11px] text-dark/30 mt-1">Users can download this from the script card</p>
                                     </div>
 
-                                    <!-- Tune YouTube URL (song scripts only) -->
-                                    <div>
-                                        <label class="block text-[12px] text-dark/50 mb-1">Song Tune YouTube URL <span class="text-[10px] text-dark/30">(Song Audition only)</span></label>
-                                        <input type="url" x-model="scriptForm.tune_youtube_url"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
-                                            placeholder="https://youtube.com/watch?v=...">
-                                        <p class="text-[11px] text-dark/30 mt-1">Opens in a popup so actors can hear the tune while recording</p>
+                                    <!-- Song Tune URLs (song scripts only) — up to 3 -->
+                                    <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak>
+                                        <label class="block text-[12px] text-dark/50 mb-2">Song YouTube URLs <span class="text-[10px] text-dark/30">(up to 3 — each becomes a "Get Song" button)</span></label>
+                                        <div class="space-y-2">
+                                            <div>
+                                                <input type="url" x-model="scriptForm.tune_youtube_url_1"
+                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
+                                                    placeholder="Song 1 — https://youtu.be/...">
+                                            </div>
+                                            <div>
+                                                <input type="url" x-model="scriptForm.tune_youtube_url_2"
+                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
+                                                    placeholder="Song 2 (optional) — https://youtu.be/...">
+                                            </div>
+                                            <div>
+                                                <input type="url" x-model="scriptForm.tune_youtube_url_3"
+                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
+                                                    placeholder="Song 3 (optional) — https://youtu.be/...">
+                                            </div>
+                                        </div>
+                                        <p class="text-[11px] text-dark/30 mt-1">Opens in popup so actors can hear the song while recording</p>
                                     </div>
 
                                     <div>
@@ -4045,7 +4070,7 @@ if (file_exists($errorLogFile)) {
             newSeason: { title: '', brief: '', start_date: '', end_date: '', status: 'active' },
             
             // Scripts
-            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' },
+            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' },
             editingScript: null,
             
             // Guides
@@ -4618,6 +4643,11 @@ if (file_exists($errorLogFile)) {
                     tune_youtube_url:  sc.tune_youtube_url   || '',
                     rules:             sc.rules              || '',
                 };
+                // Split tune URLs back into 3 fields
+                const tuneLines = (sc.tune_youtube_url || '').split('\n').map(s => s.trim()).filter(Boolean);
+                this.scriptForm.tune_youtube_url_1 = tuneLines[0] || '';
+                this.scriptForm.tune_youtube_url_2 = tuneLines[1] || '';
+                this.scriptForm.tune_youtube_url_3 = tuneLines[2] || '';
                 // Sync uploader previews via global bridge
                 if (typeof window.setScriptVideo === 'function') window.setScriptVideo(sc.preview_video_url || '');
                 if (typeof window.setScriptPdf   === 'function') window.setScriptPdf(sc.script_pdf_url || '');
@@ -4626,7 +4656,7 @@ if (file_exists($errorLogFile)) {
             
             cancelEditScript() {
                 this.editingScript = null;
-                this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' };
+                this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' };
                 if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
                 if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
             },
@@ -4636,7 +4666,12 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 // Always read from _adminDashboard to get latest uploader values
                 const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
+                // Combine 3 tune URL fields into newline-separated tune_youtube_url
+                const combinedTune = [form.tune_youtube_url_1, form.tune_youtube_url_2, form.tune_youtube_url_3]
+                    .map(s => (s||'').trim()).filter(Boolean).join('\n');
                 Object.keys(form).forEach(k => {
+                    if (k === 'tune_youtube_url_1' || k === 'tune_youtube_url_2' || k === 'tune_youtube_url_3') return;
+                    if (k === 'tune_youtube_url') { formData.append(k, combinedTune); return; }
                     formData.append(k, form[k] ?? '');
                 });
                 try {
@@ -4661,7 +4696,7 @@ if (file_exists($errorLogFile)) {
                             is_active:         1,
                         };
                         this.scripts.push(newScript);
-                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' };
+                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' };
                         if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
                         if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
                         if (typeof window.setScriptImage === 'function') window.setScriptImage('');
@@ -4679,7 +4714,12 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 // Always read from _adminDashboard to get latest uploader values
                 const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
+                // Combine 3 tune URL fields into newline-separated tune_youtube_url
+                const combinedTune = [form.tune_youtube_url_1, form.tune_youtube_url_2, form.tune_youtube_url_3]
+                    .map(s => (s||'').trim()).filter(Boolean).join('\n');
                 Object.keys(form).forEach(k => {
+                    if (k === 'tune_youtube_url_1' || k === 'tune_youtube_url_2' || k === 'tune_youtube_url_3') return;
+                    if (k === 'tune_youtube_url') { formData.append(k, combinedTune); return; }
                     formData.append(k, form[k] ?? '');
                 });
                 try {
@@ -4711,7 +4751,7 @@ if (file_exists($errorLogFile)) {
                             this.scripts = [...this.scripts];
                         }
                         this.editingScript = null;
-                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: '', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' };
+                        this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' };
                         if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
                         if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
                         if (typeof window.setScriptImage === 'function') window.setScriptImage('');
@@ -5845,3 +5885,4 @@ if (file_exists($errorLogFile)) {
     </script>
 </body>
 </html>
+
