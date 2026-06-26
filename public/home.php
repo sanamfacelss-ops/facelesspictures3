@@ -73,8 +73,9 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 .poster-cta.no-trailer{background:#1a1a1a;color:rgba(255,255,255,.55)}
 
 /* ROLE CARD */
-.role-card{border:2px solid #e5e7eb;border-radius:12px;padding:1.5rem 1.25rem;text-align:center;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;background:#fff;transition:border-color .2s,transform .2s,box-shadow .2s}
+.role-card{border:2px solid #e5e7eb;border-radius:12px;padding:1.5rem 1.25rem;text-align:center;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;background:#fff;transition:border-color .2s,transform .2s,box-shadow .2s;height:100%}
 .role-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.07);border-color:#111}
+.role-card .btn-black{margin-top:auto}
 .role-icon{width:56px;height:56px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:.875rem}
 .role-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:#111;margin-bottom:.25rem}
 .role-desc{font-size:.8rem;color:#6b7280;margin-bottom:1rem;line-height:1.5}
@@ -311,22 +312,21 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <?= htmlspecialchars($rolesSubheading) ?>
       </p>
     </div>
-    <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6">
+    <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6" style="align-items:stretch">
 
-      <!-- ACTOR -->
-      <div class="role-card">
-        <div class="role-icon">🎭</div>
-        <p class="role-name">ACTOR</p>
-        <p class="role-desc">Shoot your scene on camera.<br>Face hidden. Talent only.</p>
+      <!-- WRITER -->
+      <div class="role-card" style="height:100%">
+        <div class="role-icon">✍️</div>
+        <p class="role-name">WRITER</p>
+        <p class="role-desc">Read your script on camera.<br>Your words. Your voice. One video.</p>
         <div class="role-badges">
-          <span class="badge">Dialog</span>
-          <span class="badge">Song</span>
+          <span class="badge">Script Reading</span>
         </div>
-        <a href="/actor" class="btn-black">Click Here →</a>
+        <a href="/writer" class="btn-black">Click Here →</a>
       </div>
 
       <!-- DIRECTOR -->
-      <div class="role-card">
+      <div class="role-card" style="height:100%">
         <div class="role-icon">🎬</div>
         <p class="role-name">DIRECTOR</p>
         <p class="role-desc">Shoot your scene your way.<br>One phone. One take. Your vision.</p>
@@ -337,15 +337,16 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
         <a href="/director" class="btn-black">Click Here →</a>
       </div>
 
-      <!-- WRITER -->
-      <div class="role-card">
-        <div class="role-icon">✍️</div>
-        <p class="role-name">WRITER</p>
-        <p class="role-desc">Read your script on camera.<br>Your words. Your voice. One video.</p>
+      <!-- ACTOR -->
+      <div class="role-card" style="height:100%">
+        <div class="role-icon">🎭</div>
+        <p class="role-name">ACTOR</p>
+        <p class="role-desc">Shoot your scene on camera.<br>Face hidden. Talent only.</p>
         <div class="role-badges">
-          <span class="badge">Script Reading</span>
+          <span class="badge">Dialogue</span>
+          <span class="badge">Song</span>
         </div>
-        <a href="/writer" class="btn-black">Click Here →</a>
+        <a href="/actor" class="btn-black">Click Here →</a>
       </div>
 
     </div>
