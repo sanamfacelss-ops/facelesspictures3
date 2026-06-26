@@ -11,21 +11,22 @@ $rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your r
 
 // Up to 6 poster slots
 $posterKeys = [
-    ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url'],
-    ['landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url'],
-    ['landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url'],
-    ['landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url'],
-    ['landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url'],
-    ['landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url'],
+    ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label'],
+    ['landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url', 'landing_poster2_btn_label'],
+    ['landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url', 'landing_poster3_btn_label'],
+    ['landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label'],
+    ['landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label'],
+    ['landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label'],
 ];
 $posters = [];
 foreach ($posterKeys as $i => $keys) {
-    $url     = $settingsModel->get($keys[0], '');
-    $title   = $settingsModel->get($keys[1], $i === 0 ? 'Faceless Pictures 3' : '');
-    $trailer = $settingsModel->get($keys[2], '');
+    $url      = $settingsModel->get($keys[0], '');
+    $title    = $settingsModel->get($keys[1], $i === 0 ? 'Faceless Pictures 3' : '');
+    $trailer  = $settingsModel->get($keys[2], '');
+    $btnLabel = $settingsModel->get($keys[3], '');
     // Only include if image is set, or it's the first slot (always show as placeholder)
     if ($url || $i === 0) {
-        $posters[] = ['url' => $url, 'title' => $title, 'trailer' => $trailer, 'idx' => $i];
+        $posters[] = ['url' => $url, 'title' => $title, 'trailer' => $trailer, 'btn_label' => $btnLabel, 'idx' => $i];
     }
 }
 $posterCount = count($posters);
@@ -56,15 +57,20 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
 .nav-link:hover{color:#111}
 
 /* POSTER CARD */
-.poster-card{position:relative;border-radius:12px;overflow:hidden;background:#f3f4f6;aspect-ratio:2/3;box-shadow:0 2px 16px rgba(0,0,0,.10);transition:transform .3s,box-shadow .3s;display:block}
-.poster-card:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,0,0,.16)}
+.poster-wrap{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.10);transition:transform .3s,box-shadow .3s}
+.poster-wrap:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,0,0,.16)}
+.poster-card{position:relative;background:#f3f4f6;aspect-ratio:2/3;display:block;flex-shrink:0}
 .poster-card img{width:100%;height:100%;object-fit:cover;display:block}
 .poster-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(145deg,#e5e7eb,#f9fafb)}
 .play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);opacity:0;transition:opacity .25s;cursor:pointer}
-.poster-card:hover .play-overlay{opacity:1}
+.poster-wrap:hover .play-overlay{opacity:1}
 .play-circle{width:56px;height:56px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.25);transition:transform .2s}
 .play-overlay:hover .play-circle{transform:scale(1.1)}
 .poster-title-bar{position:absolute;bottom:0;left:0;right:0;padding:.875rem .75rem .6rem;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+/* CTA bar below poster image */
+.poster-cta{background:#111;color:#fff;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem .75rem;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.poster-cta svg{width:9px;height:9px;fill:#fff;flex-shrink:0}
+.poster-cta.no-trailer{background:#1a1a1a;color:rgba(255,255,255,.55)}
 
 /* ROLE CARD */
 .role-card{border:2px solid #e5e7eb;border-radius:12px;padding:1.5rem 1.25rem;text-align:center;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;background:#fff;transition:border-color .2s,transform .2s,box-shadow .2s}
@@ -165,15 +171,10 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
   .play-overlay{opacity:1!important;background:rgba(0,0,0,.18)!important}
   .play-circle{opacity:.85}
 }
-/* Poster play hint — centered bottom badge, poster fully visible */
-.poster-play-hint{position:absolute;bottom:.75rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:.32rem .8rem;display:flex;align-items:center;gap:.35rem;pointer-events:none;z-index:3;white-space:nowrap}
-.poster-play-hint svg{width:10px;height:10px;fill:#fff;flex-shrink:0}
-.poster-play-hint span{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.9)}
-/* Badge always visible on all devices */
-/* Mobile/touch: hide big dark overlay, show badge only */
+/* Mobile/touch: only suppress the big dark overlay, badge always visible */
 @media(hover:none){
   .play-overlay{opacity:0!important;pointer-events:none}
-  .poster-card:active .play-overlay{opacity:1!important;pointer-events:auto}
+  .poster-wrap:active .play-overlay{opacity:1!important;pointer-events:auto}
 }
 
 /* FOOTER */
@@ -243,17 +244,21 @@ body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;-webkit-font-sm
     // Build the poster card HTML as a reusable string
     function posterCard(array $p): string {
         $hasTrailer = !empty($p['trailer']);
+        $btnLabel   = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Tap to play trailer' : 'Trailer Coming Soon');
         $img = $p['url']
             ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="lazy">'
             : '<div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div>';
         $overlay = $hasTrailer
-            ? '<div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="poster-play-hint"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Tap to play trailer</span></div>'
-            : '<div class="poster-play-hint" style="border-color:rgba(255,255,255,.15)"><span style="color:rgba(255,255,255,.65)">Trailer Coming Soon</span></div>';
+            ? '<div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>'
+            : '';
         $title = $p['title'] ? '<div class="poster-title-bar">'.htmlspecialchars($p['title']).'</div>' : '';
-        $attr = $hasTrailer
+        $ctaClass = $hasTrailer ? 'poster-cta' : 'poster-cta no-trailer';
+        $ctaIcon  = $hasTrailer ? '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' : '';
+        $cta = '<div class="'.$ctaClass.'">'.$ctaIcon.'<span>'.$btnLabel.'</span></div>';
+        $wrapAttr = $hasTrailer
             ? 'style="cursor:pointer" @click="openPlayer(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\' )"'
             : 'style="cursor:default"';
-        return '<div class="poster-card" '.$attr.'>'.$img.$overlay.$title.'</div>';
+        return '<div class="poster-wrap" '.$wrapAttr.'><div class="poster-card">'.$img.$overlay.$title.'</div>'.$cta.'</div>';
     }
     ?>
 
