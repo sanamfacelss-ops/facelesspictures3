@@ -261,6 +261,15 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <div class="card-sec">
       <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Tune' : 'Script' ?></div>
       <div class="btn-row">
+        <?php if ($isSong && !empty($tuneUrls)): ?>
+          <?php foreach ($tuneUrls as $idx => $tuneUrl): ?>
+            <button type="button" class="btn-tune"
+              onclick="openTuneModal(<?= htmlspecialchars(json_encode($tuneUrl), ENT_QUOTES) ?>)">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <?= count($tuneUrls) > 1 ? 'Tune ' . ($idx + 1) : 'Get Tune' ?>
+            </button>
+          <?php endforeach; ?>
+        <?php endif; ?>
         <?php if ($pdfUrl): ?>
           <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -271,15 +280,6 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             <?= $isSong ? 'Lyrics' : 'Script' ?> PDF not available yet
           </span>
-        <?php endif; ?>
-        <?php if ($isSong && !empty($tuneUrls)): ?>
-          <?php foreach ($tuneUrls as $idx => $tuneUrl): ?>
-            <button type="button" class="btn-tune"
-              onclick="openTuneModal(<?= htmlspecialchars(json_encode($tuneUrl), ENT_QUOTES) ?>)">
-              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <?= count($tuneUrls) > 1 ? 'Tune ' . ($idx + 1) : 'Get Tune' ?>
-            </button>
-          <?php endforeach; ?>
         <?php endif; ?>
       </div>
     </div>
