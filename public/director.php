@@ -112,8 +112,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
   <div class="brief-card">
     <!-- Card heading -->
     <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem .875rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1;margin-bottom:.3rem">DIRECTOR AUDITION</p>
-      <p style="font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.5">Cast an actor, shoot the scene on camera. One phone, one take, your vision.</p>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1">DIRECTOR AUDITION</p>
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl): ?>
@@ -146,10 +145,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         <span class="btn-outline disabled">Script PDF not available yet</span>
       <?php endif; ?>
     </div>
-    <div class="card-sec tinted" style="flex:1">
-      <div class="sec-label">Rules &amp; Limits</div>
-      <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
-    </div>
+    <div class="card-sec tinted" style="flex:1"></div>
   </div><!-- /brief-card -->
 
   <!-- RIGHT: SUBMISSION CARD (direct grid child) -->

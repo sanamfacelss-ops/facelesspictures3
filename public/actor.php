@@ -195,15 +195,11 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
 
     // Card heading: use audition_type as the heading
     $cardHeading    = $isSong ? 'SONG AUDITION' : 'DIALOGUE AUDITION';
-    $cardSubheading = $isSong
-        ? 'Learn the song, perform it on camera with full expression and energy.'
-        : 'Read the script, perform the scene on camera with full emotion.';
 ?>
   <div class="brief-card">
-    <!-- Card heading + subheading -->
+    <!-- Card heading -->
     <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem .875rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1;margin-bottom:.3rem"><?= $cardHeading ?></p>
-      <p style="font-size:.72rem;color:rgba(255,255,255,.55);line-height:1.5"><?= $cardSubheading ?></p>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1"><?= $cardHeading ?></p>
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
@@ -287,10 +283,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
         <?php endif; ?>
       </div>
     </div>
-    <div class="card-sec tinted" style="flex:1">
-      <div class="sec-label">Rules &amp; Limits</div>
-      <?php foreach ($ruleList as $r): ?><div class="rule-row"><span class="rule-dot"></span><span><?= htmlspecialchars($r) ?></span></div><?php endforeach; ?>
-    </div>
+    <div class="card-sec tinted" style="flex:1"></div>
     <?php if ($isSong): ?>
     <div class="card-sec" style="padding:.875rem 1.125rem">
       <a href="#submit-form" onclick="document.getElementById('submit-form').scrollIntoView({behavior:'smooth'});return false;"
