@@ -723,5 +723,8 @@ function posterSlider(total) {
   Trailer not available yet
 </div>
 
+<!-- ══ LANGUAGE SWITCHER ══ -->
+<?php include __DIR__ . '/partials/language-switcher.php'; ?>
+
 </body>
 </html>

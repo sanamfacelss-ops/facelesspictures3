@@ -249,5 +249,6 @@ function writerSubmit(){
 }
 </script>
 <?php require_once __DIR__ . '/partials/submission-shared.php'; ?>
+<?php include __DIR__ . '/partials/language-switcher.php'; ?>
 </body>
 </html>
