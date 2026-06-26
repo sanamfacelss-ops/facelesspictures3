@@ -208,14 +208,12 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
         <div class="media-9-16">
-          <span class="media-badge"><?= $audType ?></span>
           <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
             allowfullscreen title="<?= $title ?> preview"></iframe>
         </div>
       <?php elseif ($previewUrl): ?>
         <div class="media-9-16 pv-wrap" id="<?= $uid ?>" onclick="pvToggle('<?= $uid ?>')" style="cursor:pointer">
-          <span class="media-badge"><?= $audType ?></span>
           <video id="<?= $uid ?>_v" preload="metadata" playsinline
             ontimeupdate="pvTimeUpdate('<?= $uid ?>')"
             onended="pvEnded('<?= $uid ?>')"
@@ -245,7 +243,6 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
         </div>
       <?php else: ?>
         <div class="media-9-16 placeholder-bg">
-          <span class="media-badge"><?= $audType ?></span>
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           Preview video coming soon
         </div>
