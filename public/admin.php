@@ -3231,8 +3231,8 @@ if (file_exists($errorLogFile)) {
 
                                         <!-- Button label -->
                                         <div>
-                                            <label class="block text-[11px] text-dark/40 mb-1">Button Text <span class="text-dark/25">(e.g. "Tap to Play Trailer" or "Trailer Coming Soon")</span></label>
-                                            <input type="text" x-model="form.<?= $p[4] ?>" placeholder="Tap to play trailer..."
+                                            <label class="block text-[11px] text-dark/40 mb-1">Button Text <span class="text-dark/25">(leave blank for smart default)</span></label>
+                                            <input type="text" x-model="form.<?= $p[4] ?>" placeholder="Watch Trailer Now / Trailer · Teaser Coming Soon..."
                                                 class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         </div>
 
