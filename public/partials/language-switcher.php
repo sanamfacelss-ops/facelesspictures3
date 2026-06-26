@@ -47,6 +47,21 @@ iframe.skiptranslate{display:none!important}
 .fp-lang-item.active{background:#111;color:#fff;font-weight:600}
 </style>
 
+<!-- Indian script fonts so translated text doesn't break layout -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans+Gujarati:wght@400;600;700&family=Noto+Sans+Gurmukhi:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Extend the body font stack to include Noto Sans variants for all Indian scripts.
+   These only activate when the browser needs to render those characters,
+   so English layout is completely unaffected. */
+body{
+  font-family: 'DM Sans',
+    'Noto Sans Devanagari', 'Noto Sans Bengali', 'Noto Sans Tamil',
+    'Noto Sans Telugu', 'Noto Sans Kannada', 'Noto Sans Malayalam',
+    'Noto Sans Gujarati', 'Noto Sans Gurmukhi',
+    sans-serif;
+}
+</style>
+
 <!-- Hidden GT container -->
 <div id="google_translate_element" style="display:none;visibility:hidden;position:absolute;left:-9999px"></div>
 
