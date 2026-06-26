@@ -3314,10 +3314,18 @@ if (file_exists($errorLogFile)) {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     <?php for ($mv = 1; $mv <= 6; $mv++): ?>
-                                    <div>
-                                        <label class="block text-[11px] text-dark/40 mb-1">Video <?= $mv ?> YouTube URL</label>
-                                        <input type="url" x-model="form.manifesto_video<?= $mv ?>_url" placeholder="https://youtube.com/watch?v=..."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <div class="bg-dark/[.02] rounded-lg p-3 space-y-2">
+                                        <p class="text-[11px] font-semibold text-dark/40">Video <?= $mv ?></p>
+                                        <div>
+                                            <label class="block text-[10px] text-dark/35 mb-1">YouTube URL</label>
+                                            <input type="url" x-model="form.manifesto_video<?= $mv ?>_url" placeholder="https://youtu.be/..."
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] text-dark/35 mb-1">Title <span class="text-dark/20">(optional — leave blank to hide)</span></label>
+                                            <input type="text" x-model="form.manifesto_video<?= $mv ?>_title" placeholder="Video title..."
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        </div>
                                     </div>
                                     <?php endfor; ?>
                                 </div>
@@ -5768,11 +5776,17 @@ if (file_exists($errorLogFile)) {
                 manifesto_heading:     <?= json_encode($settingsModel->get('manifesto_heading','OUR MANIFESTO')) ?>,
                 manifesto_subheading:  <?= json_encode($settingsModel->get('manifesto_subheading','What Faceless Pictures 3 stands for.')) ?>,
                 manifesto_video1_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video1_url',''))) ?>',
+                manifesto_video1_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video1_title',''))) ?>',
                 manifesto_video2_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video2_url',''))) ?>',
+                manifesto_video2_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video2_title',''))) ?>',
                 manifesto_video3_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video3_url',''))) ?>',
+                manifesto_video3_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video3_title',''))) ?>',
                 manifesto_video4_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video4_url',''))) ?>',
+                manifesto_video4_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video4_title',''))) ?>',
                 manifesto_video5_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video5_url',''))) ?>',
+                manifesto_video5_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video5_title',''))) ?>',
                 manifesto_video6_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video6_url',''))) ?>',
+                manifesto_video6_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video6_title',''))) ?>',
             },
             init() {
                 // Sync uploaded image URLs back into the form

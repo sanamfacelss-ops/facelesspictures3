@@ -111,8 +111,8 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
   <!-- LEFT: Brief card -->
   <div class="brief-card">
     <!-- Card heading -->
-    <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem .875rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1">DIRECTOR AUDITION</p>
+    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1">DIRECTOR AUDITION</p>
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl): ?>

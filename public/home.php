@@ -9,13 +9,14 @@ $heroHeadline     = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECT
 $rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star in 3 Clicks');
 $rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
 
-// Manifesto video slider (up to 6 YouTube URLs)
+// Manifesto video slider (up to 6 YouTube URLs + optional titles)
 $manifestoHeading    = $settingsModel->get('manifesto_heading', 'OUR MANIFESTO');
 $manifestoSubheading = $settingsModel->get('manifesto_subheading', 'What Faceless Pictures 3 stands for.');
 $manifestoVideos = [];
 for ($i = 1; $i <= 6; $i++) {
-    $url = $settingsModel->get('manifesto_video' . $i . '_url', '');
-    if ($url) $manifestoVideos[] = $url;
+    $url   = $settingsModel->get('manifesto_video' . $i . '_url', '');
+    $title = $settingsModel->get('manifesto_video' . $i . '_title', '');
+    if ($url) $manifestoVideos[] = ['url' => $url, 'title' => $title];
 }
 
 // Up to 6 poster slots
@@ -344,27 +345,28 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
       </div>
       <div class="manifesto-slider">
-        <div class="manifesto-track" :style="'transform:translateX(-'+offset+'px)'"
-          x-ref="track">>
-          <?php foreach ($manifestoVideos as $idx => $mvUrl):
-            // Extract YouTube video ID for thumbnail + embed
+        <div class="manifesto-track" :style="'transform:translateX(-'+offset+'px)'">
+          <?php foreach ($manifestoVideos as $idx => $mv):
+            $mvUrl   = $mv['url'];
+            $mvTitle = $mv['title'];
+            // Robust YouTube ID extraction — strip tracking params first
             $mvId = '';
-            if (preg_match('/youtu\.be\/([^?&#]+)/', $mvUrl, $mm)) $mvId = $mm[1];
-            elseif (preg_match('/[?&]v=([^&#]+)/', $mvUrl, $mm)) $mvId = $mm[1];
-            elseif (preg_match('/\/shorts\/([^?&#]+)/', $mvUrl, $mm)) $mvId = $mm[1];
-            $mvEmbed = $mvId ? 'https://www.youtube.com/embed/' . $mvId : '';
+            $clean = preg_replace('/[?&]si=[^&]+/', '', $mvUrl); // remove ?si= tracking
+            if (preg_match('/youtu\.be\/([A-Za-z0-9_\-]{11})/', $clean, $mm))      $mvId = $mm[1];
+            elseif (preg_match('/[?&]v=([A-Za-z0-9_\-]{11})/', $clean, $mm))       $mvId = $mm[1];
+            elseif (preg_match('/\/shorts\/([A-Za-z0-9_\-]{11})/', $clean, $mm))   $mvId = $mm[1];
+            elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $mvId = $mm[1];
             $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/hqdefault.jpg' : '';
           ?>
           <div class="manifesto-slide">
             <div class="manifesto-embed"
-              @click="openManifestoPlayer(<?= htmlspecialchars(json_encode($mvUrl), ENT_QUOTES) ?>)"
+              @click="openManifestoPlayer(<?= htmlspecialchars(json_encode($mvUrl), ENT_QUOTES) ?>)">
               <?php if ($mvThumb): ?>
-                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="Video <?= $idx+1 ?>"
-                  style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-              <?php elseif ($mvEmbed): ?>
-                <iframe src="<?= htmlspecialchars($mvEmbed) ?>?rel=0&modestbranding=1&mute=1"
-                  allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
-                  allowfullscreen title="Manifesto video <?= $idx+1 ?>"></iframe>
+                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="<?= htmlspecialchars($mvTitle ?: 'Video ' . ($idx+1)) ?>">
+              <?php else: ?>
+                <div style="position:absolute;inset:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center">
+                  <svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </div>
               <?php endif; ?>
               <div class="manifesto-play-overlay">
                 <div class="manifesto-play-circle">
@@ -372,6 +374,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
                 </div>
               </div>
             </div>
+            <?php if ($mvTitle): ?>
+            <div style="padding:.6rem .75rem;background:#fff;font-size:.78rem;font-weight:600;color:#111;line-height:1.4"><?= htmlspecialchars($mvTitle) ?></div>
+            <?php endif; ?>
           </div>
           <?php endforeach; ?>
         </div>

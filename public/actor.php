@@ -201,9 +201,9 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
 ?>
   <div class="brief-card">
     <!-- Card heading + subheading — both admin-editable via Scripts tab -->
-    <div class="card-sec" style="background:#111;border-bottom:none;padding:1.25rem 1.25rem 1rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.45rem"><?= htmlspecialchars($cardHeading) ?></p>
-      <p style="font-size:.85rem;font-weight:500;color:rgba(255,255,255,.75);line-height:1.5"><?= htmlspecialchars($cardSubheading) ?></p>
+    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1;margin-bottom:.45rem"><?= htmlspecialchars($cardHeading) ?></p>
+      <p style="font-size:.85rem;font-weight:500;color:#6b7280;line-height:1.5"><?= htmlspecialchars($cardSubheading) ?></p>
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
