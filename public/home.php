@@ -198,7 +198,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#fff;position:relative;
   box-shadow:0 2px 16px rgba(0,0,0,.10);
   width:calc((100% - 2 * 1.25rem) / 3)} /* desktop: 3 per row */
-@media(max-width:1023px){.manifesto-slide{width:100%}} /* mobile/tablet: 1 per row */
+@media(max-width:1023px){
+  .manifesto-slide{width:100%} /* mobile/tablet: 1 per row */
+  .manifesto-track{transition:transform .38s cubic-bezier(.22,.68,0,1.2)} /* springy on mobile */
+}
 /* 16:9 YouTube embed inside each slide */
 .manifesto-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;cursor:pointer}
 .manifesto-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none}
@@ -347,7 +350,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
       </div>
       <div class="manifesto-slider">
-        <div style="overflow:hidden;margin:-4px;padding:4px">
+        <div style="overflow:hidden;margin:-12px;padding:12px">
         <div class="manifesto-track" :style="'transform:translateX(-'+offset+'px)'">
           <?php foreach ($manifestoVideos as $idx => $mv):
             $mvUrl   = $mv['url'];
@@ -833,7 +836,8 @@ function manifestoSlider(total) {
         },
         next() { this.goTo(this.currentPage + 1); },
         startAuto() {
-            this.autoTimer = setInterval(() => this.next(), 4500);
+            const interval = window.innerWidth >= 1024 ? 4500 : 2500;
+            this.autoTimer = setInterval(() => this.next(), interval);
         },
         openManifestoPlayer(url) {
             document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url } }));
