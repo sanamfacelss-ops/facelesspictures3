@@ -193,13 +193,13 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     // Multiple tune URLs — newline-separated
     $tuneUrls = $isSong ? array_values(array_filter(array_map('trim', explode("\n", $tuneRaw)))) : [];
 
-    // Card heading: use audition_type as the heading
-    $cardHeading    = $isSong ? 'SONG AUDITION' : 'DIALOGUE AUDITION';
+    // Card heading: use script title if set, otherwise fallback to audition type
+    $cardHeading = !empty($sc['title']) ? strtoupper($sc['title']) : ($isSong ? 'SONG AUDITION' : 'DIALOGUE AUDITION');
 ?>
   <div class="brief-card">
-    <!-- Card heading -->
+    <!-- Card heading — editable via script title in admin -->
     <div class="card-sec" style="background:#111;border-bottom:none;padding:1rem 1.125rem .875rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1"><?= $cardHeading ?></p>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#fff;line-height:1"><?= htmlspecialchars($cardHeading) ?></p>
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
@@ -246,10 +246,6 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
           Preview video coming soon
         </div>
       <?php endif; ?>
-    </div>
-    <div class="card-sec" style="border-bottom:none;padding-bottom:.5rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.03em;color:#111"><?= $title ?></p>
-      <p style="font-size:.78rem;color:#6b7280;margin-top:.3rem;line-height:1.5"><?= $brief ?></p>
     </div>
     <?php if ($imageUrl): ?>
     <div class="card-sec" style="padding:0">
