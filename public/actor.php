@@ -22,6 +22,21 @@ if (empty($songScripts) && !empty($dialogScripts)) {
 }
 
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
+
+// Collect all tune URLs across all song scripts for the Film Song card
+$allTuneUrls = [];
+foreach ($songScripts as $sc) {
+    $raw = $sc['tune_youtube_url'] ?? '';
+    foreach (array_filter(array_map('trim', explode("\n", $raw))) as $line) {
+        $sep = strpos($line, '|');
+        if ($sep !== false) {
+            $allTuneUrls[] = ['label' => trim(substr($line, 0, $sep)), 'url' => trim(substr($line, $sep + 1))];
+        } elseif ($line) {
+            $allTuneUrls[] = ['label' => '', 'url' => $line];
+        }
+    }
+}
+$allTuneUrls = array_values(array_filter($allTuneUrls, fn($t) => !empty($t['url'])));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -271,12 +286,9 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <?php endif; ?>
     <div class="card-sec">
-      <?php if (!$isSong): ?>
-      <div class="sec-label">Script</div>
-      <?php endif; ?>
+      <div class="sec-label"><?= $isSong ? 'Lyrics' : 'Script' ?></div>
       <div class="btn-row">
         <?php if ($isSong): ?>
-          <?php /* Song card: Download Lyrics full-width, then Get Song full-width (black) */ ?>
           <?php if ($pdfUrl): ?>
             <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline" style="width:100%">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -288,20 +300,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
               Lyrics PDF not available yet
             </span>
           <?php endif; ?>
-          <?php if (!empty($tuneUrls)): ?>
-            <?php
-              $tuneJson = htmlspecialchars(json_encode(array_values(array_filter($tuneUrls, fn($t) => !empty($t['url'])))), ENT_QUOTES);
-            ?>
-            <button type="button" style="display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#111;color:#fff;border:2px solid #111;border-radius:9px;padding:.7rem 1rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s,color .15s"
-              onmouseover="this.style.background='#333';this.style.borderColor='#333'"
-              onmouseout="this.style.background='#111';this.style.borderColor='#111'"
-              onclick="openSongSlider(<?= $tuneJson ?>)">
-              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              Get Song
-            </button>
-          <?php endif; ?>
         <?php else: ?>
-          <?php /* Dialog card: just the PDF button */ ?>
           <?php if ($pdfUrl): ?>
             <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -333,6 +332,27 @@ if (!empty($songScripts)) {
 ?>
 
 </div><!-- /brief-grid -->
+
+<?php if (!empty($allTuneUrls)): ?>
+<?php $filmSongJson = htmlspecialchars(json_encode($allTuneUrls), ENT_QUOTES); ?>
+<!-- FILM SONG CARD -->
+<div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem">
+  <div style="background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem">
+    <div>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem">FILM SONG</p>
+      <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45">Listen to the song before you record your audition</p>
+    </div>
+    <button type="button"
+      style="display:flex;align-items:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s,color .15s;flex-shrink:0"
+      onmouseover="this.style.background='#e5e7eb'"
+      onmouseout="this.style.background='#fff'"
+      onclick="openSongSlider(<?= $filmSongJson ?>)">
+      <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      Get Song
+    </button>
+  </div>
+</div>
+<?php endif; ?>
 
 <!-- SUBMISSION CARD (full width, dark) -->
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
