@@ -78,16 +78,18 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000}
-/* 9:16 media container — full card width, full height, video always 9:16 fills perfectly */
+/* 9:16 media container — for portrait/vertical videos */
 .media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;position:relative}
+/* 16:9 media container — for landscape YouTube embeds */
+.media-16-9{width:100%;overflow:hidden;background:#000;aspect-ratio:16/9;position:relative}
 /* local video: contain — letterbox if not exactly 9:16 */
 .media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;border:0;background:#000}
-/* YouTube iframe: fill the box — video is always 9:16 short */
-.media-9-16 iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+/* YouTube iframe: fills the box */
+.media-9-16 iframe,.media-16-9 iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 /* image: cover fill — poster is always 9:16 */
 .media-9-16 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}
 /* placeholder inside 9:16 box */
-.media-9-16.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}/* Overlapping audition type badge */
+.media-9-16.placeholder-bg,.media-16-9.placeholder-bg{background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}/* Overlapping audition type badge */
 .media-badge{position:absolute;top:.75rem;left:.75rem;z-index:4;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:.3rem .65rem;border-radius:20px;border:1px solid rgba(255,255,255,.18);pointer-events:none}
 /* Custom video player for local files */
 .pv-wrap{position:relative;width:100%;overflow:hidden}
@@ -245,7 +247,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <div class="card-sec" style="padding:0">
       <?php if ($previewUrl && $isYT): ?>
-        <div class="media-9-16">
+        <div class="media-16-9">
           <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
             allowfullscreen title="<?= $title ?> preview"></iframe>
