@@ -288,15 +288,15 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
               </span>
             <?php endif; ?>
             <?php if (!empty($tuneUrls)): ?>
-              <?php foreach ($tuneUrls as $idx => $tune): ?>
-                <?php if (!empty($tune['url'])): ?>
-                <button type="button" class="btn-tune"
-                  onclick="openTuneModal(<?= htmlspecialchars(json_encode($tune['url']), ENT_QUOTES) ?>)">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                  <?= htmlspecialchars(!empty($tune['label']) ? $tune['label'] : 'Get Song') ?>
-                </button>
-                <?php endif; ?>
-              <?php endforeach; ?>
+              <?php
+                // Build JSON array of all tune entries for the slider modal
+                $tuneJson = htmlspecialchars(json_encode(array_values(array_filter($tuneUrls, fn($t) => !empty($t['url'])))), ENT_QUOTES);
+              ?>
+              <button type="button" class="btn-tune"
+                onclick="openSongSlider(<?= $tuneJson ?>)">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                Get Song
+              </button>
             <?php endif; ?>
           </div>
         <?php else: ?>
@@ -416,14 +416,27 @@ if (!empty($songScripts)) {
   </div>
 </footer>
 
-<!-- TUNE MODAL -->
+<!-- SONG SLIDER MODAL -->
 <div id="tuneModal">
   <div class="tune-box">
-    <button class="tune-close" onclick="closeTuneModal()">✕</button>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.04em;color:#fff;margin-bottom:.75rem">▶ Song</p>
+    <button class="tune-close" onclick="closeTuneModal()" aria-label="Close">✕</button>
+
+    <!-- Header -->
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.06em;color:#fff;margin-bottom:.85rem">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><path d="M8 5v14l11-7z"/></svg>
+      Choose &amp; Play Song
+    </p>
+
+    <!-- Song tabs / slider -->
+    <div id="songTabs" style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.85rem"></div>
+
+    <!-- Player -->
     <div class="tune-wrap">
       <iframe id="tuneIframe" src="" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen title="Song tune"></iframe>
     </div>
+
+    <!-- Song title label -->
+    <p id="songLabel" style="margin-top:.65rem;font-size:.78rem;color:rgba(255,255,255,.55);text-align:center;min-height:1.1em"></p>
   </div>
 </div>
 
@@ -476,16 +489,57 @@ function pvToggleMute(id){
     var v=document.getElementById(id+'_v');if(v)v.muted=!v.muted;
 }
 function openTuneModal(url){
-    var e=_embedUrl(url);
-    if(!e) return;
-    document.getElementById('tuneIframe').src=e+'?autoplay=1';
+    // legacy single-url call → wrap in array
+    openSongSlider([{label:'',url:url}]);
+}
+var _songSliderTunes = [];
+var _songSliderActive = -1;
+function openSongSlider(tunes){
+    _songSliderTunes = tunes.filter(function(t){return t.url;});
+    if(!_songSliderTunes.length) return;
+    // Build tab buttons
+    var tabsEl = document.getElementById('songTabs');
+    tabsEl.innerHTML = '';
+    _songSliderTunes.forEach(function(t, i){
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = t.label || ('Song '+(i+1));
+        btn.style.cssText = 'background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:20px;padding:.32rem .85rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s;white-space:nowrap';
+        btn.dataset.idx = i;
+        btn.addEventListener('click', function(){ songSliderPlay(i); });
+        tabsEl.appendChild(btn);
+    });
+    // auto-play first
+    songSliderPlay(0);
     document.getElementById('tuneModal').style.display='flex';
     document.body.style.overflow='hidden';
+}
+function songSliderPlay(idx){
+    var tunes = _songSliderTunes;
+    if(!tunes[idx]) return;
+    _songSliderActive = idx;
+    // update iframe
+    var e = _embedUrl(tunes[idx].url);
+    document.getElementById('tuneIframe').src = e ? e+'?autoplay=1' : '';
+    // label
+    document.getElementById('songLabel').textContent = tunes[idx].label || '';
+    // highlight active tab
+    var tabs = document.getElementById('songTabs').querySelectorAll('button');
+    tabs.forEach(function(b, i){
+        if(i===idx){
+            b.style.background='#FF0000';
+            b.style.borderColor='#FF0000';
+        } else {
+            b.style.background='rgba(255,255,255,.1)';
+            b.style.borderColor='rgba(255,255,255,.2)';
+        }
+    });
 }
 function closeTuneModal(){
     document.getElementById('tuneIframe').src='';
     document.getElementById('tuneModal').style.display='none';
     document.body.style.overflow='';
+    _songSliderActive = -1;
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeTuneModal();});
 document.getElementById('tuneModal').addEventListener('click',function(e){if(e.target===this)closeTuneModal();});
