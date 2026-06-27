@@ -192,7 +192,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
 
 /* MANIFESTO SLIDER */
-.manifesto-section{padding:3rem 0 2.5rem;border-bottom:1px solid #e5e7eb}
+.manifesto-section{padding:2rem 0 2.5rem;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;margin-bottom:2.5rem}
 .manifesto-slider{position:relative;overflow:visible;padding-bottom:.5rem}
 .manifesto-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
 .manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#fff;position:relative;
@@ -251,9 +251,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     </a>
     <div class="flex items-center gap-4 sm:gap-6">
       <a href="#about"    class="nav-link hidden sm:block">About</a>
-      <a href="/actor"    class="nav-link">Actors</a>
-      <a href="/director" class="nav-link">Directors</a>
       <a href="/writer"   class="nav-link">Writers</a>
+      <a href="/director" class="nav-link">Directors</a>
+      <a href="/actor"    class="nav-link">Actors</a>
     </div>
   </div>
 </nav>
@@ -264,12 +264,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
     <!-- ══ HERO HEADLINE — centered ══ -->
     <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
         <?= htmlspecialchars($heroHeadline) ?>
       </h1>
-      <p style="font-size:.95rem;color:#6b7280;margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
-        <?= htmlspecialchars($siteTagline) ?>
-      </p>
     </div>
 
     <div class="py-10 sm:py-12">
@@ -299,7 +296,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     ?>
 
     <!-- MOBILE: 1-col grid, one poster at a time full width -->
-    <div class="poster-mobile-grid" style="margin-bottom:3.5rem">
+    <div class="poster-mobile-grid" style="margin-bottom:2rem">
       <?php foreach ($posters as $p): ?>
       <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
@@ -307,13 +304,13 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
     <!-- DESKTOP: grid ≤3, slider ≥4 -->
     <?php if ($posterCount <= 3): ?>
-    <div class="poster-desktop-grid" style="grid-template-columns:repeat(<?= $posterCount ?>,1fr);margin-bottom:3.5rem">
+    <div class="poster-desktop-grid" style="grid-template-columns:repeat(<?= $posterCount ?>,1fr);margin-bottom:2rem">
       <?php foreach ($posters as $p): ?>
       <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
     </div>
     <?php else: ?>
-    <div class="poster-slider poster-desktop-only" style="margin-bottom:3.5rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
+    <div class="poster-slider poster-desktop-only" style="margin-bottom:2rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
       <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       </button>
@@ -341,13 +338,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <?php if (!empty($manifestoVideos)): ?>
     <div class="manifesto-section" x-data="manifestoSlider(<?= count($manifestoVideos) ?>)">
       <div style="text-align:center;margin-bottom:1.75rem">
-        <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.5rem">Watch</p>
-        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.5rem">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:.02em;line-height:.95;color:#111">
           <?= htmlspecialchars($manifestoHeading) ?>
         </h2>
-        <?php if ($manifestoSubheading): ?>
-        <p style="font-size:.85rem;color:#6b7280;max-width:400px;margin:0 auto;line-height:1.6"><?= htmlspecialchars($manifestoSubheading) ?></p>
-        <?php endif; ?>
       </div>
       <div class="manifesto-slider">
         <div style="overflow:hidden;margin:-12px;padding:12px">
@@ -397,14 +390,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
-    <div style="text-align:center;margin-bottom:2rem;padding-top:.5rem">
-      <p style="font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem">Choose Your Role</p>
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111;margin-bottom:.625rem">
+    <div style="text-align:center;margin-bottom:2rem;padding-top:2rem">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111">
         <?= htmlspecialchars($rolesHeading) ?>
       </h2>
-      <p style="font-size:.9rem;color:#6b7280;max-width:400px;margin:0 auto;line-height:1.6">
-        <?= htmlspecialchars($rolesSubheading) ?>
-      </p>
     </div>
     <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6" style="align-items:stretch">
 

@@ -3156,36 +3156,22 @@ if (file_exists($errorLogFile)) {
                             <!-- SECTION: Hero / Headline -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Hero Section</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Main Headline</label>
-                                        <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <p class="text-[11px] text-dark/30 mt-1">Large centered text on homepage.</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Tagline / Subtitle</label>
-                                        <input type="text" x-model="form.site_tagline" placeholder="India's first anonymous film competition..."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/60 mb-1.5">Main Headline</label>
+                                    <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Large centered text on homepage.</p>
                                 </div>
                             </div>
 
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards Section (below posters)</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Heading</label>
-                                        <input type="text" x-model="form.landing_roles_heading" placeholder="Become a Star in 3 Clicks"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <p class="text-[11px] text-dark/30 mt-1">Big bold heading above the Actor / Director / Writer cards.</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Subheading</label>
-                                        <input type="text" x-model="form.landing_roles_subheading" placeholder="Pick your role. Shoot your video. Submit. That's it."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Heading</label>
+                                    <input type="text" x-model="form.landing_roles_heading" placeholder="Become a Star in 3 Clicks"
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Big bold heading above the Actor / Director / Writer cards.</p>
                                 </div>
                             </div>
 
@@ -3379,14 +3365,9 @@ if (file_exists($errorLogFile)) {
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-1">Manifesto Video Slider</p>
                                 <p class="text-[11px] text-dark/40 mb-3">YouTube links shown between the film posters and role cards. Desktop shows 3 at a time, mobile shows 1.</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                    <div>
+                                    <div class="md:col-span-2">
                                         <label class="block text-[11px] text-dark/40 mb-1">Section Heading</label>
                                         <input type="text" x-model="form.manifesto_heading" placeholder="OUR MANIFESTO"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] text-dark/40 mb-1">Section Subheading</label>
-                                        <input type="text" x-model="form.manifesto_subheading" placeholder="What Faceless Pictures 3 stands for."
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                     </div>
                                 </div>
