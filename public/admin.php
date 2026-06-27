@@ -4668,18 +4668,20 @@ if (file_exists($errorLogFile)) {
             // Song URL list helpers — format: "label|url" per line, label optional
             songUrlList() {
                 const raw = this.scriptForm.tune_youtube_url || '';
-                const lines = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-                if (lines.length === 0) return [{ label: '', url: '' }];
-                return lines.map(line => {
+                const lines = raw.split('\n').map(s => s.trim());
+                const parsed = lines.map(line => {
+                    if (!line) return null;
                     const sep = line.indexOf('|');
                     if (sep === -1) return { label: '', url: line };
                     return { label: line.substring(0, sep), url: line.substring(sep + 1) };
-                });
+                }).filter(e => e !== null);
+                if (parsed.length === 0) return [{ label: '', url: '' }];
+                return parsed;
             },
             _saveSongList(arr) {
+                // Keep all entries including blank ones so new rows survive re-render
                 this.scriptForm.tune_youtube_url = arr
                     .map(e => (e.label.trim() ? e.label.trim() + '|' : '') + e.url.trim())
-                    .filter(s => s.replace('|','').trim().length > 0)
                     .join('\n');
             },
             updateSongUrl(idx, val) {
@@ -4709,6 +4711,10 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 // Always read from _adminDashboard to get latest uploader values
                 const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
+                // Strip blank lines from tune_youtube_url before sending
+                if (form.tune_youtube_url) {
+                    form.tune_youtube_url = form.tune_youtube_url.split('\n').map(s => s.trim()).filter(s => s.replace('|','').trim().length > 0).join('\n');
+                }
                 // tune_youtube_url is already newline-separated (written directly by the dynamic list)
                 Object.keys(form).forEach(k => {
                     if (k === 'tune_youtube_url_1' || k === 'tune_youtube_url_2' || k === 'tune_youtube_url_3') return;
@@ -4754,6 +4760,10 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 // Always read from _adminDashboard to get latest uploader values
                 const form = (window._adminDashboard && window._adminDashboard.scriptForm) || this.scriptForm;
+                // Strip blank lines from tune_youtube_url before sending
+                if (form.tune_youtube_url) {
+                    form.tune_youtube_url = form.tune_youtube_url.split('\n').map(s => s.trim()).filter(s => s.replace('|','').trim().length > 0).join('\n');
+                }
                 // tune_youtube_url is already newline-separated (written directly by the dynamic list)
                 Object.keys(form).forEach(k => {
                     if (k === 'tune_youtube_url_1' || k === 'tune_youtube_url_2' || k === 'tune_youtube_url_3') return;
