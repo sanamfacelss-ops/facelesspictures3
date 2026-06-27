@@ -192,7 +192,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
 
 /* MANIFESTO SLIDER */
-.manifesto-section{padding:2rem 0 2.5rem;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;margin-bottom:2.5rem}
+.manifesto-section{padding:3rem 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;margin-bottom:3rem}
 .manifesto-slider{position:relative;overflow:visible;padding-bottom:.5rem}
 .manifesto-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
 .manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#fff;position:relative;
@@ -296,7 +296,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     ?>
 
     <!-- MOBILE: 1-col grid, one poster at a time full width -->
-    <div class="poster-mobile-grid" style="margin-bottom:2rem">
+    <div class="poster-mobile-grid" style="margin-bottom:3rem">
       <?php foreach ($posters as $p): ?>
       <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
@@ -304,13 +304,13 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
     <!-- DESKTOP: grid ≤3, slider ≥4 -->
     <?php if ($posterCount <= 3): ?>
-    <div class="poster-desktop-grid" style="grid-template-columns:repeat(<?= $posterCount ?>,1fr);margin-bottom:2rem">
+    <div class="poster-desktop-grid" style="grid-template-columns:repeat(<?= $posterCount ?>,1fr);margin-bottom:3rem">
       <?php foreach ($posters as $p): ?>
       <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
     </div>
     <?php else: ?>
-    <div class="poster-slider poster-desktop-only" style="margin-bottom:2rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
+    <div class="poster-slider poster-desktop-only" style="margin-bottom:3rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
       <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       </button>
@@ -390,7 +390,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
-    <div style="text-align:center;margin-bottom:2rem;padding-top:2rem">
+    <div style="text-align:center;margin-bottom:2rem;padding-top:3rem">
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111">
         <?= htmlspecialchars($rolesHeading) ?>
       </h2>
