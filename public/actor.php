@@ -271,34 +271,35 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <?php endif; ?>
     <div class="card-sec">
-      <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Song' : 'Script' ?></div>
+      <?php if (!$isSong): ?>
+      <div class="sec-label">Script</div>
+      <?php endif; ?>
       <div class="btn-row">
         <?php if ($isSong): ?>
-          <?php /* Song card: Download Lyrics + Get Song side by side on one row */ ?>
-          <div class="btn-row-split">
-            <?php if ($pdfUrl): ?>
-              <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Download Lyrics PDF
-              </a>
-            <?php else: ?>
-              <span class="btn-outline disabled">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Lyrics PDF not available yet
-              </span>
-            <?php endif; ?>
-            <?php if (!empty($tuneUrls)): ?>
-              <?php
-                // Build JSON array of all tune entries for the slider modal
-                $tuneJson = htmlspecialchars(json_encode(array_values(array_filter($tuneUrls, fn($t) => !empty($t['url'])))), ENT_QUOTES);
-              ?>
-              <button type="button" class="btn-tune"
-                onclick="openSongSlider(<?= $tuneJson ?>)">
-                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                Get Song
-              </button>
-            <?php endif; ?>
-          </div>
+          <?php /* Song card: Download Lyrics full-width, then Get Song full-width (black) */ ?>
+          <?php if ($pdfUrl): ?>
+            <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline" style="width:100%">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Download Lyrics PDF
+            </a>
+          <?php else: ?>
+            <span class="btn-outline disabled" style="width:100%">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Lyrics PDF not available yet
+            </span>
+          <?php endif; ?>
+          <?php if (!empty($tuneUrls)): ?>
+            <?php
+              $tuneJson = htmlspecialchars(json_encode(array_values(array_filter($tuneUrls, fn($t) => !empty($t['url'])))), ENT_QUOTES);
+            ?>
+            <button type="button" style="display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#111;color:#fff;border:2px solid #111;border-radius:9px;padding:.7rem 1rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s,color .15s"
+              onmouseover="this.style.background='#333';this.style.borderColor='#333'"
+              onmouseout="this.style.background='#111';this.style.borderColor='#111'"
+              onclick="openSongSlider(<?= $tuneJson ?>)">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Get Song
+            </button>
+          <?php endif; ?>
         <?php else: ?>
           <?php /* Dialog card: just the PDF button */ ?>
           <?php if ($pdfUrl): ?>
@@ -316,16 +317,6 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       </div>
     </div>
     <div class="card-sec tinted" style="flex:1"></div>
-    <?php if ($isSong): ?>
-    <div class="card-sec" style="padding:.875rem 1.125rem">
-      <a href="#submit-form" onclick="document.getElementById('submit-form').scrollIntoView({behavior:'smooth'});return false;"
-        style="display:flex;align-items:center;justify-content:center;gap:.45rem;width:100%;background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.8rem 1.25rem;font-size:.85rem;cursor:pointer;text-decoration:none;font-family:inherit;letter-spacing:.01em;transition:background .15s"
-        onmouseover="this.style.background='#333'" onmouseout="this.style.background='#111'">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-        I'm Ready to Upload →
-      </a>
-    </div>
-    <?php endif; ?>
   </div>
 <?php
 }
