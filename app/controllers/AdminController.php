@@ -2066,7 +2066,7 @@ class AdminController
             'manifesto_video6_url', 'manifesto_video6_title',
             'actor_dialog_script', 'actor_song_script',
             'director_brief', 'writer_brief',
-            'film_song_heading', 'film_song_subtitle',
+            'film_song_heading', 'film_song_subtitle', 'film_song_btn_label',
             // Actor page media
             'actor_preview_video_url', 'song_preview_video_url',
             'actor_script_image_url',  'song_lyrics_image_url',

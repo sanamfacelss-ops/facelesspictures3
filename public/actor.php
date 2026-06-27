@@ -26,8 +26,10 @@ $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 // Film Song card text (admin-editable)
 $filmSongHeading  = $settingsModel->get('film_song_heading',  'FILM SONG');
 $filmSongSubtitle = $settingsModel->get('film_song_subtitle', 'Listen to the song before you record your audition');
+$filmSongBtnLabel = $settingsModel->get('film_song_btn_label', 'Get Song');
 if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
 if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you record your audition';
+if (empty($filmSongBtnLabel)) $filmSongBtnLabel = 'Get Song';
 
 // Collect all tune URLs across all song scripts for the Film Song card
 $allTuneUrls = [];
@@ -360,7 +362,7 @@ if (!empty($songScripts)) {
     <button type="button" class="film-song-btn"
       onclick="openSongSlider(<?= $filmSongJson ?>)">
       <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      Get Song
+      <?= htmlspecialchars($filmSongBtnLabel) ?>
     </button>
   </div>
 </div>

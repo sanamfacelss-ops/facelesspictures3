@@ -3412,7 +3412,7 @@ if (file_exists($errorLogFile)) {
                                 </div>
                                 <div class="md:col-span-2 border-t border-dark/5 pt-4 mt-1">
                                     <p class="text-xs font-semibold text-dark/40 uppercase tracking-widest mb-3">🎵 Film Song Card (shown between audition cards and submit form)</p>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <label class="block text-xs font-medium text-dark/50 mb-1">Heading</label>
                                             <input type="text" x-model="briefs.film_song_heading" placeholder="FILM SONG" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
@@ -3422,6 +3422,11 @@ if (file_exists($errorLogFile)) {
                                             <label class="block text-xs font-medium text-dark/50 mb-1">Subtitle</label>
                                             <input type="text" x-model="briefs.film_song_subtitle" placeholder="Listen to the song before you record your audition" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
                                             <p class="text-[11px] text-dark/30 mt-1">Supporting text shown below the heading</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-dark/50 mb-1">Get Song Button Text</label>
+                                            <input type="text" x-model="briefs.film_song_btn_label" placeholder="Get Song" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                            <p class="text-[11px] text-dark/30 mt-1">Text shown on the button. Leave blank for "Get Song"</p>
                                         </div>
                                     </div>
                                 </div>
@@ -5931,6 +5936,7 @@ if (file_exists($errorLogFile)) {
                 writer_brief:        <?= json_encode($settingsModel->get('writer_brief','')) ?>,
                 film_song_heading:   <?= json_encode($settingsModel->get('film_song_heading','')) ?>,
                 film_song_subtitle:  <?= json_encode($settingsModel->get('film_song_subtitle','')) ?>,
+                film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','')) ?>,
             },
             async saveBriefs() {
                 this.saving = true; this.saved = false;
