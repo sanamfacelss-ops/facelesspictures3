@@ -1652,7 +1652,7 @@ if (file_exists($errorLogFile)) {
                                     <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak>
                                         <label class="block text-[12px] text-dark/50 mb-2">Song YouTube URLs <span class="text-[10px] text-dark/30">(each becomes a button — label optional)</span></label>
                                         <div class="space-y-2">
-                                            <template x-for="(entry, idx) in songUrlList()" :key="idx">
+                                            <template x-for="(entry, idx) in songEntries" :key="idx">
                                                 <div class="flex gap-2 items-center">
                                                     <input type="text"
                                                         :value="entry.label"
@@ -1665,7 +1665,7 @@ if (file_exists($errorLogFile)) {
                                                         class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
                                                         placeholder="https://youtu.be/...">
                                                     <button type="button" @click="removeSongUrl(idx)"
-                                                        x-show="songUrlList().length > 1"
+                                                        x-show="songEntries.length > 1"
                                                         class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                                     </button>
@@ -4080,6 +4080,7 @@ if (file_exists($errorLogFile)) {
             
             // Scripts
             scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' },
+            songEntries: [{ label: '', url: '' }],
             editingScript: null,
             
             // Guides
@@ -4652,6 +4653,7 @@ if (file_exists($errorLogFile)) {
                     tune_youtube_url:  sc.tune_youtube_url   || '',
                     rules:             sc.rules              || '',
                 };
+                this._loadSongEntriesFromForm();
                 // Sync uploader previews via global bridge
                 if (typeof window.setScriptVideo === 'function') window.setScriptVideo(sc.preview_video_url || '');
                 if (typeof window.setScriptPdf   === 'function') window.setScriptPdf(sc.script_pdf_url || '');
@@ -4661,49 +4663,46 @@ if (file_exists($errorLogFile)) {
             cancelEditScript() {
                 this.editingScript = null;
                 this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' };
+                this.songEntries = [{ label: '', url: '' }];
                 if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
                 if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
             },
 
-            // Song URL list helpers — format: "label|url" per line, label optional
-            songUrlList() {
-                const raw = this.scriptForm.tune_youtube_url || '';
-                const lines = raw.split('\n').map(s => s.trim());
-                const parsed = lines.map(line => {
-                    if (!line) return null;
-                    const sep = line.indexOf('|');
-                    if (sep === -1) return { label: '', url: line };
-                    return { label: line.substring(0, sep), url: line.substring(sep + 1) };
-                }).filter(e => e !== null);
-                if (parsed.length === 0) return [{ label: '', url: '' }];
-                return parsed;
-            },
-            _saveSongList(arr) {
-                // Keep all entries including blank ones so new rows survive re-render
-                this.scriptForm.tune_youtube_url = arr
+            // Song URL list helpers — use reactive songEntries array directly
+            _syncSongEntriesToForm() {
+                this.scriptForm.tune_youtube_url = this.songEntries
                     .map(e => (e.label.trim() ? e.label.trim() + '|' : '') + e.url.trim())
+                    .filter(s => s.replace('|','').trim().length > 0)
                     .join('\n');
             },
+            _loadSongEntriesFromForm() {
+                const raw = this.scriptForm.tune_youtube_url || '';
+                const lines = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                this.songEntries = lines.length > 0
+                    ? lines.map(line => {
+                        const sep = line.indexOf('|');
+                        if (sep === -1) return { label: '', url: line };
+                        return { label: line.substring(0, sep), url: line.substring(sep + 1) };
+                      })
+                    : [{ label: '', url: '' }];
+            },
+            songUrlList() { return this.songEntries; },
             updateSongUrl(idx, val) {
-                const arr = this.songUrlList();
-                arr[idx].url = val;
-                this._saveSongList(arr);
+                this.songEntries[idx].url = val;
+                this._syncSongEntriesToForm();
             },
             updateSongLabel(idx, val) {
-                const arr = this.songUrlList();
-                arr[idx].label = val;
-                this._saveSongList(arr);
+                this.songEntries[idx].label = val;
+                this._syncSongEntriesToForm();
             },
             addSongUrl() {
-                const arr = this.songUrlList();
-                arr.push({ label: '', url: '' });
-                this._saveSongList(arr);
+                this.songEntries.push({ label: '', url: '' });
+                this._syncSongEntriesToForm();
             },
             removeSongUrl(idx) {
-                let arr = this.songUrlList();
-                arr.splice(idx, 1);
-                if (arr.length === 0) arr = [{ label: '', url: '' }];
-                this._saveSongList(arr);
+                this.songEntries.splice(idx, 1);
+                if (this.songEntries.length === 0) this.songEntries.push({ label: '', url: '' });
+                this._syncSongEntriesToForm();
             },
             
             async createScript() {
@@ -4743,6 +4742,7 @@ if (file_exists($errorLogFile)) {
                         };
                         this.scripts.push(newScript);
                         this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' };
+                        this.songEntries = [{ label: '', url: '' }];
                         if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
                         if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
                         if (typeof window.setScriptImage === 'function') window.setScriptImage('');
@@ -4799,6 +4799,7 @@ if (file_exists($errorLogFile)) {
                         }
                         this.editingScript = null;
                         this.scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' };
+                        this.songEntries = [{ label: '', url: '' }];
                         if (typeof window.setScriptVideo === 'function') window.setScriptVideo('');
                         if (typeof window.setScriptPdf   === 'function') window.setScriptPdf('');
                         if (typeof window.setScriptImage === 'function') window.setScriptImage('');
