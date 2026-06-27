@@ -246,6 +246,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <p style="font-size:.85rem;font-weight:500;color:#6b7280;line-height:1.5"><?= htmlspecialchars($cardSubheading) ?></p>
     </div>
     <div class="card-sec" style="padding:0 0 1.5rem">
+      <?php if ($previewUrl && $isYT): ?>
         <div class="media-16-9">
           <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
