@@ -663,6 +663,11 @@ function homePage() {
                 }
                 return;
             }
+            // YouTube URL → use the manifesto YouTube modal instead of local player
+            if (/youtu(\.be|be\.com)/i.test(src)) {
+                document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: src } }));
+                return;
+            }
             this.playerSrc   = src;
             this.playerTitle = title || '';
             this.playerOpen  = true;
