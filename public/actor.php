@@ -109,7 +109,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .pv-btn svg{width:18px;height:18px}
 .pv-time{font-size:.65rem;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto}
 /* 9:16 script image — natural height, no padding, image drives the size */
-.portrait-img-wrap{width:100%;background:#fff;border-top:1px solid #f0f0f0;cursor:zoom-in;display:block;line-height:0;position:relative}
+.portrait-img-wrap{width:100%;background:#fff;cursor:zoom-in;display:block;line-height:0;position:relative}
 .portrait-img-wrap img{width:100%;height:auto;display:block;background:#fff}
 .portrait-img-wrap::after{content:'🔍  Tap to zoom';position:absolute;bottom:.6rem;right:.6rem;background:rgba(0,0,0,.55);color:#fff;font-size:.65rem;padding:.2rem .5rem;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .2s}
 .portrait-img-wrap:hover::after{opacity:1}
@@ -287,7 +287,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <?php endif; ?>
     </div>
     <?php if ($imageUrl): ?>
-    <div class="card-sec" style="padding:1rem 0 0;border-bottom:none">
+    <div class="card-sec" style="padding:0;border-bottom:none;border-top:none">
       <div class="portrait-img-wrap" onclick="openImgLightbox('<?= addslashes(htmlspecialchars($imageUrl)) ?>')">
         <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
       </div>
