@@ -47,6 +47,11 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
 .card-sec:last-child{border-bottom:none}
 .card-sec.tinted{background:#f9fafb}
+/* Mobile/tablet: shrink manifesto heading */
+@media(max-width:900px){
+  .brief-card-header p:first-child{font-size:1.45rem !important}
+  .brief-card-header p:last-child{font-size:.8rem !important}
+}
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000}
@@ -211,7 +216,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
 ?>
   <div class="brief-card">
     <!-- Card heading + subheading — both admin-editable via Scripts tab -->
-    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem">
+    <div class="card-sec brief-card-header" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem;text-align:center">
       <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1;margin-bottom:.45rem"><?= htmlspecialchars($cardHeading) ?></p>
       <p style="font-size:.85rem;font-weight:500;color:#6b7280;line-height:1.5"><?= htmlspecialchars($cardSubheading) ?></p>
     </div>
