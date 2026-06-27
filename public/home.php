@@ -390,7 +390,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
-    <div style="text-align:center;margin-bottom:2rem;padding-top:3rem">
+    <div style="text-align:center;margin-bottom:2rem;padding-top:0">
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111">
         <?= htmlspecialchars($rolesHeading) ?>
       </h2>
