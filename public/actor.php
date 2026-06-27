@@ -336,16 +336,22 @@ if (!empty($songScripts)) {
 <?php if (!empty($allTuneUrls)): ?>
 <?php $filmSongJson = htmlspecialchars(json_encode($allTuneUrls), ENT_QUOTES); ?>
 <!-- FILM SONG CARD -->
+<style>
+.film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.film-song-btn{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 2.5rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;flex-shrink:0;min-width:200px}
+.film-song-btn:hover{background:#e5e7eb}
+@media(max-width:640px){
+  .film-song-inner{flex-direction:column;align-items:center;text-align:center;padding:1.25rem 1.25rem}
+  .film-song-btn{width:100%;min-width:0;padding:.85rem 1rem}
+}
+</style>
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem">
-  <div style="background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem">
+  <div class="film-song-inner">
     <div>
       <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem">FILM SONG</p>
       <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45">Listen to the song before you record your audition</p>
     </div>
-    <button type="button"
-      style="display:flex;align-items:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s,color .15s;flex-shrink:0"
-      onmouseover="this.style.background='#e5e7eb'"
-      onmouseout="this.style.background='#fff'"
+    <button type="button" class="film-song-btn"
       onclick="openSongSlider(<?= $filmSongJson ?>)">
       <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       Get Song
