@@ -273,27 +273,45 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <div class="card-sec">
       <div class="sec-label"><?= $isSong ? 'Lyrics &amp; Song' : 'Script' ?></div>
       <div class="btn-row">
-        <?php if ($isSong && !empty($tuneUrls)): ?>
-          <?php foreach ($tuneUrls as $idx => $tune): ?>
-            <?php if (!empty($tune['url'])): ?>
-            <button type="button" class="btn-tune"
-              onclick="openTuneModal(<?= htmlspecialchars(json_encode($tune['url']), ENT_QUOTES) ?>)">
-              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <?= htmlspecialchars(!empty($tune['label']) ? $tune['label'] : 'Get Song') ?>
-            </button>
+        <?php if ($isSong): ?>
+          <?php /* Song card: Download Lyrics + Get Song side by side on one row */ ?>
+          <div class="btn-row-split">
+            <?php if ($pdfUrl): ?>
+              <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Download Lyrics PDF
+              </a>
+            <?php else: ?>
+              <span class="btn-outline disabled">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Lyrics PDF not available yet
+              </span>
             <?php endif; ?>
-          <?php endforeach; ?>
-        <?php endif; ?>
-        <?php if ($pdfUrl): ?>
-          <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <?= $isSong ? 'Download Lyrics PDF' : 'Download Script PDF' ?>
-          </a>
+            <?php if (!empty($tuneUrls)): ?>
+              <?php foreach ($tuneUrls as $idx => $tune): ?>
+                <?php if (!empty($tune['url'])): ?>
+                <button type="button" class="btn-tune"
+                  onclick="openTuneModal(<?= htmlspecialchars(json_encode($tune['url']), ENT_QUOTES) ?>)">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <?= htmlspecialchars(!empty($tune['label']) ? $tune['label'] : 'Get Song') ?>
+                </button>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </div>
         <?php else: ?>
-          <span class="btn-outline disabled">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <?= $isSong ? 'Lyrics' : 'Script' ?> PDF not available yet
-          </span>
+          <?php /* Dialog card: just the PDF button */ ?>
+          <?php if ($pdfUrl): ?>
+            <a href="<?= htmlspecialchars($pdfUrl) ?>" target="_blank" rel="noopener" class="btn-outline">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Download Script PDF
+            </a>
+          <?php else: ?>
+            <span class="btn-outline disabled">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Script PDF not available yet
+            </span>
+          <?php endif; ?>
         <?php endif; ?>
       </div>
     </div>
