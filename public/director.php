@@ -132,7 +132,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
       <p style="font-size:.78rem;color:#6b7280;margin-top:.3rem;line-height:1.5"><?= $brief ?></p>
     </div>
     <?php if ($scriptImage): ?>
-    <div class="card-sec" style="padding:0">
+    <div class="card-sec" style="padding:1.25rem 0 0;border-top:1px solid #e5e7eb;background:#fff">
       <img src="<?= htmlspecialchars($scriptImage) ?>" alt="Director script" class="portrait-img">
     </div>
     <?php endif; ?>
