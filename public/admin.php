@@ -3410,6 +3410,21 @@ if (file_exists($errorLogFile)) {
                                     <label class="block text-xs font-medium text-dark/50 mb-1">🎤 Actor — Song Brief</label>
                                     <textarea x-model="briefs.actor_song_script" rows="4" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
                                 </div>
+                                <div class="md:col-span-2 border-t border-dark/5 pt-4 mt-1">
+                                    <p class="text-xs font-semibold text-dark/40 uppercase tracking-widest mb-3">🎵 Film Song Card (shown between audition cards and submit form)</p>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-dark/50 mb-1">Heading</label>
+                                            <input type="text" x-model="briefs.film_song_heading" placeholder="FILM SONG" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                            <p class="text-[11px] text-dark/30 mt-1">Leave blank to use default "FILM SONG"</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-dark/50 mb-1">Subtitle</label>
+                                            <input type="text" x-model="briefs.film_song_subtitle" placeholder="Listen to the song before you record your audition" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                                            <p class="text-[11px] text-dark/30 mt-1">Supporting text shown below the heading</p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div>
                                     <label class="block text-xs font-medium text-dark/50 mb-1">🎬 Director Brief</label>
                                     <textarea x-model="briefs.director_brief" rows="4" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
@@ -5914,6 +5929,8 @@ if (file_exists($errorLogFile)) {
                 actor_song_script:   <?= json_encode($settingsModel->get('actor_song_script','')) ?>,
                 director_brief:      <?= json_encode($settingsModel->get('director_brief','')) ?>,
                 writer_brief:        <?= json_encode($settingsModel->get('writer_brief','')) ?>,
+                film_song_heading:   <?= json_encode($settingsModel->get('film_song_heading','')) ?>,
+                film_song_subtitle:  <?= json_encode($settingsModel->get('film_song_subtitle','')) ?>,
             },
             async saveBriefs() {
                 this.saving = true; this.saved = false;

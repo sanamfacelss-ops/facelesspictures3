@@ -23,6 +23,12 @@ if (empty($songScripts) && !empty($dialogScripts)) {
 
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 
+// Film Song card text (admin-editable)
+$filmSongHeading  = $settingsModel->get('film_song_heading',  'FILM SONG');
+$filmSongSubtitle = $settingsModel->get('film_song_subtitle', 'Listen to the song before you record your audition');
+if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
+if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you record your audition';
+
 // Collect all tune URLs across all song scripts for the Film Song card
 $allTuneUrls = [];
 foreach ($songScripts as $sc) {
@@ -348,8 +354,8 @@ if (!empty($songScripts)) {
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem">
   <div class="film-song-inner">
     <div>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem">FILM SONG</p>
-      <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45">Listen to the song before you record your audition</p>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem"><?= htmlspecialchars($filmSongHeading) ?></p>
+      <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45"><?= htmlspecialchars($filmSongSubtitle) ?></p>
     </div>
     <button type="button" class="film-song-btn"
       onclick="openSongSlider(<?= $filmSongJson ?>)">
