@@ -80,8 +80,8 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .preview-video{width:100%;display:block;background:#000}
 /* 9:16 media container — full card width, full height, video always 9:16 fills perfectly */
 .media-9-16{width:100%;overflow:hidden;background:#000;aspect-ratio:9/16;position:relative}
-/* local video: fill — video is always 9:16 */
-.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;border:0;background:#000}
+/* local video: contain — letterbox if not exactly 9:16 */
+.media-9-16 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;border:0;background:#000}
 /* YouTube iframe: fill the box — video is always 9:16 short */
 .media-9-16 iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 /* image: cover fill — poster is always 9:16 */
@@ -287,7 +287,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <?php endif; ?>
     </div>
     <?php if ($imageUrl): ?>
-    <div class="card-sec" style="padding:2rem 0 0;border-top:1px solid #e5e7eb;background:#fff">
+    <div class="card-sec" style="padding:1.25rem 0 0;border-top:1px solid #e5e7eb;background:#fff">
       <div class="portrait-img-wrap" onclick="openImgLightbox('<?= addslashes(htmlspecialchars($imageUrl)) ?>')">
         <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
       </div>
