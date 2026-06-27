@@ -287,7 +287,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
       <?php endif; ?>
     </div>
     <?php if ($imageUrl): ?>
-    <div class="card-sec" style="padding:0">
+    <div class="card-sec" style="padding:1rem 0 0">
       <div class="portrait-img-wrap" onclick="openImgLightbox('<?= addslashes(htmlspecialchars($imageUrl)) ?>')">
         <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
       </div>
