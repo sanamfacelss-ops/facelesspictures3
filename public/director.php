@@ -27,12 +27,14 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .brief-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:640px;margin:0 auto;padding:0 1.5rem 1.75rem}
 @media(max-width:768px){.brief-grid{padding:0 1rem 1.5rem}}
 /* Side-by-side layout responsive */
-.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:stretch}
 @media(max-width:860px){.side-by-side{grid-template-columns:1fr}}
 .brief-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column}
 .card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
 .card-sec:last-child{border-bottom:none}
 .card-sec.tinted{background:#f9fafb}
+/* Equal height: submit card fills its grid cell */
+.side-by-side>.submit-card{display:flex;flex-direction:column;margin:0}
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
 .preview-video{width:100%;display:block;background:#000;max-height:260px}
