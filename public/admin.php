@@ -93,7 +93,32 @@ $submissionTableMissing = false;
 try {
     $submissionModel = new App\Models\Submission();
     if ($submissionModel->tableExists()) {
-        $allSubmissions   = $submissionModel->all();
+        // Fetch submissions with linked video AI data
+        $stmt = $db->query(
+            "SELECT s.*, 
+                    v1.ai_feedback as video1_ai_feedback, 
+                    v1.ai_score as video1_ai_score,
+                    v1.ai_status as video1_ai_status,
+                    v2.ai_feedback as video2_ai_feedback,
+                    v2.ai_score as video2_ai_score,
+                    v2.ai_status as video2_ai_status
+             FROM submissions s
+             LEFT JOIN videos v1 ON s.video_id = v1.id
+             LEFT JOIN videos v2 ON s.video_id_2 = v2.id
+             ORDER BY s.submitted_at DESC"
+        );
+        $allSubmissions = $stmt->fetchAll();
+        
+        // Parse AI feedback JSON for each submission
+        foreach ($allSubmissions as &$sub) {
+            if (!empty($sub['video1_ai_feedback'])) {
+                $sub['video1_ai_feedback'] = json_decode($sub['video1_ai_feedback'], true);
+            }
+            if (!empty($sub['video2_ai_feedback'])) {
+                $sub['video2_ai_feedback'] = json_decode($sub['video2_ai_feedback'], true);
+            }
+        }
+        
         $submissionCounts = $submissionModel->countByStatus();
         $submissionRoles  = $submissionModel->countByRole();
         $submissionTotal  = $submissionModel->totalCount();
@@ -923,6 +948,18 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== SUBMISSIONS TAB ==================== -->
                 <div x-show="activeTab === 'videos'" x-cloak>
+                    <!-- Bulk Actions Toolbar (shows when items selected) -->
+                    <div x-show="selectedSubmissions.length > 0" x-cloak class="bg-crimson text-white rounded-xl p-4 mb-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[13px] font-medium" x-text="selectedSubmissions.length + ' selected'"></span>
+                            <button @click="selectedSubmissions = []" class="text-[11px] underline hover:no-underline">Clear</button>
+                        </div>
+                        <button @click="openDeleteConfirm()" class="bg-white text-crimson px-4 py-2 rounded-lg text-[12px] font-medium hover:bg-cream transition flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Delete Selected
+                        </button>
+                    </div>
+
                     <!-- Filters -->
                     <div class="flex flex-wrap gap-2 mb-4 items-center">
                         <button @click="submissionRoleFilter = ''" :class="submissionRoleFilter === '' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition" @click.prevent="filterSubmissions()">All</button>
@@ -951,6 +988,9 @@ if (file_exists($errorLogFile)) {
                             <table class="w-full text-[13px]">
                                 <thead class="bg-cream/50 text-dark/50">
                                     <tr>
+                                        <th class="px-3 py-3 text-left font-medium w-10">
+                                            <input type="checkbox" @change="toggleAllSubmissions($event.target.checked)" :checked="selectedSubmissions.length === filteredSubmissions.length && filteredSubmissions.length > 0" class="rounded border-dark/20">
+                                        </th>
                                         <th class="px-5 py-3 text-left font-medium">Name</th>
                                         <th class="px-5 py-3 text-left font-medium">Role</th>
                                         <th class="px-5 py-3 text-left font-medium">Type</th>
@@ -964,6 +1004,9 @@ if (file_exists($errorLogFile)) {
                                 <tbody class="divide-y divide-dark/5">
                                     <template x-for="sub in filteredSubmissions" :key="sub.id">
                                         <tr class="hover:bg-cream/30 transition">
+                                            <td class="px-3 py-3">
+                                                <input type="checkbox" :value="sub.id" @change="toggleSubmissionSelection(sub.id, $event.target.checked)" :checked="selectedSubmissions.includes(sub.id)" class="rounded border-dark/20">
+                                            </td>
                                             <td class="px-5 py-3">
                                                 <div class="font-medium text-dark" x-text="sub.name"></div>
                                                 <div class="text-[11px] text-dark/50" x-text="sub.email"></div>
@@ -984,8 +1027,8 @@ if (file_exists($errorLogFile)) {
                                                             :class="{
                                                                 'bg-green-100 text-green-700': sub.ai_status==='approved',
                                                                 'bg-red-100 text-red-700': sub.ai_flagged,
-                                                                'bg-amber-100 text-amber-700': sub.ai_status==='pending',
-                                                                'bg-gray-100 text-gray-600': !sub.ai_status || sub.ai_status==='processing'
+                                                                'bg-amber-100 text-amber-700': sub.ai_status==='pending' || sub.ai_status==='processing',
+                                                                'bg-gray-100 text-gray-600': !sub.ai_status
                                                             }"
                                                             x-text="sub.ai_flagged ? 'Flagged' : (sub.ai_status || 'Pending')"></span>
                                                     </div>
@@ -1001,8 +1044,8 @@ if (file_exists($errorLogFile)) {
                                                             :class="{
                                                                 'bg-green-100 text-green-700': sub.ai_status_2==='approved',
                                                                 'bg-red-100 text-red-700': sub.ai_flagged_2,
-                                                                'bg-amber-100 text-amber-700': sub.ai_status_2==='pending',
-                                                                'bg-gray-100 text-gray-600': !sub.ai_status_2 || sub.ai_status_2==='processing'
+                                                                'bg-amber-100 text-amber-700': sub.ai_status_2==='pending' || sub.ai_status_2==='processing',
+                                                                'bg-gray-100 text-gray-600': !sub.ai_status_2
                                                             }"
                                                             x-text="sub.ai_flagged_2 ? 'Flagged' : (sub.ai_status_2 || 'Pending')"></span>
                                                     </div>
@@ -1021,35 +1064,28 @@ if (file_exists($errorLogFile)) {
                                                     }" 
                                                     x-text="sub.status"></span>
                                             </td>
-                                            <td class="px-5 py-3 text-dark/40" x-text="formatDate(sub.submitted_at)"></td>
+                                            <td class="px-5 py-3 text-dark/40 text-[11px]" x-text="formatDate(sub.submitted_at)"></td>
                                             <td class="px-5 py-3">
-                                                <div class="flex gap-2 flex-wrap">
-                                                    <!-- Video 1 Watch Button -->
-                                                    <template x-if="sub.file_path">
-                                                        <a :href="'/uploads/'+sub.file_path" target="_blank" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">
-                                                            <template x-if="sub.submission_tag === 'actor-dual'">Dialog</template>
-                                                            <template x-if="sub.submission_tag !== 'actor-dual'">Watch</template>
-                                                        </a>
-                                                    </template>
-                                                    <!-- Video 2 Watch Button (Actor Dual Only) -->
-                                                    <template x-if="sub.file_path_2">
-                                                        <a :href="'/uploads/'+sub.file_path_2" target="_blank" class="bg-pink-100 text-pink-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-pink-200 transition">Song</a>
-                                                    </template>
-                                                    <!-- Status Change Buttons -->
-                                                    <template x-if="sub.status === 'new' || sub.status === 'reviewed'">
-                                                        <button @click="updateSubmissionStatus(sub.id, 'shortlisted')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">Shortlist</button>
-                                                    </template>
-                                                    <template x-if="sub.status !== 'rejected'">
-                                                        <button @click="updateSubmissionStatus(sub.id, 'rejected')" class="bg-red-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-red-700 transition">Reject</button>
-                                                    </template>
+                                                <div class="flex gap-1 flex-wrap">
                                                     <!-- View Details -->
                                                     <button @click="viewSubmission(sub)" class="bg-dark/10 text-dark/60 px-2 py-1 rounded text-[10px] font-medium hover:bg-dark/20 transition">Details</button>
+                                                    <!-- Status Change Buttons -->
+                                                    <template x-if="sub.status === 'new' || sub.status === 'reviewed'">
+                                                        <button @click="updateSubmissionStatus(sub.id, 'shortlisted')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">✓</button>
+                                                    </template>
+                                                    <template x-if="sub.status !== 'rejected'">
+                                                        <button @click="updateSubmissionStatus(sub.id, 'rejected')" class="bg-red-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-red-700 transition">✕</button>
+                                                    </template>
+                                                    <!-- Delete Button -->
+                                                    <button @click="openDeleteConfirm(sub.id)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
                                     </template>
                                     <tr x-show="filteredSubmissions.length === 0">
-                                        <td colspan="8" class="px-5 py-10 text-center text-dark/30">No submissions found</td>
+                                        <td colspan="9" class="px-5 py-10 text-center text-dark/30">No submissions found</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1398,215 +1434,6 @@ if (file_exists($errorLogFile)) {
                             <div class="text-5xl mb-4">📋</div>
                             <h3 class="font-semibold text-dark mb-2">No Submissions Found</h3>
                             <p class="text-dark/50 text-sm">Try adjusting your filters or check back later for new auditions.</p>
-                        </div>
-                    </div>
-
-                    <!-- View Submission Modal - Enhanced for Dual Videos -->
-                    <div x-show="viewingSubmission" x-cloak @click.self="viewingSubmission=null"
-                        class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-                        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
-                        x-transition:enter-end="opacity-100">
-                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" @click.stop>
-                            <!-- Header -->
-                            <div class="p-6 border-b border-dark/5 flex items-center justify-between sticky top-0 bg-white z-10">
-                                <div>
-                                    <h3 class="font-display text-2xl text-dark">SUBMISSION DETAILS</h3>
-                                    <p class="text-sm text-dark/50 mt-1" x-text="'ID: #' + viewingSubmission.id"></p>
-                                </div>
-                                <button @click="viewingSubmission=null" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-dark/5 text-dark/40 hover:text-dark transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                            
-                            <template x-if="viewingSubmission">
-                                <div class="p-6 space-y-6">
-                                    <!-- Applicant Info Card -->
-                                    <div class="bg-dark/[0.02] rounded-xl p-5">
-                                        <div class="grid md:grid-cols-2 gap-4">
-                                            <div>
-                                                <p class="text-xs text-dark/40 uppercase tracking-wider mb-1 font-semibold">Name</p>
-                                                <p class="text-dark font-medium" x-text="viewingSubmission.name"></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-dark/40 uppercase tracking-wider mb-1 font-semibold">Role</p>
-                                                <span class="inline-flex items-center gap-1.5 text-sm font-bold px-3 py-1 rounded-full"
-                                                    :class="{
-                                                        'bg-red-100 text-red-700': viewingSubmission.role==='actor',
-                                                        'bg-amber-100 text-amber-700': viewingSubmission.role==='director',
-                                                        'bg-blue-100 text-blue-700': viewingSubmission.role==='writer'
-                                                    }">
-                                                    <template x-if="viewingSubmission.role==='actor'">🎭</template>
-                                                    <template x-if="viewingSubmission.role==='director'">🎬</template>
-                                                    <template x-if="viewingSubmission.role==='writer'">✍️</template>
-                                                    <span x-text="viewingSubmission.role.toUpperCase() + ' — ' + viewingSubmission.audition_type"></span>
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-dark/40 uppercase tracking-wider mb-1 font-semibold">Email</p>
-                                                <a :href="'mailto:' + viewingSubmission.email" class="text-dark hover:text-crimson" x-text="viewingSubmission.email"></a>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-dark/40 uppercase tracking-wider mb-1 font-semibold">Phone</p>
-                                                <a :href="'tel:' + viewingSubmission.phone" class="text-dark hover:text-crimson" x-text="viewingSubmission.phone"></a>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-dark/40 uppercase tracking-wider mb-1 font-semibold">Submitted</p>
-                                                <p class="text-dark" x-text="formatDate(viewingSubmission.submitted_at)"></p>
-                                            </div>
-                                            <div>
-                                                <p class="text-xs text-dark/40 uppercase tracking-wider mb-1 font-semibold">Status</p>
-                                                <span class="inline-flex px-3 py-1 rounded-lg text-sm font-semibold"
-                                                    :class="{
-                                                        'bg-amber-100 text-amber-700': viewingSubmission.status==='new',
-                                                        'bg-blue-100 text-blue-700': viewingSubmission.status==='reviewed',
-                                                        'bg-green-100 text-green-700': viewingSubmission.status==='shortlisted',
-                                                        'bg-red-100 text-red-700': viewingSubmission.status==='rejected'
-                                                    }"
-                                                    x-text="viewingSubmission.status.toUpperCase()"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Notes Section -->
-                                    <template x-if="viewingSubmission.notes">
-                                        <div>
-                                            <p class="text-xs text-dark/40 uppercase tracking-wider mb-2 font-semibold">Applicant Notes</p>
-                                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-dark" x-text="viewingSubmission.notes"></div>
-                                        </div>
-                                    </template>
-                                    
-                                    <!-- Script Used -->
-                                    <template x-if="viewingSubmission.script_title">
-                                        <div>
-                                            <p class="text-xs text-dark/40 uppercase tracking-wider mb-2 font-semibold">Script Used</p>
-                                            <div class="bg-purple-50 border border-purple-200 rounded-lg px-4 py-2 text-sm font-medium text-purple-900" x-text="viewingSubmission.script_title"></div>
-                                        </div>
-                                    </template>
-                                    
-                                    <!-- Videos Section -->
-                                    <div>
-                                        <p class="text-xs text-dark/40 uppercase tracking-wider mb-3 font-semibold">Uploaded Videos</p>
-                                        
-                                        <!-- Actor Dual Video Layout -->
-                                        <template x-if="viewingSubmission.submission_tag === 'actor-dual' && viewingSubmission.file_path_2">
-                                            <div class="grid md:grid-cols-2 gap-4">
-                                                <!-- Dialog Video -->
-                                                <div class="border-2 border-blue-200 rounded-xl p-4 bg-blue-50">
-                                                    <div class="flex items-center justify-between mb-3">
-                                                        <h4 class="font-bold text-blue-900 flex items-center gap-2">
-                                                            <span class="w-7 h-7 rounded-full bg-blue-600 text-white text-sm flex items-center justify-center">1</span>
-                                                            Dialog Audition
-                                                        </h4>
-                                                        <span class="text-xs px-2 py-1 rounded-lg font-semibold"
-                                                            :class="{
-                                                                'bg-green-500 text-white': viewingSubmission.ai_status==='approved',
-                                                                'bg-red-500 text-white': viewingSubmission.ai_flagged,
-                                                                'bg-amber-500 text-white': viewingSubmission.ai_status==='pending'
-                                                            }"
-                                                            x-text="viewingSubmission.ai_flagged ? '🚩 Flagged' : (viewingSubmission.ai_status==='approved' ? '✅ Pass' : '⏳ Pending')"></span>
-                                                    </div>
-                                                    <a :href="'/uploads/'+viewingSubmission.file_path" target="_blank"
-                                                        class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition w-full mb-2">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                        Watch Dialog
-                                                    </a>
-                                                    <p class="text-xs text-blue-700" x-text="'Format: ' + (viewingSubmission.file_type || 'N/A').toUpperCase()"></p>
-                                                    <template x-if="viewingSubmission.ai_notes">
-                                                        <div class="mt-3 text-xs text-blue-900 bg-blue-100 rounded-lg p-3">
-                                                            <p class="font-semibold mb-1">AI Notes:</p>
-                                                            <p x-text="viewingSubmission.ai_notes"></p>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                                
-                                                <!-- Song Video -->
-                                                <div class="border-2 border-pink-200 rounded-xl p-4 bg-pink-50">
-                                                    <div class="flex items-center justify-between mb-3">
-                                                        <h4 class="font-bold text-pink-900 flex items-center gap-2">
-                                                            <span class="w-7 h-7 rounded-full bg-pink-600 text-white text-sm flex items-center justify-center">2</span>
-                                                            Song Audition
-                                                        </h4>
-                                                        <span class="text-xs px-2 py-1 rounded-lg font-semibold"
-                                                            :class="{
-                                                                'bg-green-500 text-white': viewingSubmission.ai_status_2==='approved',
-                                                                'bg-red-500 text-white': viewingSubmission.ai_flagged_2,
-                                                                'bg-amber-500 text-white': viewingSubmission.ai_status_2==='pending'
-                                                            }"
-                                                            x-text="viewingSubmission.ai_flagged_2 ? '🚩 Flagged' : (viewingSubmission.ai_status_2==='approved' ? '✅ Pass' : '⏳ Pending')"></span>
-                                                    </div>
-                                                    <a :href="'/uploads/'+viewingSubmission.file_path_2" target="_blank"
-                                                        class="flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded-lg font-semibold transition w-full mb-2">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                        Watch Song
-                                                    </a>
-                                                    <p class="text-xs text-pink-700" x-text="'Format: ' + (viewingSubmission.file_type_2 || 'N/A').toUpperCase()"></p>
-                                                    <template x-if="viewingSubmission.ai_notes_2">
-                                                        <div class="mt-3 text-xs text-pink-900 bg-pink-100 rounded-lg p-3">
-                                                            <p class="font-semibold mb-1">AI Notes:</p>
-                                                            <p x-text="viewingSubmission.ai_notes_2"></p>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </div>
-                                        </template>
-                                        
-                                        <!-- Single Video Layout (Director/Writer) -->
-                                        <template x-if="viewingSubmission.submission_tag !== 'actor-dual' && viewingSubmission.file_path">
-                                            <div class="border-2 border-crimson/30 rounded-xl p-5 bg-crimson/5">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <h4 class="font-bold text-dark">Submission Video</h4>
-                                                    <span class="text-sm px-3 py-1.5 rounded-lg font-semibold"
-                                                        :class="{
-                                                            'bg-green-500 text-white': viewingSubmission.ai_status==='approved',
-                                                            'bg-red-500 text-white': viewingSubmission.ai_flagged,
-                                                            'bg-amber-500 text-white': viewingSubmission.ai_status==='pending'
-                                                        }"
-                                                        x-text="viewingSubmission.ai_flagged ? '🚩 AI Flagged' : (viewingSubmission.ai_status==='approved' ? '✅ AI Approved' : '⏳ AI Pending')"></span>
-                                                </div>
-                                                <a :href="'/uploads/'+viewingSubmission.file_path" target="_blank"
-                                                    class="flex items-center justify-center gap-2 bg-crimson hover:bg-crimson/90 text-white px-6 py-4 rounded-lg text-lg font-semibold transition w-full mb-3">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                    Watch Submission Video
-                                                </a>
-                                                <p class="text-sm text-dark/60" x-text="'Format: ' + (viewingSubmission.file_type || 'N/A').toUpperCase() + ' • Size: ' + Math.round((viewingSubmission.file_size_bytes || 0) / 1024 / 1024) + ' MB'"></p>
-                                                <template x-if="viewingSubmission.ai_notes">
-                                                    <div class="mt-4 text-sm text-dark bg-amber-50 border border-amber-200 rounded-lg p-4">
-                                                        <p class="font-semibold mb-2 flex items-center gap-2">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                            AI Moderation Notes:
-                                                        </p>
-                                                        <p x-text="viewingSubmission.ai_notes"></p>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    
-                                    <!-- Admin Notes -->
-                                    <div>
-                                        <p class="text-xs text-dark/40 uppercase tracking-wider mb-2 font-semibold">Admin Internal Notes</p>
-                                        <textarea x-model="submissionAdminNotes" rows="4"
-                                            class="w-full border-2 border-dark/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold/40"
-                                            placeholder="Add internal notes about this submission (visible only to admins)..."></textarea>
-                                        <button @click="saveSubmissionNotes(viewingSubmission.id)"
-                                            class="mt-3 bg-dark text-white font-semibold px-6 py-3 rounded-lg hover:bg-dark/80 transition">
-                                            💾 Save Admin Notes
-                                        </button>
-                                    </div>
-                                    
-                                    <!-- Actions -->
-                                    <div class="flex gap-3 pt-4 border-t border-dark/10">
-                                        <button @click="confirmDeleteSubmission(viewingSubmission.id); viewingSubmission=null"
-                                            class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold px-6 py-3 rounded-lg transition">
-                                            🗑️ Delete Submission
-                                        </button>
-                                        <button @click="viewingSubmission=null"
-                                            class="flex-1 bg-dark/5 hover:bg-dark/10 text-dark font-semibold px-6 py-3 rounded-lg transition">
-                                            Close
-                                        </button>
-                                    </div>
-                                </div>
-                            </template>
                         </div>
                     </div>
 
@@ -4236,7 +4063,226 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
-    <!-- Submission Detail Modal - MODERN with Tabs -->
+    <!-- Submission Detail Modal - Compact -->
+    <div x-show="viewingSubmission" x-cloak @click.self="closeSubmission()"
+        class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-data="{ activeVideoTab: 'video1' }">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col" @click.stop>
+            <!-- Compact Header -->
+            <div class="px-5 py-3 border-b border-dark/10 flex items-center justify-between flex-shrink-0">
+                <template x-if="viewingSubmission">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-display text-[18px] text-dark truncate" x-text="viewingSubmission.name"></h3>
+                        <p class="text-[11px] text-dark/50" x-text="viewingSubmission.role.toUpperCase() + ' — ' + viewingSubmission.audition_type"></p>
+                    </div>
+                </template>
+                <button @click="closeSubmission()" class="text-dark/40 hover:text-dark ml-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <template x-if="viewingSubmission">
+                <div class="flex-1 overflow-y-auto">
+                    <!-- Compact Contact Bar -->
+                    <div class="px-5 py-2 bg-cream/30 border-b border-dark/5 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
+                        <span class="flex items-center gap-1 text-dark/70">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <a :href="'mailto:' + viewingSubmission.email" x-text="viewingSubmission.email" class="hover:text-crimson"></a>
+                        </span>
+                        <span class="flex items-center gap-1 text-dark/70">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            <a :href="'tel:' + viewingSubmission.phone" x-text="viewingSubmission.phone" class="hover:text-crimson"></a>
+                        </span>
+                        <span class="flex items-center gap-1 text-dark/70">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span x-text="formatDate(viewingSubmission.submitted_at)"></span>
+                        </span>
+                        <span class="ml-auto px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                            :class="{
+                                'bg-amber-100 text-amber-700': viewingSubmission.status==='new',
+                                'bg-blue-100 text-blue-700': viewingSubmission.status==='reviewed',
+                                'bg-green-100 text-green-700': viewingSubmission.status==='shortlisted',
+                                'bg-red-100 text-red-700': viewingSubmission.status==='rejected'
+                            }"
+                            x-text="viewingSubmission.status.toUpperCase()"></span>
+                    </div>
+
+                    <!-- Tabs (for actor dual videos) -->
+                    <template x-if="viewingSubmission.submission_tag === 'actor-dual' && viewingSubmission.file_path_2">
+                        <div class="border-b border-dark/5 px-5">
+                            <div class="flex gap-2">
+                                <button @click="activeVideoTab = 'video1'" 
+                                    class="px-3 py-2 text-[12px] font-medium border-b-2 transition"
+                                    :class="activeVideoTab === 'video1' ? 'border-crimson text-crimson' : 'border-transparent text-dark/50 hover:text-dark'">
+                                    🎭 Dialog
+                                </button>
+                                <button @click="activeVideoTab = 'video2'" 
+                                    class="px-3 py-2 text-[12px] font-medium border-b-2 transition"
+                                    :class="activeVideoTab === 'video2' ? 'border-crimson text-crimson' : 'border-transparent text-dark/50 hover:text-dark'">
+                                    🎵 Song
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="p-5">
+                        <!-- Dialog Video / Single Video -->
+                        <template x-if="viewingSubmission.file_path && (viewingSubmission.submission_tag !== 'actor-dual' || activeVideoTab === 'video1')">
+                            <div>
+                                <!-- Video Player (Plyr) -->
+                                <div class="mb-4">
+                                    <video :id="'submission-player-' + viewingSubmission.id" 
+                                           :src="'/uploads/' + viewingSubmission.file_path" 
+                                           controls playsinline 
+                                           class="w-full rounded-lg bg-dark max-h-[350px] plyr-video"></video>
+                                </div>
+
+                                <!-- AI Analysis (Compact) -->
+                                <div class="bg-cream rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-semibold text-dark text-[12px] flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                            AI Analysis
+                                        </h4>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                                            :class="{
+                                                'bg-green-100 text-green-700': viewingSubmission.ai_status==='approved',
+                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged,
+                                                'bg-amber-100 text-amber-700': viewingSubmission.ai_status==='pending' || viewingSubmission.ai_status==='processing',
+                                                'bg-gray-100 text-gray-600': !viewingSubmission.ai_status
+                                            }"
+                                            x-text="viewingSubmission.ai_flagged ? '🚩 FLAGGED' : (viewingSubmission.ai_status ? viewingSubmission.ai_status.toUpperCase() : 'PENDING')"></span>
+                                    </div>
+
+                                    <template x-if="viewingSubmission.ai_notes">
+                                        <p class="text-[12px] text-dark/70 whitespace-pre-wrap" x-text="viewingSubmission.ai_notes"></p>
+                                    </template>
+                                    <template x-if="!viewingSubmission.ai_notes && !viewingSubmission.ai_status">
+                                        <p class="text-[11px] text-dark/40 italic">No AI analysis available yet.</p>
+                                    </template>
+                                    <template x-if="!viewingSubmission.ai_notes && viewingSubmission.ai_status === 'processing'">
+                                        <div class="flex items-center gap-2 text-[11px] text-dark/50">
+                                            <svg class="animate-spin w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Processing...
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-if="viewingSubmission.ai_flagged">
+                                        <div class="mt-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                                            <svg class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                            <p class="text-[10px] text-red-700">Flagged for manual review</p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Song Video (for actor dual) -->
+                        <template x-if="viewingSubmission.submission_tag === 'actor-dual' && viewingSubmission.file_path_2 && activeVideoTab === 'video2'">
+                            <div>
+                                <div class="mb-4">
+                                    <video :id="'submission-player-2-' + viewingSubmission.id" 
+                                           :src="'/uploads/' + viewingSubmission.file_path_2" 
+                                           controls playsinline 
+                                           class="w-full rounded-lg bg-dark max-h-[350px] plyr-video"></video>
+                                </div>
+
+                                <div class="bg-cream rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-semibold text-dark text-[12px] flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                            AI Analysis
+                                        </h4>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                                            :class="{
+                                                'bg-green-100 text-green-700': viewingSubmission.ai_status_2==='approved',
+                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged_2,
+                                                'bg-amber-100 text-amber-700': viewingSubmission.ai_status_2==='pending' || viewingSubmission.ai_status_2==='processing',
+                                                'bg-gray-100 text-gray-600': !viewingSubmission.ai_status_2
+                                            }"
+                                            x-text="viewingSubmission.ai_flagged_2 ? '🚩 FLAGGED' : (viewingSubmission.ai_status_2 ? viewingSubmission.ai_status_2.toUpperCase() : 'PENDING')"></span>
+                                    </div>
+
+                                    <template x-if="viewingSubmission.ai_notes_2">
+                                        <p class="text-[12px] text-dark/70 whitespace-pre-wrap" x-text="viewingSubmission.ai_notes_2"></p>
+                                    </template>
+                                    <template x-if="!viewingSubmission.ai_notes_2 && !viewingSubmission.ai_status_2">
+                                        <p class="text-[11px] text-dark/40 italic">No AI analysis available yet.</p>
+                                    </template>
+                                    <template x-if="!viewingSubmission.ai_notes_2 && viewingSubmission.ai_status_2 === 'processing'">
+                                        <div class="flex items-center gap-2 text-[11px] text-dark/50">
+                                            <svg class="animate-spin w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Processing...
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-if="viewingSubmission.ai_flagged_2">
+                                        <div class="mt-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+                                            <svg class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                            <p class="text-[10px] text-red-700">Flagged for manual review</p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Applicant Notes -->
+                        <template x-if="viewingSubmission.notes">
+                            <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <h4 class="text-[11px] font-semibold text-dark/70 uppercase mb-1">Notes:</h4>
+                                <p class="text-[12px] text-dark" x-text="viewingSubmission.notes"></p>
+                            </div>
+                        </template>
+
+                        <!-- Compact Actions -->
+                        <div class="mt-4 pt-4 border-t border-dark/5 flex gap-2">
+                            <button @click="updateSubmissionStatus(viewingSubmission.id, 'shortlisted'); closeSubmission()" 
+                                class="flex-1 bg-green-600 text-white py-2.5 rounded-lg text-[12px] font-medium hover:bg-green-700 transition flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Shortlist
+                            </button>
+                            <button @click="updateSubmissionStatus(viewingSubmission.id, 'rejected'); closeSubmission()" 
+                                class="flex-1 bg-red-600 text-white py-2.5 rounded-lg text-[12px] font-medium hover:bg-red-700 transition flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div x-show="deleteConfirmOpen" x-cloak @click.self="deleteConfirmOpen=false"
+        class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6" @click.stop>
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-[16px] text-dark mb-2">Delete Submission?</h3>
+                    <p class="text-[13px] text-dark/60 mb-4">
+                        <template x-if="deleteSubmissionIds.length > 1">
+                            <span x-text="'Are you sure you want to delete ' + deleteSubmissionIds.length + ' submissions? This action cannot be undone.'"></span>
+                        </template>
+                        <template x-if="deleteSubmissionIds.length === 1">
+                            <span>Are you sure you want to delete this submission? This action cannot be undone.</span>
+                        </template>
+                    </p>
+                    <div class="flex gap-3 justify-end">
+                        <button @click="deleteConfirmOpen=false" class="px-4 py-2 text-[13px] text-dark/50 hover:text-dark transition">Cancel</button>
+                        <button @click="confirmDeleteSubmissions()" class="px-4 py-2 text-[13px] bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div x-show="viewingSubmission" x-cloak @click.self="closeSubmission()"
         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
@@ -4542,6 +4588,12 @@ if (file_exists($errorLogFile)) {
             submissionRoleFilter: '',
             submissionStatusFilter: '',
             viewingSubmission: null,
+            submissionAdminNotes: '',
+            
+            // Bulk delete
+            selectedSubmissions: [],
+            deleteConfirmOpen: false,
+            deleteSubmissionIds: [],
             submissionAdminNotes: '',
             
             // AI Settings
@@ -5001,6 +5053,61 @@ if (file_exists($errorLogFile)) {
                         if (this.viewingSubmission && this.viewingSubmission.id === id) this.viewingSubmission = null;
                     }
                 } catch(e) { console.error('Delete submission failed', e); }
+            },
+
+            // Bulk delete functions
+            toggleSubmissionSelection(id, checked) {
+                if (checked) {
+                    if (!this.selectedSubmissions.includes(id)) {
+                        this.selectedSubmissions.push(id);
+                    }
+                } else {
+                    this.selectedSubmissions = this.selectedSubmissions.filter(sid => sid !== id);
+                }
+            },
+            
+            toggleAllSubmissions(checked) {
+                if (checked) {
+                    this.selectedSubmissions = this.filteredSubmissions.map(s => s.id);
+                } else {
+                    this.selectedSubmissions = [];
+                }
+            },
+            
+            openDeleteConfirm(id = null) {
+                if (id) {
+                    // Single delete
+                    this.deleteSubmissionIds = [id];
+                } else {
+                    // Bulk delete
+                    this.deleteSubmissionIds = [...this.selectedSubmissions];
+                }
+                this.deleteConfirmOpen = true;
+            },
+            
+            async confirmDeleteSubmissions() {
+                const fd = new FormData();
+                fd.append('csrf_token', this.csrf);
+                
+                for (const id of this.deleteSubmissionIds) {
+                    try {
+                        const res = await fetch('/api/admin/submissions/'+id+'/delete', {method:'POST', body: fd});
+                        const data = await res.json();
+                        if (data.success) {
+                            this.submissions = this.submissions.filter(s => s.id !== id);
+                            this.filteredSubmissions = this.filteredSubmissions.filter(s => s.id !== id);
+                            this.selectedSubmissions = this.selectedSubmissions.filter(sid => sid !== id);
+                        }
+                    } catch(e) { 
+                        console.error('Delete submission failed', e); 
+                    }
+                }
+                
+                this.submissionTotal = this.submissions.length;
+                this.deleteConfirmOpen = false;
+                this.deleteSubmissionIds = [];
+                this.selectedSubmissions = [];
+                this.filterSubmissions();
             },
 
             // ── END SUBMISSIONS ──────────────────────────────────────────
