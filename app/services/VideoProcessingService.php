@@ -148,12 +148,12 @@ class VideoProcessingService
             }
             
             // Flag if score is above threshold OR if any SERIOUS concerning categories detected
-            // "sexual" at low scores is usually just romantic content - only flag if score >= 0.5
+            // "sexual" at low scores is usually just romantic content - only flag if score >= 0.7
             $seriousCategories = ['violence', 'hate', 'selfharm', 'self-harm', 'nudity', 'gore', 'nsfw'];
             $hasSeriousCategory = !empty(array_intersect(array_map('strtolower', $nsfwResult['categories']), $seriousCategories));
             
-            // Sexual only counts if score is high enough (>50%) - romantic content often triggers low sexual scores
-            $hasSexualConcern = in_array('sexual', array_map('strtolower', $nsfwResult['categories'])) && $nsfwResult['max_score'] >= 0.5;
+            // Sexual only counts if score is high enough (>70%) - romantic content often triggers low sexual scores
+            $hasSexualConcern = in_array('sexual', array_map('strtolower', $nsfwResult['categories'])) && $nsfwResult['max_score'] >= 0.7;
             
             if ($nsfwResult['max_score'] >= $this->nsfwFlagThreshold || $hasSeriousCategory || $hasSexualConcern) {
                 $deduction = ($hasSeriousCategory || $hasSexualConcern) ? max(20, (int)($nsfwResult['max_score'] * 100 * 0.5)) : 30;

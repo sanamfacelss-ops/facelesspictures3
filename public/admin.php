@@ -1998,7 +1998,7 @@ if (file_exists($errorLogFile)) {
                                     <p class="text-[10px] text-dark/30 mt-1">Videos below this but above reject are flagged for manual review</p>
                                 </div>
                                 
-                                <!-- NSFW Threshold -->
+                                <!-- NSFW Reject Threshold -->
                                 <div>
                                     <div class="flex items-center justify-between mb-1">
                                         <label class="text-[12px] text-dark/50">NSFW Reject Threshold</label>
@@ -2006,6 +2006,16 @@ if (file_exists($errorLogFile)) {
                                     </div>
                                     <input type="range" min="0.3" max="0.9" step="0.1" x-model="aiSettings.ai_nsfw_reject_threshold" @change="saveAISetting('ai_nsfw_reject_threshold', aiSettings.ai_nsfw_reject_threshold)" class="w-full h-2 bg-dark/10 rounded-lg appearance-none cursor-pointer accent-red-600">
                                     <p class="text-[10px] text-dark/30 mt-1">NSFW score above this = auto-reject</p>
+                                </div>
+                                
+                                <!-- NSFW Flag Threshold -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-[12px] text-dark/50">NSFW Flag Threshold</label>
+                                        <span class="text-[12px] font-medium text-orange-600" x-text="(aiSettings.ai_nsfw_flag_threshold * 100) + '%'"></span>
+                                    </div>
+                                    <input type="range" min="0.3" max="0.9" step="0.1" x-model="aiSettings.ai_nsfw_flag_threshold" @change="saveAISetting('ai_nsfw_flag_threshold', aiSettings.ai_nsfw_flag_threshold)" class="w-full h-2 bg-dark/10 rounded-lg appearance-none cursor-pointer accent-orange-600">
+                                    <p class="text-[10px] text-dark/30 mt-1">NSFW score above this = flagged for review (set higher to reduce false positives)</p>
                                 </div>
                                 
                                 <!-- Duration Limits -->
