@@ -66,13 +66,9 @@ try {
 }
 
 // Get recent videos for video management tab (LIMIT 100 for performance)
-// EXCLUDE ai_feedback to improve page load speed - load it on-demand via API
 $db = App\Config\Database::getConnection();
 $stmt = $db->query(
-    "SELECT v.id, v.user_id, v.season_id, v.title, v.file_path, v.content_type, 
-            v.video_duration, v.status, v.ai_status, v.ai_score, v.needs_manual_review,
-            v.youtube_id, v.created_at, v.approved_at, v.rejected_at,
-            u.name as user_name, u.role as user_role, s.title as season_title
+    "SELECT v.*, u.name as user_name, u.role as user_role, s.title as season_title
      FROM videos v
      JOIN users u ON v.user_id = u.id
      JOIN seasons s ON v.season_id = s.id
@@ -104,7 +100,6 @@ try {
         $submissionTotal  = $submissionModel->totalCount();
         
         // Fetch only recent submissions with linked video AI data (LIMIT 100 for performance)
-        // EXCLUDE ai_feedback to improve page load - load it on-demand via API
         $stmt = $db->query(
             "SELECT s.id, s.name, s.email, s.phone, s.role, s.audition_type, s.submission_tag,
                     s.status, s.file_path, s.file_path_2, s.video_id, s.video_id_2, 
@@ -121,7 +116,7 @@ try {
         );
         $allSubmissions = $stmt->fetchAll();
         
-        // AI feedback JSON is loaded on-demand when modal opens via /api/admin/submissions/{id}
+        // Don't parse JSON here - will parse on-demand in modal to save time
     } else {
         $submissionTableMissing = true;
     }
