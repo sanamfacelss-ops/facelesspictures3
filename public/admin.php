@@ -65,24 +65,25 @@ try {
     $aiProviders = ['azure' => false, 'openai' => false, 'sightengine' => false, 'rapidapi' => false, 'groq' => false];
 }
 
-// Get all videos for video management tab
+// Get recent videos for video management tab (LIMIT 100 for performance)
 $db = App\Config\Database::getConnection();
 $stmt = $db->query(
     "SELECT v.*, u.name as user_name, u.role as user_role, s.title as season_title
      FROM videos v
      JOIN users u ON v.user_id = u.id
      JOIN seasons s ON v.season_id = s.id
-     ORDER BY v.created_at DESC"
+     ORDER BY v.created_at DESC
+     LIMIT 100"
 );
 $allVideos = $stmt->fetchAll();
 
-// Count stats
+// Count stats (using separate efficient queries instead of loading all data)
 $totalUsers = count($allUsers);
 $pendingCount = count($pending);
 $flaggedCount = count($flagged);
-$processingCount = count(array_filter($allVideos, fn($v) => ($v['ai_status'] ?? '') === 'processing'));
-$approvedCount = count(array_filter($allVideos, fn($v) => $v['status'] === 'approved'));
-$publishedCount = count(array_filter($allVideos, fn($v) => !empty($v['youtube_id'])));
+$processingCount = (int)$db->query("SELECT COUNT(*) FROM videos WHERE ai_status = 'processing'")->fetchColumn();
+$approvedCount = (int)$db->query("SELECT COUNT(*) FROM videos WHERE status = 'approved'")->fetchColumn();
+$publishedCount = (int)$db->query("SELECT COUNT(*) FROM videos WHERE youtube_id IS NOT NULL")->fetchColumn();
 
 // Load public submissions (new no-login system)
 $allSubmissions = [];
@@ -93,35 +94,29 @@ $submissionTableMissing = false;
 try {
     $submissionModel = new App\Models\Submission();
     if ($submissionModel->tableExists()) {
-        // Fetch submissions with linked video AI data
+        // Fetch counts first (fast, no joins)
+        $submissionCounts = $submissionModel->countByStatus();
+        $submissionRoles  = $submissionModel->countByRole();
+        $submissionTotal  = $submissionModel->totalCount();
+        
+        // Fetch only recent submissions with linked video AI data (LIMIT 100 for performance)
         $stmt = $db->query(
-            "SELECT s.*, 
-                    v1.ai_feedback as video1_ai_feedback, 
+            "SELECT s.id, s.name, s.email, s.phone, s.role, s.audition_type, s.submission_tag,
+                    s.status, s.file_path, s.file_path_2, s.video_id, s.video_id_2, 
+                    s.submitted_at, s.notes,
                     v1.ai_score as video1_ai_score,
                     v1.ai_status as video1_ai_status,
-                    v2.ai_feedback as video2_ai_feedback,
                     v2.ai_score as video2_ai_score,
                     v2.ai_status as video2_ai_status
              FROM submissions s
              LEFT JOIN videos v1 ON s.video_id = v1.id
              LEFT JOIN videos v2 ON s.video_id_2 = v2.id
-             ORDER BY s.submitted_at DESC"
+             ORDER BY s.submitted_at DESC
+             LIMIT 100"
         );
         $allSubmissions = $stmt->fetchAll();
         
-        // Parse AI feedback JSON for each submission
-        foreach ($allSubmissions as &$sub) {
-            if (!empty($sub['video1_ai_feedback'])) {
-                $sub['video1_ai_feedback'] = json_decode($sub['video1_ai_feedback'], true);
-            }
-            if (!empty($sub['video2_ai_feedback'])) {
-                $sub['video2_ai_feedback'] = json_decode($sub['video2_ai_feedback'], true);
-            }
-        }
-        
-        $submissionCounts = $submissionModel->countByStatus();
-        $submissionRoles  = $submissionModel->countByRole();
-        $submissionTotal  = $submissionModel->totalCount();
+        // Don't parse JSON here - will parse on-demand in modal to save time
     } else {
         $submissionTableMissing = true;
     }
@@ -4842,9 +4837,24 @@ if (file_exists($errorLogFile)) {
             submissionPlayer1: null,
             submissionPlayer2: null,
 
-            viewSubmission(sub) {
+            async viewSubmission(sub) {
+                // Set submission immediately with basic data
                 this.viewingSubmission = sub;
                 this.submissionAdminNotes = sub.admin_notes || '';
+                
+                // Fetch full details with AI feedback JSON in background
+                if (sub.video_id || sub.video_id_2) {
+                    try {
+                        const res = await fetch('/api/admin/submissions/' + sub.id);
+                        const data = await res.json();
+                        if (data.success && data.submission) {
+                            // Update with full AI feedback data
+                            this.viewingSubmission = data.submission;
+                        }
+                    } catch (e) {
+                        console.error('Failed to load AI feedback', e);
+                    }
+                }
                 
                 // Initialize Plyr after DOM updates
                 this.$nextTick(() => {

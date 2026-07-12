@@ -2244,6 +2244,56 @@ class AdminController
     }
 
     /**
+     * Get submission details with AI feedback JSON
+     * GET /api/admin/submissions/{id}
+     */
+    public function getSubmission(int $id): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $db = \App\Config\Database::getConnection();
+            $stmt = $db->prepare(
+                "SELECT s.*, 
+                        v1.ai_feedback as video1_ai_feedback, 
+                        v1.ai_score as video1_ai_score,
+                        v1.ai_status as video1_ai_status,
+                        v2.ai_feedback as video2_ai_feedback,
+                        v2.ai_score as video2_ai_score,
+                        v2.ai_status as video2_ai_status
+                 FROM submissions s
+                 LEFT JOIN videos v1 ON s.video_id = v1.id
+                 LEFT JOIN videos v2 ON s.video_id_2 = v2.id
+                 WHERE s.id = ?
+                 LIMIT 1"
+            );
+            $stmt->execute([$id]);
+            $sub = $stmt->fetch();
+            
+            if (!$sub) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Submission not found']);
+                return;
+            }
+
+            // Parse AI feedback JSON
+            if (!empty($sub['video1_ai_feedback'])) {
+                $sub['video1_ai_feedback'] = json_decode($sub['video1_ai_feedback'], true);
+            }
+            if (!empty($sub['video2_ai_feedback'])) {
+                $sub['video2_ai_feedback'] = json_decode($sub['video2_ai_feedback'], true);
+            }
+
+            echo json_encode(['success' => true, 'submission' => $sub]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_SUBMISSION');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to load submission']);
+        }
+    }
+
+    /**
      * Delete a submission (and its uploaded file if present)
      * POST /api/admin/submissions/{id}/delete
      */

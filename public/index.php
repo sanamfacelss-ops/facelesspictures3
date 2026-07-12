@@ -164,6 +164,7 @@ $routes = [
 
     // Admin submissions API
     'api/admin/submissions'              => [AdminController::class, 'listSubmissions',    'GET'],
+    'api/admin/submissions/{id}'         => [AdminController::class, 'getSubmission',      'GET'],
     'api/admin/submissions/{id}/status'  => [AdminController::class, 'updateSubmission',   'POST'],
     'api/admin/submissions/{id}/delete'  => [AdminController::class, 'deleteSubmission',   'POST'],
 
