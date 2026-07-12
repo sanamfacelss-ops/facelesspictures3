@@ -2261,7 +2261,7 @@ class AdminController
                 return;
             }
 
-            // Delete associated file
+            // Delete associated files (both video 1 and video 2 for dual submissions)
             if (!empty($sub['file_path'])) {
                 $filePath = UPLOAD_PATH . '/' . $sub['file_path'];
                 if (file_exists($filePath)) {
@@ -2269,10 +2269,39 @@ class AdminController
                     debug_log("Deleted submission file: {$filePath}", 'ADMIN');
                 }
             }
+            
+            if (!empty($sub['file_path_2'])) {
+                $filePath2 = UPLOAD_PATH . '/' . $sub['file_path_2'];
+                if (file_exists($filePath2)) {
+                    unlink($filePath2);
+                    debug_log("Deleted submission file 2: {$filePath2}", 'ADMIN');
+                }
+            }
 
+            // Delete linked videos from videos table (cascade delete)
+            $videoModel = new \App\Models\Video();
+            if (!empty($sub['video_id'])) {
+                try {
+                    $videoModel->delete($sub['video_id']);
+                    debug_log("Cascade deleted video #{$sub['video_id']} from submissions delete", 'ADMIN');
+                } catch (\Exception $e) {
+                    debug_log("Failed to cascade delete video #{$sub['video_id']}: " . $e->getMessage(), 'ADMIN');
+                }
+            }
+            
+            if (!empty($sub['video_id_2'])) {
+                try {
+                    $videoModel->delete($sub['video_id_2']);
+                    debug_log("Cascade deleted video #{$sub['video_id_2']} from submissions delete", 'ADMIN');
+                } catch (\Exception $e) {
+                    debug_log("Failed to cascade delete video #{$sub['video_id_2']}: " . $e->getMessage(), 'ADMIN');
+                }
+            }
+
+            // Delete submission record
             $submissionModel->delete($id);
-            debug_log("Admin deleted submission #{$id}", 'ADMIN');
-            echo json_encode(['success' => true, 'message' => 'Submission deleted']);
+            debug_log("Admin deleted submission #{$id} with cascade delete to videos", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Submission and linked videos deleted']);
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_DELETE_SUBMISSION');
             http_response_code(500);
