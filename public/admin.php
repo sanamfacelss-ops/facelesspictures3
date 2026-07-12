@@ -649,6 +649,32 @@ if (file_exists($errorLogFile)) {
                         </div>
                     </div>
 
+                    <!-- Manual AI Processing Button -->
+                    <template x-if="videos.filter(v => v.ai_status === 'pending' || v.ai_status === null).length > 0">
+                        <div class="mb-5 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-dark">
+                                            <span x-text="videos.filter(v => v.ai_status === 'pending' || v.ai_status === null).length"></span> videos waiting for AI processing
+                                        </p>
+                                        <p class="text-xs text-dark/60">Click to run AI analysis on pending videos</p>
+                                    </div>
+                                </div>
+                                <button @click="processAIQueue()" 
+                                        :disabled="processingAI"
+                                        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                    <svg x-show="!processingAI" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    <svg x-show="processingAI" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span x-text="processingAI ? 'Processing...' : 'Process Now'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
                     <!-- New Auditions Banner -->
                     <template x-if="submissionCounts.new > 0">
                         <div class="mb-5 bg-gold/10 border border-gold/20 rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gold/15 transition" @click="activeTab = 'submissions'">
@@ -4442,6 +4468,7 @@ if (file_exists($errorLogFile)) {
             activeTab: 'overview',
             mobileMenuOpen: false,
             sidebarCollapsed: window.innerWidth < 1024,
+            processingAI: false,
             
             // Tab titles
             tabTitles: {
@@ -5618,6 +5645,29 @@ if (file_exists($errorLogFile)) {
                     }
                 } catch (e) {
                     this.showToast('Failed to delete videos', 'error');
+                }
+            },
+            
+            // Process AI Queue manually
+            async processAIQueue() {
+                this.processingAI = true;
+                this.showToast('Starting AI processing...', 'success');
+                
+                try {
+                    const res = await fetch('/cron/ai-process.php?key=<?= $_ENV["CRON_SECRET_KEY"] ?? "dev" ?>&limit=10');
+                    const text = await res.text();
+                    
+                    if (res.ok) {
+                        // Refresh page to show updated videos
+                        this.showToast('AI processing completed! Refreshing...', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        this.showToast('AI processing failed: ' + text.substring(0, 100), 'error');
+                        this.processingAI = false;
+                    }
+                } catch (e) {
+                    this.showToast('Failed to trigger AI processing: ' + e.message, 'error');
+                    this.processingAI = false;
                 }
             },
             
