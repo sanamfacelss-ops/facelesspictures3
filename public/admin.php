@@ -4236,6 +4236,157 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
+    <!-- Submission Detail Modal -->
+    <div x-show="viewingSubmission" x-cloak @click.self="viewingSubmission=null"
+        class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" @click.stop>
+            <!-- Header -->
+            <div class="p-6 border-b border-dark/5 flex items-center justify-between sticky top-0 bg-white z-10">
+                <div>
+                    <h3 class="font-display text-2xl text-dark">SUBMISSION DETAILS</h3>
+                    <template x-if="viewingSubmission">
+                        <p class="text-sm text-dark/50 mt-1" x-text="'ID: #' + viewingSubmission.id + ' • ' + viewingSubmission.name"></p>
+                    </template>
+                </div>
+                <button @click="viewingSubmission=null" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-dark/5 text-dark/40 hover:text-dark transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <template x-if="viewingSubmission">
+                <div class="p-6">
+                    <!-- Applicant Info -->
+                    <div class="bg-cream/50 rounded-xl p-5 mb-6">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs text-dark/40 uppercase font-semibold mb-1">Name</p>
+                                <p class="text-dark font-medium" x-text="viewingSubmission.name"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-dark/40 uppercase font-semibold mb-1">Role</p>
+                                <span class="inline-flex items-center gap-1.5 text-sm font-bold px-3 py-1 rounded-full"
+                                    :class="{
+                                        'bg-red-100 text-red-700': viewingSubmission.role==='actor',
+                                        'bg-amber-100 text-amber-700': viewingSubmission.role==='director',
+                                        'bg-blue-100 text-blue-700': viewingSubmission.role==='writer'
+                                    }">
+                                    <span x-text="viewingSubmission.role.toUpperCase() + ' — ' + viewingSubmission.audition_type"></span>
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-xs text-dark/40 uppercase font-semibold mb-1">Email</p>
+                                <a :href="'mailto:' + viewingSubmission.email" class="text-dark hover:text-crimson" x-text="viewingSubmission.email"></a>
+                            </div>
+                            <div>
+                                <p class="text-xs text-dark/40 uppercase font-semibold mb-1">Phone</p>
+                                <a :href="'tel:' + viewingSubmission.phone" class="text-dark hover:text-crimson" x-text="viewingSubmission.phone"></a>
+                            </div>
+                            <div>
+                                <p class="text-xs text-dark/40 uppercase font-semibold mb-1">Submitted</p>
+                                <p class="text-dark/70" x-text="formatDate(viewingSubmission.submitted_at)"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-dark/40 uppercase font-semibold mb-1">Status</p>
+                                <span class="inline-flex items-center gap-1.5 text-sm font-bold px-3 py-1 rounded-full"
+                                    :class="{
+                                        'bg-amber-100 text-amber-700': viewingSubmission.status==='new',
+                                        'bg-blue-100 text-blue-700': viewingSubmission.status==='reviewed',
+                                        'bg-green-100 text-green-700': viewingSubmission.status==='shortlisted',
+                                        'bg-red-100 text-red-700': viewingSubmission.status==='rejected'
+                                    }"
+                                    x-text="viewingSubmission.status.toUpperCase()"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Videos Section -->
+                    <template x-if="viewingSubmission.file_path || viewingSubmission.file_path_2">
+                        <div class="space-y-4">
+                            <!-- Video 1 (Dialog for actors, only video for directors/writers) -->
+                            <template x-if="viewingSubmission.file_path">
+                                <div class="bg-white border-2 border-dark/10 rounded-xl p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="font-semibold text-dark flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                            <template x-if="viewingSubmission.submission_tag === 'actor-dual'">Dialog Audition</template>
+                                            <template x-if="viewingSubmission.submission_tag !== 'actor-dual'">Video Submission</template>
+                                        </h4>
+                                        <span class="text-xs px-3 py-1 rounded-lg font-semibold"
+                                            :class="{
+                                                'bg-green-100 text-green-700': viewingSubmission.ai_status==='approved',
+                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged,
+                                                'bg-amber-100 text-amber-700': viewingSubmission.ai_status==='pending',
+                                                'bg-gray-100 text-gray-600': !viewingSubmission.ai_status
+                                            }"
+                                            x-text="viewingSubmission.ai_flagged ? '🚩 Flagged' : (viewingSubmission.ai_status || 'Pending')"></span>
+                                    </div>
+                                    <video :src="'/uploads/' + viewingSubmission.file_path" controls playsinline class="w-full rounded-lg bg-dark max-h-[400px] mb-4"></video>
+                                    <template x-if="viewingSubmission.ai_notes">
+                                        <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                                            <p class="text-xs text-dark/40 uppercase font-semibold mb-1">AI Notes:</p>
+                                            <p class="text-sm text-dark/70" x-text="viewingSubmission.ai_notes"></p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <!-- Video 2 (Song for actor dual only) -->
+                            <template x-if="viewingSubmission.file_path_2">
+                                <div class="bg-white border-2 border-dark/10 rounded-xl p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="font-semibold text-dark flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                            Song Audition
+                                        </h4>
+                                        <span class="text-xs px-3 py-1 rounded-lg font-semibold"
+                                            :class="{
+                                                'bg-green-100 text-green-700': viewingSubmission.ai_status_2==='approved',
+                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged_2,
+                                                'bg-amber-100 text-amber-700': viewingSubmission.ai_status_2==='pending',
+                                                'bg-gray-100 text-gray-600': !viewingSubmission.ai_status_2
+                                            }"
+                                            x-text="viewingSubmission.ai_flagged_2 ? '🚩 Flagged' : (viewingSubmission.ai_status_2 || 'Pending')"></span>
+                                    </div>
+                                    <video :src="'/uploads/' + viewingSubmission.file_path_2" controls playsinline class="w-full rounded-lg bg-dark max-h-[400px] mb-4"></video>
+                                    <template x-if="viewingSubmission.ai_notes_2">
+                                        <div class="bg-pink-50 border border-pink-200 rounded p-3">
+                                            <p class="text-xs text-dark/40 uppercase font-semibold mb-1">AI Notes:</p>
+                                            <p class="text-sm text-dark/70" x-text="viewingSubmission.ai_notes_2"></p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Notes Section -->
+                    <template x-if="viewingSubmission.notes">
+                        <div class="mt-6 bg-cream/50 rounded-xl p-5">
+                            <p class="text-xs text-dark/40 uppercase font-semibold mb-2">Applicant Notes:</p>
+                            <p class="text-sm text-dark/70" x-text="viewingSubmission.notes"></p>
+                        </div>
+                    </template>
+
+                    <!-- Admin Actions -->
+                    <div class="mt-6 pt-6 border-t border-dark/5">
+                        <div class="flex gap-3">
+                            <button @click="updateSubmissionStatus(viewingSubmission.id, 'shortlisted'); viewingSubmission=null" 
+                                class="flex-1 bg-green-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-green-700 transition">
+                                ⭐ Shortlist
+                            </button>
+                            <button @click="updateSubmissionStatus(viewingSubmission.id, 'rejected'); viewingSubmission=null" 
+                                class="flex-1 bg-red-600 text-white py-3 rounded-xl text-sm font-semibold hover:bg-red-700 transition">
+                                ❌ Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div x-show="toastShow" x-cloak 
          x-transition:enter="transition ease-out duration-300"
