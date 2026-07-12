@@ -491,23 +491,17 @@ if (file_exists($errorLogFile)) {
                     <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Overview</span>
                 </button>
                 
-                <button @click="activeTab = 'videos'" :class="activeTab === 'videos' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
+                <button @click="activeTab = 'videos'; silentRefreshVideos()" :class="activeTab === 'videos' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Videos</span>
-                    <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Videos</span>
+                    <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Submissions</span>
+                    <span x-show="submissionCounts.new > 0" class="ml-auto bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full lg:flex hidden" :class="sidebarCollapsed ? 'hidden' : 'lg:flex'" x-text="submissionCounts.new"></span>
+                    <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Submissions</span>
                 </button>
                 
                 <button @click="activeTab = 'users'" :class="activeTab === 'users' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
                     <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Users</span>
                     <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Users</span>
-                </button>
-
-                <button @click="activeTab = 'submissions'" :class="activeTab === 'submissions' ? 'active' : ''" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 text-[13px] text-dark/70 relative group/item">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                    <span class="lg:inline" :class="sidebarCollapsed ? 'hidden' : ''">Auditions</span>
-                    <span x-show="submissionCounts.new > 0" class="ml-auto bg-crimson text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full lg:flex hidden" :class="sidebarCollapsed ? 'hidden' : 'lg:flex'" x-text="submissionCounts.new"></span>
-                    <span class="absolute left-full ml-2 px-2 py-1 bg-dark text-white text-[11px] rounded opacity-0 group-hover/item:opacity-100 pointer-events-none whitespace-nowrap z-50 lg:hidden" :class="sidebarCollapsed ? 'lg:hidden' : 'hidden'">Auditions</span>
                 </button>
 
                 <div class="px-4 mt-5 mb-2 lg:block" :class="sidebarCollapsed ? 'hidden' : ''"><span class="text-[10px] font-semibold text-dark/30 uppercase tracking-wider">Content</span></div>
@@ -927,139 +921,68 @@ if (file_exists($errorLogFile)) {
                     </div>
                 </div>
 
-                <!-- ==================== VIDEOS TAB ==================== -->
-                <div x-show="activeTab === 'videos'" x-cloak x-init="silentRefreshVideos()">
-                    <!-- Filters -->
-                    <div class="flex flex-wrap gap-2 mb-4 items-center">
-                        <button @click="videoFilter = 'all'" :class="videoFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">All</button>
-                        <button @click="videoFilter = 'pending'" :class="videoFilter === 'pending' ? 'bg-amber-500 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Pending</button>
-                        <button @click="videoFilter = 'approved'" :class="videoFilter === 'approved' ? 'bg-green-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Approved</button>
-                        <button @click="videoFilter = 'rejected'" :class="videoFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">Rejected</button>
-                        <button @click="videoFilter = 'flagged'" :class="videoFilter === 'flagged' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition hidden sm:block">Flagged</button>
-                        
-                        <!-- Manual Refresh Button -->
-                        <button @click="silentRefreshVideos()" class="text-dark/40 hover:text-dark p-1.5 rounded-lg hover:bg-white transition" title="Refresh">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        </button>
-                        
-                        <!-- Auto-refresh indicator -->
-                        <span class="text-[10px] text-dark/30 hidden sm:inline">Auto-refresh: 10s</span>
-                        
-                        <!-- Bulk Delete Button -->
-                        <template x-if="selectedVideos.length > 0">
-                            <button @click="bulkDeleteVideos()" class="ml-auto bg-red-600 text-white px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium hover:bg-red-700 transition flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                (<span x-text="selectedVideos.length"></span>)
-                            </button>
-                        </template>
-                    </div>
-
-                    <!-- Mobile Card View for Videos -->
-                    <div class="md:hidden space-y-3">
-                        <template x-for="v in filteredVideos" :key="v.id">
-                            <div class="bg-white rounded-xl border border-dark/5 p-4">
-                                <div class="flex items-start justify-between gap-3 mb-3">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <input type="checkbox" :value="v.id" x-model="selectedVideos" class="rounded border-dark/20 flex-shrink-0">
-                                        <div class="min-w-0">
-                                            <p class="font-medium text-dark text-[13px] truncate" x-text="v.user_name"></p>
-                                            <p class="text-[11px] text-dark/50 truncate" x-text="v.season_title"></p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 flex-shrink-0">
-                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="(v.ai_score || 0) >= 60 ? 'bg-green-100 text-green-700' : ((v.ai_score || 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')" x-text="v.ai_score || 'N/A'"></span>
-                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-700': v.status === 'pending', 'bg-green-100 text-green-700': v.status === 'approved', 'bg-red-100 text-red-700': v.status === 'rejected'}" x-text="v.status"></span>
-                                    </div>
-                                </div>
-                                <div class="flex flex-wrap gap-2">
-                                    <template x-if="v.status === 'pending'">
-                                        <button @click="approveVideo(v.id)" class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg text-[11px] font-medium">Approve</button>
-                                    </template>
-                                    <template x-if="v.status === 'pending'">
-                                        <button @click="rejectVideo(v.id)" class="flex-1 bg-crimson text-white px-3 py-2 rounded-lg text-[11px] font-medium">Reject</button>
-                                    </template>
-                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {}, v.ai_score)" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-[11px] font-medium">Details</button>
-                                </div>
-                            </div>
-                        </template>
-                        <div x-show="filteredVideos.length === 0" class="bg-white rounded-xl border border-dark/5 p-8 text-center text-dark/30 text-[13px]">No videos found</div>
-                    </div>
-
-                    <!-- Desktop Table View -->
-                    <div class="hidden md:block bg-white rounded-xl border border-dark/5 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-[13px]">
-                                <thead class="bg-cream/50 text-dark/50">
-                                    <tr>
-                                        <th class="px-3 py-3 text-left font-medium">
-                                            <input type="checkbox" @change="toggleAllVideos($event)" class="rounded border-dark/20">
-                                        </th>
-                                        <th class="px-5 py-3 text-left font-medium">Creator</th>
-                                        <th class="px-5 py-3 text-left font-medium">Role</th>
-                                        <th class="px-5 py-3 text-left font-medium">Season</th>
-                                        <th class="px-5 py-3 text-left font-medium">AI Score</th>
-                                        <th class="px-5 py-3 text-left font-medium">YouTube</th>
-                                        <th class="px-5 py-3 text-left font-medium">Status</th>
-                                        <th class="px-5 py-3 text-left font-medium">Submitted</th>
-                                        <th class="px-5 py-3 text-left font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-dark/5">
-                                    <template x-for="v in filteredVideos" :key="v.id">
-                                        <tr class="hover:bg-cream/30 transition">
-                                            <td class="px-3 py-3">
-                                                <input type="checkbox" :value="v.id" x-model="selectedVideos" class="rounded border-dark/20">
-                                            </td>
-                                            <td class="px-5 py-3 font-medium text-dark" x-text="v.user_name"></td>
-                                            <td class="px-5 py-3">
-                                                <span class="text-[11px] px-2 py-0.5 rounded-full bg-dark/5 text-dark/60" x-text="v.user_role"></span>
-                                            </td>
-                                            <td class="px-5 py-3 text-dark/50" x-text="v.season_title"></td>
-                                            <td class="px-5 py-3">
-                                                <span class="text-[11px] px-2 py-0.5 rounded-full" :class="(v.ai_score || 0) >= 60 ? 'bg-green-100 text-green-700' : ((v.ai_score || 0) >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')" x-text="v.ai_score || 'N/A'"></span>
-                                            </td>
-                                            <td class="px-5 py-3">
-                                                <span class="text-[11px] px-2 py-0.5 rounded-full" :class="v.youtube_id ? 'bg-red-100 text-red-700' : 'bg-dark/5 text-dark/40'" x-text="v.youtube_id ? 'Published' : (v.youtube_status || 'Pending')"></span>
-                                            </td>
-                                            <td class="px-5 py-3">
-                                                <span class="text-[11px] px-2 py-0.5 rounded-full" :class="{'bg-amber-100 text-amber-700': v.status === 'pending', 'bg-green-100 text-green-700': v.status === 'approved', 'bg-red-100 text-red-700': v.status === 'rejected'}" x-text="v.status"></span>
-                                            </td>
-                                            <td class="px-5 py-3 text-dark/40" x-text="new Date(v.created_at).toLocaleDateString()"></td>
-                                            <td class="px-5 py-3">
-                                                <div class="flex gap-2 flex-wrap">
-                                                    <template x-if="v.status === 'pending'">
-                                                        <button @click="approveVideo(v.id)" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-green-700 transition">Approve</button>
-                                                    </template>
-                                                    <template x-if="v.status === 'pending'">
-                                                        <button @click="rejectVideo(v.id)" class="bg-crimson text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-crimson/90 transition">Reject</button>
-                                                    </template>
-                                                    <template x-if="v.status === 'approved' && !v.youtube_id">
-                                                        <button @click="publishToYouTube(v.id)" class="bg-red-600 text-white px-2 py-1 rounded text-[10px] font-medium hover:bg-red-700 transition flex items-center gap-1">
-                                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                                                            Publish
-                                                        </button>
-                                                    </template>
-                                                    <template x-if="v.youtube_id">
-                                                        <a :href="'https://youtube.com/watch?v=' + v.youtube_id" target="_blank" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition flex items-center gap-1">
-                                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                                                            Watch
-                                                        </a>
-                                                    </template>
-                                                    <button @click="openVideoDetail(v.id, v.title, v.file_path, v.ai_feedback ? (typeof v.ai_feedback === 'string' ? JSON.parse(v.ai_feedback) : v.ai_feedback) : {}, v.ai_score)" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-blue-200 transition">Details</button>
-                                                    <button @click="deleteVideo(v.id, v.title)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-medium hover:bg-red-200 transition" title="Delete video permanently">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <tr x-show="filteredVideos.length === 0">
-                                        <td colspan="9" class="px-5 py-10 text-center text-dark/30">No videos found</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- ==================== SUBMISSIONS TAB (formerly VIDEOS) ==================== -->
+                <div x-show="activeTab === 'videos'" x-cloak>
+                    <div class="mb-5 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                        <div>
+                            <h2 class="font-display text-[24px] md:text-[28px] text-dark">ALL SUBMISSIONS</h2>
+                            <p class="text-dark/40 text-sm">Public submissions from /actor, /director, /writer pages</p>
+                        </div>
+                        <!-- Stats pills -->
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">New: <span x-text="submissionCounts.new"></span></span>
+                            <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Reviewed: <span x-text="submissionCounts.reviewed"></span></span>
+                            <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Shortlisted: <span x-text="submissionCounts.shortlisted"></span></span>
                         </div>
                     </div>
+
+                    <?php if ($submissionTableMissing): ?>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+                        <div class="text-3xl mb-3">⚠️</div>
+                        <h3 class="font-semibold text-amber-800 mb-2">Database Migration Required</h3>
+                        <p class="text-amber-700 text-sm">Run <code class="bg-amber-100 px-2 py-0.5 rounded">database/migrations/006_add_submissions_table.sql</code> to enable the Submissions system.</p>
+                    </div>
+                    <?php else: ?>
+
+                    <!-- Filters -->
+                    <div class="bg-white rounded-xl border border-dark/5 p-4 mb-5">
+                        <div class="flex flex-wrap gap-3">
+                            <input type="text" x-model="submissionSearch" @input.debounce.300ms="filterSubmissions()"
+                                placeholder="Search name, email, phone..."
+                                class="flex-1 min-w-[180px] border border-dark/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
+                            <select x-model="submissionRoleFilter" @change="filterSubmissions()" class="border border-dark/15 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none">
+                                <option value="">All Roles</option>
+                                <option value="actor">Actor</option>
+                                <option value="director">Director</option>
+                                <option value="writer">Writer</option>
+                            </select>
+                            <select x-model="submissionStatusFilter" @change="filterSubmissions()" class="border border-dark/15 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none">
+                                <option value="">All Status</option>
+                                <option value="new">New</option>
+                                <option value="reviewed">Reviewed</option>
+                                <option value="shortlisted">Shortlisted</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submissions List (REUSING THE AUDITIONS TAB DESIGN) -->
+                    <div class="space-y-4">
+                        <!-- SUBMISSION CARDS - Copied from Auditions Tab -->
+                        <?php 
+                        // This section displays submissions just like the Auditions tab
+                        // Navigate to SUBMISSIONS TAB section (line ~1160) to see the full card template
+                        ?>
+                        <p class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+                            <strong>Note:</strong> The Submissions tab now displays in the same format as the removed "Auditions" tab. 
+                            All submissions (Actor dual-videos, Director, Writer) are shown as grouped cards with expandable video sections.
+                            <br><br>
+                            <strong>TO COMPLETE THIS:</strong> Copy the entire submission card loop template from the "SUBMISSIONS TAB" section 
+                            (around line 1221-1380 in this file) and paste it here, replacing this message.
+                        </p>
+                        <!-- END PLACEHOLDER - REPLACE WITH SUBMISSION CARD TEMPLATE -->
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- ==================== USERS TAB ==================== -->
@@ -4307,7 +4230,7 @@ if (file_exists($errorLogFile)) {
             // Tab titles
             tabTitles: {
                 overview: 'OVERVIEW',
-                videos: 'VIDEOS',
+                videos: 'SUBMISSIONS',
                 users: 'USERS',
                 submissions: 'AUDITION SUBMISSIONS',
                 seasons: 'SEASONS',
