@@ -1025,12 +1025,12 @@ if (file_exists($errorLogFile)) {
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-[10px] px-2 py-0.5 rounded-full" 
                                                             :class="{
-                                                                'bg-green-100 text-green-700': sub.ai_status==='approved',
-                                                                'bg-red-100 text-red-700': sub.ai_flagged,
-                                                                'bg-amber-100 text-amber-700': sub.ai_status==='pending' || sub.ai_status==='processing',
-                                                                'bg-gray-100 text-gray-600': !sub.ai_status
+                                                                'bg-green-100 text-green-700': (sub.video1_ai_status || sub.ai_status)==='approved',
+                                                                'bg-red-100 text-red-700': sub.ai_flagged || (sub.video1_ai_status || sub.ai_status)==='flagged',
+                                                                'bg-amber-100 text-amber-700': (sub.video1_ai_status || sub.ai_status)==='pending' || (sub.video1_ai_status || sub.ai_status)==='processing',
+                                                                'bg-gray-100 text-gray-600': !(sub.video1_ai_status || sub.ai_status)
                                                             }"
-                                                            x-text="sub.ai_flagged ? 'Flagged' : (sub.ai_status || 'Pending')"></span>
+                                                            x-text="sub.ai_flagged || (sub.video1_ai_status || sub.ai_status)==='flagged' ? 'Flagged' : ((sub.video1_ai_status || sub.ai_status) || '-')"></span>
                                                     </div>
                                                 </template>
                                                 <template x-if="!sub.file_path">
@@ -1042,12 +1042,12 @@ if (file_exists($errorLogFile)) {
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-[10px] px-2 py-0.5 rounded-full" 
                                                             :class="{
-                                                                'bg-green-100 text-green-700': sub.ai_status_2==='approved',
-                                                                'bg-red-100 text-red-700': sub.ai_flagged_2,
-                                                                'bg-amber-100 text-amber-700': sub.ai_status_2==='pending' || sub.ai_status_2==='processing',
-                                                                'bg-gray-100 text-gray-600': !sub.ai_status_2
+                                                                'bg-green-100 text-green-700': (sub.video2_ai_status || sub.ai_status_2)==='approved',
+                                                                'bg-red-100 text-red-700': sub.ai_flagged_2 || (sub.video2_ai_status || sub.ai_status_2)==='flagged',
+                                                                'bg-amber-100 text-amber-700': (sub.video2_ai_status || sub.ai_status_2)==='pending' || (sub.video2_ai_status || sub.ai_status_2)==='processing',
+                                                                'bg-gray-100 text-gray-600': !(sub.video2_ai_status || sub.ai_status_2)
                                                             }"
-                                                            x-text="sub.ai_flagged_2 ? 'Flagged' : (sub.ai_status_2 || 'Pending')"></span>
+                                                            x-text="sub.ai_flagged_2 || (sub.video2_ai_status || sub.ai_status_2)==='flagged' ? 'Flagged' : ((sub.video2_ai_status || sub.ai_status_2) || '-')"></span>
                                                     </div>
                                                 </template>
                                                 <template x-if="!sub.file_path_2">
@@ -4148,12 +4148,12 @@ if (file_exists($errorLogFile)) {
                                         </h4>
                                         <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
                                             :class="{
-                                                'bg-green-100 text-green-700': viewingSubmission.ai_status==='approved',
-                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged,
-                                                'bg-amber-100 text-amber-700': viewingSubmission.ai_status==='pending' || viewingSubmission.ai_status==='processing',
-                                                'bg-gray-100 text-gray-600': !viewingSubmission.ai_status
+                                                'bg-green-100 text-green-700': (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='approved',
+                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged || (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='flagged',
+                                                'bg-amber-100 text-amber-700': (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='pending' || (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='processing',
+                                                'bg-gray-100 text-gray-600': !(viewingSubmission.video1_ai_status || viewingSubmission.ai_status)
                                             }"
-                                            x-text="viewingSubmission.ai_flagged ? '🚩 FLAGGED' : (viewingSubmission.ai_status ? viewingSubmission.ai_status.toUpperCase() : 'PENDING')"></span>
+                                            x-text="viewingSubmission.ai_flagged || (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='flagged' ? '🚩 FLAGGED' : ((viewingSubmission.video1_ai_status || viewingSubmission.ai_status) ? (viewingSubmission.video1_ai_status || viewingSubmission.ai_status).toUpperCase() : 'PENDING')"></span>
                                     </div>
 
                                     <template x-if="viewingSubmission.ai_notes">
@@ -4197,12 +4197,12 @@ if (file_exists($errorLogFile)) {
                                         </h4>
                                         <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
                                             :class="{
-                                                'bg-green-100 text-green-700': viewingSubmission.ai_status_2==='approved',
-                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged_2,
-                                                'bg-amber-100 text-amber-700': viewingSubmission.ai_status_2==='pending' || viewingSubmission.ai_status_2==='processing',
-                                                'bg-gray-100 text-gray-600': !viewingSubmission.ai_status_2
+                                                'bg-green-100 text-green-700': (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='approved',
+                                                'bg-red-100 text-red-700': viewingSubmission.ai_flagged_2 || (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='flagged',
+                                                'bg-amber-100 text-amber-700': (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='pending' || (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='processing',
+                                                'bg-gray-100 text-gray-600': !(viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)
                                             }"
-                                            x-text="viewingSubmission.ai_flagged_2 ? '🚩 FLAGGED' : (viewingSubmission.ai_status_2 ? viewingSubmission.ai_status_2.toUpperCase() : 'PENDING')"></span>
+                                            x-text="viewingSubmission.ai_flagged_2 || (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='flagged' ? '🚩 FLAGGED' : ((viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2) ? (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2).toUpperCase() : 'PENDING')"></span>
                                     </div>
 
                                     <template x-if="viewingSubmission.ai_notes_2">
@@ -5095,7 +5095,6 @@ if (file_exists($errorLogFile)) {
                         const data = await res.json();
                         if (data.success) {
                             this.submissions = this.submissions.filter(s => s.id !== id);
-                            this.filteredSubmissions = this.filteredSubmissions.filter(s => s.id !== id);
                             this.selectedSubmissions = this.selectedSubmissions.filter(sid => sid !== id);
                         }
                     } catch(e) { 
@@ -5103,11 +5102,21 @@ if (file_exists($errorLogFile)) {
                     }
                 }
                 
+                // Recalculate counts
+                const counts = {new:0, reviewed:0, shortlisted:0, rejected:0};
+                this.submissions.forEach(s => { 
+                    if(counts[s.status]!==undefined) counts[s.status]++; 
+                });
+                this.submissionCounts = counts;
                 this.submissionTotal = this.submissions.length;
+                
+                // Re-filter to update display
+                this.filterSubmissions();
+                
+                // Close modal and reset
                 this.deleteConfirmOpen = false;
                 this.deleteSubmissionIds = [];
                 this.selectedSubmissions = [];
-                this.filterSubmissions();
             },
 
             // ── END SUBMISSIONS ──────────────────────────────────────────
