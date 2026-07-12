@@ -4156,20 +4156,70 @@ if (file_exists($errorLogFile)) {
                                             x-text="viewingSubmission.ai_flagged || (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='flagged' ? '🚩 FLAGGED' : ((viewingSubmission.video1_ai_status || viewingSubmission.ai_status) ? (viewingSubmission.video1_ai_status || viewingSubmission.ai_status).toUpperCase() : 'PENDING')"></span>
                                     </div>
 
-                                    <template x-if="viewingSubmission.ai_notes">
+                                    <!-- AI Score (from video feedback) -->
+                                    <template x-if="viewingSubmission.video1_ai_score">
+                                        <div class="mb-3 flex items-center gap-3">
+                                            <div class="text-center">
+                                                <div class="text-[28px] font-display"
+                                                    :class="{
+                                                        'text-green-600': viewingSubmission.video1_ai_score >= 70,
+                                                        'text-amber-600': viewingSubmission.video1_ai_score >= 40 && viewingSubmission.video1_ai_score < 70,
+                                                        'text-red-600': viewingSubmission.video1_ai_score < 40
+                                                    }"
+                                                    x-text="viewingSubmission.video1_ai_score"></div>
+                                                <div class="text-[9px] text-dark/40">SCORE</div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="h-2 bg-dark/10 rounded-full overflow-hidden">
+                                                    <div class="h-full rounded-full"
+                                                        :class="{
+                                                            'bg-green-500': viewingSubmission.video1_ai_score >= 70,
+                                                            'bg-amber-500': viewingSubmission.video1_ai_score >= 40 && viewingSubmission.video1_ai_score < 70,
+                                                            'bg-red-500': viewingSubmission.video1_ai_score < 40
+                                                        }"
+                                                        :style="'width: ' + viewingSubmission.video1_ai_score + '%'"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- AI Summary (from video feedback) -->
+                                    <template x-if="viewingSubmission.video1_ai_feedback?.summary">
+                                        <p class="text-[12px] text-dark/70 mb-2" x-text="viewingSubmission.video1_ai_feedback.summary"></p>
+                                    </template>
+
+                                    <!-- AI Flags (from video feedback) -->
+                                    <template x-if="viewingSubmission.video1_ai_feedback?.flags && viewingSubmission.video1_ai_feedback.flags.length > 0">
+                                        <div class="mb-2">
+                                            <span class="text-[10px] text-dark/50 uppercase">Flags:</span>
+                                            <div class="flex flex-wrap gap-1 mt-1">
+                                                <template x-for="flag in viewingSubmission.video1_ai_feedback.flags" :key="flag">
+                                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" x-text="flag"></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- AI Notes (fallback from submissions table) -->
+                                    <template x-if="viewingSubmission.ai_notes && !viewingSubmission.video1_ai_feedback?.summary">
                                         <p class="text-[12px] text-dark/70 whitespace-pre-wrap" x-text="viewingSubmission.ai_notes"></p>
                                     </template>
-                                    <template x-if="!viewingSubmission.ai_notes && !viewingSubmission.ai_status">
+
+                                    <!-- No data -->
+                                    <template x-if="!viewingSubmission.video1_ai_score && !viewingSubmission.video1_ai_feedback && !viewingSubmission.ai_notes && !(viewingSubmission.video1_ai_status || viewingSubmission.ai_status)">
                                         <p class="text-[11px] text-dark/40 italic">No AI analysis available yet.</p>
                                     </template>
-                                    <template x-if="!viewingSubmission.ai_notes && viewingSubmission.ai_status === 'processing'">
+                                    
+                                    <!-- Processing -->
+                                    <template x-if="!viewingSubmission.video1_ai_feedback && ((viewingSubmission.video1_ai_status || viewingSubmission.ai_status) === 'processing')">
                                         <div class="flex items-center gap-2 text-[11px] text-dark/50">
                                             <svg class="animate-spin w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                             Processing...
                                         </div>
                                     </template>
                                     
-                                    <template x-if="viewingSubmission.ai_flagged">
+                                    <!-- Warning for flagged -->
+                                    <template x-if="viewingSubmission.ai_flagged || (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='flagged'">
                                         <div class="mt-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
                                             <svg class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                             <p class="text-[10px] text-red-700">Flagged for manual review</p>
@@ -4205,20 +4255,70 @@ if (file_exists($errorLogFile)) {
                                             x-text="viewingSubmission.ai_flagged_2 || (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='flagged' ? '🚩 FLAGGED' : ((viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2) ? (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2).toUpperCase() : 'PENDING')"></span>
                                     </div>
 
-                                    <template x-if="viewingSubmission.ai_notes_2">
+                                    <!-- AI Score -->
+                                    <template x-if="viewingSubmission.video2_ai_score">
+                                        <div class="mb-3 flex items-center gap-3">
+                                            <div class="text-center">
+                                                <div class="text-[28px] font-display"
+                                                    :class="{
+                                                        'text-green-600': viewingSubmission.video2_ai_score >= 70,
+                                                        'text-amber-600': viewingSubmission.video2_ai_score >= 40 && viewingSubmission.video2_ai_score < 70,
+                                                        'text-red-600': viewingSubmission.video2_ai_score < 40
+                                                    }"
+                                                    x-text="viewingSubmission.video2_ai_score"></div>
+                                                <div class="text-[9px] text-dark/40">SCORE</div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="h-2 bg-dark/10 rounded-full overflow-hidden">
+                                                    <div class="h-full rounded-full"
+                                                        :class="{
+                                                            'bg-green-500': viewingSubmission.video2_ai_score >= 70,
+                                                            'bg-amber-500': viewingSubmission.video2_ai_score >= 40 && viewingSubmission.video2_ai_score < 70,
+                                                            'bg-red-500': viewingSubmission.video2_ai_score < 40
+                                                        }"
+                                                        :style="'width: ' + viewingSubmission.video2_ai_score + '%'"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- AI Summary -->
+                                    <template x-if="viewingSubmission.video2_ai_feedback?.summary">
+                                        <p class="text-[12px] text-dark/70 mb-2" x-text="viewingSubmission.video2_ai_feedback.summary"></p>
+                                    </template>
+
+                                    <!-- AI Flags -->
+                                    <template x-if="viewingSubmission.video2_ai_feedback?.flags && viewingSubmission.video2_ai_feedback.flags.length > 0">
+                                        <div class="mb-2">
+                                            <span class="text-[10px] text-dark/50 uppercase">Flags:</span>
+                                            <div class="flex flex-wrap gap-1 mt-1">
+                                                <template x-for="flag in viewingSubmission.video2_ai_feedback.flags" :key="flag">
+                                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" x-text="flag"></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- AI Notes (fallback) -->
+                                    <template x-if="viewingSubmission.ai_notes_2 && !viewingSubmission.video2_ai_feedback?.summary">
                                         <p class="text-[12px] text-dark/70 whitespace-pre-wrap" x-text="viewingSubmission.ai_notes_2"></p>
                                     </template>
-                                    <template x-if="!viewingSubmission.ai_notes_2 && !viewingSubmission.ai_status_2">
+
+                                    <!-- No data -->
+                                    <template x-if="!viewingSubmission.video2_ai_score && !viewingSubmission.video2_ai_feedback && !viewingSubmission.ai_notes_2 && !(viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)">
                                         <p class="text-[11px] text-dark/40 italic">No AI analysis available yet.</p>
                                     </template>
-                                    <template x-if="!viewingSubmission.ai_notes_2 && viewingSubmission.ai_status_2 === 'processing'">
+                                    
+                                    <!-- Processing -->
+                                    <template x-if="!viewingSubmission.video2_ai_feedback && ((viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2) === 'processing')">
                                         <div class="flex items-center gap-2 text-[11px] text-dark/50">
                                             <svg class="animate-spin w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                             Processing...
                                         </div>
                                     </template>
                                     
-                                    <template x-if="viewingSubmission.ai_flagged_2">
+                                    <!-- Warning -->
+                                    <template x-if="viewingSubmission.ai_flagged_2 || (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='flagged'">
                                         <div class="mt-3 p-2 bg-red-50 border border-red-200 rounded flex items-start gap-2">
                                             <svg class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                             <p class="text-[10px] text-red-700">Flagged for manual review</p>
