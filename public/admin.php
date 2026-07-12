@@ -968,7 +968,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SUBMISSIONS TAB ==================== -->
-                <div x-show="activeTab === 'videos'" x-cloak>
+                <div x-if="activeTab === 'videos'" x-cloak>
                     <!-- Bulk Actions Toolbar (shows when items selected) -->
                     <div x-show="selectedSubmissions.length > 0" x-cloak class="bg-crimson text-white rounded-xl p-4 mb-4 flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -1116,7 +1116,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== USERS TAB ==================== -->
-                <div x-show="activeTab === 'users'" x-cloak>
+                <div x-if="activeTab === 'users'" x-cloak>
                     <!-- Filter -->
                     <div class="flex flex-wrap gap-2 mb-4">
                         <button @click="userFilter = 'all'" :class="userFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">All</button>
@@ -1462,7 +1462,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SEASONS TAB ==================== -->
-                <div x-show="activeTab === 'seasons'" x-cloak>
+                <div x-if="activeTab === 'seasons'" x-cloak>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Create Season Form -->
                         <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
@@ -1530,7 +1530,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SCRIPTS TAB ==================== -->
-                <div x-show="activeTab === 'scripts'" x-cloak>
+                <div x-if="activeTab === 'scripts'" x-cloak>
                     <!-- Info banner: briefs moved to Settings -->
                     <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 flex items-start gap-3">
                         <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1586,7 +1586,7 @@ if (file_exists($errorLogFile)) {
 
                                         <!-- Current image preview -->
                                         <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:120px">
-                                            <img :src="scriptForm.image_url" class="w-full h-full object-cover">
+                                            <img :src="scriptForm.image_url" loading="lazy" class="w-full h-full object-cover">
                                             <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
                                                 class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition border border-dark/10">
                                                 <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -1656,7 +1656,7 @@ if (file_exists($errorLogFile)) {
                                                     <button type="button" @click="selectFromGallery(img.url)"
                                                         class="relative rounded-lg overflow-hidden border-2 transition aspect-square"
                                                         :class="img.url === (window.setScriptImage && $el.closest('[x-data*=adminDashboard]') ? null : null) || false ? 'border-dark' : 'border-transparent hover:border-dark/30'">
-                                                        <img :src="img.url" :alt="img.name" class="w-full h-full object-cover">
+                                                        <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
                                                     </button>
                                                 </template>
                                             </div>
@@ -1826,7 +1826,7 @@ if (file_exists($errorLogFile)) {
                                                 <div class="flex gap-3 flex-1 min-w-0">
                                                     <!-- Script image thumbnail -->
                                                     <div x-show="sc.image_url" class="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-dark/5 border border-dark/10">
-                                                        <img :src="sc.image_url" class="w-full h-full object-cover">
+                                                        <img :src="sc.image_url" loading="lazy" class="w-full h-full object-cover">
                                                     </div>
                                                     <div x-show="!sc.image_url" class="w-12 h-16 rounded-lg flex-shrink-0 bg-dark/5 border border-dashed border-dark/15 flex items-center justify-center">
                                                         <svg class="w-4 h-4 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -1856,7 +1856,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== AI CONFIG TAB ==================== -->
-                <div x-show="activeTab === 'aiconfig'" x-cloak>
+                <div x-if="activeTab === 'aiconfig'" x-cloak>
                     <!-- Provider Status Overview -->
                     <div class="bg-white rounded-xl border border-dark/5 p-5 mb-6">
                         <div class="flex items-center justify-between mb-4">
@@ -2284,7 +2284,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== YOUTUBE TAB ==================== -->
-                <div x-show="activeTab === 'youtube'" x-cloak>
+                <div x-if="activeTab === 'youtube'" x-cloak>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         <!-- Connection Status Card -->
                         <div class="lg:col-span-3">
@@ -3239,7 +3239,7 @@ if (file_exists($errorLogFile)) {
                                             <!-- Preview state -->
                                             <template x-if="preview && !uploading">
                                                 <div class="flex items-center gap-4 p-4">
-                                                    <img :src="preview" alt="Logo preview" style="height:48px;max-width:160px;object-fit:contain;background:#f9fafb;border-radius:6px;padding:4px">
+                                                    <img :src="preview" alt="Logo preview" loading="lazy" style="height:48px;max-width:160px;object-fit:contain;background:#f9fafb;border-radius:6px;padding:4px">
                                                     <div class="flex-1 min-w-0">
                                                         <p class="text-[12px] font-medium text-dark truncate" x-text="filename || 'Logo uploaded'"></p>
                                                         <p class="text-[11px] text-green-600 mt-0.5">✓ Saved</p>
@@ -3338,7 +3338,7 @@ if (file_exists($errorLogFile)) {
 
                                                 <template x-if="preview && !uploading">
                                                     <div class="absolute inset-0">
-                                                        <img :src="preview" alt="Poster" style="width:100%;height:100%;object-fit:cover">
+                                                        <img :src="preview" alt="Poster" loading="lazy" style="width:100%;height:100%;object-fit:cover">
                                                         <div class="absolute top-1.5 right-1.5">
                                                             <button type="button" @click.stop="clearImage()" class="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition">
                                                                 <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
