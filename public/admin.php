@@ -4221,6 +4221,36 @@ if (file_exists($errorLogFile)) {
                                         </div>
                                     </template>
 
+                                    <!-- Transcript (from video feedback) -->
+                                    <template x-if="viewingSubmission.video1_ai_feedback?.transcript">
+                                        <div class="mt-3 pt-3 border-t border-dark/10">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="text-[10px] text-dark/50 uppercase font-semibold">Transcript</span>
+                                                <template x-if="viewingSubmission.video1_ai_feedback?.feedback">
+                                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
+                                                          x-text="(viewingSubmission.video1_ai_feedback.feedback.find(f => f.startsWith('Language detected:')) || '').replace('Language detected: ', '')"></span>
+                                                </template>
+                                            </div>
+                                            <p class="text-[11px] text-dark/70 leading-relaxed bg-dark/5 rounded p-2" x-text="viewingSubmission.video1_ai_feedback.transcript"></p>
+                                        </div>
+                                    </template>
+
+                                    <!-- NSFW Analysis (from video feedback) -->
+                                    <template x-if="viewingSubmission.video1_ai_feedback?.nsfw_result">
+                                        <div class="mt-3 pt-3 border-t border-dark/10">
+                                            <span class="text-[10px] text-dark/50 uppercase font-semibold">Visual Content Safety</span>
+                                            <div class="mt-1.5 grid grid-cols-2 gap-1.5 text-[10px]">
+                                                <template x-for="(value, key) in viewingSubmission.video1_ai_feedback.nsfw_result" :key="key">
+                                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
+                                                        <span class="text-dark/60 capitalize" x-text="key.replace(/_/g, ' ')"></span>
+                                                        <span :class="(typeof value === 'number' && value > 0.5 && key !== 'frames_checked') ? 'text-red-600 font-medium' : 'text-green-600'" 
+                                                              x-text="typeof value === 'number' ? (key === 'frames_checked' ? value : Math.round(value * 100) + '%') : value"></span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
                                     <!-- AI Notes (fallback from submissions table) -->
                                     <template x-if="viewingSubmission.ai_notes && !viewingSubmission.video1_ai_feedback?.summary">
                                         <p class="text-[12px] text-dark/70 whitespace-pre-wrap" x-text="viewingSubmission.ai_notes"></p>
@@ -4315,6 +4345,36 @@ if (file_exists($errorLogFile)) {
                                             <div class="flex flex-wrap gap-1 mt-1">
                                                 <template x-for="flag in viewingSubmission.video2_ai_feedback.flags" :key="flag">
                                                     <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" x-text="flag"></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- Transcript (from video feedback) -->
+                                    <template x-if="viewingSubmission.video2_ai_feedback?.transcript">
+                                        <div class="mt-3 pt-3 border-t border-dark/10">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="text-[10px] text-dark/50 uppercase font-semibold">Transcript</span>
+                                                <template x-if="viewingSubmission.video2_ai_feedback?.feedback">
+                                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
+                                                          x-text="(viewingSubmission.video2_ai_feedback.feedback.find(f => f.startsWith('Language detected:')) || '').replace('Language detected: ', '')"></span>
+                                                </template>
+                                            </div>
+                                            <p class="text-[11px] text-dark/70 leading-relaxed bg-dark/5 rounded p-2" x-text="viewingSubmission.video2_ai_feedback.transcript"></p>
+                                        </div>
+                                    </template>
+
+                                    <!-- NSFW Analysis (from video feedback) -->
+                                    <template x-if="viewingSubmission.video2_ai_feedback?.nsfw_result">
+                                        <div class="mt-3 pt-3 border-t border-dark/10">
+                                            <span class="text-[10px] text-dark/50 uppercase font-semibold">Visual Content Safety</span>
+                                            <div class="mt-1.5 grid grid-cols-2 gap-1.5 text-[10px]">
+                                                <template x-for="(value, key) in viewingSubmission.video2_ai_feedback.nsfw_result" :key="key">
+                                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
+                                                        <span class="text-dark/60 capitalize" x-text="key.replace(/_/g, ' ')"></span>
+                                                        <span :class="(typeof value === 'number' && value > 0.5 && key !== 'frames_checked') ? 'text-red-600 font-medium' : 'text-green-600'" 
+                                                              x-text="typeof value === 'number' ? (key === 'frames_checked' ? value : Math.round(value * 100) + '%') : value"></span>
+                                                    </div>
                                                 </template>
                                             </div>
                                         </div>
