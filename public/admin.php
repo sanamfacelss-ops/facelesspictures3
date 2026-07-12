@@ -2506,6 +2506,18 @@ if (file_exists($errorLogFile)) {
                                         <p class="text-[11px] text-red-700"><strong>Error:</strong> <span x-text="youtubeTestResults.error"></span></p>
                                     </div>
                                 </template>
+                                
+                                <template x-if="youtubeTestResults?.results?.oauth_error">
+                                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                        <p class="text-[11px] text-red-700 font-semibold mb-1">OAuth Error Details:</p>
+                                        <p class="text-[11px] text-red-600" x-text="youtubeTestResults.results.oauth_error.message"></p>
+                                        <p class="text-[10px] text-red-500 mt-1">HTTP Code: <span x-text="youtubeTestResults.results.oauth_error.http_code"></span></p>
+                                        <details class="mt-2">
+                                            <summary class="text-[10px] text-red-600 cursor-pointer">View raw response</summary>
+                                            <pre class="text-[9px] mt-1 p-2 bg-red-100 rounded overflow-auto" x-text="JSON.stringify(youtubeTestResults.results.oauth_error.response, null, 2)"></pre>
+                                        </details>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                         

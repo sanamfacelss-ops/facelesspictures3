@@ -1164,6 +1164,12 @@ class AdminController
                     $accessToken = $data['access_token'];
                 } else {
                     $errorMessage = $data['error_description'] ?? $data['error'] ?? 'OAuth failed';
+                    $results['oauth_error'] = [
+                        'message' => $errorMessage,
+                        'http_code' => $httpCode,
+                        'response' => $data
+                    ];
+                    log_message('error', "YouTube OAuth test failed: HTTP {$httpCode}, " . json_encode($data));
                 }
             }
 
