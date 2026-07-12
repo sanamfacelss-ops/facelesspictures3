@@ -57,24 +57,71 @@ class ModerationController
         
         log_message('info', "Admin {$user['id']} approved video {$videoId}");
 
-        // Auto-upload to YouTube after manual approval (if enabled)
-        $youtubeResult = null;
-        try {
-            $settingsModel = new \App\Models\Settings();
-            if ($settingsModel->isYouTubeAutoPublishEnabled()) {
-                $youtubeService = new \App\Services\YouTubeService();
-                $youtubeResult = $youtubeService->uploadVideo($videoId);
-                if (is_string($youtubeResult) && !empty($youtubeResult)) {
-                    log_message('info', "Video {$videoId} uploaded to YouTube after manual approval: {$youtubeResult}");
-                } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
-                    log_message('warning', "Video {$videoId} YouTube upload failed after manual approval: {$youtubeResult['error']}");
+        // Check if this video is part of an actor dual submission
+        $stmt = $this->db->prepare(
+            "SELECT s.id, s.submission_tag, s.video_id, s.video_id_2,
+                    v1.status as video1_status, v2.status as video2_status
+             FROM submissions s
+             LEFT JOIN videos v1 ON s.video_id = v1.id
+             LEFT JOIN videos v2 ON s.video_id_2 = v2.id
+             WHERE s.video_id = ? OR s.video_id_2 = ?
+             LIMIT 1"
+        );
+        $stmt->execute([$videoId, $videoId]);
+        $submission = $stmt->fetch();
+
+        // Determine if we should upload to YouTube
+        $shouldUploadToYouTube = true;
+        
+        if ($submission && $submission['submission_tag'] === 'actor-dual') {
+            // For actor dual submissions, BOTH videos must be approved
+            if ($submission['video_id'] && $submission['video_id_2']) {
+                $bothApproved = ($submission['video1_status'] === 'approved' && $submission['video2_status'] === 'approved');
+                if (!$bothApproved) {
+                    $shouldUploadToYouTube = false;
+                    log_message('info', "Video {$videoId} approved but waiting for other video in dual submission to be approved");
                 }
-            } else {
-                log_message('info', "Video {$videoId} approved but YouTube auto-publish is paused");
-                $youtubeResult = ['paused' => true, 'message' => 'YouTube auto-publish is paused'];
             }
-        } catch (\Exception $e) {
-            log_message('error', "Video {$videoId} YouTube upload error after manual approval: " . $e->getMessage());
+        }
+
+        // Auto-upload to YouTube after manual approval (if enabled and conditions met)
+        $youtubeResult = null;
+        if ($shouldUploadToYouTube) {
+            try {
+                $settingsModel = new \App\Models\Settings();
+                if ($settingsModel->isYouTubeAutoPublishEnabled()) {
+                    $youtubeService = new \App\Services\YouTubeService();
+                    
+                    // For actor dual submissions, upload BOTH videos when both are approved
+                    if ($submission && $submission['submission_tag'] === 'actor-dual' && $submission['video_id'] && $submission['video_id_2']) {
+                        // Upload both videos
+                        $result1 = $youtubeService->uploadVideo((int)$submission['video_id']);
+                        $result2 = $youtubeService->uploadVideo((int)$submission['video_id_2']);
+                        
+                        $youtubeResult = [
+                            'video1' => $result1,
+                            'video2' => $result2,
+                            'message' => 'Both videos uploaded to YouTube'
+                        ];
+                        log_message('info', "Actor dual submission videos {$submission['video_id']} and {$submission['video_id_2']} uploaded to YouTube");
+                    } else {
+                        // Single video upload
+                        $youtubeResult = $youtubeService->uploadVideo($videoId);
+                        if (is_string($youtubeResult) && !empty($youtubeResult)) {
+                            log_message('info', "Video {$videoId} uploaded to YouTube after manual approval: {$youtubeResult}");
+                        } elseif (is_array($youtubeResult) && isset($youtubeResult['error'])) {
+                            log_message('warning', "Video {$videoId} YouTube upload failed after manual approval: {$youtubeResult['error']}");
+                        }
+                    }
+                } else {
+                    log_message('info', "Video {$videoId} approved but YouTube auto-publish is paused");
+                    $youtubeResult = ['paused' => true, 'message' => 'YouTube auto-publish is paused'];
+                }
+            } catch (\Exception $e) {
+                log_message('error', "Video {$videoId} YouTube upload error after manual approval: " . $e->getMessage());
+            }
+        } else {
+            $youtubeResult = ['waiting' => true, 'message' => 'Waiting for other video in dual submission to be approved'];
         }
 
         echo json_encode([
