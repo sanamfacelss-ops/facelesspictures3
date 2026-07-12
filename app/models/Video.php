@@ -354,4 +354,13 @@ class Video
             return false;
         }
     }
+
+    /**
+     * Delete a video record
+     */
+    public function delete(int $id): bool
+    {
+        $stmt = $this->db->prepare("DELETE FROM videos WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
 }
