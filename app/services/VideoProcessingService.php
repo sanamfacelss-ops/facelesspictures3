@@ -70,8 +70,8 @@ class VideoProcessingService
         $this->flagThreshold = (float) ($aiSettings['ai_flag_threshold'] ?? 40);
         
         log_message('debug', sprintf(
-            "AI Thresholds loaded: minDuration=%.1f, maxDuration=%.1f, nsfwReject=%.2f, approveThreshold=%.0f",
-            $this->minDuration, $this->maxDuration, $this->nsfwRejectThreshold, $this->approveThreshold
+            "AI Thresholds loaded: minDuration=%.1f, maxDuration=%.1f, nsfwReject=%.2f, nsfwFlag=%.2f, approveThreshold=%.0f",
+            $this->minDuration, $this->maxDuration, $this->nsfwRejectThreshold, $this->nsfwFlagThreshold, $this->approveThreshold
         ));
     }
 
@@ -81,6 +81,10 @@ class VideoProcessingService
     public function processVideo(int $videoId): array
     {
         $startTime = microtime(true);
+        
+        // Reload thresholds from database to get latest values
+        $this->loadThresholds();
+        
         $video = $this->videoModel->findById($videoId);
         
         if (!$video) {
