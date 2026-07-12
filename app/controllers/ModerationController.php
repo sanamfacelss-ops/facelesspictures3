@@ -118,7 +118,17 @@ class ModerationController
                     $youtubeResult = ['paused' => true, 'message' => 'YouTube auto-publish is paused'];
                 }
             } catch (\Exception $e) {
-                log_message('error', "Video {$videoId} YouTube upload error after manual approval: " . $e->getMessage());
+                $errorMessage = $e->getMessage();
+                log_message('error', "Video {$videoId} YouTube upload error after manual approval: " . $errorMessage);
+                $youtubeResult = [
+                    'error' => true, 
+                    'message' => 'YouTube upload failed: ' . $errorMessage,
+                    'details' => [
+                        'exception' => get_class($e),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ]
+                ];
             }
         } else {
             $youtubeResult = ['waiting' => true, 'message' => 'Waiting for other video in dual submission to be approved'];
@@ -127,7 +137,13 @@ class ModerationController
         echo json_encode([
             'success' => true, 
             'message' => 'Video approved successfully',
-            'youtube' => $youtubeResult
+            'youtube' => $youtubeResult,
+            'dual_submission' => $submission ? [
+                'is_dual' => $submission['submission_tag'] === 'actor-dual',
+                'video1_status' => $submission['video1_status'] ?? null,
+                'video2_status' => $submission['video2_status'] ?? null,
+                'should_upload' => $shouldUploadToYouTube
+            ] : null
         ]);
     }
 

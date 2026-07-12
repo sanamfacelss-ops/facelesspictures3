@@ -5255,14 +5255,37 @@ if (file_exists($errorLogFile)) {
                 formData.append('csrf_token', this.csrf);
                 try {
                     const res = await fetch(url, { method: 'POST', body: formData });
-                    if (!res.ok) throw new Error('Failed');
+                    const data = await res.json();
+                    
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Request failed');
+                    }
+                    
                     this.modalOpen = false;
+                    
+                    // Show detailed YouTube result if available
+                    if (this.modalAction === 'approve' && data.youtube) {
+                        if (data.youtube.error) {
+                            this.showToast('Video approved but YouTube upload failed: ' + data.youtube.message, 'error');
+                            console.error('YouTube error details:', data.youtube);
+                        } else if (data.youtube.waiting) {
+                            this.showToast('Video approved. ' + data.youtube.message, 'success');
+                        } else if (data.youtube.paused) {
+                            this.showToast('Video approved. ' + data.youtube.message, 'success');
+                        } else if (data.youtube.video1 && data.youtube.video2) {
+                            this.showToast('Video approved! Both dual videos uploaded to YouTube', 'success');
+                        } else {
+                            this.showToast('Video approved and uploaded to YouTube', 'success');
+                        }
+                    } else {
+                        this.showToast(this.modalAction === 'approve' ? 'Video approved' : 'Video rejected', 'success');
+                    }
                     
                     // Silent refresh instead of page reload
                     await this.silentRefreshVideos();
-                    this.showToast(this.modalAction === 'approve' ? 'Video approved' : 'Video rejected', 'success');
                 } catch (e) {
-                    this.showToast('Action failed', 'error');
+                    console.error('Action failed:', e);
+                    this.showToast('Action failed: ' + e.message, 'error');
                 }
             },
             
