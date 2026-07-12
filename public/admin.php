@@ -65,7 +65,7 @@ try {
     $aiProviders = ['azure' => false, 'openai' => false, 'sightengine' => false, 'rapidapi' => false, 'groq' => false];
 }
 
-// Get recent videos for video management tab (LIMIT 100 for performance)
+// Get recent videos for video management tab (LIMIT 20 for faster initial load)
 $db = App\Config\Database::getConnection();
 $stmt = $db->query(
     "SELECT v.*, u.name as user_name, u.role as user_role, s.title as season_title
@@ -73,7 +73,7 @@ $stmt = $db->query(
      JOIN users u ON v.user_id = u.id
      JOIN seasons s ON v.season_id = s.id
      ORDER BY v.created_at DESC
-     LIMIT 100"
+     LIMIT 20"
 );
 $allVideos = $stmt->fetchAll();
 
@@ -99,7 +99,7 @@ try {
         $submissionRoles  = $submissionModel->countByRole();
         $submissionTotal  = $submissionModel->totalCount();
         
-        // Fetch only recent submissions with linked video AI data (LIMIT 100 for performance)
+        // Fetch only recent submissions with linked video AI data (LIMIT 20 for faster load)
         $stmt = $db->query(
             "SELECT s.id, s.name, s.email, s.phone, s.role, s.audition_type, s.submission_tag,
                     s.status, s.file_path, s.file_path_2, s.video_id, s.video_id_2, 
@@ -112,7 +112,7 @@ try {
              LEFT JOIN videos v1 ON s.video_id = v1.id
              LEFT JOIN videos v2 ON s.video_id_2 = v2.id
              ORDER BY s.submitted_at DESC
-             LIMIT 100"
+             LIMIT 20"
         );
         $allSubmissions = $stmt->fetchAll();
         
