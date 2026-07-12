@@ -968,7 +968,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SUBMISSIONS TAB ==================== -->
-                <div x-if="activeTab === 'videos'" x-cloak>
+                <div x-show="activeTab === 'videos'" x-cloak>
                     <!-- Bulk Actions Toolbar (shows when items selected) -->
                     <div x-show="selectedSubmissions.length > 0" x-cloak class="bg-crimson text-white rounded-xl p-4 mb-4 flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -1116,7 +1116,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== USERS TAB ==================== -->
-                <div x-if="activeTab === 'users'" x-cloak>
+                <div x-show="activeTab === 'users'" x-cloak>
                     <!-- Filter -->
                     <div class="flex flex-wrap gap-2 mb-4">
                         <button @click="userFilter = 'all'" :class="userFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium transition">All</button>
@@ -1462,7 +1462,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SEASONS TAB ==================== -->
-                <div x-if="activeTab === 'seasons'" x-cloak>
+                <div x-show="activeTab === 'seasons'" x-cloak>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Create Season Form -->
                         <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
@@ -1530,7 +1530,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SCRIPTS TAB ==================== -->
-                <div x-if="activeTab === 'scripts'" x-cloak>
+                <div x-show="activeTab === 'scripts'" x-cloak>
                     <!-- Info banner: briefs moved to Settings -->
                     <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 flex items-start gap-3">
                         <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1856,7 +1856,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== AI CONFIG TAB ==================== -->
-                <div x-if="activeTab === 'aiconfig'" x-cloak>
+                <div x-show="activeTab === 'aiconfig'" x-cloak>
                     <!-- Provider Status Overview -->
                     <div class="bg-white rounded-xl border border-dark/5 p-5 mb-6">
                         <div class="flex items-center justify-between mb-4">
@@ -2284,7 +2284,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== YOUTUBE TAB ==================== -->
-                <div x-if="activeTab === 'youtube'" x-cloak>
+                <div x-show="activeTab === 'youtube'" x-cloak>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         <!-- Connection Status Card -->
                         <div class="lg:col-span-3">
@@ -2735,7 +2735,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== EMAIL TAB ==================== -->
-                <div x-if="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
+                <div x-show="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         
                         <!-- Email Provider Selection -->
@@ -3025,7 +3025,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== GOOGLE LOGIN TAB ==================== -->
-                <div x-if="activeTab === 'google'" x-cloak x-data="googleSettings()" x-init="loadGoogleSettings()">
+                <div x-show="activeTab === 'google'" x-cloak x-data="googleSettings()" x-init="loadGoogleSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Configuration Card -->
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
@@ -3155,7 +3155,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SETTINGS TAB ==================== -->
-                <div x-if="activeTab === 'settings'" x-cloak>
+                <div x-show="activeTab === 'settings'" x-cloak>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 
                         <!-- Database Migrations -->
