@@ -4084,43 +4084,43 @@ if (file_exists($errorLogFile)) {
         </div>
     </div>
 
-    <!-- Submission Detail Modal - Compact -->
+    <!-- Submission Detail Modal - Compact & Mobile Friendly -->
     <div x-show="viewingSubmission" x-cloak @click.self="closeSubmission()"
-        class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4"
         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
         x-data="{ activeVideoTab: 'video1' }">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col" @click.stop>
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-full sm:max-w-3xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col" @click.stop>
             <!-- Compact Header -->
-            <div class="px-5 py-3 border-b border-dark/10 flex items-center justify-between flex-shrink-0">
+            <div class="px-3 sm:px-5 py-2 sm:py-3 border-b border-dark/10 flex items-center justify-between flex-shrink-0">
                 <template x-if="viewingSubmission">
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-display text-[18px] text-dark truncate" x-text="viewingSubmission.name"></h3>
-                        <p class="text-[11px] text-dark/50" x-text="viewingSubmission.role.toUpperCase() + ' — ' + viewingSubmission.audition_type"></p>
+                        <h3 class="font-display text-[16px] sm:text-[18px] text-dark truncate" x-text="viewingSubmission.name"></h3>
+                        <p class="text-[10px] sm:text-[11px] text-dark/50" x-text="viewingSubmission.role.toUpperCase() + ' — ' + viewingSubmission.audition_type"></p>
                     </div>
                 </template>
-                <button @click="closeSubmission()" class="text-dark/40 hover:text-dark ml-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <button @click="closeSubmission()" class="text-dark/40 hover:text-dark ml-2 sm:ml-3 flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
             <template x-if="viewingSubmission">
                 <div class="flex-1 overflow-y-auto">
                     <!-- Compact Contact Bar -->
-                    <div class="px-5 py-2 bg-cream/30 border-b border-dark/5 text-[11px] flex flex-wrap gap-x-4 gap-y-1">
-                        <span class="flex items-center gap-1 text-dark/70">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            <a :href="'mailto:' + viewingSubmission.email" x-text="viewingSubmission.email" class="hover:text-crimson"></a>
+                    <div class="px-3 sm:px-5 py-2 bg-cream/30 border-b border-dark/5 text-[10px] sm:text-[11px] flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-1">
+                        <span class="flex items-center gap-1 text-dark/70 min-w-0">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <a :href="'mailto:' + viewingSubmission.email" x-text="viewingSubmission.email" class="hover:text-crimson truncate"></a>
                         </span>
-                        <span class="flex items-center gap-1 text-dark/70">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        <span class="flex items-center gap-1 text-dark/70 flex-shrink-0">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                             <a :href="'tel:' + viewingSubmission.phone" x-text="viewingSubmission.phone" class="hover:text-crimson"></a>
                         </span>
-                        <span class="flex items-center gap-1 text-dark/70">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="flex items-center gap-1 text-dark/70 flex-shrink-0">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span x-text="formatDate(viewingSubmission.submitted_at)"></span>
                         </span>
-                        <span class="ml-auto px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                        <span class="ml-auto px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold flex-shrink-0"
                             :class="{
                                 'bg-amber-100 text-amber-700': viewingSubmission.status==='new',
                                 'bg-blue-100 text-blue-700': viewingSubmission.status==='reviewed',
@@ -4132,15 +4132,15 @@ if (file_exists($errorLogFile)) {
 
                     <!-- Tabs (for actor dual videos) -->
                     <template x-if="viewingSubmission.submission_tag === 'actor-dual' && viewingSubmission.file_path_2">
-                        <div class="border-b border-dark/5 px-5">
-                            <div class="flex gap-2">
+                        <div class="border-b border-dark/5 px-3 sm:px-5">
+                            <div class="flex gap-1 sm:gap-2">
                                 <button @click="activeVideoTab = 'video1'" 
-                                    class="px-3 py-2 text-[12px] font-medium border-b-2 transition"
+                                    class="px-3 sm:px-4 py-2 text-[11px] sm:text-[12px] font-medium border-b-2 transition"
                                     :class="activeVideoTab === 'video1' ? 'border-crimson text-crimson' : 'border-transparent text-dark/50 hover:text-dark'">
                                     🎭 Dialog
                                 </button>
                                 <button @click="activeVideoTab = 'video2'" 
-                                    class="px-3 py-2 text-[12px] font-medium border-b-2 transition"
+                                    class="px-3 sm:px-4 py-2 text-[11px] sm:text-[12px] font-medium border-b-2 transition"
                                     :class="activeVideoTab === 'video2' ? 'border-crimson text-crimson' : 'border-transparent text-dark/50 hover:text-dark'">
                                     🎵 Song
                                 </button>
@@ -4148,26 +4148,26 @@ if (file_exists($errorLogFile)) {
                         </div>
                     </template>
 
-                    <div class="p-5">
+                    <div class="p-3 sm:p-5">
                         <!-- Dialog Video / Single Video -->
                         <template x-if="viewingSubmission.file_path && (viewingSubmission.submission_tag !== 'actor-dual' || activeVideoTab === 'video1')">
                             <div>
                                 <!-- Video Player (Plyr) -->
-                                <div class="mb-4">
+                                <div class="mb-3 sm:mb-4">
                                     <video :id="'submission-player-' + viewingSubmission.id" 
                                            :src="'/uploads/' + viewingSubmission.file_path" 
                                            controls playsinline 
-                                           class="w-full rounded-lg bg-dark max-h-[350px] plyr-video"></video>
+                                           class="w-full rounded-lg bg-dark max-h-[250px] sm:max-h-[350px] plyr-video"></video>
                                 </div>
 
                                 <!-- AI Analysis (Compact) -->
-                                <div class="bg-cream rounded-lg p-3">
+                                <div class="bg-cream rounded-lg p-2.5 sm:p-3">
                                     <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-semibold text-dark text-[12px] flex items-center gap-1.5">
-                                            <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                        <h4 class="font-semibold text-dark text-[11px] sm:text-[12px] flex items-center gap-1.5">
+                                            <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                                             AI Analysis
                                         </h4>
-                                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                                        <span class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-semibold"
                                             :class="{
                                                 'bg-green-100 text-green-700': (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='approved',
                                                 'bg-red-100 text-red-700': viewingSubmission.ai_flagged || (viewingSubmission.video1_ai_status || viewingSubmission.ai_status)==='flagged',
@@ -4179,9 +4179,9 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- AI Score (from video feedback) -->
                                     <template x-if="viewingSubmission.video1_ai_score">
-                                        <div class="mb-3 flex items-center gap-3">
+                                        <div class="mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
                                             <div class="text-center">
-                                                <div class="text-[28px] font-display"
+                                                <div class="text-[24px] sm:text-[28px] font-display"
                                                     :class="{
                                                         'text-green-600': viewingSubmission.video1_ai_score >= 70,
                                                         'text-amber-600': viewingSubmission.video1_ai_score >= 40 && viewingSubmission.video1_ai_score < 70,
@@ -4206,7 +4206,7 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- AI Summary (from video feedback) -->
                                     <template x-if="viewingSubmission.video1_ai_feedback?.summary">
-                                        <p class="text-[12px] text-dark/70 mb-2" x-text="viewingSubmission.video1_ai_feedback.summary"></p>
+                                        <p class="text-[11px] sm:text-[12px] text-dark/70 mb-2" x-text="viewingSubmission.video1_ai_feedback.summary"></p>
                                     </template>
 
                                     <!-- AI Flags (from video feedback) -->
@@ -4223,26 +4223,26 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- Transcript (from video feedback) -->
                                     <template x-if="viewingSubmission.video1_ai_feedback?.transcript">
-                                        <div class="mt-3 pt-3 border-t border-dark/10">
+                                        <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-dark/10">
                                             <div class="flex items-center justify-between mb-1">
-                                                <span class="text-[10px] text-dark/50 uppercase font-semibold">Transcript</span>
+                                                <span class="text-[9px] sm:text-[10px] text-dark/50 uppercase font-semibold">Transcript</span>
                                                 <template x-if="viewingSubmission.video1_ai_feedback?.feedback">
-                                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
+                                                    <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
                                                           x-text="(viewingSubmission.video1_ai_feedback.feedback.find(f => f.startsWith('Language detected:')) || '').replace('Language detected: ', '')"></span>
                                                 </template>
                                             </div>
-                                            <p class="text-[11px] text-dark/70 leading-relaxed bg-dark/5 rounded p-2" x-text="viewingSubmission.video1_ai_feedback.transcript"></p>
+                                            <p class="text-[11px] sm:text-[12px] text-dark/70 leading-relaxed bg-dark/5 rounded p-2" x-text="viewingSubmission.video1_ai_feedback.transcript"></p>
                                         </div>
                                     </template>
 
                                     <!-- NSFW Analysis (from video feedback) -->
                                     <template x-if="viewingSubmission.video1_ai_feedback?.nsfw_result">
-                                        <div class="mt-3 pt-3 border-t border-dark/10">
-                                            <span class="text-[10px] text-dark/50 uppercase font-semibold">Visual Content Safety</span>
-                                            <div class="mt-1.5 grid grid-cols-2 gap-1.5 text-[10px]">
+                                        <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-dark/10">
+                                            <span class="text-[9px] sm:text-[10px] text-dark/50 uppercase font-semibold">Visual Content Safety</span>
+                                            <div class="mt-1.5 grid grid-cols-2 gap-1 sm:gap-1.5 text-[9px] sm:text-[10px]">
                                                 <template x-for="(value, key) in viewingSubmission.video1_ai_feedback.nsfw_result" :key="key">
-                                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
-                                                        <span class="text-dark/60 capitalize" x-text="key.replace(/_/g, ' ')"></span>
+                                                    <div class="flex justify-between bg-dark/5 rounded px-1.5 sm:px-2 py-1">
+                                                        <span class="text-dark/60 capitalize truncate" x-text="key.replace(/_/g, ' ')"></span>
                                                         <span :class="(typeof value === 'number' && value > 0.5 && key !== 'frames_checked') ? 'text-red-600 font-medium' : 'text-green-600'" 
                                                               x-text="typeof value === 'number' ? (key === 'frames_checked' ? value : Math.round(value * 100) + '%') : value"></span>
                                                     </div>
@@ -4283,20 +4283,20 @@ if (file_exists($errorLogFile)) {
                         <!-- Song Video (for actor dual) -->
                         <template x-if="viewingSubmission.submission_tag === 'actor-dual' && viewingSubmission.file_path_2 && activeVideoTab === 'video2'">
                             <div>
-                                <div class="mb-4">
+                                <div class="mb-3 sm:mb-4">
                                     <video :id="'submission-player-2-' + viewingSubmission.id" 
                                            :src="'/uploads/' + viewingSubmission.file_path_2" 
                                            controls playsinline 
-                                           class="w-full rounded-lg bg-dark max-h-[350px] plyr-video"></video>
+                                           class="w-full rounded-lg bg-dark max-h-[250px] sm:max-h-[350px] plyr-video"></video>
                                 </div>
 
-                                <div class="bg-cream rounded-lg p-3">
+                                <div class="bg-cream rounded-lg p-2.5 sm:p-3">
                                     <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-semibold text-dark text-[12px] flex items-center gap-1.5">
-                                            <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                        <h4 class="font-semibold text-dark text-[11px] sm:text-[12px] flex items-center gap-1.5">
+                                            <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                                             AI Analysis
                                         </h4>
-                                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                                        <span class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-semibold"
                                             :class="{
                                                 'bg-green-100 text-green-700': (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='approved',
                                                 'bg-red-100 text-red-700': viewingSubmission.ai_flagged_2 || (viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2)==='flagged',
@@ -4308,9 +4308,9 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- AI Score -->
                                     <template x-if="viewingSubmission.video2_ai_score">
-                                        <div class="mb-3 flex items-center gap-3">
+                                        <div class="mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
                                             <div class="text-center">
-                                                <div class="text-[28px] font-display"
+                                                <div class="text-[24px] sm:text-[28px] font-display"
                                                     :class="{
                                                         'text-green-600': viewingSubmission.video2_ai_score >= 70,
                                                         'text-amber-600': viewingSubmission.video2_ai_score >= 40 && viewingSubmission.video2_ai_score < 70,
@@ -4335,7 +4335,7 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- AI Summary -->
                                     <template x-if="viewingSubmission.video2_ai_feedback?.summary">
-                                        <p class="text-[12px] text-dark/70 mb-2" x-text="viewingSubmission.video2_ai_feedback.summary"></p>
+                                        <p class="text-[11px] sm:text-[12px] text-dark/70 mb-2" x-text="viewingSubmission.video2_ai_feedback.summary"></p>
                                     </template>
 
                                     <!-- AI Flags -->
@@ -4352,26 +4352,26 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- Transcript (from video feedback) -->
                                     <template x-if="viewingSubmission.video2_ai_feedback?.transcript">
-                                        <div class="mt-3 pt-3 border-t border-dark/10">
+                                        <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-dark/10">
                                             <div class="flex items-center justify-between mb-1">
-                                                <span class="text-[10px] text-dark/50 uppercase font-semibold">Transcript</span>
+                                                <span class="text-[9px] sm:text-[10px] text-dark/50 uppercase font-semibold">Transcript</span>
                                                 <template x-if="viewingSubmission.video2_ai_feedback?.feedback">
-                                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
+                                                    <span class="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
                                                           x-text="(viewingSubmission.video2_ai_feedback.feedback.find(f => f.startsWith('Language detected:')) || '').replace('Language detected: ', '')"></span>
                                                 </template>
                                             </div>
-                                            <p class="text-[11px] text-dark/70 leading-relaxed bg-dark/5 rounded p-2" x-text="viewingSubmission.video2_ai_feedback.transcript"></p>
+                                            <p class="text-[11px] sm:text-[12px] text-dark/70 leading-relaxed bg-dark/5 rounded p-2" x-text="viewingSubmission.video2_ai_feedback.transcript"></p>
                                         </div>
                                     </template>
 
                                     <!-- NSFW Analysis (from video feedback) -->
                                     <template x-if="viewingSubmission.video2_ai_feedback?.nsfw_result">
-                                        <div class="mt-3 pt-3 border-t border-dark/10">
-                                            <span class="text-[10px] text-dark/50 uppercase font-semibold">Visual Content Safety</span>
-                                            <div class="mt-1.5 grid grid-cols-2 gap-1.5 text-[10px]">
+                                        <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-dark/10">
+                                            <span class="text-[9px] sm:text-[10px] text-dark/50 uppercase font-semibold">Visual Content Safety</span>
+                                            <div class="mt-1.5 grid grid-cols-2 gap-1 sm:gap-1.5 text-[9px] sm:text-[10px]">
                                                 <template x-for="(value, key) in viewingSubmission.video2_ai_feedback.nsfw_result" :key="key">
-                                                    <div class="flex justify-between bg-dark/5 rounded px-2 py-1">
-                                                        <span class="text-dark/60 capitalize" x-text="key.replace(/_/g, ' ')"></span>
+                                                    <div class="flex justify-between bg-dark/5 rounded px-1.5 sm:px-2 py-1">
+                                                        <span class="text-dark/60 capitalize truncate" x-text="key.replace(/_/g, ' ')"></span>
                                                         <span :class="(typeof value === 'number' && value > 0.5 && key !== 'frames_checked') ? 'text-red-600 font-medium' : 'text-green-600'" 
                                                               x-text="typeof value === 'number' ? (key === 'frames_checked' ? value : Math.round(value * 100) + '%') : value"></span>
                                                     </div>
@@ -4411,22 +4411,22 @@ if (file_exists($errorLogFile)) {
 
                         <!-- Applicant Notes -->
                         <template x-if="viewingSubmission.notes">
-                            <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                <h4 class="text-[11px] font-semibold text-dark/70 uppercase mb-1">Notes:</h4>
-                                <p class="text-[12px] text-dark" x-text="viewingSubmission.notes"></p>
+                            <div class="mt-3 sm:mt-4 bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-3">
+                                <h4 class="text-[10px] sm:text-[11px] font-semibold text-dark/70 uppercase mb-1">Notes:</h4>
+                                <p class="text-[11px] sm:text-[12px] text-dark" x-text="viewingSubmission.notes"></p>
                             </div>
                         </template>
 
-                        <!-- Compact Actions -->
-                        <div class="mt-4 pt-4 border-t border-dark/5 flex gap-2">
+                        <!-- Compact Actions - Mobile Friendly -->
+                        <div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-dark/5 flex gap-2">
                             <button @click="updateSubmissionStatus(viewingSubmission.id, 'shortlisted'); closeSubmission()" 
-                                class="flex-1 bg-green-600 text-white py-2.5 rounded-lg text-[12px] font-medium hover:bg-green-700 transition flex items-center justify-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                class="flex-1 bg-green-600 text-white py-3 sm:py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium hover:bg-green-700 transition flex items-center justify-center gap-1.5 touch-manipulation">
+                                <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 Shortlist
                             </button>
                             <button @click="updateSubmissionStatus(viewingSubmission.id, 'rejected'); closeSubmission()" 
-                                class="flex-1 bg-red-600 text-white py-2.5 rounded-lg text-[12px] font-medium hover:bg-red-700 transition flex items-center justify-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                class="flex-1 bg-red-600 text-white py-3 sm:py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium hover:bg-red-700 transition flex items-center justify-center gap-1.5 touch-manipulation">
+                                <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 Reject
                             </button>
                         </div>
@@ -5009,8 +5009,24 @@ if (file_exists($errorLogFile)) {
                             this.submissionCounts = counts;
                         }
                         this.filterSubmissions();
+                        
+                        // Silent refresh videos list to sync Overview page
+                        this.silentRefreshVideos();
                     }
                 } catch(e) { console.error('Submission status update failed', e); }
+            },
+            
+            // Silent refresh videos (no page reload, just updates data)
+            async silentRefreshVideos() {
+                try {
+                    const res = await fetch('/api/admin/videos/refresh');
+                    const data = await res.json();
+                    if (data.success && data.videos) {
+                        this.videos = data.videos;
+                    }
+                } catch(e) {
+                    console.error('Silent refresh failed', e);
+                }
             },
 
             async saveSubmissionNotes(id) {
@@ -5241,9 +5257,12 @@ if (file_exists($errorLogFile)) {
                     const res = await fetch(url, { method: 'POST', body: formData });
                     if (!res.ok) throw new Error('Failed');
                     this.modalOpen = false;
-                    location.reload();
+                    
+                    // Silent refresh instead of page reload
+                    await this.silentRefreshVideos();
+                    this.showToast(this.modalAction === 'approve' ? 'Video approved' : 'Video rejected', 'success');
                 } catch (e) {
-                    alert('Action failed');
+                    this.showToast('Action failed', 'error');
                 }
             },
             
