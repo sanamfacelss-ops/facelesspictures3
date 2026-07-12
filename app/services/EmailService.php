@@ -485,6 +485,24 @@ class EmailService
     }
 
     /**
+     * Send submission received confirmation to submitter
+     */
+    public function sendSubmissionReceivedEmail(string $name, string $email, string $role, string $auditionType): bool
+    {
+        $emailData = $this->templateService->submissionReceivedEmail($name, $role, $auditionType);
+        return $this->sendEmail($email, $emailData['subject'], $emailData['body']);
+    }
+
+    /**
+     * Send admin notification for new submission
+     */
+    public function sendAdminNewSubmissionEmail(string $adminEmail, string $name, string $email, string $role, string $auditionType, int $submissionId): bool
+    {
+        $emailData = $this->templateService->adminNewSubmissionEmail($name, $email, $role, $auditionType, $submissionId);
+        return $this->sendEmail($adminEmail, $emailData['subject'], $emailData['body']);
+    }
+
+    /**
      * Helper method to send email using best available method
      */
     private function sendEmail(string $to, string $subject, string $body): bool

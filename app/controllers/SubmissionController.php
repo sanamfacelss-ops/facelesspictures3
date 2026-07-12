@@ -180,12 +180,28 @@ class SubmissionController
                 'file_path'       => $filename,
                 'file_type'       => $ext,
                 'file_size_bytes' => $file['size'],
+                'submission_tag'  => $role . '-single',
                 'ip_address'      => $ip,
             ]);
 
             log_message('info',
                 "New submission #{$submissionId}: {$name} <{$email}> — {$role} / {$auditionType}"
             );
+
+            // ── Send email notification to submitter ──────────────────────
+            try {
+                $emailService = new \App\Services\EmailService();
+                if ($emailService->isNotificationEnabled('submit')) {
+                    $emailService->sendSubmissionReceivedEmail($name, $email, $role, $auditionType);
+                }
+                // Admin notification
+                $adminEmail = $emailService->getAdminEmail();
+                if (!empty($adminEmail) && $emailService->isNotificationEnabled('admin_new_video')) {
+                    $emailService->sendAdminNewSubmissionEmail($adminEmail, $name, $email, $role, $auditionType, $submissionId);
+                }
+            } catch (\Throwable $emailErr) {
+                log_exception($emailErr, 'SUBMISSION_EMAIL');
+            }
 
             // ── Feed into videos pipeline ─────────────────────────────────
             // Find or create a guest-submissions season so the foreign key is satisfied
@@ -372,6 +388,7 @@ class SubmissionController
                 'file_path_2'      => $saved['song_video']['path'],
                 'file_type_2'      => $saved['song_video']['ext'],
                 'file_size_bytes_2'=> $saved['song_video']['size'],
+                'submission_tag'   => 'actor-dual',
                 'ip_address'       => $ip,
             ]);
 
@@ -414,6 +431,21 @@ class SubmissionController
             } catch (\Throwable $e) { log_exception($e, 'ACTOR_SONG_PIPELINE'); }
 
             log_message('info', "Actor dual submission #{$submissionId} from {$name} <{$email}>");
+
+            // ── Send email notification to submitter ──────────────────────
+            try {
+                $emailService = new \App\Services\EmailService();
+                if ($emailService->isNotificationEnabled('submit')) {
+                    $emailService->sendSubmissionReceivedEmail($name, $email, 'actor', 'Actor Audition (Dialog + Song)');
+                }
+                // Admin notification
+                $adminEmail = $emailService->getAdminEmail();
+                if (!empty($adminEmail) && $emailService->isNotificationEnabled('admin_new_video')) {
+                    $emailService->sendAdminNewSubmissionEmail($adminEmail, $name, $email, 'actor', 'Actor Audition (Dialog + Song)', $submissionId);
+                }
+            } catch (\Throwable $emailErr) {
+                log_exception($emailErr, 'ACTOR_SUBMIT_EMAIL');
+            }
 
             echo json_encode([
                 'success'        => true,

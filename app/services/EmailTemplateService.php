@@ -562,4 +562,112 @@ HTML : '';
 </html>
 HTML;
     }
+
+    /**
+     * Submission received confirmation email (for public submissions from /actor, /director, /writer)
+     */
+    public function submissionReceivedEmail(string $name, string $role, string $auditionType): array
+    {
+        $roleEmoji = $role === 'actor' ? '🎭' : ($role === 'director' ? '🎬' : '✍️');
+        $roleColor = $role === 'actor' ? '#DC2626' : ($role === 'director' ? '#F59E0B' : '#3B82F6');
+        $appUrl = APP_URL ?? 'https://facelesspictures.com';
+        
+        $subject = "✅ Audition Received — " . ucfirst($role) . " — Faceless Pictures 3";
+        
+        $body = $this->buildEmail([
+            'preheader' => "Your {$role} audition submission has been received successfully.",
+            'logo' => true,
+            'heading' => "Submission Received!",
+            'subheading' => "Thank you for auditioning with us",
+            'content' => <<<HTML
+<div style="text-align: center; margin-bottom: 30px;">
+    <div style="font-size: 64px; margin-bottom: 15px;">{$roleEmoji}</div>
+    <p style="color: #666; font-size: 16px; line-height: 1.7; margin: 0;">
+        Thank you, <strong>{$name}</strong>! We've received your <strong>{$role}</strong> audition.
+    </p>
+</div>
+
+<div style="background: {$this->creamColor}; border-left: 4px solid {$roleColor}; border-radius: 12px; padding: 20px; margin: 25px 0;">
+    <p style="margin: 0 0 10px; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Submission Type</p>
+    <p style="margin: 0; color: #374151; font-size: 16px; font-weight: 600;">{$auditionType}</p>
+</div>
+
+<div style="background: #EEF2FF; border: 2px solid #818CF8; border-radius: 12px; padding: 20px; margin: 25px 0;">
+    <h3 style="margin: 0 0 12px; color: #4338CA; font-size: 15px;">📋 What happens next?</h3>
+    <div style="color: #4338CA; font-size: 14px; line-height: 2;">
+        ✅ AI moderation (automatic quality check)<br>
+        👀 Creative team review<br>
+        📧 We'll email you with updates<br>
+        ⭐ Shortlisted candidates will be contacted
+    </div>
+</div>
+
+<p style="color: #999; font-size: 13px; text-align: center; line-height: 1.6;">
+    We review submissions regularly and will be in touch soon.<br>
+    Thank you for your interest in Faceless Pictures 3!
+</p>
+HTML,
+            'footer_text' => "You're receiving this because you submitted an audition to Faceless Pictures 3."
+        ]);
+        
+        return ['subject' => $subject, 'body' => $body];
+    }
+
+    /**
+     * Admin notification for new public submission
+     */
+    public function adminNewSubmissionEmail(string $name, string $email, string $role, string $auditionType, int $submissionId): array
+    {
+        $roleEmoji = $role === 'actor' ? '🎭' : ($role === 'director' ? '🎬' : '✍️');
+        $roleColor = $role === 'actor' ? '#DC2626' : ($role === 'director' ? '#F59E0B' : '#3B82F6');
+        $appUrl = APP_URL ?? 'https://facelesspictures.com';
+        
+        $subject = "🎬 New " . ucfirst($role) . " Audition (#" . $submissionId . ") — Faceless Pictures 3";
+        
+        $body = $this->buildEmail([
+            'preheader' => "New {$role} audition submission received from {$name}.",
+            'logo' => true,
+            'heading' => "New Audition 📥",
+            'subheading' => "Public submission from /{$role} page",
+            'content' => <<<HTML
+<div style="text-align: center; margin-bottom: 25px;">
+    <div style="font-size: 48px; margin-bottom: 10px;">{$roleEmoji}</div>
+    <p style="color: #666; font-size: 14px; margin: 0;">
+        Submission ID: <strong style="color: {$this->primaryColor};">#{$submissionId}</strong>
+    </p>
+</div>
+
+<div style="background: {$this->creamColor}; border: 2px solid {$roleColor}; border-radius: 16px; padding: 25px; margin: 25px 0;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 10px 0; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; width: 120px;">Applicant</td>
+            <td style="padding: 10px 0; color: {$this->darkColor}; font-size: 15px; text-align: right; font-weight: 600;">{$name}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px 0; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Email</td>
+            <td style="padding: 10px 0; text-align: right;"><a href="mailto:{$email}" style="color: {$this->primaryColor}; text-decoration: none; font-size: 15px;">{$email}</a></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px 0; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Role</td>
+            <td style="padding: 10px 0; color: {$this->darkColor}; font-size: 15px; text-align: right; font-weight: 600;">{$role}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px 0; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Type</td>
+            <td style="padding: 10px 0; color: {$this->darkColor}; font-size: 15px; text-align: right;">{$auditionType}</td>
+        </tr>
+    </table>
+</div>
+
+<p style="color: #999; font-size: 13px; text-align: center; line-height: 1.6;">
+    This submission will be automatically processed through AI moderation.<br>
+    Log in to your admin dashboard to review and manage submissions.
+</p>
+HTML,
+            'cta_text' => 'Review in Admin Dashboard →',
+            'cta_url' => "{$appUrl}/admin?tab=submissions",
+            'footer_text' => "Admin notification • Faceless Pictures 3"
+        ]);
+        
+        return ['subject' => $subject, 'body' => $body];
+    }
 }

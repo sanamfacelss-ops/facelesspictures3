@@ -35,8 +35,8 @@ class Submission
              (role, audition_type, name, email, phone, script_id, script_title, notes,
               file_path, file_type, file_size_bytes,
               file_path_2, file_type_2, file_size_bytes_2,
-              ip_address)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+              submission_tag, ip_address)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $data['role'],
@@ -53,6 +53,7 @@ class Submission
             $data['file_path_2']     ?? null,
             $data['file_type_2']     ?? null,
             $data['file_size_bytes_2'] ?? null,
+            $data['submission_tag'] ?? null,
             $data['ip_address']     ?? null,
         ]);
         return (int) $this->db->lastInsertId();
@@ -141,6 +142,38 @@ class Submission
             "UPDATE submissions SET status = ?, admin_notes = ?, reviewed_at = NOW() WHERE id = ?"
         );
         return $stmt->execute([$status, $adminNotes, $id]);
+    }
+
+    /**
+     * Update AI status for first video
+     */
+    public function updateAIStatus(int $id, string $aiStatus, ?bool $flagged = null, ?string $notes = null): bool
+    {
+        try {
+            $stmt = $this->db->prepare(
+                "UPDATE submissions SET ai_status = ?, ai_flagged = ?, ai_notes = ? WHERE id = ?"
+            );
+            return $stmt->execute([$aiStatus, $flagged ? 1 : 0, $notes, $id]);
+        } catch (\PDOException $e) {
+            debug_log("updateAIStatus failed: " . $e->getMessage(), 'SUBMISSION');
+            return false;
+        }
+    }
+
+    /**
+     * Update AI status for second video (song)
+     */
+    public function updateAIStatus2(int $id, string $aiStatus, ?bool $flagged = null, ?string $notes = null): bool
+    {
+        try {
+            $stmt = $this->db->prepare(
+                "UPDATE submissions SET ai_status_2 = ?, ai_flagged_2 = ?, ai_notes_2 = ? WHERE id = ?"
+            );
+            return $stmt->execute([$aiStatus, $flagged ? 1 : 0, $notes, $id]);
+        } catch (\PDOException $e) {
+            debug_log("updateAIStatus2 failed: " . $e->getMessage(), 'SUBMISSION');
+            return false;
+        }
     }
 
     /**
