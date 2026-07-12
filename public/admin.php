@@ -2735,7 +2735,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== EMAIL TAB ==================== -->
-                <div x-show="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
+                <div x-if="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         
                         <!-- Email Provider Selection -->
@@ -3025,7 +3025,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== GOOGLE LOGIN TAB ==================== -->
-                <div x-show="activeTab === 'google'" x-cloak x-data="googleSettings()" x-init="loadGoogleSettings()">
+                <div x-if="activeTab === 'google'" x-cloak x-data="googleSettings()" x-init="loadGoogleSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Configuration Card -->
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
@@ -3155,7 +3155,7 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== SETTINGS TAB ==================== -->
-                <div x-show="activeTab === 'settings'" x-cloak>
+                <div x-if="activeTab === 'settings'" x-cloak>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 
                         <!-- Database Migrations -->
