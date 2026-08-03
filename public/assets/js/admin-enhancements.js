@@ -158,7 +158,9 @@ document.head.appendChild(style);
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    // Start auto-refresh
+    // Auto-refresh disabled to prevent unnecessary API calls
+    // Uncomment below to enable real-time video status updates:
+    /*
     window.adminAutoRefresh = new AdminAutoRefresh();
     window.adminAutoRefresh.start();
 
@@ -175,4 +177,5 @@ document.addEventListener('DOMContentLoaded', () => {
             window.adminAutoRefresh.start();
         }
     });
+    */
 });
