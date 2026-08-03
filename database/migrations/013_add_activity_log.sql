@@ -18,17 +18,4 @@ CREATE TABLE IF NOT EXISTS activity_log (
     INDEX idx_action (action),
     INDEX idx_entity (entity_type, entity_id),
     INDEX idx_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Add stored procedure for automatic cleanup (90 days)
-DELIMITER $$
-
-CREATE PROCEDURE cleanup_old_activity_logs()
-BEGIN
-    DELETE FROM activity_log 
-    WHERE created_at < DATE_SUB(NOW(), INTERVAL 90 DAY);
-    
-    SELECT ROW_COUNT() AS deleted_count;
-END$$
-
-DELIMITER ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci

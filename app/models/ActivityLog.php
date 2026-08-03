@@ -192,10 +192,20 @@ class ActivityLog
      */
     public function cleanupOldLogs(): int
     {
-        $stmt = $this->db->query("CALL cleanup_old_activity_logs()");
-        $result = $stmt->fetch();
-        
-        return (int) ($result['deleted_count'] ?? 0);
+        // Try stored procedure first (if it exists)
+        try {
+            $stmt = $this->db->query("CALL cleanup_old_activity_logs()");
+            $result = $stmt->fetch();
+            return (int) ($result['deleted_count'] ?? 0);
+        } catch (\PDOException $e) {
+            // If stored procedure doesn't exist, use direct DELETE
+            $stmt = $this->db->prepare(
+                "DELETE FROM activity_log 
+                 WHERE created_at < DATE_SUB(NOW(), INTERVAL 90 DAY)"
+            );
+            $stmt->execute();
+            return $stmt->rowCount();
+        }
     }
 
     /**
