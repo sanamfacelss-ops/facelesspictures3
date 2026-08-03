@@ -370,28 +370,8 @@ class TranscriptionService
             return false; // Could be legitimate short audio
         }
         
-        // Check if text contains non-Latin scripts (Devanagari, Gurmukhi, Tamil, etc.)
-        // This often indicates Whisper hallucinated in the wrong script
-        if (preg_match('/[\x{0900}-\x{097F}]/u', $text)) {
-            log_message('info', "Garbage detection: contains Devanagari script");
-            return true;
-        }
-        if (preg_match('/[\x{0A00}-\x{0A7F}]/u', $text)) {
-            log_message('info', "Garbage detection: contains Gurmukhi/Punjabi script");
-            return true;
-        }
-        if (preg_match('/[\x{0B80}-\x{0BFF}]/u', $text)) {
-            log_message('info', "Garbage detection: contains Tamil script");
-            return true;
-        }
-        if (preg_match('/[\x{0C00}-\x{0C7F}]/u', $text)) {
-            log_message('info', "Garbage detection: contains Telugu script");
-            return true;
-        }
-        if (preg_match('/[\x{0600}-\x{06FF}]/u', $text)) {
-            log_message('info', "Garbage detection: contains Arabic/Urdu script");
-            return true;
-        }
+        // NOTE: Removed Indic script checks - these are VALID transcriptions, not garbage!
+        // Devanagari, Gurmukhi, Tamil, etc. indicate successful transcription
         
         // Check for repetitive patterns like "the the the" or "tons of the tons of the"
         $words = preg_split('/\s+/', $text);
