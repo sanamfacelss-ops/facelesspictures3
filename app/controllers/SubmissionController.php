@@ -83,9 +83,20 @@ class SubmissionController
             }
 
             // ── Video is required ─────────────────────────────────────────
-            $filePresent = !empty($_FILES['file']) &&
-                           $_FILES['file']['error'] !== UPLOAD_ERR_NO_FILE;
-            $fileOk      = $filePresent && $_FILES['file']['error'] === UPLOAD_ERR_OK;
+            // Support multiple field names: file, director_video, writer_video
+            $fileFieldNames = ['file', 'director_video', 'writer_video'];
+            $file = null;
+            $filePresent = false;
+            $fileOk = false;
+            
+            foreach ($fileFieldNames as $fieldName) {
+                if (!empty($_FILES[$fieldName]) && $_FILES[$fieldName]['error'] !== UPLOAD_ERR_NO_FILE) {
+                    $file = $_FILES[$fieldName];
+                    $filePresent = true;
+                    $fileOk = $file['error'] === UPLOAD_ERR_OK;
+                    break;
+                }
+            }
 
             if (!$filePresent || !$fileOk) {
                 if (!$filePresent) {
@@ -99,7 +110,7 @@ class SubmissionController
                         UPLOAD_ERR_NO_TMP_DIR => 'Server missing temporary folder.',
                         UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
                     ];
-                    $errors[] = $uploadErrors[$_FILES['file']['error']] ?? 'Video upload error.';
+                    $errors[] = $uploadErrors[$file['error']] ?? 'Video upload error.';
                 }
             }
 
