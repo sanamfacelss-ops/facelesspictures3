@@ -162,6 +162,9 @@ $routes = [
     'api/submit'       => [SubmissionController::class, 'store',       'POST'],
     'api/submit/actor' => [SubmissionController::class, 'actorSubmit', 'POST'],
 
+    // Video status check API (for auto-refresh)
+    'api/videos/status-check' => [AdminController::class, 'videoStatusCheck', 'GET'],
+
     // Admin submissions API
     'api/admin/submissions'              => [AdminController::class, 'listSubmissions',    'GET'],
     'api/admin/submissions/{id}'         => [AdminController::class, 'getSubmission',      'GET'],

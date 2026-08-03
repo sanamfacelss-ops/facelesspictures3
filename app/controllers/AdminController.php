@@ -2516,4 +2516,68 @@ class AdminController
             echo json_encode(['error' => 'Failed to cleanup activity logs']);
         }
     }
+
+    // ==================== VIDEO STATUS CHECK (AUTO-REFRESH) ====================
+
+    /**
+     * Get current status of all videos (for auto-refresh polling)
+     * Returns lightweight data with only ID and status
+     */
+    public function videoStatusCheck(): void
+    {
+        header('Content-Type: application/json');
+        
+        // Allow authenticated users (not just admins)
+        if (!is_authenticated()) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Authentication required']);
+            return;
+        }
+
+        try {
+            $user = auth_user();
+            $isAdmin = $user['is_admin'] ?? false;
+
+            // Build query based on user role
+            if ($isAdmin) {
+                // Admins see all videos
+                $sql = "SELECT 
+                            id, 
+                            title, 
+                            status, 
+                            rejection_reason,
+                            updated_at
+                        FROM videos 
+                        ORDER BY updated_at DESC 
+                        LIMIT 100";
+                $stmt = $this->db->query($sql);
+            } else {
+                // Regular users see only their videos
+                $sql = "SELECT 
+                            id, 
+                            title, 
+                            status, 
+                            rejection_reason,
+                            updated_at
+                        FROM videos 
+                        WHERE user_id = ?
+                        ORDER BY updated_at DESC 
+                        LIMIT 50";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([$user['id']]);
+            }
+
+            $videos = $stmt->fetchAll();
+
+            echo json_encode([
+                'success' => true,
+                'videos' => $videos,
+                'timestamp' => time()
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'VIDEO_STATUS_CHECK');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to check video status']);
+        }
+    }
 }
