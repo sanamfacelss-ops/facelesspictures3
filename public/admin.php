@@ -2542,204 +2542,206 @@ if (file_exists($errorLogFile)) {
                             </div>
                         </div>
                         
-                        <!-- Step-by-Step Guide -->
+                        <!-- Connect Your Channel — unified step-by-step guide with inline fields -->
                         <div class="lg:col-span-2">
-                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:22px;box-shadow:0 1px 2px rgba(22,26,36,0.04);" class="youtube-guide">
-                                <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                                    Setup Guide
-                                </h3>
-                                
-                                <div class="space-y-3 md:space-y-4">
-                                    <!-- Step 1 -->
-                                    <div class="border border-dark/10 rounded-xl p-3 md:p-4">
-                                        <div class="flex items-start gap-2 md:gap-3">
+                            <form @submit.prevent="saveAPIKeys()" style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:22px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
+                                <div class="flex items-center justify-between mb-1 gap-3">
+                                    <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
+                                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                                        Connect Your Channel
+                                    </h3>
+                                    <span class="text-[11px] text-dark/40 flex-shrink-0"
+                                        x-text="['YOUTUBE_CLIENT_ID','YOUTUBE_CLIENT_SECRET','YOUTUBE_REFRESH_TOKEN','YOUTUBE_API_KEY','YOUTUBE_CHANNEL_ID'].filter(k => apiKeyStatus[k]?.configured).length + ' of 5 connected'"></span>
+                                </div>
+                                <p class="text-[11px] md:text-[12px] text-dark/50 mb-4">Six steps, in order. Each one shows exactly what to copy, right where it goes — do it once and you shouldn't need this page again.</p>
+
+                                <div class="space-y-3" x-data="{ ytOpen: 1 }">
+
+                                    <!-- Step 1: Enable API (no field) -->
+                                    <div class="border border-dark/10 rounded-xl overflow-hidden">
+                                        <button type="button" @click="ytOpen = ytOpen === 1 ? 0 : 1" class="w-full flex items-center gap-2 md:gap-3 p-3 md:p-4 text-left">
                                             <div class="w-6 h-6 md:w-7 md:h-7 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0">1</div>
                                             <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px] mb-1">Enable YouTube Data API v3</h4>
-                                                <p class="text-[10px] md:text-[11px] text-dark/60 mb-2">Go to Google Cloud Console and enable the API.</p>
-                                                <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
-                                                    <li>Go to <a href="https://console.cloud.google.com/apis/library" target="_blank" class="text-blue-600 hover:underline break-all">API Library</a></li>
-                                                    <li>Search for "YouTube Data API v3"</li>
-                                                    <li>Click and press "Enable"</li>
-                                                </ol>
+                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px]">Enable YouTube Data API v3</h4>
+                                                <p class="text-[10px] md:text-[11px] text-dark/50">Go to Google Cloud Console and enable the API.</p>
                                             </div>
+                                            <svg class="w-4 h-4 text-dark/30 transition-transform flex-shrink-0" :class="ytOpen===1 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="ytOpen===1" x-collapse class="px-3 md:px-4 pb-4 border-t border-dark/10 pt-3">
+                                            <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
+                                                <li>Go to <a href="https://console.cloud.google.com/apis/library" target="_blank" class="text-blue-600 hover:underline break-all">API Library</a></li>
+                                                <li>Search for "YouTube Data API v3"</li>
+                                                <li>Click and press "Enable"</li>
+                                            </ol>
+                                            <button type="button" @click="ytOpen = 2" class="mt-3 text-[11px] font-medium text-crimson hover:underline">Next step →</button>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Step 2 -->
-                                    <div class="border border-dark/10 rounded-xl p-3 md:p-4">
-                                        <div class="flex items-start gap-2 md:gap-3">
-                                            <div class="w-6 h-6 md:w-7 md:h-7 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0">2</div>
+
+                                    <!-- Step 2: OAuth credentials → Client ID + Secret -->
+                                    <div class="border rounded-xl overflow-hidden" :class="(apiKeyStatus.YOUTUBE_CLIENT_ID?.configured && apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured) ? 'border-green-300' : 'border-dark/10'">
+                                        <button type="button" @click="ytOpen = ytOpen === 2 ? 0 : 2" class="w-full flex items-center gap-2 md:gap-3 p-3 md:p-4 text-left">
+                                            <div class="w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0"
+                                                :class="(apiKeyStatus.YOUTUBE_CLIENT_ID?.configured && apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured) ? 'bg-green-500 text-white' : 'bg-crimson text-white'">
+                                                <svg x-show="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured && apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                <span x-show="!(apiKeyStatus.YOUTUBE_CLIENT_ID?.configured && apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured)">2</span>
+                                            </div>
                                             <div class="flex-1 min-w-0 overflow-hidden">
-                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px] mb-1">Create OAuth 2.0 Credentials</h4>
-                                                <p class="text-[10px] md:text-[11px] text-dark/60 mb-2">Create OAuth credentials for uploads.</p>
-                                                <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
-                                                    <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Credentials</a></li>
-                                                    <li>"Create Credentials" → "OAuth client ID"</li>
-                                                    <li>Type: <strong>Web application</strong></li>
-                                                    <li>Name: "Faceless Pictures 3"</li>
-                                                    <li class="break-all">Redirect URI: <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px] break-all">developers.google.com/oauthplayground</code></li>
-                                                    <li>Copy <strong>Client ID</strong> & <strong>Secret</strong></li>
-                                                </ol>
+                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px]">Create OAuth 2.0 credentials</h4>
+                                                <p class="text-[10px] md:text-[11px] text-dark/50">Gives you a Client ID and Client Secret.</p>
+                                            </div>
+                                            <svg class="w-4 h-4 text-dark/30 transition-transform flex-shrink-0" :class="ytOpen===2 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="ytOpen===2" x-collapse class="px-3 md:px-4 pb-4 border-t border-dark/10 pt-3">
+                                            <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal mb-3">
+                                                <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Credentials</a> → "Create Credentials" → "OAuth client ID"</li>
+                                                <li>Type: <strong>Web application</strong>, name it "Faceless Pictures 3"</li>
+                                                <li class="break-all">Redirect URI: <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px] break-all">developers.google.com/oauthplayground</code></li>
+                                            </ol>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
+                                                        OAuth Client ID
+                                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                                    </label>
+                                                    <input type="text" x-model="apiKeyForm.YOUTUBE_CLIENT_ID"
+                                                        :placeholder="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? apiKeyStatus.YOUTUBE_CLIENT_ID.masked : 'xxxx.apps.googleusercontent.com'"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
+                                                        OAuth Client Secret
+                                                        <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                                    </label>
+                                                    <input type="password" x-model="apiKeyForm.YOUTUBE_CLIENT_SECRET"
+                                                        :placeholder="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? '••••••••••••' : 'GOCSPX-...'"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Step 3 -->
-                                    <div class="border border-dark/10 rounded-xl p-3 md:p-4">
-                                        <div class="flex items-start gap-2 md:gap-3">
+
+                                    <!-- Step 3: Add test user (no field) -->
+                                    <div class="border border-dark/10 rounded-xl overflow-hidden">
+                                        <button type="button" @click="ytOpen = ytOpen === 3 ? 0 : 3" class="w-full flex items-center gap-2 md:gap-3 p-3 md:p-4 text-left">
                                             <div class="w-6 h-6 md:w-7 md:h-7 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0">3</div>
                                             <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px] mb-1">Add Test User</h4>
-                                                <p class="text-[10px] md:text-[11px] text-dark/60 mb-2">Required if app is in "Testing" mode.</p>
-                                                <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
-                                                    <li>Go to <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" class="text-blue-600 hover:underline">OAuth consent</a></li>
-                                                    <li>Scroll to "Test users"</li>
-                                                    <li>Click "Add Users"</li>
-                                                    <li>Enter your YouTube email</li>
-                                                    <li>Click "Save"</li>
-                                                </ol>
-                                                <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                                    <p class="text-[9px] md:text-[10px] text-yellow-800"><strong>Note:</strong> Use the Gmail that owns your YouTube channel!</p>
-                                                </div>
+                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px]">Add test user</h4>
+                                                <p class="text-[10px] md:text-[11px] text-dark/50">Required if the app is in "Testing" mode.</p>
                                             </div>
+                                            <svg class="w-4 h-4 text-dark/30 transition-transform flex-shrink-0" :class="ytOpen===3 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="ytOpen===3" x-collapse class="px-3 md:px-4 pb-4 border-t border-dark/10 pt-3">
+                                            <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
+                                                <li>Go to <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" class="text-blue-600 hover:underline">OAuth consent</a></li>
+                                                <li>Scroll to "Test users" → Click "Add Users"</li>
+                                                <li>Enter your YouTube email → Click "Save"</li>
+                                            </ol>
+                                            <div class="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                                <p class="text-[9px] md:text-[10px] text-yellow-800"><strong>Note:</strong> Use the Gmail that owns your YouTube channel!</p>
+                                            </div>
+                                            <button type="button" @click="ytOpen = 4" class="mt-3 text-[11px] font-medium text-crimson hover:underline">Next step →</button>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Step 4 -->
-                                    <div class="border border-dark/10 rounded-xl p-3 md:p-4">
-                                        <div class="flex items-start gap-2 md:gap-3">
-                                            <div class="w-6 h-6 md:w-7 md:h-7 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0">4</div>
+
+                                    <!-- Step 4: OAuth Playground → Refresh Token -->
+                                    <div class="border rounded-xl overflow-hidden" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'border-green-300' : 'border-dark/10'">
+                                        <button type="button" @click="ytOpen = ytOpen === 4 ? 0 : 4" class="w-full flex items-center gap-2 md:gap-3 p-3 md:p-4 text-left">
+                                            <div class="w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0"
+                                                :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500 text-white' : 'bg-crimson text-white'">
+                                                <svg x-show="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                <span x-show="!apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured">4</span>
+                                            </div>
                                             <div class="flex-1 min-w-0 overflow-hidden">
-                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px] mb-1">Get Refresh Token</h4>
-                                                <p class="text-[10px] md:text-[11px] text-dark/60 mb-2">Use OAuth Playground to generate token.</p>
-                                                <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
-                                                    <li>Go to <a href="https://developers.google.com/oauthplayground" target="_blank" class="text-blue-600 hover:underline">OAuth Playground</a></li>
-                                                    <li>Click ⚙️ gear icon (top-right)</li>
-                                                    <li>Check "Use your own OAuth credentials"</li>
-                                                    <li>Enter Client ID & Secret</li>
-                                                    <li>Find "YouTube Data API v3"</li>
-                                                    <li class="break-all">Select: <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px] break-all">.../auth/youtube.upload</code></li>
-                                                    <li>Click "Authorize APIs"</li>
-                                                    <li>Sign in with YouTube account</li>
-                                                    <li>Allow access</li>
-                                                    <li>"Exchange authorization code for tokens"</li>
-                                                    <li>Copy the <strong>Refresh token</strong></li>
-                                                </ol>
+                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px]">Connect your YouTube account</h4>
+                                                <p class="text-[10px] md:text-[11px] text-dark/50">Use OAuth Playground to generate a refresh token.</p>
                                             </div>
+                                            <svg class="w-4 h-4 text-dark/30 transition-transform flex-shrink-0" :class="ytOpen===4 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="ytOpen===4" x-collapse class="px-3 md:px-4 pb-4 border-t border-dark/10 pt-3">
+                                            <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal mb-3">
+                                                <li>Go to <a href="https://developers.google.com/oauthplayground" target="_blank" class="text-blue-600 hover:underline">OAuth Playground</a> → ⚙️ gear icon (top-right)</li>
+                                                <li>Check "Use your own OAuth credentials" → enter Client ID & Secret from Step 2</li>
+                                                <li>Find "YouTube Data API v3" → select <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px] break-all">.../auth/youtube.upload</code></li>
+                                                <li>Click "Authorize APIs" → sign in → Allow access</li>
+                                                <li>"Exchange authorization code for tokens" → copy the <strong>Refresh token</strong></li>
+                                            </ol>
+                                            <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
+                                                OAuth Refresh Token
+                                                <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                            </label>
+                                            <input type="password" x-model="apiKeyForm.YOUTUBE_REFRESH_TOKEN"
+                                                :placeholder="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? '••••••••••••' : '1//0g...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
                                         </div>
                                     </div>
-                                    
-                                    <!-- Step 5 -->
-                                    <div class="border border-dark/10 rounded-xl p-3 md:p-4">
-                                        <div class="flex items-start gap-2 md:gap-3">
-                                            <div class="w-6 h-6 md:w-7 md:h-7 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0">5</div>
+
+                                    <!-- Step 5: API Key -->
+                                    <div class="border rounded-xl overflow-hidden" :class="apiKeyStatus.YOUTUBE_API_KEY?.configured ? 'border-green-300' : 'border-dark/10'">
+                                        <button type="button" @click="ytOpen = ytOpen === 5 ? 0 : 5" class="w-full flex items-center gap-2 md:gap-3 p-3 md:p-4 text-left">
+                                            <div class="w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0"
+                                                :class="apiKeyStatus.YOUTUBE_API_KEY?.configured ? 'bg-green-500 text-white' : 'bg-crimson text-white'">
+                                                <svg x-show="apiKeyStatus.YOUTUBE_API_KEY?.configured" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                <span x-show="!apiKeyStatus.YOUTUBE_API_KEY?.configured">5</span>
+                                            </div>
                                             <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px] mb-1">Create API Key</h4>
-                                                <p class="text-[10px] md:text-[11px] text-dark/60 mb-2">Create an API key for public data access.</p>
-                                                <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
-                                                    <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Credentials</a></li>
-                                                    <li>"Create Credentials" → "API key"</li>
-                                                    <li>Copy the API key (AIza...)</li>
-                                                    <li>Optional: Restrict to YouTube API</li>
-                                                </ol>
+                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px]">Get a public API key</h4>
+                                                <p class="text-[10px] md:text-[11px] text-dark/50">Lets the app read channel stats — no upload access.</p>
                                             </div>
+                                            <svg class="w-4 h-4 text-dark/30 transition-transform flex-shrink-0" :class="ytOpen===5 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="ytOpen===5" x-collapse class="px-3 md:px-4 pb-4 border-t border-dark/10 pt-3">
+                                            <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal mb-3">
+                                                <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline">Credentials</a> → "Create Credentials" → "API key"</li>
+                                                <li>Optional: restrict it to YouTube Data API v3</li>
+                                            </ol>
+                                            <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
+                                                YouTube API Key
+                                                <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_API_KEY?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                            </label>
+                                            <input type="password" x-model="apiKeyForm.YOUTUBE_API_KEY"
+                                                :placeholder="apiKeyStatus.YOUTUBE_API_KEY?.configured ? '••••••••••••' : 'AIza...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
                                         </div>
                                     </div>
-                                    
-                                    <!-- Step 6 -->
-                                    <div class="border border-dark/10 rounded-xl p-3 md:p-4">
-                                        <div class="flex items-start gap-2 md:gap-3">
-                                            <div class="w-6 h-6 md:w-7 md:h-7 bg-crimson text-white rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0">6</div>
+
+                                    <!-- Step 6: Channel ID -->
+                                    <div class="border rounded-xl overflow-hidden" :class="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? 'border-green-300' : 'border-dark/10'">
+                                        <button type="button" @click="ytOpen = ytOpen === 6 ? 0 : 6" class="w-full flex items-center gap-2 md:gap-3 p-3 md:p-4 text-left">
+                                            <div class="w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[11px] md:text-[12px] font-bold flex-shrink-0"
+                                                :class="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? 'bg-green-500 text-white' : 'bg-crimson text-white'">
+                                                <svg x-show="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                <span x-show="!apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured">6</span>
+                                            </div>
                                             <div class="flex-1 min-w-0 overflow-hidden">
-                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px] mb-1">Get Your Channel ID</h4>
-                                                <p class="text-[10px] md:text-[11px] text-dark/60 mb-2">Find your YouTube channel ID.</p>
-                                                <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal">
-                                                    <li>Go to <a href="https://www.youtube.com" target="_blank" class="text-blue-600 hover:underline">YouTube</a></li>
-                                                    <li>Click profile → "Your channel"</li>
-                                                    <li class="break-all">URL shows: <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px]">channel/<strong>UC...</strong></code></li>
-                                                    <li>Copy the ID (starts with "UC")</li>
-                                                </ol>
-                                                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                                                    <p class="text-[9px] md:text-[10px] text-blue-800">If URL shows @username, go to <a href="https://www.youtube.com/account_advanced" target="_blank" class="underline">Advanced Settings</a></p>
-                                                </div>
+                                                <h4 class="font-semibold text-dark text-[12px] md:text-[13px]">Point it at your channel</h4>
+                                                <p class="text-[10px] md:text-[11px] text-dark/50">Find your YouTube channel ID.</p>
                                             </div>
+                                            <svg class="w-4 h-4 text-dark/30 transition-transform flex-shrink-0" :class="ytOpen===6 ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <div x-show="ytOpen===6" x-collapse class="px-3 md:px-4 pb-4 border-t border-dark/10 pt-3">
+                                            <ol class="text-[10px] md:text-[11px] text-dark/70 space-y-1 ml-3 md:ml-4 list-decimal mb-3">
+                                                <li>Go to <a href="https://www.youtube.com" target="_blank" class="text-blue-600 hover:underline">YouTube</a> → profile → "Your channel"</li>
+                                                <li class="break-all">URL shows: <code class="bg-dark/5 px-1 py-0.5 rounded text-[9px] md:text-[10px]">channel/<strong>UC...</strong></code> — copy the ID (starts with "UC")</li>
+                                            </ol>
+                                            <div class="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <p class="text-[9px] md:text-[10px] text-blue-800">If the URL shows @username instead, go to <a href="https://www.youtube.com/account_advanced" target="_blank" class="underline">Advanced Settings</a></p>
+                                            </div>
+                                            <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
+                                                Channel ID
+                                                <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                            </label>
+                                            <input type="text" x-model="apiKeyForm.YOUTUBE_CHANNEL_ID"
+                                                :placeholder="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? apiKeyStatus.YOUTUBE_CHANNEL_ID.masked : 'UC...'"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
                                         </div>
                                     </div>
+
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- API Configuration Form -->
-                        <div class="lg:col-span-1">
-                            <form @submit.prevent="saveAPIKeys()" style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);position:sticky;top:24px;">
-                                <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                                    API Configuration
-                                </h3>
-                                
-                                <div class="space-y-3 md:space-y-4">
-                                    <!-- API Key -->
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
-                                            YouTube API Key
-                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_API_KEY?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
-                                        </label>
-                                        <input type="password" x-model="apiKeyForm.YOUTUBE_API_KEY" 
-                                            :placeholder="apiKeyStatus.YOUTUBE_API_KEY?.configured ? '••••••••••••' : 'AIza...'"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
-                                    </div>
-                                    
-                                    <!-- Client ID -->
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
-                                            OAuth Client ID
-                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
-                                        </label>
-                                        <input type="text" x-model="apiKeyForm.YOUTUBE_CLIENT_ID" 
-                                            :placeholder="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? apiKeyStatus.YOUTUBE_CLIENT_ID.masked : 'xxxx.apps.googleusercontent.com'"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
-                                    </div>
-                                    
-                                    <!-- Client Secret -->
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
-                                            OAuth Client Secret
-                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
-                                        </label>
-                                        <input type="password" x-model="apiKeyForm.YOUTUBE_CLIENT_SECRET" 
-                                            :placeholder="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? '••••••••••••' : 'GOCSPX-...'"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
-                                    </div>
-                                    
-                                    <!-- Refresh Token -->
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
-                                            OAuth Refresh Token
-                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
-                                        </label>
-                                        <input type="password" x-model="apiKeyForm.YOUTUBE_REFRESH_TOKEN" 
-                                            :placeholder="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? '••••••••••••' : '1//0g...'"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
-                                    </div>
-                                    
-                                    <!-- Channel ID -->
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1 flex items-center gap-1">
-                                            Channel ID
-                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
-                                        </label>
-                                        <input type="text" x-model="apiKeyForm.YOUTUBE_CHANNEL_ID" 
-                                            :placeholder="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? apiKeyStatus.YOUTUBE_CHANNEL_ID.masked : 'UC...'"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson font-mono">
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-6 pt-4 border-t border-dark/10">
-                                    <p class="text-[10px] text-dark/40 mb-3">Only filled fields will be updated. Leave empty to keep current value.</p>
-                                    <button type="submit" 
-                                        class="w-full px-4 py-2.5 bg-crimson text-white rounded-xl text-[13px] font-medium hover:bg-crimson/90 transition flex items-center justify-center gap-2"
+
+                                <div class="mt-5 pt-4 border-t border-dark/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <p class="text-[10px] text-dark/40">Only filled fields will be updated. Leave empty to keep current value.</p>
+                                    <button type="submit"
+                                        class="w-full sm:w-auto px-4 py-2.5 bg-crimson text-white rounded-xl text-[13px] font-medium hover:bg-crimson/90 transition flex items-center justify-center gap-2 flex-shrink-0"
                                         :disabled="savingKeys"
                                         :class="savingKeys ? 'opacity-50 cursor-not-allowed' : ''">
                                         <svg x-show="savingKeys" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -2748,7 +2750,26 @@ if (file_exists($errorLogFile)) {
                                     </button>
                                 </div>
                             </form>
-                            
+                        </div>
+
+                        <!-- Side: connection checklist + quick links -->
+                        <div class="lg:col-span-1">
+                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(22,26,36,0.04);position:sticky;top:24px;">
+                                <h4 class="font-semibold text-dark text-[13px] mb-3">What's connected</h4>
+                                <template x-for="f in [
+                                        {key:'YOUTUBE_CLIENT_ID', label:'OAuth Client ID'},
+                                        {key:'YOUTUBE_CLIENT_SECRET', label:'OAuth Client Secret'},
+                                        {key:'YOUTUBE_REFRESH_TOKEN', label:'Refresh Token'},
+                                        {key:'YOUTUBE_API_KEY', label:'API Key'},
+                                        {key:'YOUTUBE_CHANNEL_ID', label:'Channel ID'}
+                                    ]" :key="f.key">
+                                    <div class="flex items-center gap-2 py-1.5 text-[12px]">
+                                        <span class="w-2 h-2 rounded-full flex-shrink-0" :class="apiKeyStatus[f.key]?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                        <span :class="apiKeyStatus[f.key]?.configured ? 'text-dark' : 'text-dark/40'" x-text="f.label"></span>
+                                    </div>
+                                </template>
+                            </div>
+
                             <!-- Quick Links -->
                             <div style="background:#EEF0FF;border:1px solid #C7C9F5;border-radius:14px;padding:16px 18px;margin-top:16px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
                                 <h4 class="font-semibold text-blue-900 text-[11px] md:text-[12px] mb-2 md:mb-3 flex items-center gap-2">
