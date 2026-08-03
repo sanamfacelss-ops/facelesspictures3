@@ -2295,10 +2295,397 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== YOUTUBE TAB ==================== -->
                 <div x-show="activeTab === 'youtube'" x-cloak>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-                        <!-- Connection Status Card -->
-                        <div class="lg:col-span-3">
-                            <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                    <!-- Hero Header -->
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mb-4 shadow-lg">
+                            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <h2 class="font-display text-3xl text-dark mb-2">YouTube Integration Setup</h2>
+                        <p class="text-dark/60 text-sm max-w-2xl mx-auto">Connect your YouTube channel to automatically publish approved videos. Follow these steps to complete the setup.</p>
+                    </div>
+
+                    <!-- Connection Status Banner -->
+                    <div class="max-w-5xl mx-auto mb-8">
+                        <div class="bg-white rounded-2xl border border-dark/5 p-6 shadow-sm">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-3 h-3 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500 animate-pulse' : 'bg-gray-300'"></div>
+                                        <div>
+                                            <p class="font-semibold text-dark text-sm">Connection Status</p>
+                                            <p class="text-xs" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'text-green-600' : 'text-dark/50'" x-text="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'Connected & Ready' : 'Not Connected'"></p>
+                                        </div>
+                                    </div>
+                                    <div class="h-8 w-px bg-dark/10"></div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs text-dark/50">Auto-Publish:</span>
+                                        <button @click="toggleYouTubeAutoPublish()" 
+                                            class="relative w-11 h-6 rounded-full transition-colors duration-200"
+                                            :class="youtubeAutoPublish ? 'bg-green-500' : 'bg-dark/20'">
+                                            <span class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"
+                                                :class="youtubeAutoPublish ? 'translate-x-5' : ''"></span>
+                                        </button>
+                                        <span class="text-xs font-medium" :class="youtubeAutoPublish ? 'text-green-600' : 'text-amber-600'" x-text="youtubeAutoPublish ? 'ON' : 'OFF'"></span>
+                                    </div>
+                                </div>
+                                <button @click="testYouTubeConnection()" 
+                                    :disabled="testingYouTube"
+                                    class="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition flex items-center justify-center gap-2 shadow-sm"
+                                    :class="testingYouTube ? 'opacity-50 cursor-not-allowed' : ''">
+                                    <svg x-show="testingYouTube" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span x-text="testingYouTube ? 'Testing Connection...' : 'Test Connection'"></span>
+                                </button>
+                            </div>
+                            <div x-show="!youtubeAutoPublish" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                                <p class="text-xs text-amber-700 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <span>Auto-publish is currently paused. Videos will still be processed but won't be uploaded to YouTube automatically.</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                        <!-- Setup Steps (Left Column) -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white rounded-2xl border border-dark/5 p-6 shadow-sm">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-dark text-lg">Setup Guide</h3>
+                                        <p class="text-xs text-dark/50">Follow these 6 steps to complete integration</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-5">
+                                    <!-- Step 1 -->
+                                    <div class="relative pl-8 pb-5 border-l-2 border-crimson/20 last:border-l-0 last:pb-0">
+                                        <div class="absolute -left-4 top-0 w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            1
+                                        </div>
+                                        <div class="bg-cream/50 rounded-xl p-4 ml-2">
+                                            <h4 class="font-semibold text-dark text-sm mb-2">Enable YouTube Data API v3</h4>
+                                            <p class="text-xs text-dark/60 mb-3">Activate the YouTube API in Google Cloud Console</p>
+                                            <div class="space-y-2 text-xs text-dark/70">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Go to <a href="https://console.cloud.google.com/apis/library" target="_blank" class="text-blue-600 hover:underline font-medium">Google Cloud API Library</a></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Search for "YouTube Data API v3"</span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click the API and press <strong>"Enable"</strong></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 2 -->
+                                    <div class="relative pl-8 pb-5 border-l-2 border-crimson/20 last:border-l-0 last:pb-0">
+                                        <div class="absolute -left-4 top-0 w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            2
+                                        </div>
+                                        <div class="bg-cream/50 rounded-xl p-4 ml-2">
+                                            <h4 class="font-semibold text-dark text-sm mb-2">Create OAuth 2.0 Credentials</h4>
+                                            <p class="text-xs text-dark/60 mb-3">Set up OAuth for video uploads</p>
+                                            <div class="space-y-2 text-xs text-dark/70">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline font-medium">Credentials</a></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click <strong>"Create Credentials"</strong> → <strong>"OAuth client ID"</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Application type: <strong>Web application</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Name: "Faceless Pictures 3"</span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <div class="flex-1">
+                                                        <span>Authorized redirect URI:</span>
+                                                        <code class="block mt-1 bg-dark/5 px-2 py-1 rounded text-[10px] break-all">https://developers.google.com/oauthplayground</code>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click <strong>"Create"</strong> and copy <strong>Client ID</strong> and <strong>Client Secret</strong></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 3 -->
+                                    <div class="relative pl-8 pb-5 border-l-2 border-crimson/20 last:border-l-0 last:pb-0">
+                                        <div class="absolute -left-4 top-0 w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            3
+                                        </div>
+                                        <div class="bg-cream/50 rounded-xl p-4 ml-2">
+                                            <h4 class="font-semibold text-dark text-sm mb-2">Configure OAuth Consent Screen</h4>
+                                            <p class="text-xs text-dark/60 mb-3">Set up the consent screen for your app</p>
+                                            <div class="space-y-2 text-xs text-dark/70">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Go to <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" class="text-blue-600 hover:underline font-medium">OAuth Consent Screen</a></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>User Type: <strong>External</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Fill in: App name, User support email, Developer email</span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Add scopes: <code class="bg-dark/5 px-1 rounded">.../auth/youtube.upload</code></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Save and continue through all steps</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 4 -->
+                                    <div class="relative pl-8 pb-5 border-l-2 border-crimson/20 last:border-l-0 last:pb-0">
+                                        <div class="absolute -left-4 top-0 w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            4
+                                        </div>
+                                        <div class="bg-cream/50 rounded-xl p-4 ml-2">
+                                            <h4 class="font-semibold text-dark text-sm mb-2">Generate Refresh Token</h4>
+                                            <p class="text-xs text-dark/60 mb-3">Use OAuth Playground to get your refresh token</p>
+                                            <div class="space-y-2 text-xs text-dark/70">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Go to <a href="https://developers.google.com/oauthplayground" target="_blank" class="text-blue-600 hover:underline font-medium">OAuth Playground</a></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click ⚙️ gear icon (top-right)</span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Check <strong>"Use your own OAuth credentials"</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Enter your <strong>Client ID</strong> and <strong>Client Secret</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>In left panel, find <strong>YouTube Data API v3</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Select: <code class="bg-dark/5 px-1 rounded">.../auth/youtube.upload</code></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click <strong>"Authorize APIs"</strong> and sign in with your YouTube account</span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click <strong>"Exchange authorization code for tokens"</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Copy the <strong>Refresh token</strong> (starts with "1//0g...")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 5 -->
+                                    <div class="relative pl-8 pb-5 border-l-2 border-crimson/20 last:border-l-0 last:pb-0">
+                                        <div class="absolute -left-4 top-0 w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            5
+                                        </div>
+                                        <div class="bg-cream/50 rounded-xl p-4 ml-2">
+                                            <h4 class="font-semibold text-dark text-sm mb-2">Create API Key</h4>
+                                            <p class="text-xs text-dark/60 mb-3">Generate an API key for YouTube data access</p>
+                                            <div class="space-y-2 text-xs text-dark/70">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 hover:underline font-medium">Credentials</a></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click <strong>"Create Credentials"</strong> → <strong>"API key"</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Copy the API key (starts with "AIza...")</span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span><em>(Optional)</em> Restrict key to YouTube Data API v3 only</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 6 -->
+                                    <div class="relative pl-8">
+                                        <div class="absolute -left-4 top-0 w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                            6
+                                        </div>
+                                        <div class="bg-cream/50 rounded-xl p-4 ml-2">
+                                            <h4 class="font-semibold text-dark text-sm mb-2">Get Your Channel ID</h4>
+                                            <p class="text-xs text-dark/60 mb-3">Find your YouTube channel identifier</p>
+                                            <div class="space-y-2 text-xs text-dark/70">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Go to <a href="https://www.youtube.com" target="_blank" class="text-blue-600 hover:underline font-medium">YouTube</a></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Click your profile icon → <strong>"Your channel"</strong></span>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <div class="flex-1">
+                                                        <span>Look at the URL: <code class="bg-dark/5 px-1 rounded text-[10px]">youtube.com/channel/<strong>UC...</strong></code></span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-crimson mt-0.5">→</span>
+                                                    <span>Copy the Channel ID (starts with "UC")</span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                                                <p class="text-[10px] text-blue-800">💡 If URL shows @username, go to <a href="https://www.youtube.com/account_advanced" target="_blank" class="underline">Advanced Settings</a> to find your Channel ID</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Links -->
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-5 shadow-sm">
+                                <h4 class="font-semibold text-blue-900 text-sm mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                    Quick Access Links
+                                </h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <a href="https://console.cloud.google.com/apis/library" target="_blank" class="flex items-center gap-2 text-xs text-blue-700 hover:text-blue-900 bg-white/70 hover:bg-white px-3 py-2 rounded-lg transition">
+                                        <span class="text-blue-500">→</span>
+                                        <span>API Library</span>
+                                    </a>
+                                    <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="flex items-center gap-2 text-xs text-blue-700 hover:text-blue-900 bg-white/70 hover:bg-white px-3 py-2 rounded-lg transition">
+                                        <span class="text-blue-500">→</span>
+                                        <span>Credentials</span>
+                                    </a>
+                                    <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" class="flex items-center gap-2 text-xs text-blue-700 hover:text-blue-900 bg-white/70 hover:bg-white px-3 py-2 rounded-lg transition">
+                                        <span class="text-blue-500">→</span>
+                                        <span>OAuth Consent</span>
+                                    </a>
+                                    <a href="https://developers.google.com/oauthplayground" target="_blank" class="flex items-center gap-2 text-xs text-blue-700 hover:text-blue-900 bg-white/70 hover:bg-white px-3 py-2 rounded-lg transition">
+                                        <span class="text-blue-500">→</span>
+                                        <span>OAuth Playground</span>
+                                    </a>
+                                    <a href="https://www.youtube.com/account_advanced" target="_blank" class="flex items-center gap-2 text-xs text-blue-700 hover:text-blue-900 bg-white/70 hover:bg-white px-3 py-2 rounded-lg transition col-span-2">
+                                        <span class="text-blue-500">→</span>
+                                        <span>Get Channel ID</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configuration Form (Right Column) -->
+                        <div class="lg:col-span-1">
+                            <form @submit.prevent="saveAPIKeys()" class="bg-white rounded-2xl border border-dark/5 p-6 shadow-sm sticky top-6">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-10 h-10 bg-crimson/10 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-dark text-lg">API Configuration</h3>
+                                        <p class="text-xs text-dark/50">Enter your credentials</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <!-- API Key -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5 flex items-center justify-between">
+                                            <span>YouTube API Key</span>
+                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_API_KEY?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                        </label>
+                                        <input type="password" x-model="apiKeyForm.YOUTUBE_API_KEY" 
+                                            :placeholder="apiKeyStatus.YOUTUBE_API_KEY?.configured ? '••••••••••••' : 'AIza...'"
+                                            class="w-full border border-dark/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-crimson focus:ring-2 focus:ring-crimson/20 transition font-mono bg-white">
+                                    </div>
+
+                                    <!-- Client ID -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5 flex items-center justify-between">
+                                            <span>OAuth Client ID</span>
+                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                        </label>
+                                        <input type="text" x-model="apiKeyForm.YOUTUBE_CLIENT_ID" 
+                                            :placeholder="apiKeyStatus.YOUTUBE_CLIENT_ID?.configured ? apiKeyStatus.YOUTUBE_CLIENT_ID.masked : 'xxxx.apps.googleusercontent.com'"
+                                            class="w-full border border-dark/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-crimson focus:ring-2 focus:ring-crimson/20 transition font-mono bg-white">
+                                    </div>
+
+                                    <!-- Client Secret -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5 flex items-center justify-between">
+                                            <span>OAuth Client Secret</span>
+                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                        </label>
+                                        <input type="password" x-model="apiKeyForm.YOUTUBE_CLIENT_SECRET" 
+                                            :placeholder="apiKeyStatus.YOUTUBE_CLIENT_SECRET?.configured ? '••••••••••••' : 'GOCSPX-...'"
+                                            class="w-full border border-dark/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-crimson focus:ring-2 focus:ring-crimson/20 transition font-mono bg-white">
+                                    </div>
+
+                                    <!-- Refresh Token -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5 flex items-center justify-between">
+                                            <span>OAuth Refresh Token</span>
+                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                        </label>
+                                        <input type="password" x-model="apiKeyForm.YOUTUBE_REFRESH_TOKEN" 
+                                            :placeholder="apiKeyStatus.YOUTUBE_REFRESH_TOKEN?.configured ? '••••••••••••' : '1//0g...'"
+                                            class="w-full border border-dark/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-crimson focus:ring-2 focus:ring-crimson/20 transition font-mono bg-white">
+                                    </div>
+
+                                    <!-- Channel ID -->
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5 flex items-center justify-between">
+                                            <span>Channel ID</span>
+                                            <span class="w-2 h-2 rounded-full" :class="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? 'bg-green-500' : 'bg-gray-300'"></span>
+                                        </label>
+                                        <input type="text" x-model="apiKeyForm.YOUTUBE_CHANNEL_ID" 
+                                            :placeholder="apiKeyStatus.YOUTUBE_CHANNEL_ID?.configured ? apiKeyStatus.YOUTUBE_CHANNEL_ID.masked : 'UC...'"
+                                            class="w-full border border-dark/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-crimson focus:ring-2 focus:ring-crimson/20 transition font-mono bg-white">
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 pt-6 border-t border-dark/10">
+                                    <p class="text-[10px] text-dark/40 mb-3">Only filled fields will be updated. Leave empty to keep current value.</p>
+                                    <button type="submit" 
+                                        class="w-full px-4 py-3 bg-gradient-to-r from-crimson to-red-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                                        :disabled="savingKeys"
+                                        :class="savingKeys ? 'opacity-50 cursor-not-allowed' : ''">
+                                        <svg x-show="savingKeys" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <svg x-show="!savingKeys" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        <span x-text="savingKeys ? 'Saving Configuration...' : 'Save YouTube Settings'"></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3 youtube-status-header">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 md:w-12 md:h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
