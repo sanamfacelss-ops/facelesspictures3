@@ -134,7 +134,7 @@ class SubmissionController
             }
 
             // ── Validate video file ───────────────────────────────────────
-            $file         = $_FILES['file'];
+            // $file is already set from the multi-field name check above
             $allowedMimes = [
                 'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm',
                 'video/mpeg', 'video/avi',
