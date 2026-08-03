@@ -2364,4 +2364,156 @@ class AdminController
             echo json_encode(['error' => 'Failed to delete submission']);
         }
     }
+
+    // ==================== ACTIVITY LOGS ====================
+
+    /**
+     * Get all activity logs with pagination and filters
+     */
+    public function getActivityLogs(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $activityLog = new \App\Models\ActivityLog();
+            
+            if (!$activityLog->tableExists()) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Activity log table not found. Run migration 013.'
+                ]);
+                return;
+            }
+
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $perPage = max(10, min(100, (int)($_GET['per_page'] ?? 50)));
+            $filter = trim($_GET['filter'] ?? '');
+
+            $logs = $activityLog->getAll($page, $perPage, $filter ?: null);
+            $total = $activityLog->count($filter ?: null);
+            $stats = $activityLog->getStats();
+
+            echo json_encode([
+                'success' => true,
+                'logs' => $logs,
+                'pagination' => [
+                    'page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $total,
+                    'pages' => ceil($total / $perPage)
+                ],
+                'stats' => $stats
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_ACTIVITY_LOGS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to fetch activity logs']);
+        }
+    }
+
+    /**
+     * Delete a single activity log entry
+     */
+    public function deleteActivityLog(int $id): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $activityLog = new \App\Models\ActivityLog();
+            
+            if (!$activityLog->tableExists()) {
+                http_response_code(503);
+                echo json_encode(['error' => 'Activity log table not found']);
+                return;
+            }
+
+            $activityLog->delete($id);
+            
+            debug_log("Admin deleted activity log #{$id}", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Activity log deleted permanently']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_DELETE_ACTIVITY_LOG');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete activity log']);
+        }
+    }
+
+    /**
+     * Bulk delete activity logs
+     */
+    public function bulkDeleteActivityLogs(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $logIds = json_decode($_POST['log_ids'] ?? '[]', true);
+        if (empty($logIds) || !is_array($logIds)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'No logs selected']);
+            return;
+        }
+
+        try {
+            $activityLog = new \App\Models\ActivityLog();
+            
+            if (!$activityLog->tableExists()) {
+                http_response_code(503);
+                echo json_encode(['error' => 'Activity log table not found']);
+                return;
+            }
+
+            $deleted = $activityLog->bulkDelete($logIds);
+
+            debug_log("Admin bulk deleted {$deleted} activity logs", 'ADMIN');
+            echo json_encode([
+                'success' => true,
+                'deleted' => $deleted,
+                'message' => "{$deleted} activity log(s) deleted permanently"
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_BULK_DELETE_ACTIVITY_LOGS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to bulk delete activity logs']);
+        }
+    }
+
+    /**
+     * Run activity log cleanup manually (delete logs older than 90 days)
+     */
+    public function cleanupActivityLogs(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $activityLog = new \App\Models\ActivityLog();
+            
+            if (!$activityLog->tableExists()) {
+                http_response_code(503);
+                echo json_encode(['error' => 'Activity log table not found']);
+                return;
+            }
+
+            $deleted = $activityLog->cleanupOldLogs();
+
+            debug_log("Admin ran activity log cleanup: {$deleted} logs removed", 'ADMIN');
+            log_message('info', "Admin cleanup: deleted {$deleted} activity logs older than 90 days");
+
+            echo json_encode([
+                'success' => true,
+                'deleted' => $deleted,
+                'message' => "Deleted {$deleted} activity log(s) older than 90 days"
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_CLEANUP_ACTIVITY_LOGS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to cleanup activity logs']);
+        }
+    }
 }

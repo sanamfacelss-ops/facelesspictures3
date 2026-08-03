@@ -156,3 +156,44 @@ function log_exception(\Throwable $e, string $context = ''): void
         debug_log($e->getMessage(), $context ?: 'EXCEPTION');
     }
 }
+
+/**
+ * Log activity to activity_log table
+ * 
+ * @param int $userId User who performed the action
+ * @param string $action Action performed (e.g., 'create', 'update', 'delete', 'login')
+ * @param string $entityType Type of entity (video, script, season, user, submission, system, auth, settings)
+ * @param int|null $entityId ID of the entity (null for system actions)
+ * @param string $description Human-readable description
+ * @param array|null $metadata Additional context data
+ * @return int|null Activity log ID, or null if logging failed
+ */
+function log_activity(
+    int $userId,
+    string $action,
+    string $entityType,
+    ?int $entityId,
+    string $description,
+    ?array $metadata = null
+): ?int {
+    try {
+        $activityLog = new \App\Models\ActivityLog();
+        
+        if (!$activityLog->tableExists()) {
+            return null;
+        }
+        
+        return $activityLog->log(
+            $userId,
+            $action,
+            $entityType,
+            $entityId,
+            $description,
+            $metadata
+        );
+    } catch (\Throwable $e) {
+        // Don't let activity logging break the app
+        debug_log("Failed to log activity: " . $e->getMessage(), 'ACTIVITY_LOG');
+        return null;
+    }
+}
