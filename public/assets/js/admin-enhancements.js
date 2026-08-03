@@ -15,7 +15,6 @@ class AdminAutoRefresh {
 
     start() {
         if (this.isPolling) return;
-        console.log('[Admin Auto-Refresh] Starting...');
         this.isPolling = true;
         this.poll();
     }
@@ -26,7 +25,6 @@ class AdminAutoRefresh {
             this.pollTimer = null;
         }
         this.isPolling = false;
-        console.log('[Admin Auto-Refresh] Stopped');
     }
 
     async poll() {
@@ -42,7 +40,7 @@ class AdminAutoRefresh {
                 }
             }
         } catch (error) {
-            console.error('[Admin Auto-Refresh] Error:', error);
+            // Silent fail - retry on next poll
         }
 
         // Schedule next poll
@@ -55,7 +53,6 @@ class AdminAutoRefresh {
         videos.forEach(video => {
             const lastStatus = this.lastChecked[video.id];
             if (lastStatus && lastStatus !== video.status) {
-                console.log(`[Admin] Video ${video.id} status changed: ${lastStatus} → ${video.status}`);
                 hasChanges = true;
                 this.showNotification(video, lastStatus);
             }
@@ -104,8 +101,6 @@ class AdminAutoRefresh {
     }
 
     refreshAdminView() {
-        console.log('[Admin] Refreshing view...');
-        
         // Trigger Alpine.js refresh if available
         if (window.Alpine && window.Alpine.store) {
             // Refresh submissions
@@ -180,6 +175,4 @@ document.addEventListener('DOMContentLoaded', () => {
             window.adminAutoRefresh.start();
         }
     });
-
-    console.log('[Admin] Enhancements loaded');
 });
