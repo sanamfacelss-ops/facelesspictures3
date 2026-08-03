@@ -2294,11 +2294,22 @@ if (file_exists($errorLogFile)) {
                 </div>
 
                 <!-- ==================== YOUTUBE TAB ==================== -->
-                <div x-show="activeTab === 'youtube'" x-cloak>
+                <div x-show="activeTab === 'youtube'" x-cloak style="max-width:1180px;margin:0 auto;">
+                    <!-- Hero Header -->
+                    <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;">
+                        <div style="width:42px;height:42px;border-radius:11px;background:#FDEAEA;display:flex;align-items:center;justify-content:center;flex:0 0 42px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#DC2626"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </div>
+                        <div style="flex:1;">
+                            <div class="font-display" style="font-size:24px;font-weight:800;letter-spacing:0.02em;">YouTube Integration</div>
+                            <div style="font-size:13px;color:#5B6172;margin-top:2px;">Connect your channel so approved videos publish automatically</div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         <!-- Connection Status Card -->
                         <div class="lg:col-span-3">
-                            <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3 youtube-status-header">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 md:w-12 md:h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -2351,7 +2362,7 @@ if (file_exists($errorLogFile)) {
                         
                         <!-- Publish Queue Card -->
                         <div class="lg:col-span-3">
-                            <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                         <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
@@ -2422,7 +2433,7 @@ if (file_exists($errorLogFile)) {
                         
                         <!-- Test Results Panel -->
                         <div x-show="youtubeTestResults" x-cloak class="lg:col-span-3">
-                            <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="font-semibold text-dark flex items-center gap-2 text-[14px] md:text-base">
                                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -2533,7 +2544,7 @@ if (file_exists($errorLogFile)) {
                         
                         <!-- Step-by-Step Guide -->
                         <div class="lg:col-span-2">
-                            <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5 youtube-guide">
+                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:22px;box-shadow:0 1px 2px rgba(22,26,36,0.04);" class="youtube-guide">
                                 <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
                                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                                     Setup Guide
@@ -2662,7 +2673,7 @@ if (file_exists($errorLogFile)) {
                         
                         <!-- API Configuration Form -->
                         <div class="lg:col-span-1">
-                            <form @submit.prevent="saveAPIKeys()" class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
+                            <form @submit.prevent="saveAPIKeys()" style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);position:sticky;top:24px;">
                                 <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
                                     <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                     API Configuration
@@ -2739,7 +2750,7 @@ if (file_exists($errorLogFile)) {
                             </form>
                             
                             <!-- Quick Links -->
-                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 md:p-4 mt-4">
+                            <div style="background:#EEF0FF;border:1px solid #C7C9F5;border-radius:14px;padding:16px 18px;margin-top:16px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
                                 <h4 class="font-semibold text-blue-900 text-[11px] md:text-[12px] mb-2 md:mb-3 flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                                     Quick Links
