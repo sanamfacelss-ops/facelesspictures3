@@ -6734,6 +6734,9 @@ if (file_exists($errorLogFile)) {
         };
     }
     </script>
+
+    <!-- Admin Enhancements: YouTube Guide + Auto-Refresh -->
+    <script src="/assets/js/admin-enhancements.js"></script>
 </body>
 </html>
 
