@@ -1,11 +1,6 @@
 -- Migration 014: Add YouTube Playlist Support
 -- This migration adds playlist support for organizing videos by role and audition type
 
--- Add playlist ID column to videos table
-ALTER TABLE videos 
-ADD COLUMN youtube_playlist_id VARCHAR(255) DEFAULT NULL AFTER youtube_id,
-ADD INDEX idx_playlist (youtube_playlist_id);
-
 -- Add playlists table to track created playlists
 CREATE TABLE IF NOT EXISTS youtube_playlists (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -23,9 +18,9 @@ CREATE TABLE IF NOT EXISTS youtube_playlists (
     INDEX idx_season (season_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Add settings for playlist management
-INSERT INTO settings (setting_key, setting_value, category, description) 
+-- Add settings for playlist management (using existing settings table structure)
+INSERT INTO settings (setting_key, setting_value, description) 
 VALUES 
-    ('youtube_playlist_enabled', '1', 'youtube', 'Enable automatic playlist organization'),
-    ('youtube_playlist_per_season', '0', 'youtube', 'Create separate playlists for each season (0 = single playlist per role/type)')
+    ('youtube_playlist_enabled', '1', 'Enable automatic playlist organization'),
+    ('youtube_playlist_per_season', '0', 'Create separate playlists for each season')
 ON DUPLICATE KEY UPDATE setting_value = setting_value;
