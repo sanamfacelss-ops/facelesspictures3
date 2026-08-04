@@ -2786,7 +2786,6 @@ if (file_exists($errorLogFile)) {
                             </div>
                         </div>
                     </div>
-                </div>
 
                     <!-- YouTube Playlists Section -->
                     <div class="mt-8">
