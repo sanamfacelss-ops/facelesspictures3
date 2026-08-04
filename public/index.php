@@ -235,6 +235,8 @@ $routes = [
     'api/admin/playlists/settings/update' => [AdminController::class, 'updatePlaylistSettings', 'POST'],
     'api/admin/playlists/create-default' => [AdminController::class, 'createDefaultPlaylists', 'POST'],
     'api/admin/playlists/organize' => [AdminController::class, 'organizeVideosIntoPlaylists', 'POST'],
+    'api/admin/playlists/{id}/delete' => [AdminController::class, 'deletePlaylist', 'POST'],
+    'api/admin/playlists/delete-all' => [AdminController::class, 'deleteAllPlaylists', 'POST'],
 ];
 
 $matched = false;

@@ -2904,7 +2904,15 @@ if (file_exists($errorLogFile)) {
                             <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
                                 <div class="flex items-center justify-between mb-4">
                                     <h4 class="font-semibold text-dark text-[15px]">Your YouTube Playlists</h4>
-                                    <span x-text="playlists.length + ' playlist' + (playlists.length !== 1 ? 's' : '')" class="text-[11px] text-dark/40"></span>
+                                    <div class="flex items-center gap-2">
+                                        <span x-text="playlists.length + ' playlist' + (playlists.length !== 1 ? 's' : '')" class="text-[11px] text-dark/40"></span>
+                                        <button @click="deleteAllPlaylists()" 
+                                            x-show="playlists.length > 0"
+                                            class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-[11px] font-medium hover:bg-red-600 transition flex items-center gap-1.5">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            Delete All
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div x-show="playlists.length === 0 && !loadingPlaylists" class="text-center py-8">
@@ -2944,11 +2952,19 @@ if (file_exists($errorLogFile)) {
                                                     <p class="text-[11px] text-dark/50 mt-1 line-clamp-2" x-text="playlist.description"></p>
                                                 </template>
                                             </div>
-                                            <a :href="'https://www.youtube.com/playlist?list=' + playlist.playlist_id" target="_blank" 
-                                                class="flex-shrink-0 px-3 py-1.5 bg-red-600 text-white rounded-lg text-[11px] font-medium hover:bg-red-700 transition flex items-center gap-1.5">
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                                                View
-                                            </a>
+                                            <div class="flex items-center gap-2">
+                                                <a :href="'https://www.youtube.com/playlist?list=' + playlist.playlist_id" target="_blank" 
+                                                    class="flex-shrink-0 px-3 py-1.5 bg-red-600 text-white rounded-lg text-[11px] font-medium hover:bg-red-700 transition flex items-center gap-1.5">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                    View
+                                                </a>
+                                                <button @click="deletePlaylist(playlist.id, playlist.title)" 
+                                                    class="flex-shrink-0 px-3 py-1.5 bg-red-500 text-white rounded-lg text-[11px] font-medium hover:bg-red-600 transition flex items-center gap-1.5"
+                                                    title="Delete this playlist from database">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -5236,6 +5252,51 @@ if (file_exists($errorLogFile)) {
                     this.showToast('Failed to organize videos', 'error');
                 }
                 this.organizingVideos = false;
+            },
+
+            async deletePlaylist(playlistId, playlistTitle) {
+                if (!confirm(`Are you sure you want to delete "${playlistTitle}" from the database?\n\nNote: This only removes it from your database, not from YouTube.`)) {
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                
+                try {
+                    const res = await fetch(`/api/admin/playlists/${playlistId}/delete`, { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast('Playlist deleted successfully', 'success');
+                        // Remove from local array
+                        this.playlists = this.playlists.filter(p => p.id !== playlistId);
+                    } else {
+                        this.showToast('Failed to delete playlist: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to delete playlist', 'error');
+                }
+            },
+
+            async deleteAllPlaylists() {
+                if (!confirm(`Are you sure you want to delete ALL ${this.playlists.length} playlist(s) from the database?\n\nNote: This only removes them from your database, not from YouTube.`)) {
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                
+                try {
+                    const res = await fetch('/api/admin/playlists/delete-all', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(`${data.deleted} playlist(s) deleted successfully`, 'success');
+                        this.playlists = [];
+                    } else {
+                        this.showToast('Failed to delete playlists: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to delete playlists', 'error');
+                }
             },
             
             // Format date helper for reactive templates

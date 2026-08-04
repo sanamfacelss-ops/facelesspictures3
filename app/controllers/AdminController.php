@@ -2791,5 +2791,60 @@ class AdminController
             echo json_encode(['error' => 'Failed to organize videos: ' . $e->getMessage()]);
         }
     }
+
+    /**
+     * Delete a single playlist from database
+     */
+    public function deletePlaylist(int $playlistId): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            // Remove playlist ID from videos that reference it
+            $stmt = $this->db->prepare("UPDATE videos SET youtube_playlist_id = NULL WHERE youtube_playlist_id = (SELECT playlist_id FROM youtube_playlists WHERE id = ?)");
+            $stmt->execute([$playlistId]);
+            
+            // Delete the playlist record
+            $stmt = $this->db->prepare("DELETE FROM youtube_playlists WHERE id = ?");
+            $stmt->execute([$playlistId]);
+            
+            debug_log("Admin deleted playlist ID: {$playlistId}", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Playlist deleted successfully']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_DELETE_PLAYLIST');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete playlist: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete all playlists from database
+     */
+    public function deleteAllPlaylists(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            // Clear playlist IDs from all videos
+            $this->db->exec("UPDATE videos SET youtube_playlist_id = NULL WHERE youtube_playlist_id IS NOT NULL");
+            
+            // Count playlists before deletion
+            $count = $this->db->query("SELECT COUNT(*) FROM youtube_playlists")->fetchColumn();
+            
+            // Delete all playlists
+            $this->db->exec("DELETE FROM youtube_playlists");
+            
+            debug_log("Admin deleted all playlists ({$count} total)", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'All playlists deleted', 'deleted' => $count]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_DELETE_ALL_PLAYLISTS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete playlists: ' . $e->getMessage()]);
+        }
+    }
 }
 
