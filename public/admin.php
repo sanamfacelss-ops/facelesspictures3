@@ -2788,6 +2788,176 @@ if (file_exists($errorLogFile)) {
                     </div>
                 </div>
 
+                    <!-- YouTube Playlists Section -->
+                    <div class="mt-8">
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h3 class="font-display text-[22px] text-dark">YouTube Playlists</h3>
+                                <p class="text-[12px] text-dark/50 mt-1">Organize videos into role-based playlists automatically</p>
+                            </div>
+                        </div>
+
+                        <div class="grid lg:grid-cols-3 gap-5">
+                            <!-- Playlist Settings -->
+                            <div class="lg:col-span-2">
+                                <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="font-semibold text-dark text-[15px]">Playlist Settings</h4>
+                                        <button @click="loadPlaylistSettings()" class="text-[11px] text-blue-600 hover:underline">Refresh</button>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <!-- Enable Playlists Toggle -->
+                                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <label class="font-medium text-[13px] text-dark">Enable Automatic Playlists</label>
+                                                <p class="text-[11px] text-dark/50 mt-0.5">Automatically add videos to role-based playlists when published</p>
+                                            </div>
+                                            <button @click="togglePlaylistSetting('enabled')" 
+                                                :class="playlistSettings.enabled ? 'bg-green-500' : 'bg-gray-300'"
+                                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none">
+                                                <span :class="playlistSettings.enabled ? 'translate-x-6' : 'translate-x-1'" 
+                                                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Per-Season Playlists Toggle -->
+                                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <label class="font-medium text-[13px] text-dark">Separate Playlists Per Season</label>
+                                                <p class="text-[11px] text-dark/50 mt-0.5">Create individual playlists for each season (not recommended for most setups)</p>
+                                            </div>
+                                            <button @click="togglePlaylistSetting('perSeason')" 
+                                                :class="playlistSettings.perSeason ? 'bg-green-500' : 'bg-gray-300'"
+                                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none">
+                                                <span :class="playlistSettings.perSeason ? 'translate-x-6' : 'translate-x-1'" 
+                                                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Info Box -->
+                                    <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <div class="flex gap-2">
+                                            <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            <div>
+                                                <p class="text-[11px] text-blue-800 font-medium">How Playlists Work</p>
+                                                <p class="text-[10px] text-blue-700 mt-1">Videos are automatically organized by role:</p>
+                                                <ul class="text-[10px] text-blue-700 mt-1 space-y-0.5 ml-4">
+                                                    <li>• <strong>Actors:</strong> 2 playlists (Auditions & Song Auditions)</li>
+                                                    <li>• <strong>Directors:</strong> 1 playlist (Director Submissions)</li>
+                                                    <li>• <strong>Writers:</strong> 1 playlist (Writer Submissions)</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Playlist Actions -->
+                            <div class="lg:col-span-1">
+                                <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
+                                    <h4 class="font-semibold text-dark text-[13px] mb-3">Quick Actions</h4>
+                                    
+                                    <div class="space-y-3">
+                                        <!-- Create Default Playlists -->
+                                        <button @click="createDefaultPlaylists()" 
+                                            :disabled="creatingPlaylists"
+                                            :class="creatingPlaylists ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-600'"
+                                            class="w-full px-4 py-3 bg-green-500 text-white rounded-lg text-[12px] font-medium transition flex items-center justify-center gap-2">
+                                            <svg x-show="creatingPlaylists" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            <svg x-show="!creatingPlaylists" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                            <span x-text="creatingPlaylists ? 'Creating...' : 'Create Default Playlists'"></span>
+                                        </button>
+
+                                        <!-- Organize Existing Videos -->
+                                        <button @click="organizeVideosIntoPlaylists()" 
+                                            :disabled="organizingVideos"
+                                            :class="organizingVideos ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'"
+                                            class="w-full px-4 py-3 bg-blue-500 text-white rounded-lg text-[12px] font-medium transition flex items-center justify-center gap-2">
+                                            <svg x-show="organizingVideos" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            <svg x-show="!organizingVideos" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            <span x-text="organizingVideos ? 'Organizing...' : 'Organize Existing Videos'"></span>
+                                        </button>
+
+                                        <!-- Refresh Playlists List -->
+                                        <button @click="loadPlaylists()" 
+                                            :disabled="loadingPlaylists"
+                                            :class="loadingPlaylists ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-600'"
+                                            class="w-full px-4 py-3 bg-gray-500 text-white rounded-lg text-[12px] font-medium transition flex items-center justify-center gap-2">
+                                            <svg x-show="loadingPlaylists" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            <svg x-show="!loadingPlaylists" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            <span x-text="loadingPlaylists ? 'Loading...' : 'Refresh Playlists'"></span>
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-4 pt-3 border-t border-dark/10">
+                                        <p class="text-[10px] text-dark/40">
+                                            Use "Create Default Playlists" to set up the 4 standard playlists on YouTube. Then use "Organize Existing Videos" to add any already-published videos to the appropriate playlists.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Existing Playlists List -->
+                        <div class="mt-5">
+                            <div style="background:#FFFFFF;border:1px solid #E6E8EF;border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(22,26,36,0.04);">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="font-semibold text-dark text-[15px]">Your YouTube Playlists</h4>
+                                    <span x-text="playlists.length + ' playlist' + (playlists.length !== 1 ? 's' : '')" class="text-[11px] text-dark/40"></span>
+                                </div>
+
+                                <div x-show="playlists.length === 0 && !loadingPlaylists" class="text-center py-8">
+                                    <svg class="w-16 h-16 mx-auto text-dark/20 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                    <p class="text-[13px] text-dark/40 mb-4">No playlists found</p>
+                                    <button @click="createDefaultPlaylists()" class="px-4 py-2 bg-crimson text-white rounded-lg text-[12px] font-medium hover:bg-crimson/90 transition">
+                                        Create Default Playlists
+                                    </button>
+                                </div>
+
+                                <div x-show="loadingPlaylists" class="text-center py-8">
+                                    <svg class="w-8 h-8 mx-auto text-crimson animate-spin mb-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <p class="text-[11px] text-dark/40">Loading playlists...</p>
+                                </div>
+
+                                <div x-show="playlists.length > 0 && !loadingPlaylists" class="space-y-3">
+                                    <template x-for="playlist in playlists" :key="playlist.id">
+                                        <div class="flex items-start gap-4 p-3 border border-dark/10 rounded-lg hover:border-crimson/30 transition">
+                                            <div class="flex-shrink-0 w-10 h-10 bg-crimson/10 rounded-lg flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-crimson" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h5 class="font-medium text-[13px] text-dark" x-text="playlist.title"></h5>
+                                                <div class="flex items-center gap-3 mt-1">
+                                                    <span class="text-[10px] text-dark/40">
+                                                        <span class="capitalize" x-text="playlist.role"></span>
+                                                        <template x-if="playlist.audition_type">
+                                                            <span> - <span x-text="playlist.audition_type === 'song_audition' ? 'Song Audition' : 'Audition'"></span></span>
+                                                        </template>
+                                                    </span>
+                                                    <template x-if="playlist.season_title">
+                                                        <span class="text-[10px] text-dark/40" x-text="'Season: ' + playlist.season_title"></span>
+                                                    </template>
+                                                    <span class="text-[10px] text-dark/30" x-text="'Created: ' + new Date(playlist.created_at).toLocaleDateString()"></span>
+                                                </div>
+                                                <template x-if="playlist.description">
+                                                    <p class="text-[11px] text-dark/50 mt-1 line-clamp-2" x-text="playlist.description"></p>
+                                                </template>
+                                            </div>
+                                            <a :href="'https://www.youtube.com/playlist?list=' + playlist.playlist_id" target="_blank" 
+                                                class="flex-shrink-0 px-3 py-1.5 bg-red-600 text-white rounded-lg text-[11px] font-medium hover:bg-red-700 transition flex items-center gap-1.5">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="white" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                View
+                                            </a>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ==================== EMAIL TAB ==================== -->
                 <div x-show="activeTab === 'email'" x-cloak x-data="emailSettings()" x-init="loadEmailSettings()">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
@@ -4728,6 +4898,16 @@ if (file_exists($errorLogFile)) {
             
             csrf: '<?= csrf_token() ?>',
             
+            // Playlist Management
+            playlists: [],
+            playlistSettings: {
+                enabled: true,
+                perSeason: false
+            },
+            loadingPlaylists: false,
+            creatingPlaylists: false,
+            organizingVideos: false,
+            
             init() {
                 window._adminDashboard = this;
                 window.addEventListener('resize', () => {
@@ -4736,6 +4916,14 @@ if (file_exists($errorLogFile)) {
                 
                 // Load YouTube status
                 this.loadYouTubeStatus();
+
+                // Watch for tab changes to load playlist data
+                this.$watch('activeTab', (newTab) => {
+                    if (newTab === 'youtube') {
+                        this.loadPlaylists();
+                        this.loadPlaylistSettings();
+                    }
+                });
 
                 // Listen for script image picker selections
                 // Uses a global bridge function so child Alpine components can set parent state
@@ -4941,6 +5129,114 @@ if (file_exists($errorLogFile)) {
                 this.toastType = type;
                 this.toastShow = true;
                 setTimeout(() => { this.toastShow = false; }, 3000);
+            },
+            
+            // ── PLAYLIST MANAGEMENT ──────────────────────────────────────
+
+            async loadPlaylists() {
+                this.loadingPlaylists = true;
+                try {
+                    const res = await fetch('/api/admin/playlists');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.playlists = data.playlists || [];
+                    } else {
+                        this.showToast('Failed to load playlists: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to load playlists', 'error');
+                }
+                this.loadingPlaylists = false;
+            },
+
+            async loadPlaylistSettings() {
+                try {
+                    const res = await fetch('/api/admin/playlists/settings');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.playlistSettings.enabled = data.settings.youtube_playlist_enabled;
+                        this.playlistSettings.perSeason = data.settings.youtube_playlist_per_season;
+                    }
+                } catch (e) {
+                    console.error('Failed to load playlist settings', e);
+                }
+            },
+
+            async togglePlaylistSetting(type) {
+                const settingKey = type === 'enabled' ? 'youtube_playlist_enabled' : 'youtube_playlist_per_season';
+                const newValue = type === 'enabled' ? !this.playlistSettings.enabled : !this.playlistSettings.perSeason;
+                
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                formData.append(settingKey, newValue ? '1' : '0');
+                
+                try {
+                    const res = await fetch('/api/admin/playlists/settings/update', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        if (type === 'enabled') {
+                            this.playlistSettings.enabled = newValue;
+                        } else {
+                            this.playlistSettings.perSeason = newValue;
+                        }
+                        this.showToast('Playlist settings updated', 'success');
+                    } else {
+                        this.showToast('Failed to update settings: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to update playlist settings', 'error');
+                }
+            },
+
+            async createDefaultPlaylists() {
+                this.creatingPlaylists = true;
+                this.showToast('Creating playlists on YouTube...', 'success');
+                
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                
+                try {
+                    const res = await fetch('/api/admin/playlists/create-default', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(`Created ${data.created.length} playlist(s): ${data.created.join(', ')}`, 'success');
+                        await this.loadPlaylists();
+                    } else {
+                        if (data.created && data.created.length > 0) {
+                            this.showToast(`Partial success: ${data.created.join(', ')} created. Errors: ${data.errors.join(', ')}`, 'warning');
+                            await this.loadPlaylists();
+                        } else {
+                            this.showToast('Failed to create playlists: ' + (data.error || data.errors?.join(', ') || 'Unknown error'), 'error');
+                        }
+                    }
+                } catch (e) {
+                    this.showToast('Failed to create playlists', 'error');
+                }
+                this.creatingPlaylists = false;
+            },
+
+            async organizeVideosIntoPlaylists() {
+                this.organizingVideos = true;
+                this.showToast('Organizing videos into playlists...', 'success');
+                
+                const formData = new FormData();
+                formData.append('csrf_token', this.csrf);
+                
+                try {
+                    const res = await fetch('/api/admin/playlists/organize', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.showToast(`${data.organized} of ${data.total} video(s) organized into playlists`, 'success');
+                        if (data.errors && data.errors.length > 0) {
+                            console.warn('Some videos failed:', data.errors);
+                        }
+                    } else {
+                        this.showToast('Failed to organize videos: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (e) {
+                    this.showToast('Failed to organize videos', 'error');
+                }
+                this.organizingVideos = false;
             },
             
             // Format date helper for reactive templates

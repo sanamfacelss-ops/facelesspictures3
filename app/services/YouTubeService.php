@@ -14,11 +14,13 @@ class YouTubeService
     private string $refreshToken;
     private string $channelId;
     private Video $videoModel;
+    private \PDO $db;
 
     public function __construct()
     {
         // Try environment variables first, then fall back to database settings
         $settingsModel = new \App\Models\Settings();
+        $this->db = \App\Config\Database::getConnection();
         
         $this->apiKey = $this->getConfigValue('YOUTUBE_API_KEY', $settingsModel);
         $this->clientId = $this->getConfigValue('YOUTUBE_CLIENT_ID', $settingsModel);
@@ -142,6 +144,18 @@ class YouTubeService
                 $this->videoModel->setYoutubeId($videoId, $youtubeId);
                 $this->videoModel->updateYoutubeStatus($videoId, 'published');
                 log_message('info', "Video {$videoId} published to YouTube: {$youtubeId}");
+                
+                // Add video to appropriate playlist
+                $playlistId = $this->determinePlaylistForVideo($video);
+                if ($playlistId) {
+                    if ($this->addVideoToPlaylist($youtubeId, $playlistId)) {
+                        // Update video record with playlist ID
+                        $stmt = $this->db->prepare("UPDATE videos SET youtube_playlist_id = ? WHERE id = ?");
+                        $stmt->execute([$playlistId, $videoId]);
+                        log_message('info', "Video {$videoId} added to playlist {$playlistId}");
+                    }
+                }
+                
                 return $youtubeId;
             }
         }
@@ -262,4 +276,337 @@ class YouTubeService
         }
         return null;
     }
+
+    /**
+     * Get or create a YouTube playlist for a specific role and audition type
+     * 
+     * @param string $role User role (actor, director, writer)
+     * @param string|null $auditionType For actors: 'audition' or 'song_audition'
+     * @param int|null $seasonId Optional season ID for per-season playlists
+     * @return string|null Playlist ID or null on failure
+     */
+    public function getOrCreatePlaylist(string $role, ?string $auditionType = null, ?int $seasonId = null): ?string
+    {
+        // Check if playlist already exists in database
+        $existingPlaylist = $this->findPlaylist($role, $auditionType, $seasonId);
+        if ($existingPlaylist) {
+            log_message('info', "Using existing playlist: {$existingPlaylist['playlist_id']} for {$role}" . ($auditionType ? " - {$auditionType}" : ""));
+            return $existingPlaylist['playlist_id'];
+        }
+
+        // Create new playlist on YouTube
+        $playlistId = $this->createYouTubePlaylist($role, $auditionType, $seasonId);
+        if (!$playlistId) {
+            return null;
+        }
+
+        // Save to database
+        $this->savePlaylist($playlistId, $role, $auditionType, $seasonId);
+        
+        return $playlistId;
+    }
+
+    /**
+     * Find existing playlist in database
+     */
+    private function findPlaylist(string $role, ?string $auditionType, ?int $seasonId): ?array
+    {
+        $query = "SELECT * FROM youtube_playlists WHERE role = ?";
+        $params = [$role];
+
+        if ($auditionType) {
+            $query .= " AND audition_type = ?";
+            $params[] = $auditionType;
+        } else {
+            $query .= " AND audition_type IS NULL";
+        }
+
+        // Check if we need season-specific playlists
+        $settingsModel = new \App\Models\Settings();
+        $perSeason = $settingsModel->get('youtube_playlist_per_season') === '1';
+        
+        if ($perSeason && $seasonId) {
+            $query .= " AND season_id = ?";
+            $params[] = $seasonId;
+        } else {
+            $query .= " AND season_id IS NULL";
+        }
+
+        $query .= " LIMIT 1";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        $result = $stmt->fetch();
+        
+        return $result ?: null;
+    }
+
+    /**
+     * Create a new playlist on YouTube
+     */
+    private function createYouTubePlaylist(string $role, ?string $auditionType, ?int $seasonId): ?string
+    {
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) {
+            log_message('error', 'Failed to get access token for playlist creation');
+            return null;
+        }
+
+        // Build playlist title and description
+        $title = $this->buildPlaylistTitle($role, $auditionType, $seasonId);
+        $description = $this->buildPlaylistDescription($role, $auditionType, $seasonId);
+
+        $metadata = [
+            'snippet' => [
+                'title' => $title,
+                'description' => $description,
+                'tags' => ['facelesspictures', $role],
+                'defaultLanguage' => 'en',
+            ],
+            'status' => [
+                'privacyStatus' => 'public',
+            ],
+        ];
+
+        $ch = curl_init('https://www.googleapis.com/youtube/v3/playlists?part=snippet,status');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer {$accessToken}",
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode($metadata),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 || $httpCode === 201) {
+            $data = json_decode($response, true);
+            $playlistId = $data['id'] ?? null;
+            if ($playlistId) {
+                log_message('info', "Created YouTube playlist: {$playlistId} - {$title}");
+                return $playlistId;
+            }
+        }
+
+        $errorMsg = 'Unknown error';
+        if ($response) {
+            $data = json_decode($response, true);
+            $errorMsg = $data['error']['message'] ?? json_encode($data);
+        }
+
+        log_message('error', "Failed to create YouTube playlist (HTTP {$httpCode}): {$errorMsg}");
+        return null;
+    }
+
+    /**
+     * Build playlist title based on role and type
+     */
+    private function buildPlaylistTitle(string $role, ?string $auditionType, ?int $seasonId): string
+    {
+        $title = 'Faceless Pictures - ';
+        
+        switch ($role) {
+            case 'actor':
+                if ($auditionType === 'song_audition') {
+                    $title .= 'Actor Song Auditions';
+                } else {
+                    $title .= 'Actor Auditions';
+                }
+                break;
+            case 'director':
+                $title .= 'Director Submissions';
+                break;
+            case 'writer':
+                $title .= 'Writer Submissions';
+                break;
+        }
+
+        // Add season info if enabled
+        if ($seasonId) {
+            $stmt = $this->db->prepare("SELECT title FROM seasons WHERE id = ?");
+            $stmt->execute([$seasonId]);
+            $season = $stmt->fetch();
+            if ($season) {
+                $title .= ' - ' . $season['title'];
+            }
+        }
+
+        return $title;
+    }
+
+    /**
+     * Build playlist description
+     */
+    private function buildPlaylistDescription(string $role, ?string $auditionType, ?int $seasonId): string
+    {
+        $description = "Official competition submissions for Faceless Pictures.\n\n";
+        
+        switch ($role) {
+            case 'actor':
+                if ($auditionType === 'song_audition') {
+                    $description .= "This playlist contains song audition videos submitted by actors.";
+                } else {
+                    $description .= "This playlist contains audition videos submitted by actors.";
+                }
+                break;
+            case 'director':
+                $description .= "This playlist contains video submissions from directors.";
+                break;
+            case 'writer':
+                $description .= "This playlist contains submissions from writers.";
+                break;
+        }
+
+        if ($seasonId) {
+            $stmt = $this->db->prepare("SELECT title, brief FROM seasons WHERE id = ?");
+            $stmt->execute([$seasonId]);
+            $season = $stmt->fetch();
+            if ($season) {
+                $description .= "\n\nSeason: " . $season['title'];
+                if (!empty($season['brief'])) {
+                    $description .= "\n" . $season['brief'];
+                }
+            }
+        }
+
+        return $description;
+    }
+
+    /**
+     * Save playlist to database
+     */
+    private function savePlaylist(string $playlistId, string $role, ?string $auditionType, ?int $seasonId): bool
+    {
+        $title = $this->buildPlaylistTitle($role, $auditionType, $seasonId);
+        $description = $this->buildPlaylistDescription($role, $auditionType, $seasonId);
+
+        try {
+            $stmt = $this->db->prepare(
+                "INSERT INTO youtube_playlists (playlist_id, title, description, role, audition_type, season_id) 
+                 VALUES (?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([$playlistId, $title, $description, $role, $auditionType, $seasonId]);
+            log_message('info', "Saved playlist to database: {$playlistId}");
+            return true;
+        } catch (\Exception $e) {
+            log_message('error', "Failed to save playlist to database: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Add video to a YouTube playlist
+     */
+    public function addVideoToPlaylist(string $videoId, string $playlistId): bool
+    {
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) {
+            log_message('error', 'Failed to get access token for adding video to playlist');
+            return false;
+        }
+
+        $metadata = [
+            'snippet' => [
+                'playlistId' => $playlistId,
+                'resourceId' => [
+                    'kind' => 'youtube#video',
+                    'videoId' => $videoId,
+                ],
+            ],
+        ];
+
+        $ch = curl_init('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer {$accessToken}",
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode($metadata),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 || $httpCode === 201) {
+            log_message('info', "Added video {$videoId} to playlist {$playlistId}");
+            return true;
+        }
+
+        $errorMsg = 'Unknown error';
+        if ($response) {
+            $data = json_decode($response, true);
+            $errorMsg = $data['error']['message'] ?? json_encode($data);
+        }
+
+        log_message('error', "Failed to add video to playlist (HTTP {$httpCode}): {$errorMsg}");
+        return false;
+    }
+
+    /**
+     * Determine which playlist a video should go to based on user role and video metadata
+     */
+    public function determinePlaylistForVideo(array $video): ?string
+    {
+        $settingsModel = new \App\Models\Settings();
+        $playlistEnabled = $settingsModel->get('youtube_playlist_enabled') === '1';
+        
+        if (!$playlistEnabled) {
+            return null;
+        }
+
+        $role = $video['user_role'] ?? null;
+        $seasonId = $video['season_id'] ?? null;
+        
+        // Check if we need per-season playlists
+        $perSeason = $settingsModel->get('youtube_playlist_per_season') === '1';
+        $seasonIdToUse = $perSeason ? $seasonId : null;
+
+        // For actors, determine audition type
+        $auditionType = null;
+        if ($role === 'actor') {
+            // Check script audition_type if available
+            if (!empty($video['script_id'])) {
+                $stmt = $this->db->prepare("SELECT audition_type FROM scripts WHERE id = ?");
+                $stmt->execute([$video['script_id']]);
+                $script = $stmt->fetch();
+                $auditionType = $script['audition_type'] ?? null;
+            }
+            
+            // Fall back to checking title or content type
+            if (!$auditionType) {
+                $title = strtolower($video['title'] ?? '');
+                if (strpos($title, 'song') !== false || strpos($title, 'singing') !== false) {
+                    $auditionType = 'song_audition';
+                } else {
+                    $auditionType = 'audition';
+                }
+            }
+        }
+
+        return $this->getOrCreatePlaylist($role, $auditionType, $seasonIdToUse);
+    }
+
+    /**
+     * Get all playlists from database
+     */
+    public function getAllPlaylists(): array
+    {
+        $stmt = $this->db->query(
+            "SELECT p.*, s.title as season_title 
+             FROM youtube_playlists p 
+             LEFT JOIN seasons s ON p.season_id = s.id 
+             ORDER BY p.created_at DESC"
+        );
+        return $stmt->fetchAll();
+    }
 }
+

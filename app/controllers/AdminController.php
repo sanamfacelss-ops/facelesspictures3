@@ -2580,4 +2580,216 @@ class AdminController
             echo json_encode(['error' => 'Failed to check video status']);
         }
     }
+
+    // ==================== PLAYLISTS ====================
+
+    /**
+     * Get all YouTube playlists
+     */
+    public function getPlaylists(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $youtubeService = new \App\Services\YouTubeService();
+            $playlists = $youtubeService->getAllPlaylists();
+            
+            echo json_encode([
+                'success' => true,
+                'playlists' => $playlists
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_PLAYLISTS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to fetch playlists: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Create playlists for all roles
+     */
+    public function createDefaultPlaylists(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $youtubeService = new \App\Services\YouTubeService();
+            $created = [];
+            $errors = [];
+
+            // Create actor playlists (audition and song audition)
+            $auditionPlaylist = $youtubeService->getOrCreatePlaylist('actor', 'audition');
+            if ($auditionPlaylist) {
+                $created[] = 'Actor Auditions';
+            } else {
+                $errors[] = 'Failed to create Actor Auditions playlist';
+            }
+
+            $songPlaylist = $youtubeService->getOrCreatePlaylist('actor', 'song_audition');
+            if ($songPlaylist) {
+                $created[] = 'Actor Song Auditions';
+            } else {
+                $errors[] = 'Failed to create Actor Song Auditions playlist';
+            }
+
+            // Create director playlist
+            $directorPlaylist = $youtubeService->getOrCreatePlaylist('director');
+            if ($directorPlaylist) {
+                $created[] = 'Director Submissions';
+            } else {
+                $errors[] = 'Failed to create Director Submissions playlist';
+            }
+
+            // Create writer playlist
+            $writerPlaylist = $youtubeService->getOrCreatePlaylist('writer');
+            if ($writerPlaylist) {
+                $created[] = 'Writer Submissions';
+            } else {
+                $errors[] = 'Failed to create Writer Submissions playlist';
+            }
+
+            debug_log("Admin created default playlists: " . implode(', ', $created), 'ADMIN');
+            
+            if (empty($errors)) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Default playlists created successfully',
+                    'created' => $created
+                ]);
+            } else {
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Some playlists failed to create',
+                    'created' => $created,
+                    'errors' => $errors
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_CREATE_DEFAULT_PLAYLISTS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to create playlists: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update playlist settings
+     */
+    public function updatePlaylistSettings(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            
+            if (isset($_POST['youtube_playlist_enabled'])) {
+                $enabled = $_POST['youtube_playlist_enabled'] === '1' ? '1' : '0';
+                $settingsModel->set('youtube_playlist_enabled', $enabled, 'youtube', 'Enable automatic playlist organization');
+            }
+            
+            if (isset($_POST['youtube_playlist_per_season'])) {
+                $perSeason = $_POST['youtube_playlist_per_season'] === '1' ? '1' : '0';
+                $settingsModel->set('youtube_playlist_per_season', $perSeason, 'youtube', 'Create separate playlists for each season');
+            }
+
+            debug_log("Admin updated playlist settings", 'ADMIN');
+            echo json_encode(['success' => true, 'message' => 'Playlist settings updated successfully']);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_UPDATE_PLAYLIST_SETTINGS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update playlist settings: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Get playlist settings
+     */
+    public function getPlaylistSettings(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin()) return;
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            
+            $settings = [
+                'youtube_playlist_enabled' => $settingsModel->get('youtube_playlist_enabled') === '1',
+                'youtube_playlist_per_season' => $settingsModel->get('youtube_playlist_per_season') === '1',
+            ];
+
+            echo json_encode(['success' => true, 'settings' => $settings]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_GET_PLAYLIST_SETTINGS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to get playlist settings: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Organize existing videos into playlists
+     */
+    public function organizeVideosIntoPlaylists(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        try {
+            $youtubeService = new \App\Services\YouTubeService();
+            
+            // Get all videos that have been published to YouTube
+            $stmt = $this->db->query(
+                "SELECT v.*, u.role as user_role, s.title as season_title
+                 FROM videos v
+                 JOIN users u ON v.user_id = u.id
+                 JOIN seasons s ON v.season_id = s.id
+                 WHERE v.youtube_id IS NOT NULL AND v.youtube_id != ''
+                 AND (v.youtube_playlist_id IS NULL OR v.youtube_playlist_id = '')
+                 ORDER BY v.published_at ASC"
+            );
+            $videos = $stmt->fetchAll();
+            
+            $organized = 0;
+            $errors = [];
+
+            foreach ($videos as $video) {
+                try {
+                    $playlistId = $youtubeService->determinePlaylistForVideo($video);
+                    
+                    if ($playlistId && $youtubeService->addVideoToPlaylist($video['youtube_id'], $playlistId)) {
+                        // Update video record with playlist ID
+                        $updateStmt = $this->db->prepare("UPDATE videos SET youtube_playlist_id = ? WHERE id = ?");
+                        $updateStmt->execute([$playlistId, $video['id']]);
+                        $organized++;
+                    } else {
+                        $errors[] = "Failed to add video {$video['id']} to playlist";
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Error organizing video {$video['id']}: " . $e->getMessage();
+                }
+            }
+
+            debug_log("Admin organized {$organized} videos into playlists", 'ADMIN');
+            
+            echo json_encode([
+                'success' => true,
+                'message' => "{$organized} video(s) organized into playlists",
+                'organized' => $organized,
+                'total' => count($videos),
+                'errors' => $errors
+            ]);
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_ORGANIZE_VIDEOS');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to organize videos: ' . $e->getMessage()]);
+        }
+    }
 }
+

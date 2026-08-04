@@ -228,6 +228,13 @@ $routes = [
     'api/admin/youtube/toggle' => [AdminController::class, 'toggleYouTubePublish', 'POST'],
     'api/admin/youtube/bulk-publish' => [AdminController::class, 'bulkPublishYouTube', 'POST'],
     'api/admin/videos/refresh' => [AdminController::class, 'refreshVideos', 'GET'],
+    
+    // YouTube Playlist API
+    'api/admin/playlists' => [AdminController::class, 'getPlaylists', 'GET'],
+    'api/admin/playlists/settings' => [AdminController::class, 'getPlaylistSettings', 'GET'],
+    'api/admin/playlists/settings/update' => [AdminController::class, 'updatePlaylistSettings', 'POST'],
+    'api/admin/playlists/create-default' => [AdminController::class, 'createDefaultPlaylists', 'POST'],
+    'api/admin/playlists/organize' => [AdminController::class, 'organizeVideosIntoPlaylists', 'POST'],
 ];
 
 $matched = false;
