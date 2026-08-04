@@ -399,7 +399,8 @@ class YouTubeService
             $errorMsg = $data['error']['message'] ?? json_encode($data);
         }
 
-        log_message('error', "Failed to create YouTube playlist (HTTP {$httpCode}): {$errorMsg}");
+        log_message('error', "Failed to create YouTube playlist '{$title}' (HTTP {$httpCode}): {$errorMsg}");
+        log_message('error', "Full response: " . $response);
         return null;
     }
 

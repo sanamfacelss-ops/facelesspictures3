@@ -2620,36 +2620,58 @@ class AdminController
             $youtubeService = new \App\Services\YouTubeService();
             $created = [];
             $errors = [];
+            $details = [];
 
             // Create actor playlists (audition and song audition)
+            log_message('info', 'Creating Actor Auditions playlist...');
             $auditionPlaylist = $youtubeService->getOrCreatePlaylist('actor', 'audition');
             if ($auditionPlaylist) {
                 $created[] = 'Actor Auditions';
+                $details[] = "Actor Auditions: {$auditionPlaylist}";
             } else {
                 $errors[] = 'Failed to create Actor Auditions playlist';
+                log_message('error', 'Failed to create Actor Auditions playlist');
             }
+            
+            // Small delay to avoid rate limiting
+            sleep(1);
 
+            log_message('info', 'Creating Actor Song Auditions playlist...');
             $songPlaylist = $youtubeService->getOrCreatePlaylist('actor', 'song_audition');
             if ($songPlaylist) {
                 $created[] = 'Actor Song Auditions';
+                $details[] = "Actor Song Auditions: {$songPlaylist}";
             } else {
                 $errors[] = 'Failed to create Actor Song Auditions playlist';
+                log_message('error', 'Failed to create Actor Song Auditions playlist');
             }
+            
+            // Small delay to avoid rate limiting
+            sleep(1);
 
             // Create director playlist
+            log_message('info', 'Creating Director Submissions playlist...');
             $directorPlaylist = $youtubeService->getOrCreatePlaylist('director');
             if ($directorPlaylist) {
                 $created[] = 'Director Submissions';
+                $details[] = "Director Submissions: {$directorPlaylist}";
             } else {
                 $errors[] = 'Failed to create Director Submissions playlist';
+                log_message('error', 'Failed to create Director Submissions playlist');
             }
+            
+            // Small delay to avoid rate limiting
+            sleep(1);
 
             // Create writer playlist
+            log_message('info', 'Creating Writer Submissions playlist...');
             $writerPlaylist = $youtubeService->getOrCreatePlaylist('writer');
             if ($writerPlaylist) {
                 $created[] = 'Writer Submissions';
+                $details[] = "Writer Submissions: {$writerPlaylist}";
             } else {
                 $errors[] = 'Failed to create Writer Submissions playlist';
+                log_message('error', 'Failed to create Writer Submissions playlist');
             }
 
             debug_log("Admin created default playlists: " . implode(', ', $created), 'ADMIN');
@@ -2658,7 +2680,8 @@ class AdminController
                 echo json_encode([
                     'success' => true,
                     'message' => 'Default playlists created successfully',
-                    'created' => $created
+                    'created' => $created,
+                    'details' => $details
                 ]);
             } else {
                 http_response_code(500);
@@ -2666,7 +2689,8 @@ class AdminController
                     'success' => false,
                     'message' => 'Some playlists failed to create',
                     'created' => $created,
-                    'errors' => $errors
+                    'errors' => $errors,
+                    'details' => $details
                 ]);
             }
         } catch (\Exception $e) {
