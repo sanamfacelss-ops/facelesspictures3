@@ -278,6 +278,51 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
     <div class="py-10 sm:py-12">
 
+    <!-- ══ HORIZONTAL AUTO-PLAY TRAILER ══ -->
+    <?php
+    $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
+    if ($heroTrailerUrl):
+        // Check if it's a YouTube URL
+        $isYoutube = (strpos($heroTrailerUrl, 'youtube.com') !== false || strpos($heroTrailerUrl, 'youtu.be') !== false);
+        $ytId = '';
+        if ($isYoutube) {
+            // Extract YouTube ID
+            $clean = preg_replace('/[?&]si=[^&]+/', '', $heroTrailerUrl);
+            if (preg_match('/youtu\.be\/([A-Za-z0-9_\-]{11})/', $clean, $mm))      $ytId = $mm[1];
+            elseif (preg_match('/[?&]v=([A-Za-z0-9_\-]{11})/', $clean, $mm))       $ytId = $mm[1];
+            elseif (preg_match('/\/shorts\/([A-Za-z0-9_\-]{11})/', $clean, $mm))   $ytId = $mm[1];
+            elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $ytId = $mm[1];
+        }
+    ?>
+    <div class="hero-trailer-wrap" style="margin-bottom:3rem;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#000">
+        <?php if ($isYoutube && $ytId): ?>
+            <!-- YouTube Embed with Autoplay -->
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
+                <iframe 
+                    src="https://www.youtube.com/embed/<?= htmlspecialchars($ytId) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($ytId) ?>&controls=1&modestbranding=1&rel=0"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+            </div>
+        <?php else: ?>
+            <!-- Native Video Player with Autoplay -->
+            <video 
+                controls 
+                autoplay 
+                muted 
+                loop 
+                playsinline
+                style="width:100%;height:auto;display:block"
+                onloadedmetadata="this.play().catch(e => console.log('Autoplay blocked:', e))">
+                <source src="<?= htmlspecialchars($heroTrailerUrl) ?>" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
 
     <?php
@@ -338,51 +383,6 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
           <div class="slider-dot" :class="i===currentPage?'active':''" @click="goTo(i)"></div>
         </template>
       </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- ══ HORIZONTAL AUTO-PLAY TRAILER ══ -->
-    <?php
-    $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
-    if ($heroTrailerUrl):
-        // Check if it's a YouTube URL
-        $isYoutube = (strpos($heroTrailerUrl, 'youtube.com') !== false || strpos($heroTrailerUrl, 'youtu.be') !== false);
-        $ytId = '';
-        if ($isYoutube) {
-            // Extract YouTube ID
-            $clean = preg_replace('/[?&]si=[^&]+/', '', $heroTrailerUrl);
-            if (preg_match('/youtu\.be\/([A-Za-z0-9_\-]{11})/', $clean, $mm))      $ytId = $mm[1];
-            elseif (preg_match('/[?&]v=([A-Za-z0-9_\-]{11})/', $clean, $mm))       $ytId = $mm[1];
-            elseif (preg_match('/\/shorts\/([A-Za-z0-9_\-]{11})/', $clean, $mm))   $ytId = $mm[1];
-            elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $ytId = $mm[1];
-        }
-    ?>
-    <div class="hero-trailer-wrap" style="margin-bottom:3rem;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#000">
-        <?php if ($isYoutube && $ytId): ?>
-            <!-- YouTube Embed with Autoplay -->
-            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
-                <iframe 
-                    src="https://www.youtube.com/embed/<?= htmlspecialchars($ytId) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($ytId) ?>&controls=1&modestbranding=1&rel=0"
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                    loading="lazy">
-                </iframe>
-            </div>
-        <?php else: ?>
-            <!-- Native Video Player with Autoplay -->
-            <video 
-                controls 
-                autoplay 
-                muted 
-                loop 
-                playsinline
-                style="width:100%;height:auto;display:block"
-                onloadedmetadata="this.play().catch(e => console.log('Autoplay blocked:', e))">
-                <source src="<?= htmlspecialchars($heroTrailerUrl) ?>" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        <?php endif; ?>
     </div>
     <?php endif; ?>
 
