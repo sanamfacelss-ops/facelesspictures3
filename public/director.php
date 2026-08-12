@@ -72,20 +72,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="fp-nav">
-  <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:space-between">
-    <a href="/" style="display:flex;align-items:center;gap:7px;text-decoration:none">
-      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:52px;width:auto">
-      <?php else: ?><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span><span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">3</span><?php endif; ?>
-    </a>
-    <div style="display:flex;gap:1.5rem;align-items:center">
-      <a href="/actor"    style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;text-decoration:none">Actor</a>
-      <a href="/director" style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#111;text-decoration:none;border-bottom:2px solid #111;padding-bottom:1px">Director</a>
-      <a href="/writer"   style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;text-decoration:none">Writer</a>
-    </div>
-  </div>
-</nav>
+<?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
 <!-- HERO -->
 <section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
