@@ -3712,6 +3712,113 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- SECTION: Horizontal Auto-Play Trailer -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-1">Horizontal Auto-Play Trailer</p>
+                                <p class="text-[11px] text-dark/40 mb-3">Full-width horizontal video player displayed below the three posters. Auto-plays on page load.</p>
+                                
+                                <div class="bg-dark/[.025] rounded-xl p-4" x-data="videoUploader('landing_hero_trailer_url', '<?= addslashes(htmlspecialchars($settingsModel->get('landing_hero_trailer_url', ''))) ?>')">
+                                    
+                                    <!-- Toggle tabs -->
+                                    <div class="flex gap-1 mb-3">
+                                        <button type="button"
+                                            @click="trailerTab='upload'"
+                                            :class="trailerTab==='upload' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                            class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">
+                                            Upload Video File
+                                        </button>
+                                        <button type="button"
+                                            @click="trailerTab='yt'"
+                                            :class="trailerTab==='yt' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                            class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">
+                                            YouTube URL
+                                        </button>
+                                    </div>
+
+                                    <!-- File Upload tab -->
+                                    <div x-show="trailerTab==='upload'">
+                                        <div
+                                            class="relative border-2 rounded-xl transition-all overflow-hidden bg-white"
+                                            :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                            style="min-height:120px;cursor:pointer"
+                                            @dragover.prevent="dragging=true"
+                                            @dragleave.prevent="dragging=false"
+                                            @drop.prevent="onDrop($event)"
+                                            @click="$refs.vidInput.click()">
+                                            <input type="file" x-ref="vidInput" class="hidden"
+                                                accept="video/mp4,video/quicktime,video/webm,video/x-msvideo"
+                                                @change="onFile($event)">
+
+                                            <!-- Empty -->
+                                            <template x-if="!preview && !uploading">
+                                                <div class="flex flex-col items-center justify-center gap-2 p-6 text-center">
+                                                    <svg class="w-8 h-8 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                    <div>
+                                                        <p class="text-[13px] text-dark/40 font-medium">Drop video file or <span class="underline">click to browse</span></p>
+                                                        <p class="text-[11px] text-dark/25 mt-1">MP4 · MOV · WEBM · max 500 MB</p>
+                                                        <p class="text-[11px] text-dark/25 mt-0.5">Recommended: Horizontal 16:9 format</p>
+                                                    </div>
+                                                </div>
+                                            </template>
+
+                                            <!-- Uploading -->
+                                            <template x-if="uploading">
+                                                <div class="flex flex-col items-center justify-center gap-3 p-6">
+                                                    <div class="w-full max-w-md bg-dark/10 rounded-full h-1.5 overflow-hidden">
+                                                        <div class="h-full bg-dark rounded-full transition-all" :style="'width:'+progress+'%'"></div>
+                                                    </div>
+                                                    <p class="text-[12px] text-dark/50 font-medium" x-text="progress+'% — uploading...'"></p>
+                                                </div>
+                                            </template>
+
+                                            <!-- Uploaded -->
+                                            <template x-if="preview && !uploading">
+                                                <div class="flex items-center gap-3 px-4 py-3">
+                                                    <div class="w-10 h-10 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
+                                                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-[13px] font-semibold text-dark truncate" x-text="filename || 'Video uploaded'"></p>
+                                                        <p class="text-[11px] text-green-600">✓ Ready to auto-play on homepage</p>
+                                                    </div>
+                                                    <button type="button" @click.stop="clearVideo()"
+                                                        class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                        <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    </button>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- YouTube URL tab -->
+                                    <div x-show="trailerTab==='yt'">
+                                        <div class="flex items-center gap-2 border border-dark/10 rounded-xl px-4 py-3 bg-white">
+                                            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                            <input type="url"
+                                                x-model="ytUrl"
+                                                @input="syncYtToForm()"
+                                                placeholder="https://youtu.be/... or youtube.com/watch?v=..."
+                                                class="flex-1 text-[13px] outline-none bg-transparent text-dark placeholder-dark/25">
+                                            <button x-show="ytUrl" type="button" @click.stop="ytUrl=''; saveYtUrl()"
+                                                class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                <svg class="w-3.5 h-3.5 text-dark/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <button type="button" @click.stop="saveYtUrl()"
+                                                class="px-4 py-1.5 bg-dark text-white rounded-lg text-[12px] font-semibold hover:bg-dark/80 transition"
+                                                x-text="ytSaved ? '✓ Saved' : 'Save URL'">
+                                            </button>
+                                            <p class="text-[11px] text-dark/30">YouTube URL takes priority over uploaded file</p>
+                                        </div>
+                                    </div>
+
+                                    <template x-if="uploadError">
+                                        <p class="text-[11px] text-red-500 mt-2" x-text="uploadError"></p>
+                                    </template>
+                                </div>
+                            </div>
+
                             <!-- SECTION: Manifesto Videos -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-1">Manifesto Video Slider</p>
@@ -7048,6 +7155,7 @@ if (file_exists($errorLogFile)) {
                 landing_poster4_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster4_btn_label',''))) ?>',
                 landing_poster5_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_btn_label',''))) ?>',
                 landing_poster6_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_btn_label',''))) ?>',
+                landing_hero_trailer_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_hero_trailer_url',''))) ?>',
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
                 manifesto_heading:     <?= json_encode($settingsModel->get('manifesto_heading','OUR MANIFESTO')) ?>,
                 manifesto_subheading:  <?= json_encode($settingsModel->get('manifesto_subheading','What Faceless Pictures 3 stands for.')) ?>,

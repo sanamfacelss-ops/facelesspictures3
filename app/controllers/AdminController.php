@@ -1950,6 +1950,7 @@ class AdminController
         $videoFields = [
             'landing_trailer_url',  'landing_trailer2_url', 'landing_trailer3_url',
             'landing_trailer4_url', 'landing_trailer5_url', 'landing_trailer6_url',
+            'landing_hero_trailer_url', // Horizontal auto-play trailer below posters
             'actor_preview_video_url', 'song_preview_video_url',
             'director_preview_video_url', 'writer_preview_video_url',
         ];
@@ -2062,6 +2063,7 @@ class AdminController
             'landing_poster4_url',  'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label',
             'landing_poster5_url',  'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label',
             'landing_poster6_url',  'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label',
+            'landing_hero_trailer_url', // Horizontal auto-play trailer
             'landing_about_text',
             'manifesto_heading', 'manifesto_subheading',
             'manifesto_video1_url', 'manifesto_video1_title',
