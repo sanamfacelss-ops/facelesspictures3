@@ -3501,6 +3501,17 @@ if (file_exists($errorLogFile)) {
                                         <input type="url" x-model="form.site_logo_url" placeholder="https://..."
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         <p class="text-[11px] text-dark/30 mt-1">Use this if your logo is hosted externally.</p>
+                                        
+                                        <!-- Logo size control -->
+                                        <div class="mt-4">
+                                            <label class="block text-xs font-medium text-dark/60 mb-2">Logo Height (pixels)</label>
+                                            <div class="flex items-center gap-3">
+                                                <input type="number" x-model="form.site_logo_height" min="20" max="200" step="1" placeholder="44"
+                                                    class="w-24 border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                <span class="text-xs text-dark/50">px (width auto-adjusts)</span>
+                                            </div>
+                                            <p class="text-[11px] text-dark/30 mt-1">Default: 44px. Range: 20-200px.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -7288,6 +7299,7 @@ if (file_exists($errorLogFile)) {
             csrf: document.querySelector('meta[name="csrf-token"]')?.content || '',
             form: {
                 site_logo_url:         '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>',
+                site_logo_height:      '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_height','44'))) ?>',
                 landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
                 site_tagline:          <?= json_encode($settingsModel->get('site_tagline',"India's first anonymous film competition — no face, no connections, just raw talent.")) ?>,
                 landing_roles_heading:    <?= json_encode($settingsModel->get('landing_roles_heading','Become a Star in 3 Clicks')) ?>,

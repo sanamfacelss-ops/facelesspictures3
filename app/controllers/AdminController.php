@@ -2054,7 +2054,7 @@ class AdminController
         $value = trim($_POST['value'] ?? '');
 
         $allowed = [
-            'site_logo_url',
+            'site_logo_url', 'site_logo_height',
             'landing_headline', 'site_tagline',
             'landing_roles_heading', 'landing_roles_subheading',
             'landing_poster_url',   'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label',

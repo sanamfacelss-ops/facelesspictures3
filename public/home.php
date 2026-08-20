@@ -4,6 +4,7 @@ $settingsModel = new App\Models\Settings();
 
 $aboutText    = $settingsModel->get('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
 $logoUrl      = $settingsModel->get('site_logo_url', '');
+$logoHeight   = $settingsModel->get('site_logo_height', '44'); // Height in pixels
 $siteTagline  = $settingsModel->get('site_tagline', "India's first film competition. Submit your video. Show your talent.");
 $heroHeadline     = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
 $rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star in 3 Clicks');
@@ -285,7 +286,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   <div class="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
     <a href="/" class="nav-logo">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:52px;width:auto">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto">
       <?php else: ?>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
         <span class="nav-badge">3</span>
@@ -604,7 +605,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
     <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:44px;width:auto">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto">
       <?php else: ?>
         FACELESS PICTURES
         <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
