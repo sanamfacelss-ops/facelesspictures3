@@ -3439,6 +3439,25 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- Collapsible Sections Wrapper -->
+                            <div x-data="{showHome: true, showRoleCards: false, showWriter: false, showDirector: false, showActor: false}">
+
+                            <!-- ========== HOME PAGE CONTENT ========== -->
+                            <div class="mb-4">
+                                <div @click="showHome = !showHome" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg cursor-pointer hover:from-gray-100 hover:to-gray-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">🏠</span>
+                                        <h4 class="font-semibold text-dark text-sm">HOME PAGE CONTENT</h4>
+                                        <span class="text-xs text-dark/40">(Brand, Hero, Posters, Videos, About, Marquee)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showHome}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showHome" x-collapse>
+                                    <div class="mt-3 pl-4 pr-4">
+
                             <!-- SECTION: Brand -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Brand</p>
@@ -3882,6 +3901,26 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                                    </div><!-- End Home Page Content -->
+                                </div><!-- End Home Page Collapse -->
+                            </div><!-- End Home Page Section -->
+
+                            <!-- ========== ROLE CARDS (shown on home page) ========== -->
+                            <div class="mb-4">
+                                <div @click="showRoleCards = !showRoleCards" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg cursor-pointer hover:from-purple-100 hover:to-purple-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">🎭</span>
+                                        <h4 class="font-semibold text-dark text-sm">ROLE CARDS</h4>
+                                        <span class="text-xs text-dark/40">(Writer, Director, Actor cards shown on home page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showRoleCards}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showRoleCards" x-collapse>
+                                    <div class="mt-3 pl-4 pr-4">
+
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards (Writer, Director, Actor)</p>
@@ -4016,13 +4055,29 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
-                            <!-- SECTION: Role Page Text Settings -->
+                                    </div><!-- End Role Cards Content -->
+                                </div><!-- End Role Cards Collapse -->
+                            </div><!-- End Role Cards Section -->
+
+                            <!-- ========== WRITER PAGE TEXT ========== -->
+                            <div class="mb-4">
+                                <div @click="showWriter = !showWriter" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg cursor-pointer hover:from-blue-100 hover:to-blue-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">✍️</span>
+                                        <h4 class="font-semibold text-dark text-sm">WRITER PAGE TEXT</h4>
+                                        <span class="text-xs text-dark/40">(Hero & Submission Form text on <a href="/writer" target="_blank" class="underline">/writer</a> page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showWriter}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showWriter" x-collapse>
+                                    <div class="mt-3 pl-4 pr-4">
+
+                            <!-- WRITER PAGE TEXT -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Page Hero & Form Text</p>
-                                <p class="text-xs text-dark/40 mb-4">Control the text shown on Writer, Director, and Actor pages. Leave blank to hide sections.</p>
-                                
-                                <div class="space-y-6">
-                                    <!-- WRITER PAGE TEXT -->
+                                <p class="text-xs text-dark/40 mb-4">Control the hero section and submission form text shown on the Writer page. Leave blank to hide sections.</p>
                                     <div class="p-4 bg-gray-50 rounded-lg">
                                         <p class="text-xs font-bold text-dark/70 mb-3">✍️ WRITER PAGE</p>
                                         <div class="space-y-3">
@@ -4059,7 +4114,29 @@ if (file_exists($errorLogFile)) {
                                         </div>
                                     </div>
 
+                                    </div><!-- End Writer Page Content -->
+                                </div><!-- End Writer Page Collapse -->
+                            </div><!-- End Writer Page Section -->
+
+                            <!-- ========== DIRECTOR PAGE TEXT ========== -->
+                            <div class="mb-4">
+                                <div @click="showDirector = !showDirector" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg cursor-pointer hover:from-green-100 hover:to-green-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">🎬</span>
+                                        <h4 class="font-semibold text-dark text-sm">DIRECTOR PAGE TEXT</h4>
+                                        <span class="text-xs text-dark/40">(Hero & Submission Form text on <a href="/director" target="_blank" class="underline">/director</a> page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showDirector}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showDirector" x-collapse>
+                                    <div class="mt-3 pl-4 pr-4">
+
                                     <!-- DIRECTOR PAGE TEXT -->
+                                    <div class="mb-6 pb-6 border-b border-dark/5">
+                                        <p class="text-xs text-dark/40 mb-4">Control the hero section and submission form text shown on the Director page. Leave blank to hide sections.</p>
                                     <div class="p-4 bg-gray-50 rounded-lg">
                                         <p class="text-xs font-bold text-dark/70 mb-3">🎬 DIRECTOR PAGE</p>
                                         <div class="space-y-3">
@@ -4096,7 +4173,29 @@ if (file_exists($errorLogFile)) {
                                         </div>
                                     </div>
 
+                                    </div><!-- End Director Page Content -->
+                                </div><!-- End Director Page Collapse -->
+                            </div><!-- End Director Page Section -->
+
+                            <!-- ========== ACTOR PAGE TEXT ========== -->
+                            <div class="mb-4">
+                                <div @click="showActor = !showActor" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg cursor-pointer hover:from-orange-100 hover:to-orange-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">🎤</span>
+                                        <h4 class="font-semibold text-dark text-sm">ACTOR PAGE TEXT</h4>
+                                        <span class="text-xs text-dark/40">(Hero & Submission Form text on <a href="/actor" target="_blank" class="underline">/actor</a> page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showActor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showActor" x-collapse>
+                                    <div class="mt-3 pl-4 pr-4">
+
                                     <!-- ACTOR PAGE TEXT -->
+                                    <div class="mb-6 pb-6 border-b border-dark/5">
+                                        <p class="text-xs text-dark/40 mb-4">Control the hero section and submission form text shown on the Actor page. Leave blank to hide sections.</p>
                                     <div class="p-4 bg-gray-50 rounded-lg">
                                         <p class="text-xs font-bold text-dark/70 mb-3">🎭 ACTOR PAGE</p>
                                         <div class="space-y-3">
@@ -4149,6 +4248,12 @@ if (file_exists($errorLogFile)) {
                                     <?php endfor; ?>
                                 </div>
                             </div>
+
+                                    </div><!-- End Actor Page Content -->
+                                </div><!-- End Actor Page Collapse -->
+                            </div><!-- End Actor Page Section -->
+
+                            </div><!-- End Collapsible Sections Wrapper -->
 
                             <!-- Media fields are now per-script — see Scripts tab -->
                             <div class="mb-2 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
