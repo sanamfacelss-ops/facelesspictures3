@@ -1896,8 +1896,8 @@ class AdminController
         }
 
         $file     = $_FILES['image'];
-        $allowed  = ['image/jpeg','image/png','image/webp','image/gif'];
-        $allowExt = ['jpg','jpeg','png','webp','gif'];
+        $allowed  = ['image/jpeg','image/jpg','image/png','image/webp','image/gif','image/svg+xml','image/bmp'];
+        $allowExt = ['jpg','jpeg','png','webp','gif','svg','bmp'];
         $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
         if (!in_array($file['type'], $allowed) || !in_array($ext, $allowExt)) {
@@ -1987,8 +1987,8 @@ class AdminController
         $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
         if ($isImage) {
-            $allowed  = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-            $allowExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $allowed  = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/bmp'];
+            $allowExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'];
             $maxBytes = 5 * 1024 * 1024; // 5 MB
             $errMsg   = 'Only JPG, PNG, WEBP or GIF images accepted.';
             $sizeMsg  = 'Image must be under 5 MB.';
