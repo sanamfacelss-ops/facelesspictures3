@@ -90,7 +90,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
   <?php endif; ?>
   <?php if (!empty($heroDescription)): ?>
-  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($heroDescription) ?></p>
+  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= format_text_content($heroDescription) ?></p>
   <?php endif; ?>
 </section>
 
@@ -175,7 +175,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
     <?php endif; ?>
     <?php if (!empty($formDescription)): ?>
-    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= htmlspecialchars($formDescription) ?></p>
+    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= format_text_content($formDescription) ?></p>
     <?php endif; ?>
 
     <!-- Contact -->
