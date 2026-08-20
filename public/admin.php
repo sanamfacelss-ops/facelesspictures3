@@ -1594,18 +1594,18 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                             <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
                                                 <button @click="editScript(sc); showScriptModal = true" 
-                                                    class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition flex items-center gap-1">
+                                                    class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition flex items-center gap-1.5">
                                                     <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                     </svg>
-                                                    <span class="hidden xs:inline">Edit</span>
+                                                    <span>Edit</span>
                                                 </button>
                                                 <button @click="openDeleteModal('script', sc.id, sc.title)" 
-                                                    class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-100 transition flex items-center gap-1">
+                                                    class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-100 transition flex items-center gap-1.5">
                                                     <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
-                                                    <span class="hidden xs:inline">Delete</span>
+                                                    <span>Delete</span>
                                                 </button>
                                             </div>
                                         </div>
