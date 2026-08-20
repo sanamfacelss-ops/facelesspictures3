@@ -1540,12 +1540,6 @@ if (file_exists($errorLogFile)) {
 
                 <!-- ==================== SCRIPTS TAB ==================== -->
                 <div x-show="activeTab === 'scripts'" x-cloak>
-                    <!-- Info banner: briefs moved to Settings -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 flex items-start gap-3">
-                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <p class="text-[12px] text-blue-700">Dialog briefs, song brief, director brief and writer brief are now managed under <a href="#" @click.prevent="activeTab='settings'" class="font-semibold underline">Settings → Audition Briefs</a>. Scripts here are additional optional scripts attached to cards.</p>
-                    </div>
-
                     <!-- Scripts List (Full Width) -->
                     <div>
                         <!-- Filter and Create Button Row -->
@@ -4364,39 +4358,6 @@ if (file_exists($errorLogFile)) {
                             </div>
                         </div>
 
-                        <!-- Audition Briefs -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5 md:col-span-2 lg:col-span-3" x-data="auditionBriefs()">
-                            <h3 class="font-semibold text-dark mb-2 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                Audition Briefs
-                            </h3>
-                            <p class="text-[11px] text-dark/40 mb-4">Fallback instructions shown when a script has no content. Used on /actor, /director, /writer pages when script content field is empty.</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">🎭 Actor — Dialog Brief</label>
-                                    <textarea x-model="briefs.actor_dialog_script" rows="4" placeholder="Perform the following scene with full emotion..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">🎤 Actor — Song Brief</label>
-                                    <textarea x-model="briefs.actor_song_script" rows="4" placeholder="Perform a 60-second song showing emotional range..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">� Director Brief</label>
-                                    <textarea x-model="briefs.director_brief" rows="4" placeholder="You have one actor, one phone camera..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">✍️ Writer Brief</label>
-                                    <textarea x-model="briefs.writer_brief" rows="4" placeholder="We give you the first half of a script..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex items-center gap-3">
-                                <button @click="saveBriefs()" class="bg-dark text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-dark/80 transition" :disabled="saving">
-                                    <span x-show="!saving">Save Briefs</span>
-                                    <span x-show="saving">Saving...</span>
-                                </button>
-                                <span x-show="saved" class="text-green-600 text-sm font-medium">✓ Saved</span>
-                            </div>
-                        </div>
 
                         <!-- Debug, Log Files, Environment - Single Row on Desktop -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 md:col-span-2 lg:col-span-3">
@@ -7795,31 +7756,6 @@ if (file_exists($errorLogFile)) {
         };
     }
 
-    // Audition briefs panel
-    function auditionBriefs() {
-        return {
-            saving: false, saved: false,
-            briefs: {
-                actor_dialog_script: <?= json_encode($settingsModel->get('actor_dialog_script','')) ?>,
-                actor_song_script:   <?= json_encode($settingsModel->get('actor_song_script','')) ?>,
-                director_brief:      <?= json_encode($settingsModel->get('director_brief','')) ?>,
-                writer_brief:        <?= json_encode($settingsModel->get('writer_brief','')) ?>,
-            },
-            async saveBriefs() {
-                this.saving = true; this.saved = false;
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                for (const [key, value] of Object.entries(this.briefs)) {
-                    const fd = new FormData();
-                    fd.append('csrf_token', csrf);
-                    fd.append('key', key);
-                    fd.append('value', value);
-                    await fetch('/api/admin/settings/landing', {method:'POST', body: fd, credentials: 'same-origin'});
-                }
-                this.saving = false; this.saved = true;
-                setTimeout(() => this.saved = false, 2500);
-            }
-        };
-    }
     </script>
 
     <!-- Admin Enhancements: YouTube Guide + Auto-Refresh -->
