@@ -243,9 +243,17 @@ class AuthController
 
     public function logout(): void
     {
-        header('Content-Type: application/json');
         session_destroy();
-        echo json_encode(['success' => true]);
+        
+        // Check if it's an AJAX request
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'redirect' => '/login']);
+        } else {
+            // Regular form POST - redirect directly
+            redirect('/login');
+        }
     }
 
     /**
