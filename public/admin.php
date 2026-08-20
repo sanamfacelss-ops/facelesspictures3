@@ -4467,7 +4467,7 @@ if (file_exists($errorLogFile)) {
 
                     <!-- Log Viewers - Full Width Below -->
                     <?php if ($debugLogContent || $errorLogContent): ?>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                    <div class="grid grid-cols-1 gap-4 md:gap-6 md:col-span-2 lg:col-span-3">
                         <?php if ($debugLogContent): ?>
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
                             <div class="px-4 py-3 border-b border-dark/5 bg-blue-50">
