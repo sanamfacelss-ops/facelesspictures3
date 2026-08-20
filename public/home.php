@@ -497,10 +497,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
         <?php if (!empty($roles['writer']['badge1']) || !empty($roles['writer']['badge2'])): ?>
         <div class="role-badges">
-          <?php if (!empty($roles['writer']['badge1'])): ?>
+          <?php if (!empty($roles['writer']['badge1']) && trim($roles['writer']['badge1']) !== ''): ?>
           <span class="badge"><?= htmlspecialchars($roles['writer']['badge1']) ?></span>
           <?php endif; ?>
-          <?php if (!empty($roles['writer']['badge2'])): ?>
+          <?php if (!empty($roles['writer']['badge2']) && trim($roles['writer']['badge2']) !== ''): ?>
           <span class="badge"><?= htmlspecialchars($roles['writer']['badge2']) ?></span>
           <?php endif; ?>
         </div>
@@ -523,10 +523,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
         <?php if (!empty($roles['director']['badge1']) || !empty($roles['director']['badge2'])): ?>
         <div class="role-badges">
-          <?php if (!empty($roles['director']['badge1'])): ?>
+          <?php if (!empty($roles['director']['badge1']) && trim($roles['director']['badge1']) !== ''): ?>
           <span class="badge"><?= htmlspecialchars($roles['director']['badge1']) ?></span>
           <?php endif; ?>
-          <?php if (!empty($roles['director']['badge2'])): ?>
+          <?php if (!empty($roles['director']['badge2']) && trim($roles['director']['badge2']) !== ''): ?>
           <span class="badge"><?= htmlspecialchars($roles['director']['badge2']) ?></span>
           <?php endif; ?>
         </div>
@@ -549,10 +549,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
         <?php if (!empty($roles['actor']['badge1']) || !empty($roles['actor']['badge2'])): ?>
         <div class="role-badges">
-          <?php if (!empty($roles['actor']['badge1'])): ?>
+          <?php if (!empty($roles['actor']['badge1']) && trim($roles['actor']['badge1']) !== ''): ?>
           <span class="badge"><?= htmlspecialchars($roles['actor']['badge1']) ?></span>
           <?php endif; ?>
-          <?php if (!empty($roles['actor']['badge2'])): ?>
+          <?php if (!empty($roles['actor']['badge2']) && trim($roles['actor']['badge2']) !== ''): ?>
           <span class="badge"><?= htmlspecialchars($roles['actor']['badge2']) ?></span>
           <?php endif; ?>
         </div>
