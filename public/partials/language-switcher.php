@@ -126,16 +126,53 @@ var INDIAN=['hi','mr','bn','te','ta','gu','kn','ml','pa','or','as','ur','ne','si
 var fpOpen=false;
 var fpCurrent='en';
 
-// Read current language from Google Translate cookie
+// Read current language from localStorage first, then Google Translate cookie
 (function(){
-  var m=document.cookie.match(/googtrans=\/en\/([^;]+)/);
-  if(m&&m[1]){
-    fpCurrent=decodeURIComponent(m[1]);
+  // Check localStorage for saved preference
+  var saved=localStorage.getItem('fpPreferredLang');
+  var savedLabel=localStorage.getItem('fpPreferredLangLabel');
+  
+  if(saved){
+    fpCurrent=saved;
+    // Ensure cookie matches localStorage
+    var cookieMatch=document.cookie.match(/googtrans=\/en\/([^;]+)/);
+    var cookieLang=cookieMatch?decodeURIComponent(cookieMatch[1]):null;
+    
+    if(cookieLang!==saved){
+      // Sync cookie with localStorage
+      var domain=location.hostname;
+      var expires=new Date();
+      expires.setFullYear(expires.getFullYear()+1);
+      var expStr=expires.toUTCString();
+      
+      if(saved==='en'){
+        // Clear cookie for English
+        document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain='+domain;
+        document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+      } else {
+        // Set cookie to match localStorage
+        var cookieVal='googtrans=/en/'+saved+'; expires='+expStr+'; path=/';
+        document.cookie=cookieVal+'; domain='+domain;
+        document.cookie=cookieVal;
+      }
+    }
+  } else {
+    // Fall back to reading from cookie
+    var m=document.cookie.match(/googtrans=\/en\/([^;]+)/);
+    if(m&&m[1]){
+      fpCurrent=decodeURIComponent(m[1]);
+    }
+  }
+  
+  // Update label on page load
+  if(fpCurrent!=='en'){
     var l=FP_LANGS.find(function(x){return x.c===fpCurrent;});
-    if(l) document.addEventListener('DOMContentLoaded',function(){
-      var el=document.getElementById('fp-lang-label');
-      if(el) el.textContent=l.e;
-    });
+    if(l){
+      document.addEventListener('DOMContentLoaded',function(){
+        var el=document.getElementById('fp-lang-label');
+        if(el) el.textContent=l.e;
+      });
+    }
   }
 })();
 
@@ -184,20 +221,37 @@ function fpSetLang(code, label){
   document.getElementById('fp-lang-menu').classList.remove('open');
   fpOpen=false;
 
-  // Set Google Translate cookie then reload — most reliable method
+  // Save to localStorage for persistence
+  localStorage.setItem('fpPreferredLang', code);
+  localStorage.setItem('fpPreferredLangLabel', label);
+
+  // Set Google Translate cookies with proper expiration
   var domain=location.hostname;
-  // Clear old cookie
+  var expires=new Date();
+  expires.setFullYear(expires.getFullYear()+1); // 1 year expiry
+  var expStr=expires.toUTCString();
+  
+  // Clear ALL possible Google Translate cookies
   document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain='+domain;
   document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+  document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.'+domain;
+  
   if(code==='en'){
-    // Restore to English — just clear cookie and reload
-    location.reload();
+    // Restore to English — clear all translation cookies
+    localStorage.removeItem('fpPreferredLang');
+    localStorage.removeItem('fpPreferredLangLabel');
+    // Force reload to clear translation
+    location.href=location.pathname+'?lang=en&t='+Date.now();
     return;
   }
-  // Set new language cookie
-  document.cookie='googtrans=/en/'+code+'; path=/; domain='+domain;
-  document.cookie='googtrans=/en/'+code+'; path=/';
-  location.reload();
+  
+  // Set new language cookie with long expiry
+  var cookieVal='googtrans=/en/'+code+'; expires='+expStr+'; path=/';
+  document.cookie=cookieVal+'; domain='+domain;
+  document.cookie=cookieVal;
+  
+  // Force reload with cache bust
+  location.href=location.pathname+'?lang='+code+'&t='+Date.now();
 }
 
 // Close on outside click
@@ -216,6 +270,36 @@ function googleTranslateElementInit(){
     pageLanguage:'en',
     autoDisplay:false
   },'google_translate_element');
+  
+  // Prevent Google Translate from auto-switching language
+  // Watch for cookie changes and restore user preference
+  var checkInterval=setInterval(function(){
+    var saved=localStorage.getItem('fpPreferredLang');
+    if(saved){
+      var m=document.cookie.match(/googtrans=\/en\/([^;]+)/);
+      var current=m?decodeURIComponent(m[1]):'en';
+      
+      if(current!==saved){
+        // Cookie was changed externally, restore user preference
+        var domain=location.hostname;
+        var expires=new Date();
+        expires.setFullYear(expires.getFullYear()+1);
+        var expStr=expires.toUTCString();
+        
+        if(saved==='en'){
+          document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain='+domain;
+          document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+        } else {
+          var cookieVal='googtrans=/en/'+saved+'; expires='+expStr+'; path=/';
+          document.cookie=cookieVal+'; domain='+domain;
+          document.cookie=cookieVal;
+        }
+      }
+    }
+  }, 500);
+  
+  // Stop checking after 10 seconds
+  setTimeout(function(){clearInterval(checkInterval);}, 10000);
 }
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
