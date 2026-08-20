@@ -3520,11 +3520,12 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Brand -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Brand</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Brand</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Site logo and branding elements</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <!-- Logo uploader -->
                                     <div x-data="imageUploader('site_logo_url', '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>')">
-                                        <label class="block text-xs font-medium text-dark/60 mb-2">Logo Image</label>
+                                        <label class="block text-[12px] font-semibold text-dark mb-2">Logo Image</label>
                                         <div
                                             class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
                                             :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
@@ -3597,9 +3598,10 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Hero / Headline -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Hero Section</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Hero Section</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Main headline and tagline displayed at the top</p>
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/60 mb-1.5">Main Headline</label>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Main Headline</label>
                                     <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                     <p class="text-[11px] text-dark/30 mt-1">Large centered text on homepage.</p>
@@ -3608,9 +3610,10 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards Section (below posters)</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Role Cards Section</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Section heading displayed below film posters</p>
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Heading</label>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Section Heading</label>
                                     <input type="text" x-model="form.landing_roles_heading" placeholder="Become a Star in 3 Clicks"
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                     <p class="text-[11px] text-dark/30 mt-1">Big bold heading above the Actor / Director / Writer cards.</p>
@@ -3619,7 +3622,8 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Posters -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Film Poster Cards (10 slots)</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Film Poster Cards</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Up to 10 poster slots with images, trailers, and titles</p>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <?php
                                     $posterSlots = [
@@ -3808,7 +3812,7 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Horizontal Auto-Play Trailer -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-1">Horizontal Auto-Play Trailer</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Horizontal Auto-Play Trailer</h5>
                                 <p class="text-[11px] text-dark/40 mb-3">Full-width horizontal video player displayed below the three posters. Auto-plays on page load.</p>
                                 
                                 <div class="bg-dark/[.025] rounded-xl p-4" x-data="videoUploader('landing_hero_trailer_url', '<?= addslashes(htmlspecialchars($settingsModel->get('landing_hero_trailer_url', ''))) ?>')">
@@ -3915,7 +3919,7 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Manifesto Videos -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-1">Manifesto Video Slider</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Manifesto Video Slider</h5>
                                 <p class="text-[11px] text-dark/40 mb-3">YouTube links shown between the film posters and role cards. Desktop shows 3 at a time, mobile shows 1.</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                     <div class="md:col-span-2">
@@ -3945,7 +3949,8 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: About -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">About Section</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">About Section</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Brief company information and description</p>
                                 <div class="space-y-3">
                                     <div>
                                         <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Label <span class="text-dark/30">(leave blank to hide)</span></label>
@@ -3987,8 +3992,8 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards (Writer, Director, Actor)</p>
-                                <p class="text-xs text-dark/40 mb-4">Leave title blank to hide entire card. <strong>Descriptions support:</strong> Regular line breaks (use \n) OR numbered lists (type "1. Item" on each line)</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Role Cards (Writer, Director, Actor)</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Leave title blank to hide entire card. <strong>Descriptions support:</strong> Regular line breaks (use \n) OR numbered lists (type "1. Item" on each line)</p>
                                 
                                 <div class="space-y-6">
                                     <!-- WRITER -->
@@ -4300,8 +4305,8 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: Marquee -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Scrolling Marquee Text</p>
-                                <p class="text-xs text-dark/40 mb-4">Up to 10 text items. Leave blank to hide. If all blank, defaults to original text.</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Scrolling Marquee Text</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Up to 10 text items. Leave blank to hide. If all blank, defaults to original text.</p>
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
                                     <?php for ($mi = 1; $mi <= 10; $mi++): ?>
                                     <div>
