@@ -2083,6 +2083,18 @@ class AdminController
             'director_preview_video_url', 'director_script_image_url', 'director_script_pdf_url',
             // Writer page media
             'writer_preview_video_url',   'writer_script_image_url',   'writer_script_pdf_url',
+            // About section
+            'about_section_label', 'about_section_heading',
+            // Role cards
+            'role_writer_title', 'role_writer_icon', 'role_writer_description',
+            'role_writer_badge1', 'role_writer_badge2', 'role_writer_button_text', 'role_writer_button_url',
+            'role_director_title', 'role_director_icon', 'role_director_description',
+            'role_director_badge1', 'role_director_badge2', 'role_director_button_text', 'role_director_button_url',
+            'role_actor_title', 'role_actor_icon', 'role_actor_description',
+            'role_actor_badge1', 'role_actor_badge2', 'role_actor_button_text', 'role_actor_button_url',
+            // Marquee items
+            'marquee_item1', 'marquee_item2', 'marquee_item3', 'marquee_item4', 'marquee_item5',
+            'marquee_item6', 'marquee_item7', 'marquee_item8', 'marquee_item9', 'marquee_item10',
         ];
 
         if (!in_array($key, $allowed)) {
