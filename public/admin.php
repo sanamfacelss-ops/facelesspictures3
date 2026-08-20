@@ -1537,26 +1537,27 @@ if (file_exists($errorLogFile)) {
                         <p class="text-[12px] text-blue-700">Dialog briefs, song brief, director brief and writer brief are now managed under <a href="#" @click.prevent="activeTab='settings'" class="font-semibold underline">Settings → Audition Briefs</a>. Scripts here are additional optional scripts attached to cards.</p>
                     </div>
 
-                    <!-- Create New Script Button -->
-                    <div class="mb-5 flex justify-start sm:justify-end">
-                        <button @click="showScriptModal = true; editingScript = null; scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' }; songEntries = [{ label: '', url: '' }]; if (typeof window.setScriptVideo === 'function') window.setScriptVideo(''); if (typeof window.setScriptPdf === 'function') window.setScriptPdf(''); if (typeof window.setScriptImage === 'function') window.setScriptImage('');" 
-                            type="button"
-                            class="bg-crimson text-white px-4 py-2 rounded-lg font-medium hover:bg-crimson/90 transition flex items-center gap-2 text-sm shadow-md">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Create New Script
-                        </button>
-                    </div>
-
                     <!-- Scripts List (Full Width) -->
                     <div>
-                        <!-- Filter -->
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button @click="scriptFilter = 'all'" :class="scriptFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">All</button>
-                            <button @click="scriptFilter = 'actor'" :class="scriptFilter === 'actor' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Actor</button>
-                            <button @click="scriptFilter = 'director'" :class="scriptFilter === 'director' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Director</button>
-                            <button @click="scriptFilter = 'writer'" :class="scriptFilter === 'writer' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Writer</button>
+                        <!-- Filter and Create Button Row -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                            <!-- Filter Buttons -->
+                            <div class="flex flex-wrap gap-2">
+                                <button @click="scriptFilter = 'all'" :class="scriptFilter === 'all' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">All</button>
+                                <button @click="scriptFilter = 'actor'" :class="scriptFilter === 'actor' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Actor</button>
+                                <button @click="scriptFilter = 'director'" :class="scriptFilter === 'director' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Director</button>
+                                <button @click="scriptFilter = 'writer'" :class="scriptFilter === 'writer' ? 'bg-crimson text-white' : 'bg-white text-dark/60 hover:bg-cream'" class="px-3 py-1.5 rounded-lg text-[12px] font-medium transition">Writer</button>
+                            </div>
+                            
+                            <!-- Create New Script Button -->
+                            <button @click="showScriptModal = true; editingScript = null; scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' }; songEntries = [{ label: '', url: '' }]; if (typeof window.setScriptVideo === 'function') window.setScriptVideo(''); if (typeof window.setScriptPdf === 'function') window.setScriptPdf(''); if (typeof window.setScriptImage === 'function') window.setScriptImage('');" 
+                                type="button"
+                                class="bg-crimson text-white px-4 py-2 rounded-lg font-medium hover:bg-crimson/90 transition flex items-center justify-center gap-2 text-sm shadow-md whitespace-nowrap">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Create New Script
+                            </button>
                         </div>
 
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
