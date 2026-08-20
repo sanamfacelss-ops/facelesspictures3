@@ -1696,8 +1696,8 @@ if (file_exists($errorLogFile)) {
                                             </h4>
                                             <div class="space-y-3">
                                                 <!-- Card Image -->
-                                                <div x-data="scriptImagePicker()" x-init="init()">
-                                                    <label class="block text-[12px] text-dark/50 mb-1.5">Card Poster Image</label>
+                                                <div x-data="scriptImagePicker()" x-init="init()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5">
+                                                    <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Card Poster Image</label>
                                                     <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:100px">
                                                         <img :src="scriptForm.image_url" loading="lazy" class="w-full h-full object-cover">
                                                         <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
@@ -1752,8 +1752,8 @@ if (file_exists($errorLogFile)) {
                                                 </div>
 
                                                 <!-- Video Upload -->
-                                                <div x-data="scriptVideoUploader()">
-                                                    <label class="block text-[12px] text-dark/50 mb-1.5">Preview Video</label>
+                                                <div x-data="scriptVideoUploader()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5">
+                                                    <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Preview Video</label>
                                                     <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[11px]">
                                                         <button type="button" @click="mode='upload'" :class="mode==='upload'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'" class="flex-1 py-1.5 font-medium transition">Upload</button>
                                                         <button type="button" @click="mode='youtube'" :class="mode==='youtube'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'" class="flex-1 py-1.5 font-medium transition">YouTube</button>
@@ -1795,8 +1795,8 @@ if (file_exists($errorLogFile)) {
                                                 </div>
 
                                                 <!-- PDF Upload -->
-                                                <div x-data="scriptPdfUploader()">
-                                                    <label class="block text-[12px] text-dark/50 mb-1.5">Script PDF</label>
+                                                <div x-data="scriptPdfUploader()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5">
+                                                    <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Script PDF</label>
                                                     <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'" style="min-height:60px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.pdfPick.click()">
                                                         <input type="file" x-ref="pdfPick" class="hidden" accept="application/pdf" @change="onFile($event)">
                                                         <template x-if="!preview&&!uploading">
