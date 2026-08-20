@@ -1700,13 +1700,10 @@ if (file_exists($errorLogFile)) {
                                                     <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Card Poster Image</label>
                                                     <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10 group" style="aspect-ratio:16/9;max-height:100px">
                                                         <img :src="scriptForm.image_url" loading="lazy" class="w-full h-full object-cover">
-                                                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                            <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
-                                                                class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center gap-1.5 text-[11px] font-medium transition shadow-lg">
-                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                                Delete
-                                                            </button>
-                                                        </div>
+                                                        <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
+                                                            class="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                        </button>
                                                     </div>
                                                     <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[11px]">
                                                         <button type="button" @click="pickerTab='upload'"
