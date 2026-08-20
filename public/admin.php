@@ -1613,11 +1613,11 @@ if (file_exists($errorLogFile)) {
                         x-cloak
                         @keydown.escape.window="showScriptModal = false"
                         @click.self="showScriptModal = false; cancelEditScript()"
-                        class="fixed inset-0 z-50 flex items-start justify-center px-4 py-8 overflow-y-auto bg-black/50 backdrop-blur-sm"
+                        class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm overflow-hidden"
                         style="margin: 0;">
                         
                         <div @click.stop 
-                            class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl my-8"
+                            class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 transform scale-95"
                             x-transition:enter-end="opacity-100 transform scale-100"
