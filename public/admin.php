@@ -1694,7 +1694,7 @@ if (file_exists($errorLogFile)) {
                                                 <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                                 Media Files
                                             </h4>
-                                            <div class="space-y-3">
+                                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                                 <!-- Card Image -->
                                                 <div x-data="scriptImagePicker()" x-init="init()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5">
                                                     <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Card Poster Image</label>
@@ -1705,50 +1705,38 @@ if (file_exists($errorLogFile)) {
                                                             <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                                         </button>
                                                     </div>
-                                                    <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[11px]">
-                                                        <button type="button" @click="pickerTab='upload'"
-                                                            :class="pickerTab==='upload' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
-                                                            class="flex-1 py-1.5 font-medium transition">Upload</button>
-                                                        <button type="button" @click="pickerTab='gallery'; loadGallery()"
-                                                            :class="pickerTab==='gallery' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
-                                                            class="flex-1 py-1.5 font-medium transition">Gallery</button>
-                                                    </div>
-                                                    <div x-show="pickerTab==='upload'">
-                                                        <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden"
-                                                            :class="uploadDragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
-                                                            style="min-height:70px"
-                                                            @dragover.prevent="uploadDragging=true"
-                                                            @dragleave.prevent="uploadDragging=false"
-                                                            @drop.prevent="onDrop($event)"
-                                                            @click="$refs.imgPick.click()">
-                                                            <input type="file" x-ref="imgPick" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/svg+xml,image/bmp" @change="onFile($event)">
-                                                            <template x-if="!uploadProgress && !uploadError">
-                                                                <div class="flex flex-col items-center justify-center gap-1 p-3 text-center">
-                                                                    <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                                    <p class="text-[11px] text-dark/40">Drop or browse</p>
+                                                    <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden"
+                                                        :class="uploadDragging ? 'border-crimson bg-crimson/5' : 'border-dashed border-dark/20 hover:border-crimson hover:bg-crimson/5 bg-white'"
+                                                        style="min-height:100px"
+                                                        @dragover.prevent="uploadDragging=true"
+                                                        @dragleave.prevent="uploadDragging=false"
+                                                        @drop.prevent="onDrop($event)"
+                                                        @click="$refs.imgPick.click()">
+                                                        <input type="file" x-ref="imgPick" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/svg+xml,image/bmp" @change="onFile($event)">
+                                                        <template x-if="!uploadProgress && !uploadError">
+                                                            <div class="flex flex-col items-center justify-center gap-2 p-4 text-center">
+                                                                <div class="w-10 h-10 rounded-full bg-crimson/10 flex items-center justify-center">
+                                                                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                                                 </div>
-                                                            </template>
-                                                            <template x-if="uploadProgress > 0 && uploadProgress < 100">
-                                                                <div class="flex items-center justify-center p-3">
-                                                                    <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden">
-                                                                        <div class="h-full bg-dark rounded-full transition-all" :style="'width:'+uploadProgress+'%'"></div>
+                                                                <div>
+                                                                    <p class="text-[13px] font-medium text-dark mb-0.5">Click to upload image</p>
+                                                                    <p class="text-[10px] text-dark/40">or drag and drop here</p>
+                                                                </div>
+                                                                <p class="text-[10px] text-dark/30 mt-1">JPEG, PNG, WebP, GIF, SVG, BMP</p>
+                                                            </div>
+                                                        </template>
+                                                        <template x-if="uploadProgress > 0 && uploadProgress < 100">
+                                                            <div class="flex items-center justify-center p-4">
+                                                                <div class="w-full max-w-[200px]">
+                                                                    <div class="w-full bg-dark/10 rounded-full h-1.5 overflow-hidden">
+                                                                        <div class="h-full bg-crimson rounded-full transition-all" :style="'width:'+uploadProgress+'%'"></div>
                                                                     </div>
+                                                                    <p class="text-[10px] text-center text-dark/40 mt-1" x-text="uploadProgress + '%'"></p>
                                                                 </div>
-                                                            </template>
-                                                        </div>
-                                                        <template x-if="uploadError"><p class="text-[10px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                            </div>
+                                                        </template>
                                                     </div>
-                                                    <div x-show="pickerTab==='gallery'">
-                                                        <template x-if="galleryLoading"><p class="text-[11px] text-dark/30 text-center py-3">Loading...</p></template>
-                                                        <template x-if="!galleryLoading && galleryImages.length === 0"><p class="text-[11px] text-dark/30 text-center py-3">No images yet</p></template>
-                                                        <div x-show="!galleryLoading && galleryImages.length > 0" class="grid grid-cols-4 gap-1.5 max-h-32 overflow-y-auto rounded-lg border border-dark/10 p-2 bg-dark/[.015]">
-                                                            <template x-for="img in galleryImages" :key="img.url">
-                                                                <button type="button" @click="selectFromGallery(img.url)" class="relative rounded-lg overflow-hidden border-2 transition aspect-square" :class="img.url === scriptForm.image_url ? 'border-dark' : 'border-transparent hover:border-dark/30'">
-                                                                    <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
-                                                                </button>
-                                                            </template>
-                                                        </div>
-                                                    </div>
+                                                    <template x-if="uploadError"><p class="text-[10px] text-red-500 mt-1" x-text="uploadError"></p></template>
                                                 </div>
 
                                                 <!-- Video Upload -->
@@ -1759,24 +1747,33 @@ if (file_exists($errorLogFile)) {
                                                         <button type="button" @click="mode='youtube'" :class="mode==='youtube'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'" class="flex-1 py-1.5 font-medium transition">YouTube</button>
                                                     </div>
                                                     <div x-show="mode==='upload'">
-                                                        <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'" style="min-height:60px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
+                                                        <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-crimson bg-crimson/5':'border-dashed border-dark/20 hover:border-crimson hover:bg-crimson/5 bg-white'" style="min-height:100px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
                                                             <input type="file" x-ref="vidPick" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
                                                             <template x-if="!preview&&!uploading">
-                                                                <div class="flex flex-col items-center justify-center gap-1 p-2.5 text-center">
-                                                                    <svg class="w-4 h-4 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                                                    <p class="text-[10px] text-dark/40">Upload video</p>
+                                                                <div class="flex flex-col items-center justify-center gap-2 p-4 text-center">
+                                                                    <div class="w-10 h-10 rounded-full bg-crimson/10 flex items-center justify-center">
+                                                                        <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                                    </div>
+                                                                    <div>
+                                                                        <p class="text-[13px] font-medium text-dark mb-0.5">Click to upload video</p>
+                                                                        <p class="text-[10px] text-dark/40">or drag and drop here</p>
+                                                                    </div>
+                                                                    <p class="text-[10px] text-dark/30 mt-1">MP4, MOV, WebM</p>
                                                                 </div>
                                                             </template>
                                                             <template x-if="uploading">
-                                                                <div class="flex items-center justify-center gap-2 p-2.5">
-                                                                    <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div>
+                                                                <div class="flex items-center justify-center p-4">
+                                                                    <div class="w-full max-w-[200px]">
+                                                                        <div class="w-full bg-dark/10 rounded-full h-1.5 overflow-hidden"><div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div></div>
+                                                                        <p class="text-[10px] text-center text-dark/40 mt-1" x-text="progress + '%'"></p>
+                                                                    </div>
                                                                 </div>
                                                             </template>
                                                             <template x-if="preview&&!uploading&&!isYoutube(preview)">
-                                                                <div class="flex items-center gap-2 px-2.5 py-2">
-                                                                    <div class="w-6 h-6 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-                                                                    <p class="text-[11px] font-medium text-dark truncate flex-1" x-text="filename||'Video'"></p>
-                                                                    <button type="button" @click.stop="clear()" class="w-4 h-4 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[9px]">✕</button>
+                                                                <div class="flex items-center gap-2 px-3 py-2.5">
+                                                                    <div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                                                                    <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'Video uploaded'"></p>
+                                                                    <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
                                                                 </div>
                                                             </template>
                                                         </div>
@@ -1784,7 +1781,7 @@ if (file_exists($errorLogFile)) {
                                                     </div>
                                                     <div x-show="mode==='youtube'">
                                                         <div class="flex gap-2 items-center">
-                                                            <input type="url" x-model="ytUrl" @input="onYtInput()" class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson" placeholder="YouTube URL">
+                                                            <input type="url" x-model="ytUrl" @input="onYtInput()" class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson" placeholder="Paste YouTube URL here">
                                                             <button type="button" x-show="ytUrl" @click="clearYt()" class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px] flex-shrink-0">✕</button>
                                                         </div>
                                                         <div x-show="ytUrl && isYoutube(ytUrl)" class="mt-2 rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:9/16;max-height:150px">
@@ -1795,22 +1792,35 @@ if (file_exists($errorLogFile)) {
                                                 </div>
 
                                                 <!-- PDF Upload -->
-                                                <div x-data="scriptPdfUploader()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5">
+                                                <div x-data="scriptPdfUploader()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5 lg:col-span-2">
                                                     <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Script PDF</label>
-                                                    <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'" style="min-height:60px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.pdfPick.click()">
+                                                    <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-crimson bg-crimson/5':'border-dashed border-dark/20 hover:border-crimson hover:bg-crimson/5 bg-white'" style="min-height:100px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.pdfPick.click()">
                                                         <input type="file" x-ref="pdfPick" class="hidden" accept="application/pdf" @change="onFile($event)">
                                                         <template x-if="!preview&&!uploading">
-                                                            <div class="flex flex-col items-center justify-center gap-1 p-2.5 text-center">
-                                                                <svg class="w-4 h-4 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                                                <p class="text-[10px] text-dark/40">Upload PDF</p>
+                                                            <div class="flex flex-col items-center justify-center gap-2 p-4 text-center">
+                                                                <div class="w-10 h-10 rounded-full bg-crimson/10 flex items-center justify-center">
+                                                                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                                </div>
+                                                                <div>
+                                                                    <p class="text-[13px] font-medium text-dark mb-0.5">Click to upload PDF</p>
+                                                                    <p class="text-[10px] text-dark/40">or drag and drop here</p>
+                                                                </div>
+                                                                <p class="text-[10px] text-dark/30 mt-1">PDF format only</p>
                                                             </div>
                                                         </template>
-                                                        <template x-if="uploading"><div class="flex items-center justify-center p-2.5"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
+                                                        <template x-if="uploading">
+                                                            <div class="flex items-center justify-center p-4">
+                                                                <div class="w-full max-w-[200px]">
+                                                                    <div class="w-full bg-dark/10 rounded-full h-1.5 overflow-hidden"><div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div></div>
+                                                                    <p class="text-[10px] text-center text-dark/40 mt-1" x-text="progress + '%'"></p>
+                                                                </div>
+                                                            </div>
+                                                        </template>
                                                         <template x-if="preview&&!uploading">
-                                                            <div class="flex items-center gap-2 px-2.5 py-2">
-                                                                <div class="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center text-[9px] font-bold text-red-600 flex-shrink-0">PDF</div>
-                                                                <p class="text-[11px] font-medium text-dark truncate flex-1" x-text="filename||'PDF'"></p>
-                                                                <button type="button" @click.stop="clear()" class="w-4 h-4 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[9px]">✕</button>
+                                                            <div class="flex items-center gap-2 px-3 py-2.5">
+                                                                <div class="w-8 h-8 rounded bg-red-50 border border-red-200 flex items-center justify-center text-[10px] font-bold text-red-600 flex-shrink-0">PDF</div>
+                                                                <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p>
+                                                                <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
                                                             </div>
                                                         </template>
                                                     </div>
