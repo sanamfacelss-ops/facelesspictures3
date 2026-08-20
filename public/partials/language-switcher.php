@@ -135,32 +135,46 @@ var fpCurrent='en';
   if(saved){
     fpCurrent=saved;
     // Ensure cookie matches localStorage
-    var cookieMatch=document.cookie.match(/googtrans=\/en\/([^;]+)/);
+    var cookieMatch=document.cookie.match(/googtrans=\/[^\/]+\/([^;]+)/);
     var cookieLang=cookieMatch?decodeURIComponent(cookieMatch[1]):null;
     
-    if(cookieLang!==saved){
-      // Sync cookie with localStorage
+    if(saved==='en' && cookieLang && cookieLang!=='en'){
+      // localStorage says English but cookie is another language - force clear
+      var domain=location.hostname;
+      var rootDomain=domain.split('.').slice(-2).join('.');
+      var expirePast='Thu, 01 Jan 1970 00:00:00 UTC';
+      
+      document.cookie='googtrans=; expires='+expirePast+'; path=/';
+      document.cookie='googtrans=; expires='+expirePast+'; path=/; domain='+domain;
+      document.cookie='googtrans=; expires='+expirePast+'; path=/; domain=.'+domain;
+      document.cookie='googtrans=; expires='+expirePast+'; path=/; domain='+rootDomain;
+      document.cookie='googtrans=; expires='+expirePast+'; path=/; domain=.'+rootDomain;
+      
+      localStorage.removeItem('fpPreferredLang');
+      localStorage.removeItem('fpPreferredLangLabel');
+      location.reload();
+      return;
+    }
+    
+    if(cookieLang!==saved && saved!=='en'){
+      // Sync cookie with localStorage for non-English
       var domain=location.hostname;
       var expires=new Date();
       expires.setFullYear(expires.getFullYear()+1);
       var expStr=expires.toUTCString();
       
-      if(saved==='en'){
-        // Clear cookie for English
-        document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain='+domain;
-        document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
-      } else {
-        // Set cookie to match localStorage
-        var cookieVal='googtrans=/en/'+saved+'; expires='+expStr+'; path=/';
-        document.cookie=cookieVal+'; domain='+domain;
-        document.cookie=cookieVal;
-      }
+      var cookieVal='googtrans=/en/'+saved+'; expires='+expStr+'; path=/';
+      document.cookie=cookieVal+'; domain='+domain;
+      document.cookie=cookieVal;
     }
   } else {
-    // Fall back to reading from cookie
-    var m=document.cookie.match(/googtrans=\/en\/([^;]+)/);
+    // No localStorage - check if there's a cookie and it's not English
+    var m=document.cookie.match(/googtrans=\/[^\/]+\/([^;]+)/);
     if(m&&m[1]){
-      fpCurrent=decodeURIComponent(m[1]);
+      var lang=decodeURIComponent(m[1]);
+      if(lang!=='en'){
+        fpCurrent=lang;
+      }
     }
   }
   
@@ -230,22 +244,50 @@ function fpSetLang(code, label){
     localStorage.setItem('fpPreferredLangLabel', label);
   }
 
-  // Set Google Translate cookies
+  // Aggressive cookie clearing for ALL Google Translate cookies (Firefox needs this)
   var domain=location.hostname;
+  var rootDomain=domain.split('.').slice(-2).join('.');
   var expires=new Date();
   expires.setFullYear(expires.getFullYear()+1);
   var expStr=expires.toUTCString();
+  var expirePast='Thu, 01 Jan 1970 00:00:00 UTC';
+  
+  // Clear ALL possible Google Translate cookies
+  var clearCookies=[
+    'googtrans=/auto/en',
+    'googtrans=/en/en', 
+    'googtrans=/auto/hi',
+    'googtrans=/en/hi'
+  ];
+  
+  clearCookies.forEach(function(c){
+    document.cookie=c+'; expires='+expirePast+'; path=/';
+    document.cookie=c+'; expires='+expirePast+'; path=/; domain='+domain;
+    document.cookie=c+'; expires='+expirePast+'; path=/; domain=.'+domain;
+    document.cookie=c+'; expires='+expirePast+'; path=/; domain='+rootDomain;
+    document.cookie=c+'; expires='+expirePast+'; path=/; domain=.'+rootDomain;
+  });
   
   if(code==='en'){
-    // Clear cookie for English
-    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    // For English: clear everything and reload
+    document.cookie='googtrans=; expires='+expirePast+'; path=/';
+    document.cookie='googtrans=; expires='+expirePast+'; path=/; domain='+domain;
+    document.cookie='googtrans=; expires='+expirePast+'; path=/; domain=.'+domain;
+    document.cookie='googtrans=; expires='+expirePast+'; path=/; domain='+rootDomain;
+    document.cookie='googtrans=; expires='+expirePast+'; path=/; domain=.'+rootDomain;
+    
+    // Redirect to clean URL to force full reset
+    window.location.href=location.pathname+'?nocache='+Date.now();
   } else {
-    // Set language cookie
-    document.cookie='googtrans=/en/'+code+'; expires='+expStr+'; path=/';
+    // Set new language cookie with multiple domain variants for Firefox
+    var cookieVal='googtrans=/en/'+code;
+    document.cookie=cookieVal+'; expires='+expStr+'; path=/';
+    document.cookie=cookieVal+'; expires='+expStr+'; path=/; domain='+domain;
+    document.cookie=cookieVal+'; expires='+expStr+'; path=/; domain=.'+domain;
+    
+    // Force hard reload
+    location.reload(true);
   }
-  
-  // Fast reload without cache bust
-  location.reload(true);
 }
 
 // Close on outside click
