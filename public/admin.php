@@ -5520,6 +5520,15 @@ if (file_exists($errorLogFile)) {
                     this.scriptForm.script_pdf_url = url;
                 };
                 
+                // Lock/unlock body scroll when modal opens/closes
+                this.$watch('showScriptModal', (isOpen) => {
+                    if (isOpen) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+                
                 // Initial refresh
                 this.silentRefreshVideos();
                 
