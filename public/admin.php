@@ -3947,6 +3947,21 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- SECTION: Marquee Text -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Scrolling Marquee Text</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Up to 10 text items shown in scrolling animation on home page. Leave blank to hide. If all blank, defaults to original text.</p>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                                    <?php for ($mi = 1; $mi <= 10; $mi++): ?>
+                                    <div>
+                                        <label class="block text-[9px] text-dark/40 mb-1">Item <?= $mi ?></label>
+                                        <input type="text" x-model="form.marquee_item<?= $mi ?>" placeholder="TEXT"
+                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                    </div>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+
                             <!-- SECTION: About -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">About Section</h5>
@@ -4300,21 +4315,6 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- SECTION: Marquee -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Scrolling Marquee Text</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Up to 10 text items. Leave blank to hide. If all blank, defaults to original text.</p>
-                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                                    <?php for ($mi = 1; $mi <= 10; $mi++): ?>
-                                    <div>
-                                        <label class="block text-[9px] text-dark/40 mb-1">Item <?= $mi ?></label>
-                                        <input type="text" x-model="form.marquee_item<?= $mi ?>" placeholder="TEXT"
-                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                    </div>
-                                    <?php endfor; ?>
                                 </div>
                             </div>
 
