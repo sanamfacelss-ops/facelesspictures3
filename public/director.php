@@ -7,6 +7,13 @@ $logoUrl         = $settingsModel->get('site_logo_url', '');
 $directorBrief   = $settingsModel->get('director_brief', 'You have one actor, one phone camera, and a single location. Cast an actor, give them the script, and shoot the scene.');
 $directorScripts = $scriptModel->byCategory('director');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
+
+// Page text settings
+$heroLabel       = $settingsModel->get('director_hero_label', 'Auditions Now Open');
+$heroHeading     = $settingsModel->get('director_hero_heading', 'DIRECTOR AUDITIONS');
+$heroDescription = $settingsModel->get('director_hero_description', 'CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION.');
+$formHeading     = $settingsModel->get('director_form_heading', 'Ready to Direct? Submit Your Scene');
+$formDescription = $settingsModel->get('director_form_description', 'Cast your actor, give them the script, shoot the scene, and upload your video.');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -76,9 +83,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 <!-- HERO -->
 <section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
-  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Submissions Now Open</p>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap">DIRECTOR AUDITIONS</h1>
-  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($directorBrief) ?></p>
+  <?php if (!empty($heroLabel)): ?>
+  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
+  <?php endif; ?>
+  <?php if (!empty($heroHeading)): ?>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
+  <?php endif; ?>
+  <?php if (!empty($heroDescription)): ?>
+  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($heroDescription) ?></p>
+  <?php endif; ?>
 </section>
 
 <!-- BRIEF CARD + SUBMISSION — side by side on desktop -->
@@ -158,8 +171,12 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
   <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
   <div class="submit-card" style="margin:0" x-data="directorSubmit()">
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Direct? Submit Your Scene</p>
-    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55">Cast your actor, give them the script, shoot the scene, and upload your video.</p>
+    <?php if (!empty($formHeading)): ?>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
+    <?php endif; ?>
+    <?php if (!empty($formDescription)): ?>
+    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= htmlspecialchars($formDescription) ?></p>
+    <?php endif; ?>
 
     <!-- Contact -->
     <div class="form3">

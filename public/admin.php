@@ -4016,6 +4016,125 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- SECTION: Role Page Text Settings -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Page Hero & Form Text</p>
+                                <p class="text-xs text-dark/40 mb-4">Control the text shown on Writer, Director, and Actor pages. Leave blank to hide sections.</p>
+                                
+                                <div class="space-y-6">
+                                    <!-- WRITER PAGE TEXT -->
+                                    <div class="p-4 bg-gray-50 rounded-lg">
+                                        <p class="text-xs font-bold text-dark/70 mb-3">✍️ WRITER PAGE</p>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Label <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.writer_hero_label" placeholder="Submissions Now Open"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Heading</label>
+                                                <input type="text" x-model="form.writer_hero_heading" placeholder="WRITER SUBMISSIONS"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Description</label>
+                                                <textarea x-model="form.writer_hero_description" rows="2" placeholder="READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO."
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
+                                                        <input type="text" x-model="form.writer_form_heading" placeholder="Ready to Write? Submit Your Continuation"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
+                                                        <textarea x-model="form.writer_form_description" rows="2" placeholder="Read the given script, write what happens next, then record yourself narrating it on camera."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- DIRECTOR PAGE TEXT -->
+                                    <div class="p-4 bg-gray-50 rounded-lg">
+                                        <p class="text-xs font-bold text-dark/70 mb-3">🎬 DIRECTOR PAGE</p>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Label <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.director_hero_label" placeholder="Auditions Now Open"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Heading</label>
+                                                <input type="text" x-model="form.director_hero_heading" placeholder="DIRECTOR AUDITIONS"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Description</label>
+                                                <textarea x-model="form.director_hero_description" rows="2" placeholder="CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION."
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
+                                                        <input type="text" x-model="form.director_form_heading" placeholder="Ready to Direct? Submit Your Scene"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
+                                                        <textarea x-model="form.director_form_description" rows="2" placeholder="Cast your actor, give them the script, shoot the scene, and upload your video."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ACTOR PAGE TEXT -->
+                                    <div class="p-4 bg-gray-50 rounded-lg">
+                                        <p class="text-xs font-bold text-dark/70 mb-3">🎭 ACTOR PAGE</p>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Label <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.actor_hero_label" placeholder="Auditions Now Open"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Heading</label>
+                                                <input type="text" x-model="form.actor_hero_heading" placeholder="ACTOR AUDITIONS"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Description</label>
+                                                <textarea x-model="form.actor_hero_description" rows="2" placeholder="Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos."
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
+                                                        <input type="text" x-model="form.actor_form_heading" placeholder="Ready to Perform? Submit Your Auditions"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
+                                                        <textarea x-model="form.actor_form_description" rows="2" placeholder="Shoot your dialog scene and song audition, then upload both videos below."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- SECTION: Marquee -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Scrolling Marquee Text</p>
@@ -7385,6 +7504,25 @@ if (file_exists($errorLogFile)) {
                 marquee_item8:  <?= json_encode($settingsModel->get('marquee_item8','NO FACE')) ?>,
                 marquee_item9:  <?= json_encode($settingsModel->get('marquee_item9','JUST TALENT')) ?>,
                 marquee_item10: <?= json_encode($settingsModel->get('marquee_item10','SUBMIT TODAY')) ?>,
+                
+                // Role page text settings (Writer, Director, Actor)
+                writer_hero_label:       <?= json_encode($settingsModel->get('writer_hero_label','Submissions Now Open')) ?>,
+                writer_hero_heading:     <?= json_encode($settingsModel->get('writer_hero_heading','WRITER SUBMISSIONS')) ?>,
+                writer_hero_description: <?= json_encode($settingsModel->get('writer_hero_description','READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO.')) ?>,
+                writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
+                writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
+                
+                director_hero_label:       <?= json_encode($settingsModel->get('director_hero_label','Auditions Now Open')) ?>,
+                director_hero_heading:     <?= json_encode($settingsModel->get('director_hero_heading','DIRECTOR AUDITIONS')) ?>,
+                director_hero_description: <?= json_encode($settingsModel->get('director_hero_description','CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION.')) ?>,
+                director_form_heading:     <?= json_encode($settingsModel->get('director_form_heading','Ready to Direct? Submit Your Scene')) ?>,
+                director_form_description: <?= json_encode($settingsModel->get('director_form_description','Cast your actor, give them the script, shoot the scene, and upload your video.')) ?>,
+                
+                actor_hero_label:       <?= json_encode($settingsModel->get('actor_hero_label','Auditions Now Open')) ?>,
+                actor_hero_heading:     <?= json_encode($settingsModel->get('actor_hero_heading','ACTOR AUDITIONS')) ?>,
+                actor_hero_description: <?= json_encode($settingsModel->get('actor_hero_description','Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.')) ?>,
+                actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
+                actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
             },
             init() {
                 // Sync uploaded image URLs back into the form

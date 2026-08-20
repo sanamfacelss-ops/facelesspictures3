@@ -2095,6 +2095,13 @@ class AdminController
             // Marquee items
             'marquee_item1', 'marquee_item2', 'marquee_item3', 'marquee_item4', 'marquee_item5',
             'marquee_item6', 'marquee_item7', 'marquee_item8', 'marquee_item9', 'marquee_item10',
+            // Role page text settings (hero and form sections for each role)
+            'writer_hero_label', 'writer_hero_heading', 'writer_hero_description',
+            'writer_form_heading', 'writer_form_description',
+            'director_hero_label', 'director_hero_heading', 'director_hero_description',
+            'director_form_heading', 'director_form_description',
+            'actor_hero_label', 'actor_hero_heading', 'actor_hero_description',
+            'actor_form_heading', 'actor_form_description',
         ];
 
         if (!in_array($key, $allowed)) {

@@ -7,6 +7,13 @@ $logoUrl       = $settingsModel->get('site_logo_url', '');
 $writerBrief   = $settingsModel->get('writer_brief', 'We give you the first half of a script. Your job: continue the story, write the second half, then record yourself narrating/performing it on camera.');
 $writerScripts = $scriptModel->byCategory('writer');
 $pageTitle = 'Writer Submissions — Faceless Pictures 3';
+
+// Page text settings
+$heroLabel       = $settingsModel->get('writer_hero_label', 'Submissions Now Open');
+$heroHeading     = $settingsModel->get('writer_hero_heading', 'WRITER SUBMISSIONS');
+$heroDescription = $settingsModel->get('writer_hero_description', 'READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO.');
+$formHeading     = $settingsModel->get('writer_form_heading', 'Ready to Write? Submit Your Continuation');
+$formDescription = $settingsModel->get('writer_form_description', 'Read the given script, write what happens next, then record yourself narrating it on camera.');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,9 +81,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 <!-- HERO -->
 <section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
-  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Submissions Now Open</p>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap">WRITER SUBMISSIONS</h1>
-  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($writerBrief) ?></p>
+  <?php if (!empty($heroLabel)): ?>
+  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
+  <?php endif; ?>
+  <?php if (!empty($heroHeading)): ?>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
+  <?php endif; ?>
+  <?php if (!empty($heroDescription)): ?>
+  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($heroDescription) ?></p>
+  <?php endif; ?>
 </section>
 
 <!-- BRIEF CARD + SUBMISSION — side by side on desktop -->
@@ -155,8 +168,12 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
   <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
   <div class="submit-card" style="margin:0" x-data="writerSubmit()">
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Write? Submit Your Continuation</p>
-    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55">Read the given script, write what happens next, then record yourself narrating it on camera.</p>
+    <?php if (!empty($formHeading)): ?>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
+    <?php endif; ?>
+    <?php if (!empty($formDescription)): ?>
+    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= htmlspecialchars($formDescription) ?></p>
+    <?php endif; ?>
 
     <!-- Contact -->
     <div class="form3">

@@ -23,6 +23,13 @@ if (empty($songScripts) && !empty($dialogScripts)) {
 
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 
+// Page text settings
+$heroLabel       = $settingsModel->get('actor_hero_label', 'Auditions Now Open');
+$heroHeading     = $settingsModel->get('actor_hero_heading', 'ACTOR AUDITIONS');
+$heroDescription = $settingsModel->get('actor_hero_description', 'Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.');
+$formHeading     = $settingsModel->get('actor_form_heading', 'Ready to Perform? Submit Your Auditions');
+$formDescription = $settingsModel->get('actor_form_description', 'Shoot your dialog scene and song audition, then upload both videos below.');
+
 // Film Song card text (admin-editable)
 $filmSongHeading  = $settingsModel->get('film_song_heading',  'FILM SONG');
 $filmSongSubtitle = $settingsModel->get('film_song_subtitle', 'Listen to the song before you record your audition');
@@ -173,9 +180,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 <!-- HERO -->
 <section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
-  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem">Auditions Now Open</p>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem">ACTOR AUDITIONS</h1>
-  <p style="color:#6b7280;font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.55">Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.</p>
+  <?php if (!empty($heroLabel)): ?>
+  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
+  <?php endif; ?>
+  <?php if (!empty($heroHeading)): ?>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem"><?= htmlspecialchars($heroHeading) ?></h1>
+  <?php endif; ?>
+  <?php if (!empty($heroDescription)): ?>
+  <p style="color:#6b7280;font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.55"><?= htmlspecialchars($heroDescription) ?></p>
+  <?php endif; ?>
 </section>
 
 <!-- TWO BRIEF CARDS (Dialog + Song) -->
@@ -360,8 +373,12 @@ if (!empty($songScripts)) {
 <!-- SUBMISSION CARD (full width, dark) -->
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
   <div class="submit-card" id="submit-form" x-data="actorSubmit()">
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:.3rem">Ready to Audition? Submit Both Videos</p>
-    <p style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem;line-height:1.55">Both dialog and song videos are required for a complete submission. One form, two videos, one chance.</p>
+    <?php if (!empty($formHeading)): ?>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
+    <?php endif; ?>
+    <?php if (!empty($formDescription)): ?>
+    <p style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem;line-height:1.55"><?= htmlspecialchars($formDescription) ?></p>
+    <?php endif; ?>
 
     <!-- Contact -->
     <div class="form3">
