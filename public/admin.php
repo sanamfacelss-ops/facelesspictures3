@@ -4313,6 +4313,26 @@ if (file_exists($errorLogFile)) {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Film Song Card (shown between audition cards and submit form)</p>
+                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Heading</label>
+                                                        <input type="text" x-model="form.film_song_heading" placeholder="FILM SONG"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Subtitle</label>
+                                                        <input type="text" x-model="form.film_song_subtitle" placeholder="Listen to the song before you record"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                        <input type="text" x-model="form.film_song_btn_label" placeholder="Get Song"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -4360,29 +4380,8 @@ if (file_exists($errorLogFile)) {
                                     <label class="block text-xs font-medium text-dark/50 mb-1">🎤 Actor — Song Brief</label>
                                     <textarea x-model="briefs.actor_song_script" rows="4" placeholder="Perform a 60-second song showing emotional range..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
                                 </div>
-                                <div class="md:col-span-2 border-t border-dark/5 pt-4 mt-1">
-                                    <p class="text-xs font-semibold text-dark/40 uppercase tracking-widest mb-1">🎵 Film Song Card</p>
-                                    <p class="text-[11px] text-dark/30 mb-3">Shown on /actor page between audition cards and submit form. Displays song links from scripts.</p>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-medium text-dark/50 mb-1">Heading</label>
-                                            <input type="text" x-model="briefs.film_song_heading" placeholder="FILM SONG" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                            <p class="text-[11px] text-dark/30 mt-1">Leave blank to use default "FILM SONG"</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-dark/50 mb-1">Subtitle</label>
-                                            <input type="text" x-model="briefs.film_song_subtitle" placeholder="Listen to the song before you record your audition" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                            <p class="text-[11px] text-dark/30 mt-1">Supporting text shown below the heading</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-dark/50 mb-1">Get Song Button Text</label>
-                                            <input type="text" x-model="briefs.film_song_btn_label" placeholder="Get Song" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30">
-                                            <p class="text-[11px] text-dark/30 mt-1">Text shown on the button. Leave blank for "Get Song"</p>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-dark/50 mb-1">🎬 Director Brief</label>
+                                    <label class="block text-xs font-medium text-dark/50 mb-1">� Director Brief</label>
                                     <textarea x-model="briefs.director_brief" rows="4" placeholder="You have one actor, one phone camera..." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30"></textarea>
                                 </div>
                                 <div>
@@ -7762,6 +7761,10 @@ if (file_exists($errorLogFile)) {
                 actor_hero_description: <?= json_encode($settingsModel->get('actor_hero_description','Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.')) ?>,
                 actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
+                // Film Song Card (shown on actor page)
+                film_song_heading:   <?= json_encode($settingsModel->get('film_song_heading','FILM SONG')) ?>,
+                film_song_subtitle:  <?= json_encode($settingsModel->get('film_song_subtitle','Listen to the song before you record your audition')) ?>,
+                film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','Get Song')) ?>,
             },
             init() {
                 // Sync uploaded image URLs back into the form
@@ -7801,9 +7804,6 @@ if (file_exists($errorLogFile)) {
                 actor_song_script:   <?= json_encode($settingsModel->get('actor_song_script','')) ?>,
                 director_brief:      <?= json_encode($settingsModel->get('director_brief','')) ?>,
                 writer_brief:        <?= json_encode($settingsModel->get('writer_brief','')) ?>,
-                film_song_heading:   <?= json_encode($settingsModel->get('film_song_heading','')) ?>,
-                film_song_subtitle:  <?= json_encode($settingsModel->get('film_song_subtitle','')) ?>,
-                film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','')) ?>,
             },
             async saveBriefs() {
                 this.saving = true; this.saved = false;
