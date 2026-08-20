@@ -1538,11 +1538,11 @@ if (file_exists($errorLogFile)) {
                     </div>
 
                     <!-- Create New Script Button -->
-                    <div class="mb-5">
+                    <div class="mb-5 flex justify-start sm:justify-end">
                         <button @click="showScriptModal = true; editingScript = null; scriptForm = { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', rules: '' }; songEntries = [{ label: '', url: '' }]; if (typeof window.setScriptVideo === 'function') window.setScriptVideo(''); if (typeof window.setScriptPdf === 'function') window.setScriptPdf(''); if (typeof window.setScriptImage === 'function') window.setScriptImage('');" 
                             type="button"
-                            class="bg-crimson text-white px-5 py-3 rounded-xl font-semibold hover:bg-crimson/90 transition flex items-center gap-2 shadow-lg shadow-crimson/20">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            class="bg-crimson text-white px-4 py-2 rounded-lg font-medium hover:bg-crimson/90 transition flex items-center gap-2 text-sm shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                             </svg>
                             Create New Script
@@ -1582,20 +1582,20 @@ if (file_exists($errorLogFile)) {
                                                     <p class="text-[10px] text-dark/30 mt-1" x-show="sc.duration_hint" x-text="'⏱ ' + sc.duration_hint"></p>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center gap-2 flex-shrink-0">
+                                            <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
                                                 <button @click="editScript(sc); showScriptModal = true" 
-                                                    class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition flex items-center gap-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-100 transition flex items-center gap-1">
+                                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                     </svg>
-                                                    Edit
+                                                    <span class="hidden xs:inline">Edit</span>
                                                 </button>
                                                 <button @click="openDeleteModal('script', sc.id, sc.title)" 
-                                                    class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition flex items-center gap-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-100 transition flex items-center gap-1">
+                                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
-                                                    Delete
+                                                    <span class="hidden xs:inline">Delete</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -5403,6 +5403,9 @@ if (file_exists($errorLogFile)) {
             videoFilter: 'all',
             userFilter: 'all',
             scriptFilter: 'all',
+            
+            // Script modal
+            showScriptModal: false,
             
             // Selected videos for bulk operations
             selectedVideos: [],
