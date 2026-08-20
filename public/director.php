@@ -104,8 +104,24 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
       <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1">DIRECTOR AUDITION</p>
     </div>
     <div class="card-sec" style="padding:0 0 1.5rem">
-      <?php if ($previewUrl): ?>
-        <video class="preview-video" controls muted preload="metadata"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
+      <?php 
+      $isYT = preg_match('/youtu(\.be|be\.com)/i', $previewUrl);
+      if ($previewUrl && $isYT): 
+        // YouTube embed
+        $embedUrl = $previewUrl;
+        if (preg_match('/youtu\.be\/([^?&#]+)/', $previewUrl, $m)) {
+          $embedUrl = 'https://www.youtube.com/embed/' . $m[1];
+        } elseif (preg_match('/[?&]v=([^&#]+)/', $previewUrl, $m)) {
+          $embedUrl = 'https://www.youtube.com/embed/' . $m[1];
+        } elseif (preg_match('/\/shorts\/([^?&#]+)/', $previewUrl, $m)) {
+          $embedUrl = 'https://www.youtube.com/embed/' . $m[1];
+        }
+      ?>
+        <div style="width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:#000">
+          <iframe src="<?= htmlspecialchars($embedUrl) ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%"></iframe>
+        </div>
+      <?php elseif ($previewUrl): ?>
+        <video class="preview-video" controls muted preload="metadata" style="width:100%;max-height:400px;object-fit:contain;background:#000"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
       <?php else: ?>
         <div class="video-placeholder">
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -120,7 +136,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     </div>
     <?php if ($scriptImage): ?>
     <div class="card-sec" style="padding:1.25rem 0 0;border-top:1px solid #e5e7eb;background:#fff">
-      <img src="<?= htmlspecialchars($scriptImage) ?>" alt="Director script" class="portrait-img">
+      <img src="<?= htmlspecialchars($scriptImage) ?>" alt="Director script" style="width:100%;height:auto;display:block;object-fit:contain;background:#fff">
     </div>
     <?php endif; ?>
     <div class="card-sec">
