@@ -486,7 +486,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
         <p class="role-name"><?= htmlspecialchars($roles['writer']['title']) ?></p>
         <?php if ($roles['writer']['description']): ?>
-        <p class="role-desc"><?= nl2br(htmlspecialchars($roles['writer']['description'])) ?></p>
+        <div class="role-desc"><?= format_text_content($roles['writer']['description']) ?></div>
         <?php endif; ?>
         <?php if ($roles['writer']['badge1'] || $roles['writer']['badge2']): ?>
         <div class="role-badges">
@@ -510,7 +510,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
         <p class="role-name"><?= htmlspecialchars($roles['director']['title']) ?></p>
         <?php if ($roles['director']['description']): ?>
-        <p class="role-desc"><?= nl2br(htmlspecialchars($roles['director']['description'])) ?></p>
+        <div class="role-desc"><?= format_text_content($roles['director']['description']) ?></div>
         <?php endif; ?>
         <?php if ($roles['director']['badge1'] || $roles['director']['badge2']): ?>
         <div class="role-badges">
@@ -534,7 +534,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <?php endif; ?>
         <p class="role-name"><?= htmlspecialchars($roles['actor']['title']) ?></p>
         <?php if ($roles['actor']['description']): ?>
-        <p class="role-desc"><?= nl2br(htmlspecialchars($roles['actor']['description'])) ?></p>
+        <div class="role-desc"><?= format_text_content($roles['actor']['description']) ?></div>
         <?php endif; ?>
         <?php if ($roles['actor']['badge1'] || $roles['actor']['badge2']): ?>
         <div class="role-badges">
@@ -582,7 +582,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,52px);letter-spacing:.02em;color:#111;margin-bottom:1rem"><?= htmlspecialchars($aboutSectionHeading) ?></h2>
     <?php endif; ?>
     <?php if ($aboutText): ?>
-    <p style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= nl2br(htmlspecialchars($aboutText)) ?></p>
+    <div style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= format_text_content($aboutText) ?></div>
     <?php endif; ?>
   </div>
 </section>

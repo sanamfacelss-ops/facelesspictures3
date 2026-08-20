@@ -197,3 +197,60 @@ function log_activity(
         return null;
     }
 }
+
+/**
+ * Format text with support for numbered lists and line breaks
+ * Converts:
+ * - "1. Item\n2. Item" to <ol><li>Item</li><li>Item</li></ol>
+ * - "\n" to <br>
+ * 
+ * @param string $text Text to format
+ * @return string HTML formatted text
+ */
+function format_text_content(string $text): string
+{
+    if (empty($text)) {
+        return '';
+    }
+    
+    // Split by double newlines to get paragraphs
+    $paragraphs = explode("\n\n", $text);
+    $output = [];
+    
+    foreach ($paragraphs as $para) {
+        $para = trim($para);
+        if (empty($para)) continue;
+        
+        // Check if this paragraph is a numbered list
+        $lines = explode("\n", $para);
+        $isNumberedList = true;
+        $listItems = [];
+        
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line)) continue;
+            
+            // Match lines starting with "1." or "1)" or "1 -" etc
+            if (preg_match('/^(\d+)[\.\)\-\:]\s+(.+)$/', $line, $matches)) {
+                $listItems[] = $matches[2];
+            } else {
+                $isNumberedList = false;
+                break;
+            }
+        }
+        
+        if ($isNumberedList && !empty($listItems)) {
+            // Generate ordered list
+            $output[] = '<ol style="list-style-type: decimal; padding-left: 1.5rem; margin: 0.5rem 0;">';
+            foreach ($listItems as $item) {
+                $output[] = '<li style="margin-bottom: 0.25rem;">' . htmlspecialchars($item) . '</li>';
+            }
+            $output[] = '</ol>';
+        } else {
+            // Regular paragraph - just convert newlines to <br>
+            $output[] = '<p style="margin-bottom: 0.5rem;">' . nl2br(htmlspecialchars($para)) . '</p>';
+        }
+    }
+    
+    return implode('', $output);
+}

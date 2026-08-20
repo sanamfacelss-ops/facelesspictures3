@@ -3864,7 +3864,7 @@ if (file_exists($errorLogFile)) {
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text</label>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text <span class="text-dark/30">(supports numbered lists: "1. Item")</span></label>
                                         <textarea x-model="form.landing_about_text" rows="3" placeholder="Describe Faceless Pictures..."
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-y"></textarea>
                                     </div>
@@ -3874,7 +3874,7 @@ if (file_exists($errorLogFile)) {
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards (Writer, Director, Actor)</p>
-                                <p class="text-xs text-dark/40 mb-4">Leave title blank to hide the entire card. Use \n for line breaks in descriptions.</p>
+                                <p class="text-xs text-dark/40 mb-4">Leave title blank to hide entire card. <strong>Descriptions support:</strong> Regular line breaks (use \n) OR numbered lists (type "1. Item" on each line)</p>
                                 
                                 <div class="space-y-6">
                                     <!-- WRITER -->
@@ -3892,7 +3892,7 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div class="md:col-span-2">
-                                                <label class="block text-[10px] text-dark/50 mb-1">Description (use \n for line breaks)</label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(use \n for breaks OR "1. Item" for numbered list)</span></label>
                                                 <textarea x-model="form.role_writer_description" rows="2" placeholder="Read your script on camera.\nYour words. Your voice. One video."
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                             </div>
@@ -3934,7 +3934,7 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div class="md:col-span-2">
-                                                <label class="block text-[10px] text-dark/50 mb-1">Description (use \n for line breaks)</label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(use \n for breaks OR "1. Item" for numbered list)</span></label>
                                                 <textarea x-model="form.role_director_description" rows="2" placeholder="Shoot your scene your way.\nOne phone. One take. Your vision."
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                             </div>
@@ -3976,7 +3976,7 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div class="md:col-span-2">
-                                                <label class="block text-[10px] text-dark/50 mb-1">Description (use \n for line breaks)</label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(use \n for breaks OR "1. Item" for numbered list)</span></label>
                                                 <textarea x-model="form.role_actor_description" rows="2" placeholder="Shoot your scene on camera.\nFace hidden. Talent only."
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                             </div>
