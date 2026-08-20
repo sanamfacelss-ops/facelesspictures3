@@ -24,10 +24,16 @@ $roles = [];
 foreach (['writer', 'director', 'actor'] as $role) {
     $roles[$role] = [
         'title' => $settingsModel->get('role_' . $role . '_title', strtoupper($role)),
-        'icon' => $settingsModel->get('role_' . $role . '_icon', ''),
-        'description' => $settingsModel->get('role_' . $role . '_description', ''),
-        'badge1' => $settingsModel->get('role_' . $role . '_badge1', ''),
-        'badge2' => $settingsModel->get('role_' . $role . '_badge2', ''),
+        'icon' => $settingsModel->get('role_' . $role . '_icon', $role === 'writer' ? '✍️' : ($role === 'director' ? '🎬' : '🎭')),
+        'description' => $settingsModel->get('role_' . $role . '_description', 
+            $role === 'writer' ? "Read your script on camera.\nYour words. Your voice. One video." :
+            ($role === 'director' ? "Shoot your scene your way.\nOne phone. One take. Your vision." :
+            "Shoot your scene on camera.\nFace hidden. Talent only.")),
+        'badge1' => $settingsModel->get('role_' . $role . '_badge1', 
+            $role === 'writer' ? 'Script Reading' : 
+            ($role === 'director' ? 'Scene Direction' : 'Dialogue')),
+        'badge2' => $settingsModel->get('role_' . $role . '_badge2',
+            $role === 'director' ? 'Pitch' : ($role === 'actor' ? 'Song' : '')),
         'button_text' => $settingsModel->get('role_' . $role . '_button_text', 'Click Here →'),
         'button_url' => $settingsModel->get('role_' . $role . '_button_url', '/' . $role),
     ];
@@ -479,76 +485,82 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6" style="align-items:stretch">
 
       <!-- WRITER -->
-      <?php if ($roles['writer']['title']): ?>
       <div class="role-card" style="height:100%">
-        <?php if ($roles['writer']['icon']): ?>
+        <?php if (!empty($roles['writer']['icon'])): ?>
         <div class="role-icon"><?= htmlspecialchars($roles['writer']['icon']) ?></div>
         <?php endif; ?>
+        <?php if (!empty($roles['writer']['title'])): ?>
         <p class="role-name"><?= htmlspecialchars($roles['writer']['title']) ?></p>
-        <?php if ($roles['writer']['description']): ?>
+        <?php endif; ?>
+        <?php if (!empty($roles['writer']['description'])): ?>
         <div class="role-desc"><?= format_text_content($roles['writer']['description']) ?></div>
         <?php endif; ?>
-        <?php if ($roles['writer']['badge1'] || $roles['writer']['badge2']): ?>
+        <?php if (!empty($roles['writer']['badge1']) || !empty($roles['writer']['badge2'])): ?>
         <div class="role-badges">
-          <?php if ($roles['writer']['badge1']): ?>
+          <?php if (!empty($roles['writer']['badge1'])): ?>
           <span class="badge"><?= htmlspecialchars($roles['writer']['badge1']) ?></span>
           <?php endif; ?>
-          <?php if ($roles['writer']['badge2']): ?>
+          <?php if (!empty($roles['writer']['badge2'])): ?>
           <span class="badge"><?= htmlspecialchars($roles['writer']['badge2']) ?></span>
           <?php endif; ?>
         </div>
         <?php endif; ?>
+        <?php if (!empty($roles['writer']['button_text']) && !empty($roles['writer']['button_url'])): ?>
         <a href="<?= htmlspecialchars($roles['writer']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['writer']['button_text']) ?></a>
+        <?php endif; ?>
       </div>
-      <?php endif; ?>
 
       <!-- DIRECTOR -->
-      <?php if ($roles['director']['title']): ?>
       <div class="role-card" style="height:100%">
-        <?php if ($roles['director']['icon']): ?>
+        <?php if (!empty($roles['director']['icon'])): ?>
         <div class="role-icon"><?= htmlspecialchars($roles['director']['icon']) ?></div>
         <?php endif; ?>
+        <?php if (!empty($roles['director']['title'])): ?>
         <p class="role-name"><?= htmlspecialchars($roles['director']['title']) ?></p>
-        <?php if ($roles['director']['description']): ?>
+        <?php endif; ?>
+        <?php if (!empty($roles['director']['description'])): ?>
         <div class="role-desc"><?= format_text_content($roles['director']['description']) ?></div>
         <?php endif; ?>
-        <?php if ($roles['director']['badge1'] || $roles['director']['badge2']): ?>
+        <?php if (!empty($roles['director']['badge1']) || !empty($roles['director']['badge2'])): ?>
         <div class="role-badges">
-          <?php if ($roles['director']['badge1']): ?>
+          <?php if (!empty($roles['director']['badge1'])): ?>
           <span class="badge"><?= htmlspecialchars($roles['director']['badge1']) ?></span>
           <?php endif; ?>
-          <?php if ($roles['director']['badge2']): ?>
+          <?php if (!empty($roles['director']['badge2'])): ?>
           <span class="badge"><?= htmlspecialchars($roles['director']['badge2']) ?></span>
           <?php endif; ?>
         </div>
         <?php endif; ?>
+        <?php if (!empty($roles['director']['button_text']) && !empty($roles['director']['button_url'])): ?>
         <a href="<?= htmlspecialchars($roles['director']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['director']['button_text']) ?></a>
+        <?php endif; ?>
       </div>
-      <?php endif; ?>
 
       <!-- ACTOR -->
-      <?php if ($roles['actor']['title']): ?>
       <div class="role-card" style="height:100%">
-        <?php if ($roles['actor']['icon']): ?>
+        <?php if (!empty($roles['actor']['icon'])): ?>
         <div class="role-icon"><?= htmlspecialchars($roles['actor']['icon']) ?></div>
         <?php endif; ?>
+        <?php if (!empty($roles['actor']['title'])): ?>
         <p class="role-name"><?= htmlspecialchars($roles['actor']['title']) ?></p>
-        <?php if ($roles['actor']['description']): ?>
+        <?php endif; ?>
+        <?php if (!empty($roles['actor']['description'])): ?>
         <div class="role-desc"><?= format_text_content($roles['actor']['description']) ?></div>
         <?php endif; ?>
-        <?php if ($roles['actor']['badge1'] || $roles['actor']['badge2']): ?>
+        <?php if (!empty($roles['actor']['badge1']) || !empty($roles['actor']['badge2'])): ?>
         <div class="role-badges">
-          <?php if ($roles['actor']['badge1']): ?>
+          <?php if (!empty($roles['actor']['badge1'])): ?>
           <span class="badge"><?= htmlspecialchars($roles['actor']['badge1']) ?></span>
           <?php endif; ?>
-          <?php if ($roles['actor']['badge2']): ?>
+          <?php if (!empty($roles['actor']['badge2'])): ?>
           <span class="badge"><?= htmlspecialchars($roles['actor']['badge2']) ?></span>
           <?php endif; ?>
         </div>
         <?php endif; ?>
+        <?php if (!empty($roles['actor']['button_text']) && !empty($roles['actor']['button_url'])): ?>
         <a href="<?= htmlspecialchars($roles['actor']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['actor']['button_text']) ?></a>
+        <?php endif; ?>
       </div>
-      <?php endif; ?>
 
     </div>
 
@@ -575,13 +587,13 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 <!-- ── ABOUT ── -->
 <section id="about" class="py-16 px-4 bg-white border-t border-gray-100">
   <div class="max-w-3xl mx-auto text-center">
-    <?php if ($aboutSectionLabel): ?>
+    <?php if (!empty($aboutSectionLabel)): ?>
     <p style="font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-bottom:.75rem"><?= htmlspecialchars($aboutSectionLabel) ?></p>
     <?php endif; ?>
-    <?php if ($aboutSectionHeading): ?>
+    <?php if (!empty($aboutSectionHeading)): ?>
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,52px);letter-spacing:.02em;color:#111;margin-bottom:1rem"><?= htmlspecialchars($aboutSectionHeading) ?></h2>
     <?php endif; ?>
-    <?php if ($aboutText): ?>
+    <?php if (!empty($aboutText)): ?>
     <div style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= format_text_content($aboutText) ?></div>
     <?php endif; ?>
   </div>
