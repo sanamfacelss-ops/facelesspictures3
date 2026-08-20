@@ -1638,263 +1638,218 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Modal Body (Form Content) -->
-                            <div class="px-6 py-5 max-h-[calc(100vh-220px)] overflow-y-auto">
+                            <div class="px-6 py-5 max-h-[calc(100vh-200px)] overflow-y-auto">
                                 <form @submit.prevent="editingScript ? updateScript() : createScript()" id="scriptModalForm">
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-[12px] text-dark/50 mb-1">Title</label>
-                                            <input type="text" x-model="scriptForm.title" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="Dramatic Monologue #1">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[12px] text-dark/50 mb-1">Content</label>
-                                            <textarea x-model="scriptForm.content" rows="6" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson resize-none" placeholder="The script content goes here..."></textarea>
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label class="block text-[12px] text-dark/50 mb-1">Category</label>
-                                                <select x-model="scriptForm.category"
-                                                    @change="if(scriptForm.category!=='actor') scriptForm.audition_type=(scriptForm.category==='director'?'Director Audition':'Writer Submission')"
-                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
-                                                    <option value="actor">Actor</option>
-                                                    <option value="director">Director</option>
-                                                    <option value="writer">Writer</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block text-[12px] text-dark/50 mb-1">Duration Hint</label>
-                                                <input type="text" x-model="scriptForm.duration_hint" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="60-90 seconds">
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-[12px] text-dark/50 mb-1">Audition Type</label>
-                                            <template x-if="scriptForm.category === 'actor'">
-                                                <select x-model="scriptForm.audition_type" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
-                                                    <option value="Dialog Audition">Dialog Audition</option>
-                                                    <option value="Song Audition">Song Audition</option>
-                                                </select>
-                                            </template>
-                                            <template x-if="scriptForm.category !== 'actor'">
-                                                <input type="text" :value="scriptForm.category === 'director' ? 'Director Audition' : 'Writer Submission'" readonly
-                                                    class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] bg-dark/[.03] text-dark/50 cursor-not-allowed">
-                                            </template>
-                                            <p class="text-[11px] text-dark/30 mt-1">Actor: choose dialog or song. Director/Writer: fixed automatically.</p>
-                                        </div>
-                                        <div x-data="scriptImagePicker()" x-init="init()">
-                                            <label class="block text-[12px] text-dark/50 mb-1.5">Card Poster Image</label>
-
-                                            <!-- Current image preview -->
-                                            <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:120px">
-                                                <img :src="scriptForm.image_url" loading="lazy" class="w-full h-full object-cover">
-                                                <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
-                                                    class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition border border-dark/10">
-                                                    <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                </button>
-                                            </div>
-
-                                            <!-- Tabs: Upload / Gallery -->
-                                            <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[12px]">
-                                                <button type="button" @click="pickerTab='upload'"
-                                                    :class="pickerTab==='upload' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
-                                                    class="flex-1 py-2 font-medium transition flex items-center justify-center gap-1.5">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                                    Upload New
-                                                </button>
-                                                <button type="button" @click="pickerTab='gallery'; loadGallery()"
-                                                    :class="pickerTab==='gallery' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
-                                                    class="flex-1 py-2 font-medium transition flex items-center justify-center gap-1.5">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                    Pick Existing
-                                                    <span x-show="galleryImages.length" class="bg-white/20 text-white text-[10px] px-1.5 py-0.5 rounded-full" x-text="galleryImages.length"></span>
-                                                </button>
-                                            </div>
-
-                                            <!-- UPLOAD TAB -->
-                                            <div x-show="pickerTab==='upload'">
-                                                <div
-                                                    class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
-                                                    :class="uploadDragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
-                                                    style="min-height:90px"
-                                                    @dragover.prevent="uploadDragging=true"
-                                                    @dragleave.prevent="uploadDragging=false"
-                                                    @drop.prevent="onDrop($event)"
-                                                    @click="$refs.imgPick.click()">
-                                                    <input type="file" x-ref="imgPick" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/svg+xml,image/bmp" @change="onFile($event)">
-                                                    <template x-if="!uploadProgress && !uploadError">
-                                                        <div class="flex flex-col items-center justify-center gap-1.5 p-4 text-center">
-                                                            <svg class="w-7 h-7 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                            <p class="text-[12px] text-dark/40">Drop image or <span class="text-dark underline cursor-pointer">browse</span></p>
-                                                            <p class="text-[11px] text-dark/25">PNG · JPG · WEBP · max 5 MB</p>
-                                                        </div>
-                                                    </template>
-                                                    <template x-if="uploadProgress > 0 && uploadProgress < 100">
-                                                        <div class="flex flex-col items-center justify-center gap-2 p-4">
-                                                            <div class="w-full bg-dark/10 rounded-full h-1.5 overflow-hidden">
-                                                                <div class="h-full bg-dark rounded-full transition-all" :style="'width:'+uploadProgress+'%'"></div>
-                                                            </div>
-                                                            <p class="text-[11px] text-dark/40" x-text="uploadProgress+'% uploading...'"></p>
-                                                        </div>
-                                                    </template>
+                                    <div class="space-y-5">
+                                        <!-- SECTION: Basic Information -->
+                                        <div class="pb-4 border-b border-dark/10">
+                                            <h4 class="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                Basic Information
+                                            </h4>
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label class="block text-[12px] text-dark/50 mb-1">Title *</label>
+                                                    <input type="text" x-model="scriptForm.title" required class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="e.g., Dramatic Monologue #1">
                                                 </div>
-                                                <template x-if="uploadError">
-                                                    <p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p>
-                                                </template>
+                                                <div>
+                                                    <label class="block text-[12px] text-dark/50 mb-1">Script Content *</label>
+                                                    <textarea x-model="scriptForm.content" rows="4" required class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson resize-none" placeholder="Enter the script content here..."></textarea>
+                                                </div>
+                                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    <div>
+                                                        <label class="block text-[12px] text-dark/50 mb-1">Category *</label>
+                                                        <select x-model="scriptForm.category"
+                                                            @change="if(scriptForm.category!=='actor') scriptForm.audition_type=(scriptForm.category==='director'?'Director Audition':'Writer Submission')"
+                                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                                            <option value="actor">Actor</option>
+                                                            <option value="director">Director</option>
+                                                            <option value="writer">Writer</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[12px] text-dark/50 mb-1">Audition Type</label>
+                                                        <template x-if="scriptForm.category === 'actor'">
+                                                            <select x-model="scriptForm.audition_type" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson">
+                                                                <option value="Dialog Audition">Dialog</option>
+                                                                <option value="Song Audition">Song</option>
+                                                            </select>
+                                                        </template>
+                                                        <template x-if="scriptForm.category !== 'actor'">
+                                                            <input type="text" :value="scriptForm.category === 'director' ? 'Director' : 'Writer'" readonly
+                                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] bg-dark/[.03] text-dark/50 cursor-not-allowed">
+                                                        </template>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[12px] text-dark/50 mb-1">Duration</label>
+                                                        <input type="text" x-model="scriptForm.duration_hint" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson" placeholder="e.g., 60-90 sec">
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
 
-                                            <!-- GALLERY TAB -->
-                                            <div x-show="pickerTab==='gallery'">
-                                                <template x-if="galleryLoading">
-                                                    <p class="text-[12px] text-dark/30 text-center py-4">Loading images...</p>
-                                                </template>
-                                                <template x-if="!galleryLoading && galleryImages.length === 0">
-                                                    <p class="text-[12px] text-dark/30 text-center py-4">No uploaded images yet. Upload one first.</p>
-                                                </template>
-                                                <div x-show="!galleryLoading && galleryImages.length > 0"
-                                                    class="grid grid-cols-4 gap-1.5 max-h-48 overflow-y-auto rounded-xl border border-dark/10 p-2 bg-dark/[.015]">
-                                                    <template x-for="img in galleryImages" :key="img.url">
-                                                        <button type="button" @click="selectFromGallery(img.url)"
-                                                            class="relative rounded-lg overflow-hidden border-2 transition aspect-square"
-                                                            :class="img.url === (window.setScriptImage && $el.closest('[x-data*=adminDashboard]') ? null : null) || false ? 'border-dark' : 'border-transparent hover:border-dark/30'">
-                                                            <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                        <!-- SECTION: Media Files -->
+                                        <div class="pb-4 border-b border-dark/10">
+                                            <h4 class="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                Media Files
+                                            </h4>
+                                            <div class="space-y-3">
+                                                <!-- Card Image -->
+                                                <div x-data="scriptImagePicker()" x-init="init()">
+                                                    <label class="block text-[12px] text-dark/50 mb-1.5">Card Poster Image</label>
+                                                    <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:100px">
+                                                        <img :src="scriptForm.image_url" loading="lazy" class="w-full h-full object-cover">
+                                                        <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
+                                                            class="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition">
+                                                            <svg class="w-3 h-3 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                                         </button>
-                                                    </template>
-                                                </div>
-                                            </div>
-
-                                            <p class="text-[11px] text-dark/30 mt-1.5">16:9 image shown at top of the audition card</p>
-                                        </div>
-
-                                        <!-- Preview Video per script -->
-                                        <div x-data="scriptVideoUploader()">
-                                            <label class="block text-[12px] text-dark/50 mb-1.5">Mock / Preview Video</label>
-                                            <!-- Mode tabs -->
-                                            <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[12px]">
-                                                <button type="button" @click="mode='upload'"
-                                                    :class="mode==='upload'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'"
-                                                    class="flex-1 py-1.5 font-medium transition flex items-center justify-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                                    Upload File
-                                                </button>
-                                                <button type="button" @click="mode='youtube'"
-                                                    :class="mode==='youtube'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'"
-                                                    class="flex-1 py-1.5 font-medium transition flex items-center justify-center gap-1">
-                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                                                    YouTube URL
-                                                </button>
-                                            </div>
-                                            <!-- Upload mode -->
-                                            <div x-show="mode==='upload'">
-                                                <div class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
-                                                    :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
-                                                    style="min-height:64px"
-                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                                    @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
-                                                    <input type="file" x-ref="vidPick" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
-                                                    <template x-if="!preview&&!uploading">
-                                                        <div class="flex flex-col items-center justify-center gap-1.5 p-3 text-center">
-                                                            <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                                            <p class="text-[11px] text-dark/40">Upload mock/preview video</p>
-                                                            <p class="text-[10px] text-dark/25">MP4 · MOV · WEBM · max 500 MB</p>
-                                                        </div>
-                                                    </template>
-                                                    <template x-if="uploading">
-                                                        <div class="flex flex-col items-center justify-center gap-2 p-3">
-                                                            <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div>
-                                                            <p class="text-[11px] text-dark/40" x-text="progress+'%'"></p>
-                                                        </div>
-                                                    </template>
-                                                    <template x-if="preview&&!uploading&&!isYoutube(preview)">
-                                                        <div class="flex items-center gap-2 px-3 py-2">
-                                                            <div class="w-7 h-7 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-3.5 h-3.5 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-                                                            <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'Video uploaded'"></p>
-                                                            <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                                <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                            </div>
-                                            <!-- YouTube URL mode -->
-                                            <div x-show="mode==='youtube'">
-                                                <div class="flex gap-2 items-center">
-                                                    <input type="url" x-model="ytUrl" @input="onYtInput()"
-                                                        class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson"
-                                                        placeholder="https://youtube.com/watch?v=... or youtu.be/...">
-                                                    <button type="button" x-show="ytUrl" @click="clearYt()"
-                                                        class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[11px] flex-shrink-0">✕</button>
-                                                </div>
-                                                <div x-show="ytUrl && isYoutube(ytUrl)" class="mt-2 rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:9/16;max-height:180px">
-                                                    <iframe :src="ytEmbedUrl(ytUrl)+'?mute=1'" class="w-full h-full" frameborder="0" allowfullscreen title="Preview"></iframe>
-                                                </div>
-                                                <p x-show="ytUrl && !isYoutube(ytUrl)" class="text-[11px] text-red-500 mt-1">Please enter a valid YouTube URL</p>
-                                            </div>
-                                            <p class="text-[11px] text-dark/30 mt-1">Shown as the top video on the public script card</p>
-                                        </div>
-
-                                        <!-- Script PDF per script -->
-                                        <div x-data="scriptPdfUploader()">
-                                            <label class="block text-[12px] text-dark/50 mb-1.5">Script / Lyrics PDF</label>
-                                            <div class="border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
-                                                :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
-                                                style="min-height:64px"
-                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false"
-                                                @drop.prevent="onDrop($event)" @click="$refs.pdfPick.click()">
-                                                <input type="file" x-ref="pdfPick" class="hidden" accept="application/pdf" @change="onFile($event)">
-                                                <template x-if="!preview&&!uploading">
-                                                    <div class="flex flex-col items-center justify-center gap-1 p-3 text-center">
-                                                        <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                                        <p class="text-[11px] text-dark/40">Upload script/lyrics PDF</p>
                                                     </div>
-                                                </template>
-                                                <template x-if="uploading">
-                                                    <div class="flex items-center justify-center gap-2 p-3"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div>
-                                                </template>
-                                                <template x-if="preview&&!uploading">
-                                                    <div class="flex items-center gap-2 px-3 py-2">
-                                                        <div class="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center text-[10px] font-bold text-red-600 flex-shrink-0">PDF</div>
-                                                        <p class="text-[12px] font-medium text-dark truncate flex-1" x-text="filename||'PDF uploaded'"></p>
-                                                        <button type="button" @click.stop="clear()" class="w-5 h-5 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px]">✕</button>
+                                                    <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[11px]">
+                                                        <button type="button" @click="pickerTab='upload'"
+                                                            :class="pickerTab==='upload' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
+                                                            class="flex-1 py-1.5 font-medium transition">Upload</button>
+                                                        <button type="button" @click="pickerTab='gallery'; loadGallery()"
+                                                            :class="pickerTab==='gallery' ? 'bg-dark text-white' : 'bg-white text-dark/50 hover:bg-cream'"
+                                                            class="flex-1 py-1.5 font-medium transition">Gallery</button>
                                                     </div>
-                                                </template>
+                                                    <div x-show="pickerTab==='upload'">
+                                                        <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden"
+                                                            :class="uploadDragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
+                                                            style="min-height:70px"
+                                                            @dragover.prevent="uploadDragging=true"
+                                                            @dragleave.prevent="uploadDragging=false"
+                                                            @drop.prevent="onDrop($event)"
+                                                            @click="$refs.imgPick.click()">
+                                                            <input type="file" x-ref="imgPick" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/svg+xml,image/bmp" @change="onFile($event)">
+                                                            <template x-if="!uploadProgress && !uploadError">
+                                                                <div class="flex flex-col items-center justify-center gap-1 p-3 text-center">
+                                                                    <svg class="w-5 h-5 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                                    <p class="text-[11px] text-dark/40">Drop or browse</p>
+                                                                </div>
+                                                            </template>
+                                                            <template x-if="uploadProgress > 0 && uploadProgress < 100">
+                                                                <div class="flex items-center justify-center p-3">
+                                                                    <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden">
+                                                                        <div class="h-full bg-dark rounded-full transition-all" :style="'width:'+uploadProgress+'%'"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <template x-if="uploadError"><p class="text-[10px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                    </div>
+                                                    <div x-show="pickerTab==='gallery'">
+                                                        <template x-if="galleryLoading"><p class="text-[11px] text-dark/30 text-center py-3">Loading...</p></template>
+                                                        <template x-if="!galleryLoading && galleryImages.length === 0"><p class="text-[11px] text-dark/30 text-center py-3">No images yet</p></template>
+                                                        <div x-show="!galleryLoading && galleryImages.length > 0" class="grid grid-cols-4 gap-1.5 max-h-32 overflow-y-auto rounded-lg border border-dark/10 p-2 bg-dark/[.015]">
+                                                            <template x-for="img in galleryImages" :key="img.url">
+                                                                <button type="button" @click="selectFromGallery(img.url)" class="relative rounded-lg overflow-hidden border-2 transition aspect-square" :class="img.url === scriptForm.image_url ? 'border-dark' : 'border-transparent hover:border-dark/30'">
+                                                                    <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                                                </button>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Video Upload -->
+                                                <div x-data="scriptVideoUploader()">
+                                                    <label class="block text-[12px] text-dark/50 mb-1.5">Preview Video</label>
+                                                    <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[11px]">
+                                                        <button type="button" @click="mode='upload'" :class="mode==='upload'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'" class="flex-1 py-1.5 font-medium transition">Upload</button>
+                                                        <button type="button" @click="mode='youtube'" :class="mode==='youtube'?'bg-dark text-white':'bg-white text-dark/50 hover:bg-cream'" class="flex-1 py-1.5 font-medium transition">YouTube</button>
+                                                    </div>
+                                                    <div x-show="mode==='upload'">
+                                                        <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'" style="min-height:60px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.vidPick.click()">
+                                                            <input type="file" x-ref="vidPick" class="hidden" accept="video/mp4,video/quicktime,video/webm" @change="onFile($event)">
+                                                            <template x-if="!preview&&!uploading">
+                                                                <div class="flex flex-col items-center justify-center gap-1 p-2.5 text-center">
+                                                                    <svg class="w-4 h-4 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                                    <p class="text-[10px] text-dark/40">Upload video</p>
+                                                                </div>
+                                                            </template>
+                                                            <template x-if="uploading">
+                                                                <div class="flex items-center justify-center gap-2 p-2.5">
+                                                                    <div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div>
+                                                                </div>
+                                                            </template>
+                                                            <template x-if="preview&&!uploading&&!isYoutube(preview)">
+                                                                <div class="flex items-center gap-2 px-2.5 py-2">
+                                                                    <div class="w-6 h-6 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0"><svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                                                                    <p class="text-[11px] font-medium text-dark truncate flex-1" x-text="filename||'Video'"></p>
+                                                                    <button type="button" @click.stop="clear()" class="w-4 h-4 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[9px]">✕</button>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <template x-if="uploadError"><p class="text-[10px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                    </div>
+                                                    <div x-show="mode==='youtube'">
+                                                        <div class="flex gap-2 items-center">
+                                                            <input type="url" x-model="ytUrl" @input="onYtInput()" class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:border-crimson" placeholder="YouTube URL">
+                                                            <button type="button" x-show="ytUrl" @click="clearYt()" class="w-6 h-6 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[10px] flex-shrink-0">✕</button>
+                                                        </div>
+                                                        <div x-show="ytUrl && isYoutube(ytUrl)" class="mt-2 rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:9/16;max-height:150px">
+                                                            <iframe :src="ytEmbedUrl(ytUrl)+'?mute=1'" class="w-full h-full" frameborder="0" allowfullscreen title="Preview"></iframe>
+                                                        </div>
+                                                        <p x-show="ytUrl && !isYoutube(ytUrl)" class="text-[10px] text-red-500 mt-1">Invalid YouTube URL</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- PDF Upload -->
+                                                <div x-data="scriptPdfUploader()">
+                                                    <label class="block text-[12px] text-dark/50 mb-1.5">Script PDF</label>
+                                                    <div class="border-2 rounded-lg transition-all cursor-pointer overflow-hidden" :class="dragging?'border-dark bg-dark/5':'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'" style="min-height:60px" @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)" @click="$refs.pdfPick.click()">
+                                                        <input type="file" x-ref="pdfPick" class="hidden" accept="application/pdf" @change="onFile($event)">
+                                                        <template x-if="!preview&&!uploading">
+                                                            <div class="flex flex-col items-center justify-center gap-1 p-2.5 text-center">
+                                                                <svg class="w-4 h-4 text-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                                <p class="text-[10px] text-dark/40">Upload PDF</p>
+                                                            </div>
+                                                        </template>
+                                                        <template x-if="uploading"><div class="flex items-center justify-center p-2.5"><div class="w-full bg-dark/10 rounded-full h-1 overflow-hidden"><div class="h-full bg-dark rounded-full" :style="'width:'+progress+'%'"></div></div></div></template>
+                                                        <template x-if="preview&&!uploading">
+                                                            <div class="flex items-center gap-2 px-2.5 py-2">
+                                                                <div class="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center text-[9px] font-bold text-red-600 flex-shrink-0">PDF</div>
+                                                                <p class="text-[11px] font-medium text-dark truncate flex-1" x-text="filename||'PDF'"></p>
+                                                                <button type="button" @click.stop="clear()" class="w-4 h-4 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center text-[9px]">✕</button>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                    <template x-if="uploadError"><p class="text-[10px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                </div>
                                             </div>
-                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                            <p class="text-[11px] text-dark/30 mt-1">Users can download this from the script card</p>
                                         </div>
 
-                                        <!-- Song URLs (song scripts only) — unlimited, dynamic -->
-                                        <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak>
-                                            <label class="block text-[12px] text-dark/50 mb-2">Song YouTube URLs <span class="text-[10px] text-dark/30">(each becomes a button — label optional)</span></label>
+                                        <!-- SECTION: Song Links (for Song Auditions) -->
+                                        <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak class="pb-4 border-b border-dark/10">
+                                            <h4 class="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                                Song Links
+                                            </h4>
                                             <div class="space-y-2">
                                                 <template x-for="(entry, idx) in songEntries" :key="idx">
                                                     <div class="flex gap-2 items-center">
-                                                        <input type="text"
-                                                            :value="entry.label"
-                                                            @input="updateSongLabel(idx, $event.target.value)"
-                                                            class="w-32 flex-shrink-0 border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
-                                                            placeholder="Button label…">
-                                                        <input type="url"
-                                                            :value="entry.url"
-                                                            @input="updateSongUrl(idx, $event.target.value)"
-                                                            class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson"
-                                                            placeholder="https://youtu.be/...">
-                                                        <button type="button" @click="removeSongUrl(idx)"
-                                                            x-show="songEntries.length > 1"
-                                                            class="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
-                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                        <input type="text" :value="entry.label" @input="updateSongLabel(idx, $event.target.value)" class="w-24 flex-shrink-0 border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] focus:outline-none focus:border-crimson" placeholder="Label">
+                                                        <input type="url" :value="entry.url" @input="updateSongUrl(idx, $event.target.value)" class="flex-1 border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] focus:outline-none focus:border-crimson" placeholder="YouTube URL">
+                                                        <button type="button" @click="removeSongUrl(idx)" x-show="songEntries.length > 1" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                                         </button>
                                                     </div>
                                                 </template>
                                             </div>
-                                            <button type="button" @click="addSongUrl()"
-                                                class="mt-2 flex items-center gap-1.5 text-[12px] text-dark/50 hover:text-dark transition">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                                Add another song link
+                                            <button type="button" @click="addSongUrl()" class="mt-2 flex items-center gap-1 text-[11px] text-dark/50 hover:text-dark transition">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                                Add song link
                                             </button>
-                                            <p class="text-[11px] text-dark/30 mt-1">Label is optional — leave blank to show "Get Song". Opens in popup so actors can hear the song while recording</p>
                                         </div>
 
+                                        <!-- SECTION: Rules & Guidelines -->
                                         <div>
-                                            <label class="block text-[12px] text-dark/50 mb-1">Rules &amp; Limits</label>
-                                            <textarea x-model="scriptForm.rules" rows="5" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson resize-y" placeholder="One rule per line:&#10;Video under 3 minutes&#10;Shoot on any device&#10;Face must not be visible&#10;Clear audio required"></textarea>
-                                            <p class="text-[11px] text-dark/30 mt-1">One rule per line — shown as bullet list on the card</p>
+                                            <h4 class="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                                Rules & Guidelines
+                                            </h4>
+                                            <textarea x-model="scriptForm.rules" rows="4" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-[13px] focus:outline-none focus:border-crimson resize-y" placeholder="One rule per line:&#10;• Video under 3 minutes&#10;• Clear audio required&#10;• Face not visible"></textarea>
+                                            <p class="text-[10px] text-dark/30 mt-1">One rule per line</p>
                                         </div>
                                     </div>
                                 </form>
