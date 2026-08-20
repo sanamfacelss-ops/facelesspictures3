@@ -1698,11 +1698,11 @@ if (file_exists($errorLogFile)) {
                                                 <!-- Card Image -->
                                                 <div x-data="scriptImagePicker()" x-init="init()" class="bg-dark/[.02] rounded-lg p-3 border border-dark/5">
                                                     <label class="block text-[12px] font-medium text-dark/60 mb-1.5">Card Poster Image</label>
-                                                    <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10 group" style="aspect-ratio:16/9;max-height:100px">
+                                                    <div x-show="scriptForm.image_url" class="mb-2 relative rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:16/9;max-height:100px">
                                                         <img :src="scriptForm.image_url" loading="lazy" class="w-full h-full object-cover">
                                                         <button type="button" @click="scriptForm.image_url=''; if(typeof window.setScriptImage==='function') window.setScriptImage('')"
-                                                            class="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                            class="absolute top-1 right-1 w-6 h-6 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow transition text-dark/60 hover:text-dark">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                                         </button>
                                                     </div>
                                                     <div class="flex border border-dark/10 rounded-lg overflow-hidden mb-2 text-[11px]">
@@ -1749,9 +1749,14 @@ if (file_exists($errorLogFile)) {
                                                         <template x-if="!galleryLoading && galleryImages.length === 0"><p class="text-[11px] text-dark/30 text-center py-3">No images uploaded yet</p></template>
                                                         <div x-show="!galleryLoading && galleryImages.length > 0" class="grid grid-cols-4 gap-1.5 max-h-32 overflow-y-auto rounded-lg border border-dark/10 p-2 bg-white">
                                                             <template x-for="img in galleryImages" :key="img.url">
-                                                                <button type="button" @click="selectFromGallery(img.url)" class="relative rounded-lg overflow-hidden border-2 transition aspect-square" :class="img.url === scriptForm.image_url ? 'border-crimson ring-2 ring-crimson/20' : 'border-transparent hover:border-crimson/50'">
-                                                                    <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
-                                                                </button>
+                                                                <div class="relative group">
+                                                                    <button type="button" @click="selectFromGallery(img.url)" class="w-full relative rounded-lg overflow-hidden border-2 transition aspect-square" :class="img.url === scriptForm.image_url ? 'border-crimson ring-2 ring-crimson/20' : 'border-transparent hover:border-crimson/50'">
+                                                                        <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                                                    </button>
+                                                                    <button type="button" @click.stop="deleteGalleryImage(img.url)" class="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                    </button>
+                                                                </div>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -7261,6 +7266,36 @@ if (file_exists($errorLogFile)) {
             selectFromGallery(url) {
                 if (typeof window.setScriptImage === 'function') {
                     window.setScriptImage(url);
+                }
+            },
+
+            async deleteGalleryImage(url) {
+                if (!confirm('Permanently delete this image from server?')) return;
+                
+                try {
+                    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    const fd = new FormData();
+                    fd.append('csrf_token', csrf);
+                    fd.append('url', url);
+                    
+                    const res = await fetch('/api/admin/media/delete-image', {
+                        method: 'POST',
+                        body: fd
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        // Remove from gallery
+                        this.galleryImages = this.galleryImages.filter(img => img.url !== url);
+                        // Clear selection if deleted image was selected
+                        if (window._adminDashboard && window._adminDashboard.scriptForm.image_url === url) {
+                            window._adminDashboard.scriptForm.image_url = '';
+                        }
+                    } else {
+                        alert('Failed to delete: ' + (data.error || 'Unknown error'));
+                    }
+                } catch(e) {
+                    alert('Network error while deleting image');
                 }
             },
 
