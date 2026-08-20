@@ -3440,7 +3440,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div class="space-y-4" x-data="{showHome: true, showRoleCards: false, showWriter: false, showDirector: false, showActor: false}">
+                            <div class="space-y-4" x-data="{showHome: false, showRoleCards: false, showWriter: false, showDirector: false, showActor: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
                             <div>
@@ -3455,7 +3455,7 @@ if (file_exists($errorLogFile)) {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </div>
-                                <div x-show="showHome" x-collapse>
+                                <div x-show="showHome" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
 
                             <!-- SECTION: Brand -->
@@ -3918,7 +3918,7 @@ if (file_exists($errorLogFile)) {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </div>
-                                <div x-show="showRoleCards" x-collapse>
+                                <div x-show="showRoleCards" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
 
                             <!-- SECTION: Role Cards -->
@@ -4072,7 +4072,7 @@ if (file_exists($errorLogFile)) {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </div>
-                                <div x-show="showWriter" x-collapse>
+                                <div x-show="showWriter" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
 
                             <!-- WRITER PAGE TEXT -->
@@ -4131,7 +4131,7 @@ if (file_exists($errorLogFile)) {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </div>
-                                <div x-show="showDirector" x-collapse>
+                                <div x-show="showDirector" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
 
                                     <!-- DIRECTOR PAGE TEXT -->
@@ -4190,7 +4190,7 @@ if (file_exists($errorLogFile)) {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </div>
-                                <div x-show="showActor" x-collapse>
+                                <div x-show="showActor" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
 
                                     <!-- ACTOR PAGE TEXT -->
