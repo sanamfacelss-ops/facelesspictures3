@@ -241,6 +241,15 @@ if (file_exists($errorLogFile)) {
         ::-webkit-scrollbar-thumb { background: #D92B3A33; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #D92B3A66; }
         
+        /* Hide scrollbar utility */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari, Opera */
+        }
+        
         /* Mobile-first responsive fixes */
         html { overflow-x: hidden; }
         body { overflow-x: hidden; max-width: 100vw; }
@@ -1617,7 +1626,7 @@ if (file_exists($errorLogFile)) {
                         style="margin: 0;">
                         
                         <div @click.stop 
-                            class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+                            class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto scrollbar-hide"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 transform scale-95"
                             x-transition:enter-end="opacity-100 transform scale-100"
