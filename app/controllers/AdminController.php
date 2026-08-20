@@ -2063,6 +2063,10 @@ class AdminController
             'landing_poster4_url',  'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label',
             'landing_poster5_url',  'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label',
             'landing_poster6_url',  'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label',
+            'landing_poster7_url',  'landing_poster7_title', 'landing_trailer7_url', 'landing_poster7_btn_label',
+            'landing_poster8_url',  'landing_poster8_title', 'landing_trailer8_url', 'landing_poster8_btn_label',
+            'landing_poster9_url',  'landing_poster9_title', 'landing_trailer9_url', 'landing_poster9_btn_label',
+            'landing_poster10_url', 'landing_poster10_title', 'landing_trailer10_url', 'landing_poster10_btn_label',
             'landing_hero_trailer_url', // Horizontal auto-play trailer
             'landing_about_text',
             'manifesto_heading', 'manifesto_subheading',

@@ -55,7 +55,7 @@ if (empty($marqueeItems)) {
 $aboutSectionLabel = $settingsModel->get('about_section_label', 'About');
 $aboutSectionHeading = $settingsModel->get('about_section_heading', 'WHAT IS FACELESS PICTURES?');
 
-// Up to 6 poster slots
+// Up to 10 poster slots
 $posterKeys = [
     ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label'],
     ['landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url', 'landing_poster2_btn_label'],
@@ -63,6 +63,10 @@ $posterKeys = [
     ['landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label'],
     ['landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label'],
     ['landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label'],
+    ['landing_poster7_url', 'landing_poster7_title', 'landing_trailer7_url', 'landing_poster7_btn_label'],
+    ['landing_poster8_url', 'landing_poster8_title', 'landing_trailer8_url', 'landing_poster8_btn_label'],
+    ['landing_poster9_url', 'landing_poster9_title', 'landing_trailer9_url', 'landing_poster9_btn_label'],
+    ['landing_poster10_url', 'landing_poster10_title', 'landing_trailer10_url', 'landing_poster10_btn_label'],
 ];
 $posters = [];
 foreach ($posterKeys as $i => $keys) {
@@ -383,44 +387,37 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     }
     ?>
 
-    <!-- MOBILE: 1-col grid, one poster at a time full width -->
-    <div class="poster-mobile-grid" style="margin-bottom:3rem">
+    <!-- MOBILE: 1-col grid -->
+    <div class="poster-mobile-grid" style="display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:3rem">
       <?php foreach ($posters as $p): ?>
       <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
     </div>
 
-    <!-- DESKTOP: grid ≤3, slider ≥4 -->
-    <?php if ($posterCount <= 3): ?>
-    <div class="poster-desktop-grid" style="grid-template-columns:repeat(<?= $posterCount ?>,1fr);margin-bottom:3rem">
+    <!-- TABLET: 2-col grid -->
+    <div class="poster-tablet-grid" style="display:none;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:3rem">
       <?php foreach ($posters as $p): ?>
       <div><?= posterCard($p) ?></div>
       <?php endforeach; ?>
     </div>
-    <?php else: ?>
-    <div class="poster-slider poster-desktop-only" style="margin-bottom:3rem;padding:0 28px" x-data="posterSlider(<?= $posterCount ?>)">
-      <button class="slider-btn prev" @click="prev()" x-show="canPrev" x-cloak aria-label="Previous">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-      </button>
-      <div style="overflow:hidden">
-        <div class="poster-track" :style="'transform:translateX(-'+offset+'px)'">
-          <?php foreach ($posters as $p): ?>
-          <div style="flex-shrink:0;width:calc((100% - 2rem) / 3)" class="poster-slide-card">
-            <?= posterCard($p) ?>
-          </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-      <button class="slider-btn next" @click="next()" x-show="canNext" x-cloak aria-label="Next">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-      </button>
-      <div class="slider-dots">
-        <template x-for="i in pages" :key="i">
-          <div class="slider-dot" :class="i===currentPage?'active':''" @click="goTo(i)"></div>
-        </template>
-      </div>
+
+    <!-- DESKTOP: 3-col grid -->
+    <div class="poster-desktop-grid" style="display:none;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
+      <?php foreach ($posters as $p): ?>
+      <div><?= posterCard($p) ?></div>
+      <?php endforeach; ?>
     </div>
-    <?php endif; ?>
+    
+    <style>
+    @media (min-width: 640px) {
+      .poster-mobile-grid { display: none !important; }
+      .poster-tablet-grid { display: grid !important; }
+    }
+    @media (min-width: 1024px) {
+      .poster-tablet-grid { display: none !important; }
+      .poster-desktop-grid { display: grid !important; }
+    }
+    </style>
 
     <!-- ══ MANIFESTO VIDEO SLIDER ══ -->
     <?php if (!empty($manifestoVideos)): ?>
