@@ -4397,137 +4397,139 @@ if (file_exists($errorLogFile)) {
                             </div>
                         </div>
 
-                        <!-- Debug Controls -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                Debug Mode
-                            </h3>
+                        <!-- Debug, Log Files, Environment - Single Row on Desktop -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 md:col-span-2 lg:col-span-3">
                             
-                            <div class="flex items-center justify-between p-3 md:p-4 bg-cream rounded-xl mb-4">
-                                <div class="min-w-0 mr-3">
-                                    <p class="font-medium text-dark text-[13px]">Debug Logging</p>
-                                    <p class="text-[11px] text-dark/40 truncate">Logs to /logs/debug.log</p>
-                                </div>
-                                <div class="flex items-center gap-2 flex-shrink-0">
-                                    <span class="text-[11px] font-medium <?= FP3_DEBUG ? 'text-green-600' : 'text-dark/30' ?>">
-                                        <?= FP3_DEBUG ? 'ON' : 'OFF' ?>
-                                    </span>
-                                    <form method="POST" class="inline">
-                                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                                        <input type="hidden" name="toggle_debug" value="1">
-                                        <button type="submit" class="relative w-10 h-5 rounded-full transition-colors <?= FP3_DEBUG ? 'bg-green-500' : 'bg-dark/20' ?>">
-                                            <span class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform <?= FP3_DEBUG ? 'translate-x-5' : '' ?>"></span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
-                                <p class="text-[11px] text-amber-800">
-                                    <strong>⚠️</strong> Debug mode logs sensitive data. Disable in production.
-                                </p>
-                            </div>
-                            
-                            <form method="POST" @submit.prevent="openConfirmModal('logs', null, 'Clear all log files?')">
-                                <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-                                <input type="hidden" name="clear_logs" value="1">
-                                <button type="submit" class="w-full bg-crimson/10 text-crimson font-medium py-2 rounded-xl hover:bg-crimson/20 transition text-[12px]">
-                                    Clear All Logs
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Log Files -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Log Files
-                            </h3>
-                            
-                            <?php if (empty($logFiles)): ?>
-                            <p class="text-[12px] text-dark/30 text-center py-6">No log files</p>
-                            <?php else: ?>
-                            <div class="space-y-2">
-                                <?php foreach ($logFiles as $log): ?>
-                                <div class="flex items-center justify-between p-3 bg-cream rounded-lg">
-                                    <div class="min-w-0">
-                                        <p class="font-medium text-dark text-[12px] truncate"><?= e($log['name']) ?></p>
-                                        <p class="text-[10px] text-dark/40"><?= date('M j, H:i', $log['modified']) ?></p>
+                            <!-- Debug Logging -->
+                            <div class="bg-white rounded-xl border border-dark/5 p-4">
+                                <h3 class="font-semibold text-dark mb-3 flex items-center gap-2 text-[13px]">
+                                    <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Debug Logging
+                                </h3>
+                                
+                                <div class="flex items-center justify-between p-3 bg-cream rounded-lg mb-3">
+                                    <div>
+                                        <p class="font-medium text-dark text-[12px]">Status</p>
+                                        <p class="text-[10px] text-dark/40">Logs to /logs/debug.log</p>
                                     </div>
-                                    <span class="text-[10px] text-dark/40 flex-shrink-0 ml-2"><?= number_format($log['size'] / 1024, 1) ?> KB</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] font-medium <?= FP3_DEBUG ? 'text-green-600' : 'text-dark/30' ?>">
+                                            <?= FP3_DEBUG ? 'ON' : 'OFF' ?>
+                                        </span>
+                                        <form method="POST" action="" class="inline">
+                                            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                            <input type="hidden" name="toggle_debug" value="1">
+                                            <button type="submit" class="relative w-10 h-5 rounded-full transition-colors <?= FP3_DEBUG ? 'bg-green-500' : 'bg-dark/20' ?>">
+                                                <span class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform <?= FP3_DEBUG ? 'translate-x-5' : '' ?>"></span>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                                <?php endforeach; ?>
+                                
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 mb-3">
+                                    <p class="text-[10px] text-amber-800">⚠️ Logs sensitive data</p>
+                                </div>
+                                
+                                <form method="POST" action="">
+                                    <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                                    <input type="hidden" name="clear_logs" value="1">
+                                    <button type="submit" class="w-full bg-crimson/10 text-crimson font-medium py-2 rounded-lg hover:bg-crimson/20 transition text-[11px]">
+                                        Clear All Logs
+                                    </button>
+                                </form>
                             </div>
-                            <?php endif; ?>
-                        </div>
 
-                        <!-- Environment -->
-                        <div class="bg-white rounded-xl border border-dark/5 p-4 md:p-5">
-                            <h3 class="font-semibold text-dark mb-4 flex items-center gap-2 text-[14px] md:text-base">
-                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                </svg>
-                                Environment
-                            </h3>
-                            
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-[12px] p-2 bg-cream rounded">
-                                    <span class="text-dark/50">Environment</span>
-                                    <span class="font-medium text-dark"><?= APP_ENV ?></span>
+                            <!-- Log Files -->
+                            <div class="bg-white rounded-xl border border-dark/5 p-4">
+                                <h3 class="font-semibold text-dark mb-3 flex items-center gap-2 text-[13px]">
+                                    <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Log Files
+                                </h3>
+                                
+                                <?php if (empty($logFiles)): ?>
+                                <p class="text-[11px] text-dark/30 text-center py-8">No log files</p>
+                                <?php else: ?>
+                                <div class="space-y-2">
+                                    <?php foreach ($logFiles as $log): ?>
+                                    <div class="p-2 bg-cream rounded-lg">
+                                        <p class="font-medium text-dark text-[11px] truncate"><?= e($log['name']) ?></p>
+                                        <div class="flex justify-between items-center mt-0.5">
+                                            <p class="text-[9px] text-dark/40"><?= date('M j, H:i', $log['modified']) ?></p>
+                                            <span class="text-[9px] text-dark/40"><?= number_format($log['size'] / 1024, 1) ?> KB</span>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
                                 </div>
-                                <div class="flex justify-between text-[12px] p-2 bg-cream rounded">
-                                    <span class="text-dark/50">PHP Version</span>
-                                    <span class="font-medium text-dark"><?= PHP_VERSION ?></span>
-                                </div>
-                                <div class="flex justify-between text-[12px] p-2 bg-cream rounded">
-                                    <span class="text-dark/50">Debug Mode</span>
-                                    <span class="font-medium <?= FP3_DEBUG ? 'text-green-600' : 'text-dark/40' ?>"><?= FP3_DEBUG ? 'ON' : 'OFF' ?></span>
-                                </div>
-                                <div class="flex justify-between text-[12px] p-2 bg-cream rounded">
-                                    <span class="text-dark/50">Memory Limit</span>
-                                    <span class="font-medium text-dark"><?= ini_get('memory_limit') ?></span>
-                                </div>
-                                <div class="flex justify-between text-[12px] p-2 bg-cream rounded">
-                                    <span class="text-dark/50">Max Upload</span>
-                                    <span class="font-medium text-dark"><?= ini_get('upload_max_filesize') ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Environment -->
+                            <div class="bg-white rounded-xl border border-dark/5 p-4">
+                                <h3 class="font-semibold text-dark mb-3 flex items-center gap-2 text-[13px]">
+                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                    Environment
+                                </h3>
+                                
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between text-[11px] p-2 bg-cream rounded">
+                                        <span class="text-dark/50">Environment</span>
+                                        <span class="font-medium text-dark"><?= APP_ENV ?></span>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] p-2 bg-cream rounded">
+                                        <span class="text-dark/50">PHP</span>
+                                        <span class="font-medium text-dark"><?= PHP_VERSION ?></span>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] p-2 bg-cream rounded">
+                                        <span class="text-dark/50">Debug</span>
+                                        <span class="font-medium <?= FP3_DEBUG ? 'text-green-600' : 'text-dark/40' ?>"><?= FP3_DEBUG ? 'ON' : 'OFF' ?></span>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] p-2 bg-cream rounded">
+                                        <span class="text-dark/50">Memory</span>
+                                        <span class="font-medium text-dark"><?= ini_get('memory_limit') ?></span>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] p-2 bg-cream rounded">
+                                        <span class="text-dark/50">Upload</span>
+                                        <span class="font-medium text-dark"><?= ini_get('upload_max_filesize') ?></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Log Viewers - Stack on mobile -->
+                    <!-- Log Viewers - Full Width Below -->
                     <?php if ($debugLogContent || $errorLogContent): ?>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                         <?php if ($debugLogContent): ?>
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
-                            <div class="px-5 py-3 border-b border-dark/5 bg-blue-50">
-                                <h3 class="font-semibold text-dark text-[13px] flex items-center gap-2">
+                            <div class="px-4 py-3 border-b border-dark/5 bg-blue-50">
+                                <h3 class="font-semibold text-dark text-[12px] flex items-center gap-2">
                                     <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
                                     Debug Log (last 100 lines)
                                 </h3>
                             </div>
                             <div class="p-3 bg-dark max-h-[300px] overflow-auto">
-                                <pre class="log-viewer text-green-400 whitespace-pre-wrap text-[10px]"><?= e($debugLogContent) ?></pre>
+                                <pre class="log-viewer text-green-400 whitespace-pre-wrap text-[10px] leading-relaxed"><?= e($debugLogContent) ?></pre>
                             </div>
                         </div>
                         <?php endif; ?>
                         
                         <?php if ($errorLogContent): ?>
                         <div class="bg-white rounded-xl border border-dark/5 overflow-hidden">
-                            <div class="px-5 py-3 border-b border-dark/5 bg-red-50">
-                                <h3 class="font-semibold text-dark text-[13px] flex items-center gap-2">
+                            <div class="px-4 py-3 border-b border-dark/5 bg-red-50">
+                                <h3 class="font-semibold text-dark text-[12px] flex items-center gap-2">
                                     <span class="w-2 h-2 bg-red-500 rounded-full"></span>
                                     Error Log (last 50 lines)
                                 </h3>
                             </div>
                             <div class="p-3 bg-dark max-h-[300px] overflow-auto">
-                                <pre class="log-viewer text-red-400 whitespace-pre-wrap text-[10px]"><?= e($errorLogContent) ?></pre>
+                                <pre class="log-viewer text-red-400 whitespace-pre-wrap text-[10px] leading-relaxed"><?= e($errorLogContent) ?></pre>
                             </div>
                         </div>
                         <?php endif; ?>
