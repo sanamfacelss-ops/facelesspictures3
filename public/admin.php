@@ -3440,10 +3440,10 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div x-data="{showHome: true, showRoleCards: false, showWriter: false, showDirector: false, showActor: false}">
+                            <div class="space-y-4" x-data="{showHome: true, showRoleCards: false, showWriter: false, showDirector: false, showActor: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
-                            <div class="mb-4">
+                            <div>
                                 <div @click="showHome = !showHome" 
                                     class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg cursor-pointer hover:from-gray-100 hover:to-gray-150 transition-all">
                                     <div class="flex items-center gap-2">
@@ -3456,7 +3456,7 @@ if (file_exists($errorLogFile)) {
                                     </svg>
                                 </div>
                                 <div x-show="showHome" x-collapse>
-                                    <div class="mt-3 pl-4 pr-4">
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
 
                             <!-- SECTION: Brand -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
@@ -3906,7 +3906,7 @@ if (file_exists($errorLogFile)) {
                             </div><!-- End Home Page Section -->
 
                             <!-- ========== ROLE CARDS (shown on home page) ========== -->
-                            <div class="mb-4">
+                            <div>
                                 <div @click="showRoleCards = !showRoleCards" 
                                     class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg cursor-pointer hover:from-purple-100 hover:to-purple-150 transition-all">
                                     <div class="flex items-center gap-2">
@@ -3919,7 +3919,7 @@ if (file_exists($errorLogFile)) {
                                     </svg>
                                 </div>
                                 <div x-show="showRoleCards" x-collapse>
-                                    <div class="mt-3 pl-4 pr-4">
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
 
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
@@ -4060,7 +4060,7 @@ if (file_exists($errorLogFile)) {
                             </div><!-- End Role Cards Section -->
 
                             <!-- ========== WRITER PAGE TEXT ========== -->
-                            <div class="mb-4">
+                            <div>
                                 <div @click="showWriter = !showWriter" 
                                     class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg cursor-pointer hover:from-blue-100 hover:to-blue-150 transition-all">
                                     <div class="flex items-center gap-2">
@@ -4073,7 +4073,7 @@ if (file_exists($errorLogFile)) {
                                     </svg>
                                 </div>
                                 <div x-show="showWriter" x-collapse>
-                                    <div class="mt-3 pl-4 pr-4">
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
 
                             <!-- WRITER PAGE TEXT -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
@@ -4119,7 +4119,7 @@ if (file_exists($errorLogFile)) {
                             </div><!-- End Writer Page Section -->
 
                             <!-- ========== DIRECTOR PAGE TEXT ========== -->
-                            <div class="mb-4">
+                            <div>
                                 <div @click="showDirector = !showDirector" 
                                     class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg cursor-pointer hover:from-green-100 hover:to-green-150 transition-all">
                                     <div class="flex items-center gap-2">
@@ -4132,7 +4132,7 @@ if (file_exists($errorLogFile)) {
                                     </svg>
                                 </div>
                                 <div x-show="showDirector" x-collapse>
-                                    <div class="mt-3 pl-4 pr-4">
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
 
                                     <!-- DIRECTOR PAGE TEXT -->
                                     <div class="mb-6 pb-6 border-b border-dark/5">
@@ -4178,7 +4178,7 @@ if (file_exists($errorLogFile)) {
                             </div><!-- End Director Page Section -->
 
                             <!-- ========== ACTOR PAGE TEXT ========== -->
-                            <div class="mb-4">
+                            <div>
                                 <div @click="showActor = !showActor" 
                                     class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg cursor-pointer hover:from-orange-100 hover:to-orange-150 transition-all">
                                     <div class="flex items-center gap-2">
@@ -4191,7 +4191,7 @@ if (file_exists($errorLogFile)) {
                                     </svg>
                                 </div>
                                 <div x-show="showActor" x-collapse>
-                                    <div class="mt-3 pl-4 pr-4">
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
 
                                     <!-- ACTOR PAGE TEXT -->
                                     <div class="mb-6 pb-6 border-b border-dark/5">
