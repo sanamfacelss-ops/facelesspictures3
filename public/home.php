@@ -19,6 +19,35 @@ for ($i = 1; $i <= 6; $i++) {
     if ($url) $manifestoVideos[] = ['url' => $url, 'title' => $title];
 }
 
+// Role card settings
+$roles = [];
+foreach (['writer', 'director', 'actor'] as $role) {
+    $roles[$role] = [
+        'title' => $settingsModel->get('role_' . $role . '_title', strtoupper($role)),
+        'icon' => $settingsModel->get('role_' . $role . '_icon', ''),
+        'description' => $settingsModel->get('role_' . $role . '_description', ''),
+        'badge1' => $settingsModel->get('role_' . $role . '_badge1', ''),
+        'badge2' => $settingsModel->get('role_' . $role . '_badge2', ''),
+        'button_text' => $settingsModel->get('role_' . $role . '_button_text', 'Click Here →'),
+        'button_url' => $settingsModel->get('role_' . $role . '_button_url', '/' . $role),
+    ];
+}
+
+// Marquee items
+$marqueeItems = [];
+for ($i = 1; $i <= 10; $i++) {
+    $item = $settingsModel->get('marquee_item' . $i, '');
+    if ($item) $marqueeItems[] = $item;
+}
+// Fallback if no items
+if (empty($marqueeItems)) {
+    $marqueeItems = ['ACTORS','DIRECTORS','WRITERS','NO CONNECTIONS','ONE VIDEO','ONE CHANCE','NOW OPEN','NO FACE','JUST TALENT','SUBMIT TODAY'];
+}
+
+// About section
+$aboutSectionLabel = $settingsModel->get('about_section_label', 'About');
+$aboutSectionHeading = $settingsModel->get('about_section_heading', 'WHAT IS FACELESS PICTURES?');
+
 // Up to 6 poster slots
 $posterKeys = [
     ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label'],
@@ -450,39 +479,76 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6" style="align-items:stretch">
 
       <!-- WRITER -->
+      <?php if ($roles['writer']['title']): ?>
       <div class="role-card" style="height:100%">
-        <div class="role-icon">✍️</div>
-        <p class="role-name">WRITER</p>
-        <p class="role-desc">Read your script on camera.<br>Your words. Your voice. One video.</p>
+        <?php if ($roles['writer']['icon']): ?>
+        <div class="role-icon"><?= htmlspecialchars($roles['writer']['icon']) ?></div>
+        <?php endif; ?>
+        <p class="role-name"><?= htmlspecialchars($roles['writer']['title']) ?></p>
+        <?php if ($roles['writer']['description']): ?>
+        <p class="role-desc"><?= nl2br(htmlspecialchars($roles['writer']['description'])) ?></p>
+        <?php endif; ?>
+        <?php if ($roles['writer']['badge1'] || $roles['writer']['badge2']): ?>
         <div class="role-badges">
-          <span class="badge">Script Reading</span>
+          <?php if ($roles['writer']['badge1']): ?>
+          <span class="badge"><?= htmlspecialchars($roles['writer']['badge1']) ?></span>
+          <?php endif; ?>
+          <?php if ($roles['writer']['badge2']): ?>
+          <span class="badge"><?= htmlspecialchars($roles['writer']['badge2']) ?></span>
+          <?php endif; ?>
         </div>
-        <a href="/writer" class="btn-black">Click Here →</a>
+        <?php endif; ?>
+        <a href="<?= htmlspecialchars($roles['writer']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['writer']['button_text']) ?></a>
       </div>
+      <?php endif; ?>
 
       <!-- DIRECTOR -->
+      <?php if ($roles['director']['title']): ?>
       <div class="role-card" style="height:100%">
-        <div class="role-icon">🎬</div>
-        <p class="role-name">DIRECTOR</p>
-        <p class="role-desc">Shoot your scene your way.<br>One phone. One take. Your vision.</p>
+        <?php if ($roles['director']['icon']): ?>
+        <div class="role-icon"><?= htmlspecialchars($roles['director']['icon']) ?></div>
+        <?php endif; ?>
+        <p class="role-name"><?= htmlspecialchars($roles['director']['title']) ?></p>
+        <?php if ($roles['director']['description']): ?>
+        <p class="role-desc"><?= nl2br(htmlspecialchars($roles['director']['description'])) ?></p>
+        <?php endif; ?>
+        <?php if ($roles['director']['badge1'] || $roles['director']['badge2']): ?>
         <div class="role-badges">
-          <span class="badge">Scene Direction</span>
-          <span class="badge">Pitch</span>
+          <?php if ($roles['director']['badge1']): ?>
+          <span class="badge"><?= htmlspecialchars($roles['director']['badge1']) ?></span>
+          <?php endif; ?>
+          <?php if ($roles['director']['badge2']): ?>
+          <span class="badge"><?= htmlspecialchars($roles['director']['badge2']) ?></span>
+          <?php endif; ?>
         </div>
-        <a href="/director" class="btn-black">Click Here →</a>
+        <?php endif; ?>
+        <a href="<?= htmlspecialchars($roles['director']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['director']['button_text']) ?></a>
       </div>
+      <?php endif; ?>
 
       <!-- ACTOR -->
+      <?php if ($roles['actor']['title']): ?>
       <div class="role-card" style="height:100%">
-        <div class="role-icon">🎭</div>
-        <p class="role-name">ACTOR</p>
-        <p class="role-desc">Shoot your scene on camera.<br>Face hidden. Talent only.</p>
+        <?php if ($roles['actor']['icon']): ?>
+        <div class="role-icon"><?= htmlspecialchars($roles['actor']['icon']) ?></div>
+        <?php endif; ?>
+        <p class="role-name"><?= htmlspecialchars($roles['actor']['title']) ?></p>
+        <?php if ($roles['actor']['description']): ?>
+        <p class="role-desc"><?= nl2br(htmlspecialchars($roles['actor']['description'])) ?></p>
+        <?php endif; ?>
+        <?php if ($roles['actor']['badge1'] || $roles['actor']['badge2']): ?>
         <div class="role-badges">
-          <span class="badge">Dialogue</span>
-          <span class="badge">Song</span>
+          <?php if ($roles['actor']['badge1']): ?>
+          <span class="badge"><?= htmlspecialchars($roles['actor']['badge1']) ?></span>
+          <?php endif; ?>
+          <?php if ($roles['actor']['badge2']): ?>
+          <span class="badge"><?= htmlspecialchars($roles['actor']['badge2']) ?></span>
+          <?php endif; ?>
         </div>
-        <a href="/actor" class="btn-black">Click Here →</a>
+        <?php endif; ?>
+        <a href="<?= htmlspecialchars($roles['actor']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['actor']['button_text']) ?></a>
       </div>
+      <?php endif; ?>
 
     </div>
 
@@ -491,25 +557,33 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 </main>
 
 <!-- ── MARQUEE ── -->
+<?php if (!empty($marqueeItems)): ?>
 <div class="marquee-wrap overflow-hidden border-y border-gray-100 py-3 bg-gray-50">
   <div class="marquee-track">
     <?php for ($i = 0; $i < 2; $i++): ?>
     <div class="flex items-center gap-6 px-4">
-      <?php foreach (['ACTORS','DIRECTORS','WRITERS','NO CONNECTIONS','ONE VIDEO','ONE CHANCE','NOW OPEN','NO FACE','JUST TALENT','SUBMIT TODAY'] as $w): ?>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.18em;color:#9ca3af"><?= $w ?></span>
+      <?php foreach ($marqueeItems as $item): ?>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.18em;color:#9ca3af"><?= htmlspecialchars($item) ?></span>
         <span style="width:3px;height:3px;background:#d1d5db;border-radius:50%;display:inline-block;flex-shrink:0"></span>
       <?php endforeach; ?>
     </div>
     <?php endfor; ?>
   </div>
 </div>
+<?php endif; ?>
 
 <!-- ── ABOUT ── -->
 <section id="about" class="py-16 px-4 bg-white border-t border-gray-100">
   <div class="max-w-3xl mx-auto text-center">
-    <p style="font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-bottom:.75rem">About</p>
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,52px);letter-spacing:.02em;color:#111;margin-bottom:1rem">WHAT IS FACELESS PICTURES?</h2>
-    <p style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= htmlspecialchars($aboutText) ?></p>
+    <?php if ($aboutSectionLabel): ?>
+    <p style="font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-bottom:.75rem"><?= htmlspecialchars($aboutSectionLabel) ?></p>
+    <?php endif; ?>
+    <?php if ($aboutSectionHeading): ?>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,52px);letter-spacing:.02em;color:#111;margin-bottom:1rem"><?= htmlspecialchars($aboutSectionHeading) ?></h2>
+    <?php endif; ?>
+    <?php if ($aboutText): ?>
+    <p style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= nl2br(htmlspecialchars($aboutText)) ?></p>
+    <?php endif; ?>
   </div>
 </section>
 

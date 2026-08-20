@@ -3852,10 +3852,171 @@ if (file_exists($errorLogFile)) {
                             <!-- SECTION: About -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">About Section</p>
-                                <div>
-                                    <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text</label>
-                                    <textarea x-model="form.landing_about_text" rows="3" placeholder="Describe Faceless Pictures..."
-                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-y"></textarea>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Label <span class="text-dark/30">(leave blank to hide)</span></label>
+                                        <input type="text" x-model="form.about_section_label" placeholder="About"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Heading <span class="text-dark/30">(leave blank to hide)</span></label>
+                                        <input type="text" x-model="form.about_section_heading" placeholder="WHAT IS FACELESS PICTURES?"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text</label>
+                                        <textarea x-model="form.landing_about_text" rows="3" placeholder="Describe Faceless Pictures..."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-y"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: Role Cards -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Role Cards (Writer, Director, Actor)</p>
+                                <p class="text-xs text-dark/40 mb-4">Leave title blank to hide the entire card. Use \n for line breaks in descriptions.</p>
+                                
+                                <div class="space-y-6">
+                                    <!-- WRITER -->
+                                    <div class="p-4 bg-gray-50 rounded-lg">
+                                        <p class="text-xs font-bold text-dark/70 mb-3">✍️ WRITER</p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Title</label>
+                                                <input type="text" x-model="form.role_writer_title" placeholder="WRITER"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Icon Emoji</label>
+                                                <input type="text" x-model="form.role_writer_icon" placeholder="✍️"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-[10px] text-dark/50 mb-1">Description (use \n for line breaks)</label>
+                                                <textarea x-model="form.role_writer_description" rows="2" placeholder="Read your script on camera.\nYour words. Your voice. One video."
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Badge 1 <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.role_writer_badge1" placeholder="Script Reading"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Badge 2 <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.role_writer_badge2" placeholder=""
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                <input type="text" x-model="form.role_writer_button_text" placeholder="Click Here →"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
+                                                <input type="text" x-model="form.role_writer_button_url" placeholder="/writer"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- DIRECTOR -->
+                                    <div class="p-4 bg-gray-50 rounded-lg">
+                                        <p class="text-xs font-bold text-dark/70 mb-3">🎬 DIRECTOR</p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Title</label>
+                                                <input type="text" x-model="form.role_director_title" placeholder="DIRECTOR"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Icon Emoji</label>
+                                                <input type="text" x-model="form.role_director_icon" placeholder="🎬"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-[10px] text-dark/50 mb-1">Description (use \n for line breaks)</label>
+                                                <textarea x-model="form.role_director_description" rows="2" placeholder="Shoot your scene your way.\nOne phone. One take. Your vision."
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Badge 1 <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.role_director_badge1" placeholder="Scene Direction"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Badge 2 <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.role_director_badge2" placeholder="Pitch"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                <input type="text" x-model="form.role_director_button_text" placeholder="Click Here →"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
+                                                <input type="text" x-model="form.role_director_button_url" placeholder="/director"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ACTOR -->
+                                    <div class="p-4 bg-gray-50 rounded-lg">
+                                        <p class="text-xs font-bold text-dark/70 mb-3">🎭 ACTOR</p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Title</label>
+                                                <input type="text" x-model="form.role_actor_title" placeholder="ACTOR"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Icon Emoji</label>
+                                                <input type="text" x-model="form.role_actor_icon" placeholder="🎭"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-[10px] text-dark/50 mb-1">Description (use \n for line breaks)</label>
+                                                <textarea x-model="form.role_actor_description" rows="2" placeholder="Shoot your scene on camera.\nFace hidden. Talent only."
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Badge 1 <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.role_actor_badge1" placeholder="Dialogue"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Badge 2 <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.role_actor_badge2" placeholder="Song"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                <input type="text" x-model="form.role_actor_button_text" placeholder="Click Here →"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
+                                                <input type="text" x-model="form.role_actor_button_url" placeholder="/actor"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION: Marquee -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <p class="text-[11px] font-semibold tracking-widest uppercase text-dark/30 mb-3">Scrolling Marquee Text</p>
+                                <p class="text-xs text-dark/40 mb-4">Up to 10 text items. Leave blank to hide. If all blank, defaults to original text.</p>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                                    <?php for ($mi = 1; $mi <= 10; $mi++): ?>
+                                    <div>
+                                        <label class="block text-[9px] text-dark/40 mb-1">Item <?= $mi ?></label>
+                                        <input type="text" x-model="form.marquee_item<?= $mi ?>" placeholder="TEXT"
+                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                    </div>
+                                    <?php endfor; ?>
                                 </div>
                             </div>
 
@@ -7171,6 +7332,47 @@ if (file_exists($errorLogFile)) {
                 manifesto_video5_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video5_title',''))) ?>',
                 manifesto_video6_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video6_url',''))) ?>',
                 manifesto_video6_title:'<?= addslashes(htmlspecialchars($settingsModel->get('manifesto_video6_title',''))) ?>',
+                
+                // About section
+                about_section_label:   <?= json_encode($settingsModel->get('about_section_label','About')) ?>,
+                about_section_heading: <?= json_encode($settingsModel->get('about_section_heading','WHAT IS FACELESS PICTURES?')) ?>,
+                
+                // Role cards
+                role_writer_title:       <?= json_encode($settingsModel->get('role_writer_title','WRITER')) ?>,
+                role_writer_icon:        <?= json_encode($settingsModel->get('role_writer_icon','✍️')) ?>,
+                role_writer_description: <?= json_encode($settingsModel->get('role_writer_description','Read your script on camera.\nYour words. Your voice. One video.')) ?>,
+                role_writer_badge1:      <?= json_encode($settingsModel->get('role_writer_badge1','Script Reading')) ?>,
+                role_writer_badge2:      <?= json_encode($settingsModel->get('role_writer_badge2','')) ?>,
+                role_writer_button_text: <?= json_encode($settingsModel->get('role_writer_button_text','Click Here →')) ?>,
+                role_writer_button_url:  <?= json_encode($settingsModel->get('role_writer_button_url','/writer')) ?>,
+                
+                role_director_title:       <?= json_encode($settingsModel->get('role_director_title','DIRECTOR')) ?>,
+                role_director_icon:        <?= json_encode($settingsModel->get('role_director_icon','🎬')) ?>,
+                role_director_description: <?= json_encode($settingsModel->get('role_director_description','Shoot your scene your way.\nOne phone. One take. Your vision.')) ?>,
+                role_director_badge1:      <?= json_encode($settingsModel->get('role_director_badge1','Scene Direction')) ?>,
+                role_director_badge2:      <?= json_encode($settingsModel->get('role_director_badge2','Pitch')) ?>,
+                role_director_button_text: <?= json_encode($settingsModel->get('role_director_button_text','Click Here →')) ?>,
+                role_director_button_url:  <?= json_encode($settingsModel->get('role_director_button_url','/director')) ?>,
+                
+                role_actor_title:       <?= json_encode($settingsModel->get('role_actor_title','ACTOR')) ?>,
+                role_actor_icon:        <?= json_encode($settingsModel->get('role_actor_icon','🎭')) ?>,
+                role_actor_description: <?= json_encode($settingsModel->get('role_actor_description','Shoot your scene on camera.\nFace hidden. Talent only.')) ?>,
+                role_actor_badge1:      <?= json_encode($settingsModel->get('role_actor_badge1','Dialogue')) ?>,
+                role_actor_badge2:      <?= json_encode($settingsModel->get('role_actor_badge2','Song')) ?>,
+                role_actor_button_text: <?= json_encode($settingsModel->get('role_actor_button_text','Click Here →')) ?>,
+                role_actor_button_url:  <?= json_encode($settingsModel->get('role_actor_button_url','/actor')) ?>,
+                
+                // Marquee items
+                marquee_item1:  <?= json_encode($settingsModel->get('marquee_item1','ACTORS')) ?>,
+                marquee_item2:  <?= json_encode($settingsModel->get('marquee_item2','DIRECTORS')) ?>,
+                marquee_item3:  <?= json_encode($settingsModel->get('marquee_item3','WRITERS')) ?>,
+                marquee_item4:  <?= json_encode($settingsModel->get('marquee_item4','NO CONNECTIONS')) ?>,
+                marquee_item5:  <?= json_encode($settingsModel->get('marquee_item5','ONE VIDEO')) ?>,
+                marquee_item6:  <?= json_encode($settingsModel->get('marquee_item6','ONE CHANCE')) ?>,
+                marquee_item7:  <?= json_encode($settingsModel->get('marquee_item7','NOW OPEN')) ?>,
+                marquee_item8:  <?= json_encode($settingsModel->get('marquee_item8','NO FACE')) ?>,
+                marquee_item9:  <?= json_encode($settingsModel->get('marquee_item9','JUST TALENT')) ?>,
+                marquee_item10: <?= json_encode($settingsModel->get('marquee_item10','SUBMIT TODAY')) ?>,
             },
             init() {
                 // Sync uploaded image URLs back into the form
