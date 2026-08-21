@@ -758,3 +758,16 @@ function actorSubmit(){
 <?php include __DIR__ . '/partials/language-switcher.php'; ?>
 </body>
 </html>
+
+
+<!-- Inject role-specific submission messages -->
+<script>
+window._submissionMessages = {
+    actor_success_heading: <?= json_encode($settingsModel->get('actor_success_heading', 'ACTOR SUBMISSION RECEIVED!')) ?>,
+    actor_success_message: <?= json_encode($settingsModel->get('actor_success_message', "Your acting video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
+    actor_success_pdf_button: <?= json_encode($settingsModel->get('actor_success_pdf_button', 'Download Actor Brief PDF')) ?>,
+    actor_failure_heading: <?= json_encode($settingsModel->get('actor_failure_heading', 'SUBMISSION FAILED')) ?>,
+    actor_failure_message: <?= json_encode($settingsModel->get('actor_failure_message', "We couldn't process your acting video. Please check your file and try again.")) ?>,
+    actor_failure_retry_button: <?= json_encode($settingsModel->get('actor_failure_retry_button', 'Try Again')) ?>
+};
+</script>

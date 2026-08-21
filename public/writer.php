@@ -278,3 +278,16 @@ function writerSubmit(){
 <?php include __DIR__ . '/partials/language-switcher.php'; ?>
 </body>
 </html>
+
+
+<!-- Inject role-specific submission messages -->
+<script>
+window._submissionMessages = {
+    writer_success_heading: <?= json_encode($settingsModel->get('writer_success_heading', 'WRITER SUBMISSION RECEIVED!')) ?>,
+    writer_success_message: <?= json_encode($settingsModel->get('writer_success_message', "Your writer video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
+    writer_success_pdf_button: <?= json_encode($settingsModel->get('writer_success_pdf_button', 'Download Writer Brief PDF')) ?>,
+    writer_failure_heading: <?= json_encode($settingsModel->get('writer_failure_heading', 'SUBMISSION FAILED')) ?>,
+    writer_failure_message: <?= json_encode($settingsModel->get('writer_failure_message', "We couldn't process your writer video. Please check your file and try again.")) ?>,
+    writer_failure_retry_button: <?= json_encode($settingsModel->get('writer_failure_retry_button', 'Try Again')) ?>
+};
+</script>

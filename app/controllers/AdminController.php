@@ -2185,6 +2185,13 @@ class AdminController
             'footer_menu_item_2_text', 'footer_menu_item_2_page', 'footer_menu_item_2_order',
             'footer_menu_item_3_text', 'footer_menu_item_3_page', 'footer_menu_item_3_order',
             'footer_menu_item_4_text', 'footer_menu_item_4_page', 'footer_menu_item_4_order',
+            // Role submission messages
+            'actor_success_heading', 'actor_success_message', 'actor_success_pdf_button',
+            'actor_failure_heading', 'actor_failure_message', 'actor_failure_retry_button',
+            'director_success_heading', 'director_success_message', 'director_success_pdf_button',
+            'director_failure_heading', 'director_failure_message', 'director_failure_retry_button',
+            'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
+            'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
         ];
 
         if (!in_array($key, $allowed)) {

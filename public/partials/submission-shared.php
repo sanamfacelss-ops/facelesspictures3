@@ -69,11 +69,26 @@ window._briefForPDF = window._briefForPDF || { title: '', content: '', auditionT
 
 /* ── show / hide modal ─────────────────────────────────────────── */
 function showSuccessModal(data) {
+    const role = (data.role || '').toLowerCase();
+    
+    // Get role-specific text from PHP (injected per page)
+    const messages = window._submissionMessages || {};
+    
     document.getElementById('modalName').textContent    = data.name        || '';
     document.getElementById('modalEmail').textContent   = data.email       || '';
     document.getElementById('modalRole').textContent    = (data.role || '') + ' — ' + (data.audition_type || '');
-    document.getElementById('modalSubtitle').textContent =
-        "Your video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at " + (data.email || 'your email') + '.';
+    
+    // Use role-specific heading and message
+    const heading = messages[role + '_success_heading'] || 'SUBMISSION RECEIVED!';
+    const message = messages[role + '_success_message'] || "Your video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at " + (data.email || 'your email') + '.';
+    const pdfButton = messages[role + '_success_pdf_button'] || 'Download Brief as PDF';
+    
+    document.querySelector('#successModal h2').textContent = heading;
+    document.getElementById('modalSubtitle').textContent = message;
+    document.getElementById('modalPdfBtn').querySelector('span') ? 
+        document.getElementById('modalPdfBtn').querySelector('span').textContent = pdfButton :
+        document.getElementById('modalPdfBtn').textContent = pdfButton;
+    
     document.getElementById('successModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
