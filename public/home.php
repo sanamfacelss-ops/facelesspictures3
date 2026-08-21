@@ -167,9 +167,9 @@ endforeach;
 <noscript><link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"></noscript>
 <script defer src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
-<!-- Tailwind and Alpine (deferred) -->
-<script defer src="https://cdn.tailwindcss.com"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!-- Tailwind and Alpine -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
