@@ -114,6 +114,8 @@ $posterCount = count($posters);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faceless Pictures 3 — No Face. Just Talent.</title>
 <meta name="description" content="India's first anonymous film competition. Actor, Director & Writer auditions open now.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" href="/favicon.ico">
 
 <!-- Performance Optimizations -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
