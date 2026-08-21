@@ -25,7 +25,7 @@ class ImageCompressionService
      * 
      * @param string $inputPath Full path to input image
      * @param string|null $outputPath Full path for output (optional, will overwrite if null)
-     * @param bool $convertToWebP Convert to WebP format for better compression
+     * @param bool $convertToWebP Convert to WebP format for better compression (auto-disabled if not supported)
      * @return array ['success' => bool, 'output_path' => string, 'original_size' => int, 'compressed_size' => int, 'compression_ratio' => float]
      */
     public function compressImage(string $inputPath, ?string $outputPath = null, bool $convertToWebP = true): array
@@ -42,6 +42,14 @@ class ImageCompressionService
 
         // Get original file size
         $originalSize = filesize($inputPath);
+        
+        // Check if WebP is actually supported
+        $webpSupported = function_exists('imagewebp');
+        if ($convertToWebP && !$webpSupported) {
+            // Auto-disable WebP conversion if not supported
+            $convertToWebP = false;
+            log_message('warning', 'WebP conversion requested but not supported, using JPEG/PNG compression instead');
+        }
         
         // Detect image type
         $imageInfo = getimagesize($inputPath);
@@ -90,7 +98,7 @@ class ImageCompressionService
 
         // Determine output path and format
         if (!$outputPath) {
-            if ($convertToWebP && function_exists('imagewebp')) {
+            if ($convertToWebP && $webpSupported) {
                 $pathInfo = pathinfo($inputPath);
                 $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
             } else {
@@ -100,7 +108,7 @@ class ImageCompressionService
 
         // Save compressed image
         $saved = false;
-        if ($convertToWebP && function_exists('imagewebp') && (str_ends_with($outputPath, '.webp') || !$outputPath)) {
+        if ($convertToWebP && $webpSupported && (str_ends_with($outputPath, '.webp') || !$outputPath)) {
             // Save as WebP
             if (!str_ends_with($outputPath, '.webp')) {
                 $pathInfo = pathinfo($outputPath);

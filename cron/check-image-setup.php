@@ -43,8 +43,15 @@ echo "\n";
 
 // Check 2: Upload Directory
 echo "2. Checking Upload Directory...\n";
+// Try public/uploads first, then fall back to root uploads
 $uploadDir = __DIR__ . '/../public/uploads';
 $uploadDirFull = realpath($uploadDir);
+
+if (!$uploadDirFull) {
+    // Try root uploads directory
+    $uploadDir = __DIR__ . '/../uploads';
+    $uploadDirFull = realpath($uploadDir);
+}
 
 if (!$uploadDirFull) {
     echo "   ✗ Upload directory does not exist: $uploadDir\n\n";

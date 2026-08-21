@@ -19,8 +19,24 @@ echo "════════════════════════�
 echo "  BULK IMAGE OPTIMIZATION SCRIPT\n";
 echo "══════════════════════════════════════════════════════\n\n";
 
+// Try public/uploads first, then fall back to root uploads
 $uploadDir = __DIR__ . '/../public/uploads';
+if (!is_dir($uploadDir)) {
+    $uploadDir = __DIR__ . '/../uploads';
+}
+
+echo "Upload directory: " . realpath($uploadDir) . "\n";
+
 $imageService = new ImageCompressionService();
+
+// Check if WebP is supported
+$webpSupported = function_exists('imagewebp');
+if ($webpSupported) {
+    echo "WebP support: ENABLED (will convert to WebP)\n\n";
+} else {
+    echo "WebP support: DISABLED (will use JPEG/PNG compression)\n";
+    echo "→ To enable WebP: sudo apt-get install libwebp-dev && sudo apt-get install --reinstall php-gd\n\n";
+}
 
 // Find all images
 $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
@@ -74,8 +90,8 @@ foreach ($images as $index => $imagePath) {
     }
     
     try {
-        // Compress the image
-        $result = $imageService->compressImage($imagePath);
+        // Compress the image (WebP conversion will be skipped if not supported)
+        $result = $imageService->compressImage($imagePath, null, $webpSupported);
         
         if ($result['success']) {
             $newSize = filesize($result['path']);
