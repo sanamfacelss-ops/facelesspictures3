@@ -1,6 +1,50 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
 require_once __DIR__ . '/../app/helpers/settings_helper.php';
+
+// Helper function to format text content with list detection
+function format_text_content($text) {
+    if (empty($text)) return '';
+    
+    // Detect numbered lists: lines starting with "1. " or "1) " etc.
+    $lines = explode("\n", $text);
+    $inList = false;
+    $result = '';
+    
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if (empty($line)) {
+            if ($inList) {
+                $result .= '</ul>';
+                $inList = false;
+            }
+            $result .= '<br>';
+            continue;
+        }
+        
+        // Check if line starts with number pattern: "1. " or "1) " or "1 - "
+        if (preg_match('/^\d+[\.\)]\s+(.+)$/', $line, $matches)) {
+            if (!$inList) {
+                $result .= '<ul class="text-list">';
+                $inList = true;
+            }
+            $result .= '<li>' . htmlspecialchars($matches[1]) . '</li>';
+        } else {
+            if ($inList) {
+                $result .= '</ul>';
+                $inList = false;
+            }
+            $result .= htmlspecialchars($line) . '<br>';
+        }
+    }
+    
+    if ($inList) {
+        $result .= '</ul>';
+    }
+    
+    return $result;
+}
+
 $scriptModel   = new App\Models\Script();
 
 $logoUrl         = setting('site_logo_url', '');
@@ -28,6 +72,11 @@ $formDescription = setting('director_form_description', 'Cast your actor, give t
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;overflow-x:hidden}
+
+/* TEXT LISTS - Auto-format numbered lists with spacing */
+.text-list{list-style:none;padding:0;margin:0.5rem 0}
+.text-list li{padding:0.5rem 0;position:relative;line-height:1.6}
+.text-list li:not(:last-child){margin-bottom:0.375rem}
 body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans Tamil','Noto Sans Telugu','Noto Sans Kannada','Noto Sans Malayalam','Noto Sans Gujarati','Noto Sans Gurmukhi',sans-serif;background:#f9fafb;color:#111;-webkit-font-smoothing:antialiased}
 [x-cloak]{display:none!important}
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50}
