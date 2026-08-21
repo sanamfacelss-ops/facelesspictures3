@@ -178,11 +178,11 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 [x-cloak]{display:none!important}
 
 /* NAV */
-.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
+.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50}
 .fp-nav > div{position:relative}
 .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px}
 .nav-badge{background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-link{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;text-decoration:none;transition:color .2s}
+.nav-link{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;text-decoration:none;transition:color .2s;white-space:nowrap}
 .nav-link:hover{color:#111}
 
 /* POSTER CARD */
@@ -365,10 +365,14 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 <body x-data="homePage()" @keydown.escape.window="closePlayer()" x-init="init()">
 
 <!-- ── NAV ── -->
-<nav class="fp-nav">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+<?php
+// Calculate header height based on logo size (logo height + 16px padding)
+$navHeight = (int)$logoHeight + 16;
+?>
+<nav class="fp-nav" style="height:<?= $navHeight ?>px">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-center gap-8 sm:gap-12 md:gap-16">
     <!-- LEFT MENU ITEMS (orders 1-2) -->
-    <div class="flex items-center gap-4 sm:gap-6">
+    <div class="flex items-center gap-4 sm:gap-5">
       <?php foreach ($headerMenuItems['left'] as $item): ?>
         <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link <?= $item['order'] <= 1 ? 'hidden sm:block' : '' ?>">
           <?= htmlspecialchars($item['text']) ?>
@@ -377,7 +381,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     </div>
     
     <!-- CENTERED LOGO -->
-    <a href="/" class="nav-logo absolute left-1/2 transform -translate-x-1/2">
+    <a href="/" class="nav-logo flex-shrink-0">
       <?php if ($logoUrl): ?>
         <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto" loading="eager">
       <?php else: ?>
@@ -387,7 +391,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     </a>
     
     <!-- RIGHT MENU ITEMS (orders 3-4) -->
-    <div class="flex items-center gap-4 sm:gap-6">
+    <div class="flex items-center gap-4 sm:gap-5">
       <?php foreach ($headerMenuItems['right'] as $item): ?>
         <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link">
           <?= htmlspecialchars($item['text']) ?>
@@ -398,7 +402,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 </nav>
 
 <!-- ── MAIN CONTENT ── -->
-<main class="pt-[60px]">
+<main style="padding-top:<?= $navHeight ?>px">
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
     <!-- ══ HERO HEADLINE — centered ══ -->

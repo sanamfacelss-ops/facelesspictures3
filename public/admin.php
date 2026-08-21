@@ -142,7 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_debug'])) {
                 $content .= "\nFP3_DEBUG=$newDebug";
             }
             file_put_contents($envFile, $content);
-            header('Location: /admin?debug_updated=1');
+            
+            // Force browser to reload without cache
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+            header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+            header('Location: /admin?debug_updated=1&t=' . time());
             exit;
         }
     }
@@ -4845,7 +4850,7 @@ if (file_exists($errorLogFile)) {
                                         <span class="text-[11px] font-medium <?= FP3_DEBUG ? 'text-green-600' : 'text-dark/30' ?>">
                                             <?= FP3_DEBUG ? 'ON' : 'OFF' ?>
                                         </span>
-                                        <form method="POST" action="" class="inline">
+                                        <form method="POST" action="" class="inline" onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerHTML='<span class=\'text-[9px]\'>Saving...</span>';">
                                             <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                                             <input type="hidden" name="toggle_debug" value="1">
                                             <button type="submit" class="relative w-10 h-5 rounded-full transition-colors <?= FP3_DEBUG ? 'bg-green-500' : 'bg-dark/20' ?>">

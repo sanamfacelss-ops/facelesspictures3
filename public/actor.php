@@ -69,7 +69,7 @@ $allTuneUrls = array_values(array_filter($allTuneUrls, fn($t) => !empty($t['url'
 html,body{width:100%;overflow-x:hidden}
 body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans Tamil','Noto Sans Telugu','Noto Sans Kannada','Noto Sans Malayalam','Noto Sans Gujarati','Noto Sans Gurmukhi',sans-serif;background:#f9fafb;color:#111;-webkit-font-smoothing:antialiased}
 [x-cloak]{display:none!important}
-.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
+.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50}
 .brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem}
 .brief-grid>.brief-card:last-child:nth-child(odd){grid-column:1/-1}
 @media(max-width:768px){.brief-grid{grid-template-columns:1fr;padding:0 1rem 1.5rem}
@@ -177,10 +177,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 </head>
 <body>
 
+<?php 
+// Get the header height from nav-frontend.php calculation
+$headerHeight = (int)setting('site_logo_height', '44') + 16;
+?>
+
 <?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
 <!-- HERO -->
-<section style="padding:4.5rem 1.5rem 1.75rem;text-align:center" class="fade-up">
+<section style="padding:<?= $headerHeight + 16 ?>px 1.5rem 1.75rem;text-align:center" class="fade-up">
   <?php if (!empty($heroLabel)): ?>
   <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
   <?php endif; ?>
