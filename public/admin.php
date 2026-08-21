@@ -8259,15 +8259,36 @@ if (file_exists($errorLogFile)) {
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;
                 const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                
+                // Send all settings in ONE batch request
+                const fd = new FormData();
+                fd.append('csrf_token', csrf);
+                
+                // Add all form fields
                 for (const [key, value] of Object.entries(this.form)) {
-                    const fd = new FormData();
-                    fd.append('csrf_token', csrf);
-                    fd.append('key', key);
-                    fd.append('value', value);
-                    await fetch('/api/admin/settings/landing', {method:'POST', body: fd, credentials: 'same-origin'});
+                    fd.append(key, value);
                 }
-                this.saving = false; this.saved = true;
-                setTimeout(() => this.saved = false, 2500);
+                
+                try {
+                    const res = await fetch('/api/admin/settings/landing-batch', {
+                        method: 'POST', 
+                        body: fd, 
+                        credentials: 'same-origin'
+                    });
+                    
+                    if (res.ok) {
+                        this.saving = false; 
+                        this.saved = true;
+                        setTimeout(() => this.saved = false, 2500);
+                    } else {
+                        const err = await res.json();
+                        alert('Save failed: ' + (err.error || 'Unknown error'));
+                        this.saving = false;
+                    }
+                } catch (error) {
+                    alert('Network error: ' + error.message);
+                    this.saving = false;
+                }
             }
         };
     }
