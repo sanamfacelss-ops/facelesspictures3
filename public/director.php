@@ -92,7 +92,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
   <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
   <?php endif; ?>
   <?php if (!empty($heroHeading)): ?>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
+  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,40px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
   <?php endif; ?>
   <?php if (!empty($heroDescription)): ?>
   <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= format_text_content($heroDescription) ?></p>
