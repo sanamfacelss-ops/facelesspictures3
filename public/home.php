@@ -126,12 +126,12 @@ $posterCount = count($posters);
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="dns-prefetch" href="https://cdn.plyr.io">
 
-<!-- Preload critical images (first 3 posters) -->
+<!-- Preload critical images ONLY (first 3 posters) - more creates congestion -->
 <?php 
 $criticalPosters = array_slice($posters, 0, 3);
-foreach ($criticalPosters as $p): 
+foreach ($criticalPosters as $idx => $p): 
     if (!empty($p['url'])): ?>
-<link rel="preload" as="image" href="<?= htmlspecialchars($p['url']) ?>" fetchpriority="high">
+<link rel="preload" as="image" href="<?= htmlspecialchars($p['url']) ?>" fetchpriority="high" imagesrcset="<?= htmlspecialchars($p['url']) ?> 1x">
 <?php 
     endif;
 endforeach; 
@@ -1189,17 +1189,52 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') fpCloseMa
 
 <!-- ══ LAZY LOADING FIX ══ -->
 <script>
-// Fix browser lazy loading bug - force load images when visible
+// Progressive image loading - load in batches to avoid overwhelming slow connections
 document.addEventListener('DOMContentLoaded', function() {
-    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+    const lazyImages = Array.from(document.querySelectorAll('img[loading="lazy"]'));
+    const eagerImages = Array.from(document.querySelectorAll('img[loading="eager"]'));
     
+    // Load eager images first (already happening automatically)
+    console.log(`Loading ${eagerImages.length} eager images immediately...`);
+    
+    // Then load lazy images in batches of 3
+    const batchSize = 3;
+    let currentBatch = 0;
+    
+    function loadNextBatch() {
+        const start = currentBatch * batchSize;
+        const end = start + batchSize;
+        const batch = lazyImages.slice(start, end);
+        
+        if (batch.length === 0) {
+            console.log('All images loaded!');
+            return;
+        }
+        
+        console.log(`Loading batch ${currentBatch + 1}: ${batch.length} images...`);
+        
+        batch.forEach(img => {
+            if (img.src) {
+                const src = img.src;
+                img.src = '';
+                img.src = src;
+            }
+        });
+        
+        currentBatch++;
+        
+        // Wait 1 second between batches to avoid congestion
+        setTimeout(loadNextBatch, 1000);
+    }
+    
+    // Standard IntersectionObserver as fallback
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
                     // Force load by touching src
-                    if (img.src) {
+                    if (img.src && img.loading === 'lazy') {
                         const src = img.src;
                         img.src = '';
                         img.src = src;
@@ -1208,19 +1243,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }, {
-            rootMargin: '50px' // Start loading 50px before entering viewport
+            rootMargin: '100px' // Increased to 100px for better preloading
         });
         
         lazyImages.forEach(img => imageObserver.observe(img));
     } else {
-        // Fallback: load all images immediately if IntersectionObserver not supported
-        lazyImages.forEach(img => {
-            if (img.src) {
-                const src = img.src;
-                img.src = '';
-                img.src = src;
-            }
-        });
+        // Fallback: progressive batch loading
+        setTimeout(loadNextBatch, 2000); // Start after 2 seconds
     }
 });
 </script>
