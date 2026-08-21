@@ -10,6 +10,9 @@ $heroHeadline     = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECT
 $rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star in 3 Clicks');
 $rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
 
+// Get customizable header menu items (grouped by left/right position)
+$headerMenuItems = $settingsModel->getHeaderMenuItemsGrouped();
+
 // Manifesto video slider (up to 6 YouTube URLs + optional titles)
 $manifestoHeading    = $settingsModel->get('manifesto_heading', 'OUR MANIFESTO');
 $manifestoSubheading = $settingsModel->get('manifesto_subheading', 'What Faceless Pictures 3 stands for.');
@@ -91,6 +94,9 @@ $posterCount = count($posters);
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&family=Noto+Sans+Gujarati:wght@400;700&family=Noto+Sans+Gurmukhi:wght@400;700&display=swap" rel="stylesheet">
+<!-- Plyr Video Player -->
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
@@ -101,6 +107,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 /* NAV */
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50;height:60px}
+.fp-nav > div{position:relative}
 .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px}
 .nav-badge{background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .nav-link{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;text-decoration:none;transition:color .2s}
@@ -288,7 +295,17 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 <!-- ── NAV ── -->
 <nav class="fp-nav">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
-    <a href="/" class="nav-logo">
+    <!-- LEFT MENU ITEMS (orders 1-2) -->
+    <div class="flex items-center gap-4 sm:gap-6">
+      <?php foreach ($headerMenuItems['left'] as $item): ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link <?= $item['order'] <= 1 ? 'hidden sm:block' : '' ?>">
+          <?= htmlspecialchars($item['text']) ?>
+        </a>
+      <?php endforeach; ?>
+    </div>
+    
+    <!-- CENTERED LOGO -->
+    <a href="/" class="nav-logo absolute left-1/2 transform -translate-x-1/2">
       <?php if ($logoUrl): ?>
         <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto">
       <?php else: ?>
@@ -296,11 +313,14 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         <span class="nav-badge">3</span>
       <?php endif; ?>
     </a>
+    
+    <!-- RIGHT MENU ITEMS (orders 3-4) -->
     <div class="flex items-center gap-4 sm:gap-6">
-      <a href="#about"    class="nav-link hidden sm:block">About</a>
-      <a href="/writer"   class="nav-link">Writers</a>
-      <a href="/director" class="nav-link">Directors</a>
-      <a href="/actor"    class="nav-link">Actors</a>
+      <?php foreach ($headerMenuItems['right'] as $item): ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link">
+          <?= htmlspecialchars($item['text']) ?>
+        </a>
+      <?php endforeach; ?>
     </div>
   </div>
 </nav>
@@ -347,15 +367,16 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
                 </iframe>
             </div>
         <?php else: ?>
-            <!-- Native Video Player with Autoplay -->
+            <!-- Modern Video Player with Plyr -->
             <video 
+                id="hero-trailer-player"
+                class="plyr-video"
                 controls 
                 autoplay 
                 muted 
                 loop 
                 playsinline
-                style="width:100%;height:auto;display:block"
-                onloadedmetadata="this.play().catch(e => console.log('Autoplay blocked:', e))">
+                style="width:100%;height:auto;display:block">
                 <source src="<?= htmlspecialchars($heroTrailerUrl) ?>" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -974,6 +995,35 @@ function manifestoSlider(total) {
         }
     };
 }
+</script>
+
+<!-- Initialize Plyr for Hero Trailer -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const heroPlayer = document.getElementById('hero-trailer-player');
+    if (heroPlayer) {
+        const player = new Plyr(heroPlayer, {
+            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+            autoplay: true,
+            muted: true,
+            loop: { active: true },
+            hideControls: true,
+            resetOnEnd: false,
+            settings: ['quality', 'speed'],
+            quality: {
+                default: 720,
+                options: [1080, 720, 576, 480, 360]
+            }
+        });
+        
+        // Auto-play on load
+        player.on('ready', () => {
+            player.play().catch(() => {
+                console.log('Autoplay blocked by browser');
+            });
+        });
+    }
+});
 </script>
 
 <!-- ══ MANIFESTO YOUTUBE MODAL ══ -->

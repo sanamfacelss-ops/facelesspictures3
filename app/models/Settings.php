@@ -352,4 +352,82 @@ class Settings
     {
         return $this->set('landing_footer_content', $content, 'text', 'Footer content text with copyright and other information');
     }
+
+    /**
+     * Get header menu items
+     */
+    public function getHeaderMenuItems(): array
+    {
+        $items = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $items[] = [
+                'text' => $this->get("header_menu_item_{$i}_text", ''),
+                'url' => $this->get("header_menu_item_{$i}_url", ''),
+                'order' => (int) $this->get("header_menu_item_{$i}_order", $i),
+                'number' => $i
+            ];
+        }
+        
+        // Sort by order
+        usort($items, function($a, $b) {
+            return $a['order'] - $b['order'];
+        });
+        
+        return $items;
+    }
+
+    /**
+     * Get header menu items grouped by position (left/right of centered logo)
+     */
+    public function getHeaderMenuItemsGrouped(): array
+    {
+        $items = $this->getHeaderMenuItems();
+        
+        $left = [];
+        $right = [];
+        
+        foreach ($items as $item) {
+            if (empty($item['text'])) continue; // Skip empty items
+            
+            if ($item['order'] <= 2) {
+                $left[] = $item;
+            } else {
+                $right[] = $item;
+            }
+        }
+        
+        return [
+            'left' => $left,
+            'right' => $right
+        ];
+    }
+
+    /**
+     * Update a header menu item
+     */
+    public function updateHeaderMenuItem(int $itemNumber, string $text, string $url, int $order = null): bool
+    {
+        if ($itemNumber < 1 || $itemNumber > 4) {
+            return false;
+        }
+
+        if ($order !== null && ($order < 1 || $order > 4)) {
+            return false;
+        }
+
+        $this->db->beginTransaction();
+        try {
+            $this->set("header_menu_item_{$itemNumber}_text", $text, 'text', "Header menu item {$itemNumber} text label");
+            $this->set("header_menu_item_{$itemNumber}_url", $url, 'text', "Header menu item {$itemNumber} URL/link");
+            if ($order !== null) {
+                $this->set("header_menu_item_{$itemNumber}_order", (string)$order, 'text', "Header menu item {$itemNumber} display order");
+            }
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            debug_log("Failed to update header menu item {$itemNumber}: " . $e->getMessage(), 'SETTINGS');
+            return false;
+        }
+    }
 }

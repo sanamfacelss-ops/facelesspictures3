@@ -3528,6 +3528,116 @@ if (file_exists($errorLogFile)) {
                                     <p class="text-[11px] text-dark/30 mt-1">Optional announcement or message shown in the header across all pages.</p>
                                 </div>
 
+                                <!-- Header Menu Items -->
+                                <div class="mb-5 bg-dark/[.02] rounded-lg p-4 border border-dark/5">
+                                    <h6 class="text-[12px] font-bold text-dark mb-3 flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        Header Navigation Menu
+                                    </h6>
+                                    <p class="text-[11px] text-dark/40 mb-3">Four customizable menu items. Logo displays in center, with 2 items on left and 2 on right based on order (1-4).</p>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <!-- Menu Item 1 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 1</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.header_menu_item_1_text" placeholder="About"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link URL</label>
+                                                    <input type="text" x-model="form.header_menu_item_1_url" placeholder="#about"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.header_menu_item_1_order" min="1" max="4" placeholder="1"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Menu Item 2 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 2</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.header_menu_item_2_text" placeholder="Writers"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link URL</label>
+                                                    <input type="text" x-model="form.header_menu_item_2_url" placeholder="/writer"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.header_menu_item_2_order" min="1" max="4" placeholder="2"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Menu Item 3 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 3</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.header_menu_item_3_text" placeholder="Directors"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link URL</label>
+                                                    <input type="text" x-model="form.header_menu_item_3_url" placeholder="/director"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.header_menu_item_3_order" min="1" max="4" placeholder="3"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Menu Item 4 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 4</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.header_menu_item_4_text" placeholder="Actors"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link URL</label>
+                                                    <input type="text" x-model="form.header_menu_item_4_url" placeholder="/actor"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.header_menu_item_4_order" min="1" max="4" placeholder="4"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <p class="text-[10px] text-blue-800 flex items-start gap-2">
+                                            <svg class="w-3 h-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                                            <span><strong>Layout:</strong> Items 1-2 appear on the left of centered logo, Items 3-4 appear on the right. Order determines exact position.</span>
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <!-- Logo uploader -->
                                     <div x-data="imageUploader('site_logo_url', '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>')">
@@ -7638,6 +7748,18 @@ if (file_exists($errorLogFile)) {
                 site_logo_url:         '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>',
                 site_logo_height:      '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_height','44'))) ?>',
                 landing_header_content: <?= json_encode($settingsModel->get('landing_header_content','')) ?>,
+                header_menu_item_1_text: <?= json_encode($settingsModel->get('header_menu_item_1_text','About')) ?>,
+                header_menu_item_1_url:  <?= json_encode($settingsModel->get('header_menu_item_1_url','#about')) ?>,
+                header_menu_item_1_order: <?= json_encode($settingsModel->get('header_menu_item_1_order','1')) ?>,
+                header_menu_item_2_text: <?= json_encode($settingsModel->get('header_menu_item_2_text','Writers')) ?>,
+                header_menu_item_2_url:  <?= json_encode($settingsModel->get('header_menu_item_2_url','/writer')) ?>,
+                header_menu_item_2_order: <?= json_encode($settingsModel->get('header_menu_item_2_order','2')) ?>,
+                header_menu_item_3_text: <?= json_encode($settingsModel->get('header_menu_item_3_text','Directors')) ?>,
+                header_menu_item_3_url:  <?= json_encode($settingsModel->get('header_menu_item_3_url','/director')) ?>,
+                header_menu_item_3_order: <?= json_encode($settingsModel->get('header_menu_item_3_order','3')) ?>,
+                header_menu_item_4_text: <?= json_encode($settingsModel->get('header_menu_item_4_text','Actors')) ?>,
+                header_menu_item_4_url:  <?= json_encode($settingsModel->get('header_menu_item_4_url','/actor')) ?>,
+                header_menu_item_4_order: <?= json_encode($settingsModel->get('header_menu_item_4_order','4')) ?>,
                 landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
                 site_tagline:          <?= json_encode($settingsModel->get('site_tagline',"India's first anonymous film competition — no face, no connections, just raw talent.")) ?>,
                 landing_roles_heading:    <?= json_encode($settingsModel->get('landing_roles_heading','Become a Star in 3 Clicks')) ?>,
