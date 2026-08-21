@@ -184,8 +184,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .nav-badge{background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .nav-link{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;text-decoration:none;transition:color .2s;white-space:nowrap}
 .nav-link:hover{color:#111}
-.mobile-nav-link{border-left:3px solid transparent}
-.mobile-nav-link:hover{border-left-color:#D92B3A}
+.mobile-nav-link{display:block;transition:all .2s;border-radius:8px;margin:0 12px}
 
 /* POSTER CARD */
 .poster-wrap{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.10);transition:transform .3s,box-shadow .3s}
@@ -457,10 +456,16 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       </div>
       
       <!-- Menu Items -->
-      <nav class="flex-1 overflow-y-auto py-4">
-        <?php foreach ($allMenuItems as $item): ?>
+      <nav class="flex-1 overflow-y-auto py-6">
+        <?php 
+        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        foreach ($allMenuItems as $item): 
+          $itemPath = parse_url($item['url'], PHP_URL_PATH);
+          $isActive = ($currentPath === $itemPath) || 
+                      ($itemPath !== '/' && strpos($currentPath, $itemPath) === 0);
+        ?>
           <a href="<?= htmlspecialchars($item['url']) ?>" 
-             class="mobile-nav-link block px-6 py-3 text-dark/70 hover:bg-dark/5 hover:text-dark transition text-sm font-medium">
+             class="mobile-nav-link block px-6 py-4 <?= $isActive ? 'bg-black text-white font-semibold' : 'text-gray-700 hover:bg-gray-100' ?> transition text-base">
             <?= htmlspecialchars($item['text']) ?>
           </a>
         <?php endforeach; ?>
