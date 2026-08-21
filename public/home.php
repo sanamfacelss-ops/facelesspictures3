@@ -1,4 +1,20 @@
 <?php
+// Page cache - serve cached HTML if available (skips all PHP/DB processing)
+require_once __DIR__ . '/../app/helpers/page_cache.php';
+
+$cacheKey = 'home_' . ($_GET['lang'] ?? 'en');
+$cachedPage = PageCache::get($cacheKey);
+
+if ($cachedPage !== null && !isset($_SESSION['user_id'])) {
+    // Serve cached page for non-logged-in users
+    header('X-Cache: HIT');
+    echo $cachedPage;
+    exit;
+}
+
+// Start output buffering to capture page for caching
+ob_start();
+
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
 
@@ -1244,3 +1260,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+>
+<?php
+// Save rendered page to cache for next request (non-logged-in users only)
+if (!isset($_SESSION['user_id'])) {
+    $pageContent = ob_get_contents();
+    PageCache::set($cacheKey, $pageContent);
+    header('X-Cache: MISS');
+}
+ob_end_flush();
+?>

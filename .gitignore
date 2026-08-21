@@ -27,6 +27,8 @@ Thumbs.db
 
 # Cache
 *.cache
+cache/pages/*.html
+cache/*.html
 tmp/
 temp/
 
