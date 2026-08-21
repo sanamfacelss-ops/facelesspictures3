@@ -1902,7 +1902,7 @@ class AdminController
 
         if (!in_array($file['type'], $allowed) || !in_array($ext, $allowExt)) {
             http_response_code(422);
-            echo json_encode(['error' => 'Only JPG, PNG, WEBP or GIF accepted.']);
+            echo json_encode(['error' => 'Only JPG, PNG, WebP, GIF, SVG, or BMP accepted.']);
             return;
         }
         if ($file['size'] > 5 * 1024 * 1024) {
@@ -1990,7 +1990,7 @@ class AdminController
             $allowed  = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/bmp'];
             $allowExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'];
             $maxBytes = 5 * 1024 * 1024; // 5 MB
-            $errMsg   = 'Only JPG, PNG, WEBP or GIF images accepted.';
+            $errMsg   = 'Only JPG, PNG, WebP, GIF, SVG, or BMP images accepted.';
             $sizeMsg  = 'Image must be under 5 MB.';
         } elseif ($isPdf) {
             $allowed  = ['application/pdf'];

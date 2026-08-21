@@ -3512,10 +3512,22 @@ if (file_exists($errorLogFile)) {
                                 <div x-show="showHome" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
 
-                            <!-- SECTION: Brand -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Brand</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Site logo and branding elements</p>
+                            <!-- ========== SECTION: Header Section ========== -->
+                            <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    <h5 class="text-[14px] font-bold text-dark">Header Section</h5>
+                                </div>
+                                <p class="text-[11px] text-dark/40 mb-4">Logo, navigation bar, and header content</p>
+                                
+                                <!-- Header Content Text -->
+                                <div class="mb-5">
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Header Content Text</label>
+                                    <textarea x-model="form.landing_header_content" rows="2" placeholder="Optional text to display in the header area..."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-none"></textarea>
+                                    <p class="text-[11px] text-dark/30 mt-1">Optional announcement or message shown in the header across all pages.</p>
+                                </div>
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <!-- Logo uploader -->
                                     <div x-data="imageUploader('site_logo_url', '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>')">
@@ -3590,34 +3602,28 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
-                            <!-- SECTION: Hero / Headline -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Hero Section</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Main headline and tagline displayed at the top</p>
+                            <!-- ========== SECTION: Hero Section ========== -->
+                            <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                                    <h5 class="text-[14px] font-bold text-dark">Hero Section</h5>
+                                </div>
+                                <p class="text-[11px] text-dark/40 mb-4">Main headline and tagline displayed prominently on homepage</p>
                                 <div>
                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Main Headline</label>
                                     <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Large centered text on homepage.</p>
+                                    <p class="text-[11px] text-dark/30 mt-1">Large centered text displayed at the top of the homepage.</p>
                                 </div>
                             </div>
 
-                            <!-- SECTION: Role Cards -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Role Cards Section</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Section heading displayed below film posters</p>
-                                <div>
-                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Section Heading</label>
-                                    <input type="text" x-model="form.landing_roles_heading" placeholder="Become a Star in 3 Clicks"
-                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Big bold heading above the Actor / Director / Writer cards.</p>
+                            <!-- ========== SECTION: Film Posters ========== -->
+                            <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+                                    <h5 class="text-[14px] font-bold text-dark">Film Poster Cards</h5>
                                 </div>
-                            </div>
-
-                            <!-- SECTION: Posters -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Film Poster Cards</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Up to 10 poster slots with images, trailers, and titles</p>
+                                <p class="text-[11px] text-dark/40 mb-4">Up to 10 poster slots with images, film titles, trailers, and button text</p>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <?php
                                     $posterSlots = [
@@ -3908,6 +3914,36 @@ if (file_exists($errorLogFile)) {
                                     <template x-if="uploadError">
                                         <p class="text-[11px] text-red-500 mt-2" x-text="uploadError"></p>
                                     </template>
+                                </div>
+                            </div>
+
+                            <!-- ========== SECTION: Role Cards ========== -->
+                            <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    <h5 class="text-[14px] font-bold text-dark">Role Cards Section</h5>
+                                </div>
+                                <p class="text-[11px] text-dark/40 mb-4">Heading displayed above the Actor / Director / Writer cards</p>
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Section Heading</label>
+                                    <input type="text" x-model="form.landing_roles_heading" placeholder="Become a Star in 3 Clicks"
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Bold heading displayed above the three role cards (Actor, Director, Writer).</p>
+                                </div>
+                            </div>
+
+                            <!-- ========== SECTION: Footer Section ========== -->
+                            <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                                    <h5 class="text-[14px] font-bold text-dark">Footer Section</h5>
+                                </div>
+                                <p class="text-[11px] text-dark/40 mb-4">Footer content and copyright information</p>
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Footer Content Text</label>
+                                    <textarea x-model="form.landing_footer_content" rows="3" placeholder="© 2024 Faceless Pictures. All rights reserved."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-none"></textarea>
+                                    <p class="text-[11px] text-dark/30 mt-1">Text displayed in the footer area. Supports multiple lines.</p>
                                 </div>
                             </div>
 
@@ -7120,9 +7156,9 @@ if (file_exists($errorLogFile)) {
                 document.dispatchEvent(ev);
             },
             upload(file) {
-                const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+                const allowed = ['image/jpeg','image/jpg','image/png','image/webp','image/gif','image/svg+xml','image/bmp'];
                 if (!allowed.includes(file.type)) {
-                    this.uploadError = 'Only JPG, PNG, WEBP or GIF accepted.';
+                    this.uploadError = 'Only JPG, PNG, WebP, GIF, SVG, or BMP accepted.';
                     return;
                 }
                 if (file.size > 5 * 1024 * 1024) {
@@ -7205,9 +7241,9 @@ if (file_exists($errorLogFile)) {
             },
 
             upload(file) {
-                const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+                const allowed = ['image/jpeg','image/jpg','image/png','image/webp','image/gif','image/svg+xml','image/bmp'];
                 if (!allowed.includes(file.type)) {
-                    this.uploadError = 'Only JPG, PNG, WEBP or GIF accepted.';
+                    this.uploadError = 'Only JPG, PNG, WebP, GIF, SVG, or BMP accepted.';
                     return;
                 }
                 if (file.size > 5 * 1024 * 1024) {
@@ -7601,10 +7637,12 @@ if (file_exists($errorLogFile)) {
             form: {
                 site_logo_url:         '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>',
                 site_logo_height:      '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_height','44'))) ?>',
+                landing_header_content: <?= json_encode($settingsModel->get('landing_header_content','')) ?>,
                 landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
                 site_tagline:          <?= json_encode($settingsModel->get('site_tagline',"India's first anonymous film competition — no face, no connections, just raw talent.")) ?>,
                 landing_roles_heading:    <?= json_encode($settingsModel->get('landing_roles_heading','Become a Star in 3 Clicks')) ?>,
                 landing_roles_subheading: <?= json_encode($settingsModel->get('landing_roles_subheading',"Pick your role. Shoot your video. Submit. That's it.")) ?>,
+                landing_footer_content: <?= json_encode($settingsModel->get('landing_footer_content','© 2024 Faceless Pictures. All rights reserved.')) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
                 landing_trailer_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer_url',''))) ?>',

@@ -320,4 +320,36 @@ class Settings
             return false;
         }
     }
+
+    /**
+     * Get landing page header content
+     */
+    public function getHeaderContent(): string
+    {
+        return $this->get('landing_header_content', '');
+    }
+
+    /**
+     * Get landing page footer content
+     */
+    public function getFooterContent(): string
+    {
+        return $this->get('landing_footer_content', '© 2024 Faceless Pictures. All rights reserved.');
+    }
+
+    /**
+     * Update header content
+     */
+    public function updateHeaderContent(string $content): bool
+    {
+        return $this->set('landing_header_content', $content, 'text', 'Header content text displayed across all pages');
+    }
+
+    /**
+     * Update footer content
+     */
+    public function updateFooterContent(string $content): bool
+    {
+        return $this->set('landing_footer_content', $content, 'text', 'Footer content text with copyright and other information');
+    }
 }
