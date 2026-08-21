@@ -10,6 +10,28 @@
  * 4. ImageCompressionService can be loaded
  */
 
+// Load only what we need - avoid session warnings
+define('ROOT_PATH', dirname(__DIR__));
+define('APP_PATH', ROOT_PATH . '/app');
+
+// Simple autoloader for our service
+spl_autoload_register(function ($class) {
+    $class = str_replace('App\\Services\\', '', $class);
+    $file = APP_PATH . '/services/' . $class . '.php';
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
+
+// Simple log function
+if (!function_exists('log_message')) {
+    function log_message($level, $message) {
+        // Silent for check script
+    }
+}
+
+use App\Services\ImageCompressionService;
+
 echo "══════════════════════════════════════════════════════\n";
 echo "  IMAGE OPTIMIZATION SETUP CHECKER\n";
 echo "══════════════════════════════════════════════════════\n\n";
@@ -118,13 +140,7 @@ echo "\n";
 
 // Check 4: ImageCompressionService
 echo "4. Checking ImageCompressionService...\n";
-$configPath = __DIR__ . '/../app/config/config.php';
 $servicePath = __DIR__ . '/../app/services/ImageCompressionService.php';
-
-if (!file_exists($configPath)) {
-    echo "   ✗ Config not found: $configPath\n\n";
-    exit(1);
-}
 
 if (!file_exists($servicePath)) {
     echo "   ✗ ImageCompressionService not found: $servicePath\n\n";
@@ -132,8 +148,6 @@ if (!file_exists($servicePath)) {
 }
 
 try {
-    require_once $configPath;
-    require_once $servicePath;
     $service = new ImageCompressionService();
     echo "   ✓ ImageCompressionService loaded successfully\n";
 } catch (Exception $e) {

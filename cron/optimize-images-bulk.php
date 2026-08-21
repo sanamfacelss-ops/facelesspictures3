@@ -4,7 +4,7 @@
  * Bulk Image Optimization Script
  * 
  * Optimizes all existing images by:
- * 1. Converting to WebP format (85% quality)
+ * 1. Converting to WebP format (85% quality) if supported
  * 2. Resizing if larger than 1920x1920
  * 3. Replacing original with optimized version
  * 4. Logging compression results
@@ -12,8 +12,27 @@
  * Usage: php cron/optimize-images-bulk.php
  */
 
-require_once __DIR__ . '/../app/config/config.php';
-require_once __DIR__ . '/../app/services/ImageCompressionService.php';
+// Load only what we need - avoid session warnings
+define('ROOT_PATH', dirname(__DIR__));
+define('APP_PATH', ROOT_PATH . '/app');
+
+// Simple autoloader for our service
+spl_autoload_register(function ($class) {
+    $class = str_replace('App\\Services\\', '', $class);
+    $file = APP_PATH . '/services/' . $class . '.php';
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
+
+// Simple log function
+if (!function_exists('log_message')) {
+    function log_message($level, $message) {
+        echo "[$level] $message\n";
+    }
+}
+
+use App\Services\ImageCompressionService;
 
 echo "══════════════════════════════════════════════════════\n";
 echo "  BULK IMAGE OPTIMIZATION SCRIPT\n";
