@@ -405,7 +405,7 @@ class Settings
     /**
      * Update a header menu item
      */
-    public function updateHeaderMenuItem(int $itemNumber, string $text, string $url, int $order = null): bool
+    public function updateHeaderMenuItem(int $itemNumber, string $text, string $url, ?int $order = null): bool
     {
         if ($itemNumber < 1 || $itemNumber > 4) {
             return false;

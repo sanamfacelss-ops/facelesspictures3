@@ -11,7 +11,21 @@ $rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star 
 $rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
 
 // Get customizable header menu items (grouped by left/right position)
-$headerMenuItems = $settingsModel->getHeaderMenuItemsGrouped();
+try {
+    $headerMenuItems = $settingsModel->getHeaderMenuItemsGrouped();
+} catch (\Exception $e) {
+    // Fallback if method fails or database not updated yet
+    $headerMenuItems = [
+        'left' => [
+            ['text' => 'About', 'url' => '#about', 'order' => 1],
+            ['text' => 'Writers', 'url' => '/writer', 'order' => 2],
+        ],
+        'right' => [
+            ['text' => 'Directors', 'url' => '/director', 'order' => 3],
+            ['text' => 'Actors', 'url' => '/actor', 'order' => 4],
+        ]
+    ];
+}
 
 // Manifesto video slider (up to 6 YouTube URLs + optional titles)
 $manifestoHeading    = $settingsModel->get('manifesto_heading', 'OUR MANIFESTO');
