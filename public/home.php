@@ -406,7 +406,7 @@ $navHeight = (int)$logoHeight + 16;
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
     <!-- ══ HERO HEADLINE — centered ══ -->
-    <div style="text-align:center;padding:3.5rem 0 2.5rem;border-bottom:1px solid #e5e7eb">
+    <div style="text-align:center;padding:2rem 0 1.25rem;border-bottom:1px solid #e5e7eb">
       <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
         <?= htmlspecialchars($heroHeadline) ?>
       </h1>

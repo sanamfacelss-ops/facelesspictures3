@@ -85,7 +85,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 <?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
 <!-- HERO -->
-<section style="padding:<?= $headerHeight + 16 ?>px 1.5rem 1.75rem;text-align:center" class="fade-up">
+<section style="padding:<?= $headerHeight + 8 ?>px 1.5rem 1rem;text-align:center" class="fade-up">
   <?php if (!empty($heroLabel)): ?>
   <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
   <?php endif; ?>
