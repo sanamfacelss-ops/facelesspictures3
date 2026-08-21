@@ -475,7 +475,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 
     <!-- ══ HERO HEADLINE — centered ══ -->
     <div style="text-align:center;padding:2rem 0 1.25rem;border-bottom:1px solid #e5e7eb">
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,88px);letter-spacing:.02em;line-height:.95;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
         <?= htmlspecialchars($heroHeadline) ?>
       </h1>
     </div>
