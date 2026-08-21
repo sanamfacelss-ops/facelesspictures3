@@ -126,6 +126,22 @@ $posterCount = count($posters);
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="dns-prefetch" href="https://cdn.plyr.io">
 
+<!-- Preload critical images (first 3 posters) -->
+<?php 
+$criticalPosters = array_slice($posters, 0, 3);
+foreach ($criticalPosters as $p): 
+    if (!empty($p['url'])): ?>
+<link rel="preload" as="image" href="<?= htmlspecialchars($p['url']) ?>" fetchpriority="high">
+<?php 
+    endif;
+endforeach; 
+?>
+
+<!-- Preload logo if set -->
+<?php if ($logoUrl): ?>
+<link rel="preload" as="image" href="<?= htmlspecialchars($logoUrl) ?>" fetchpriority="high">
+<?php endif; ?>
+
 <!-- Critical CSS inline (fonts loaded async below) -->
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
@@ -449,11 +465,17 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
     <?php
     // Build the poster card HTML as a reusable string
-    function posterCard(array $p): string {
+    function posterCard(array $p, int $index): string {
         $hasTrailer = !empty($p['trailer']);
         $btnLabel   = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer Now' : 'Trailer / Teaser Coming Soon');
+        
+        // First 6 posters: eager loading with high priority
+        // Remaining posters: lazy loading
+        $loading = $index < 6 ? 'eager' : 'lazy';
+        $fetchpriority = $index < 3 ? 'fetchpriority="high"' : '';
+        
         $img = $p['url']
-            ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="lazy" decoding="async">'
+            ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="'.$loading.'" decoding="async" '.$fetchpriority.' style="width:100%;height:100%;object-fit:cover">'
             : '<div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div>';
         $overlay = $hasTrailer
             ? '<div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>'
@@ -471,22 +493,22 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
     <!-- MOBILE: 1-col grid -->
     <div class="poster-mobile-grid" style="display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:3rem">
-      <?php foreach ($posters as $p): ?>
-      <div><?= posterCard($p) ?></div>
+      <?php foreach ($posters as $idx => $p): ?>
+      <div><?= posterCard($p, $idx) ?></div>
       <?php endforeach; ?>
     </div>
 
     <!-- TABLET: 2-col grid -->
     <div class="poster-tablet-grid" style="display:none;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:3rem">
-      <?php foreach ($posters as $p): ?>
-      <div><?= posterCard($p) ?></div>
+      <?php foreach ($posters as $idx => $p): ?>
+      <div><?= posterCard($p, $idx) ?></div>
       <?php endforeach; ?>
     </div>
 
     <!-- DESKTOP: 3-col grid -->
     <div class="poster-desktop-grid" style="display:none;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
-      <?php foreach ($posters as $p): ?>
-      <div><?= posterCard($p) ?></div>
+      <?php foreach ($posters as $idx => $p): ?>
+      <div><?= posterCard($p, $idx) ?></div>
       <?php endforeach; ?>
     </div>
     
@@ -523,12 +545,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
             elseif (preg_match('/\/shorts\/([A-Za-z0-9_\-]{11})/', $clean, $mm))   $mvId = $mm[1];
             elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $mvId = $mm[1];
             $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/hqdefault.jpg' : '';
+            // First 3 videos: eager loading with high priority
+            $loading = $idx < 3 ? 'eager' : 'lazy';
+            $fetchpriority = $idx < 3 ? 'fetchpriority="high"' : '';
           ?>
           <div class="manifesto-slide">
             <div class="manifesto-embed"
               @click="openManifestoPlayer(<?= htmlspecialchars(json_encode($mvUrl), ENT_QUOTES) ?>)">
               <?php if ($mvThumb): ?>
-                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="<?= htmlspecialchars($mvTitle ?: 'Video ' . ($idx+1)) ?>" loading="lazy" decoding="async">
+                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="<?= htmlspecialchars($mvTitle ?: 'Video ' . ($idx+1)) ?>" loading="<?= $loading ?>" decoding="async" <?= $fetchpriority ?> style="width:100%;height:100%;object-fit:cover">
               <?php else: ?>
                 <div style="position:absolute;inset:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center">
                   <svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -684,7 +709,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
     <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto" loading="lazy">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto" loading="eager" fetchpriority="high">
       <?php else: ?>
         FACELESS PICTURES
         <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
