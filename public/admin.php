@@ -4499,6 +4499,58 @@ if (file_exists($errorLogFile)) {
                                         </div>
                                     </div>
 
+                                    <!-- Submission Messages -->
+                                    <div class="border-t border-dark/10 pt-4 mt-4 px-4">
+                                        <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-3">Submission Messages</p>
+                                        <p class="text-[11px] text-dark/50 mb-3">Customize success and failure messages shown after writer submissions.</p>
+                                        
+                                        <div class="space-y-3">
+                                            <!-- Success Messages -->
+                                            <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                                <p class="text-[10px] font-semibold text-green-800 mb-2">✓ Success Messages</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Success Heading</label>
+                                                        <input type="text" x-model="form.writer_success_heading" placeholder="WRITER SUBMISSION RECEIVED!"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Success Message</label>
+                                                        <textarea x-model="form.writer_success_message" rows="2" placeholder="Your writer video is in the queue for AI review..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300"></textarea>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">PDF Button Text</label>
+                                                        <input type="text" x-model="form.writer_success_pdf_button" placeholder="Download Writer Brief PDF"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Failure Messages -->
+                                            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                                <p class="text-[10px] font-semibold text-red-800 mb-2">✗ Failure Messages</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Failure Heading</label>
+                                                        <input type="text" x-model="form.writer_failure_heading" placeholder="SUBMISSION FAILED"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Failure Message</label>
+                                                        <textarea x-model="form.writer_failure_message" rows="2" placeholder="We couldn't process your writer video..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"></textarea>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Retry Button Text</label>
+                                                        <input type="text" x-model="form.writer_failure_retry_button" placeholder="Try Again"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     </div><!-- End Writer Page Content -->
                                 </div><!-- End Writer Page Collapse -->
                             </div><!-- End Writer Page Section -->
@@ -4552,6 +4604,58 @@ if (file_exists($errorLogFile)) {
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
                                                         <textarea x-model="form.director_form_description" rows="2" placeholder="Cast your actor, give them the script, shoot the scene, and upload your video."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submission Messages -->
+                                    <div class="border-t border-dark/10 pt-4 mt-4 px-4">
+                                        <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-3">Submission Messages</p>
+                                        <p class="text-[11px] text-dark/50 mb-3">Customize success and failure messages shown after director submissions.</p>
+                                        
+                                        <div class="space-y-3">
+                                            <!-- Success Messages -->
+                                            <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                                <p class="text-[10px] font-semibold text-green-800 mb-2">✓ Success Messages</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Success Heading</label>
+                                                        <input type="text" x-model="form.director_success_heading" placeholder="DIRECTOR SUBMISSION RECEIVED!"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Success Message</label>
+                                                        <textarea x-model="form.director_success_message" rows="2" placeholder="Your director video is in the queue for AI review..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300"></textarea>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">PDF Button Text</label>
+                                                        <input type="text" x-model="form.director_success_pdf_button" placeholder="Download Director Brief PDF"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Failure Messages -->
+                                            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                                <p class="text-[10px] font-semibold text-red-800 mb-2">✗ Failure Messages</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Failure Heading</label>
+                                                        <input type="text" x-model="form.director_failure_heading" placeholder="SUBMISSION FAILED"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Failure Message</label>
+                                                        <textarea x-model="form.director_failure_message" rows="2" placeholder="We couldn't process your director video..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"></textarea>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/60 mb-1">Retry Button Text</label>
+                                                        <input type="text" x-model="form.director_failure_retry_button" placeholder="Try Again"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300">
                                                     </div>
                                                 </div>
                                             </div>
@@ -4614,6 +4718,59 @@ if (file_exists($errorLogFile)) {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Submission Messages -->
+                                            <div class="border-t border-dark/10 pt-4 mt-4">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-3">Submission Messages</p>
+                                                <p class="text-[11px] text-dark/50 mb-3">Customize success and failure messages shown after actor submissions.</p>
+                                                
+                                                <div class="space-y-3">
+                                                    <!-- Success Messages -->
+                                                    <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                                        <p class="text-[10px] font-semibold text-green-800 mb-2">✓ Success Messages</p>
+                                                        <div class="space-y-2">
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Success Heading</label>
+                                                                <input type="text" x-model="form.actor_success_heading" placeholder="ACTOR SUBMISSION RECEIVED!"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Success Message</label>
+                                                                <textarea x-model="form.actor_success_message" rows="2" placeholder="Your acting video is in the queue for AI review..."
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300"></textarea>
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">PDF Button Text</label>
+                                                                <input type="text" x-model="form.actor_success_pdf_button" placeholder="Download Actor Brief PDF"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Failure Messages -->
+                                                    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                                        <p class="text-[10px] font-semibold text-red-800 mb-2">✗ Failure Messages</p>
+                                                        <div class="space-y-2">
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Failure Heading</label>
+                                                                <input type="text" x-model="form.actor_failure_heading" placeholder="SUBMISSION FAILED"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Failure Message</label>
+                                                                <textarea x-model="form.actor_failure_message" rows="2" placeholder="We couldn't process your acting video..."
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"></textarea>
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Retry Button Text</label>
+                                                                <input type="text" x-model="form.actor_failure_retry_button" placeholder="Try Again"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <div class="border-t border-dark/10 pt-3 mt-3">
                                                 <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Film Song Card (shown between audition cards and submit form)</p>
                                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -8043,18 +8200,39 @@ if (file_exists($errorLogFile)) {
                 writer_hero_description: <?= json_encode($settingsModel->get('writer_hero_description','READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO.')) ?>,
                 writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
                 writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
+                // Writer submission messages
+                writer_success_heading: <?= json_encode($settingsModel->get('writer_success_heading','WRITER SUBMISSION RECEIVED!')) ?>,
+                writer_success_message: <?= json_encode($settingsModel->get('writer_success_message',"Your writer video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
+                writer_success_pdf_button: <?= json_encode($settingsModel->get('writer_success_pdf_button','Download Writer Brief PDF')) ?>,
+                writer_failure_heading: <?= json_encode($settingsModel->get('writer_failure_heading','SUBMISSION FAILED')) ?>,
+                writer_failure_message: <?= json_encode($settingsModel->get('writer_failure_message',"We couldn't process your writer video. Please check your file and try again.")) ?>,
+                writer_failure_retry_button: <?= json_encode($settingsModel->get('writer_failure_retry_button','Try Again')) ?>,
                 
                 director_hero_label:       <?= json_encode($settingsModel->get('director_hero_label','Auditions Now Open')) ?>,
                 director_hero_heading:     <?= json_encode($settingsModel->get('director_hero_heading','DIRECTOR AUDITIONS')) ?>,
                 director_hero_description: <?= json_encode($settingsModel->get('director_hero_description','CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION.')) ?>,
                 director_form_heading:     <?= json_encode($settingsModel->get('director_form_heading','Ready to Direct? Submit Your Scene')) ?>,
                 director_form_description: <?= json_encode($settingsModel->get('director_form_description','Cast your actor, give them the script, shoot the scene, and upload your video.')) ?>,
+                // Director submission messages
+                director_success_heading: <?= json_encode($settingsModel->get('director_success_heading','DIRECTOR SUBMISSION RECEIVED!')) ?>,
+                director_success_message: <?= json_encode($settingsModel->get('director_success_message',"Your director video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
+                director_success_pdf_button: <?= json_encode($settingsModel->get('director_success_pdf_button','Download Director Brief PDF')) ?>,
+                director_failure_heading: <?= json_encode($settingsModel->get('director_failure_heading','SUBMISSION FAILED')) ?>,
+                director_failure_message: <?= json_encode($settingsModel->get('director_failure_message',"We couldn't process your director video. Please check your file and try again.")) ?>,
+                director_failure_retry_button: <?= json_encode($settingsModel->get('director_failure_retry_button','Try Again')) ?>,
                 
                 actor_hero_label:       <?= json_encode($settingsModel->get('actor_hero_label','Auditions Now Open')) ?>,
                 actor_hero_heading:     <?= json_encode($settingsModel->get('actor_hero_heading','ACTOR AUDITIONS')) ?>,
                 actor_hero_description: <?= json_encode($settingsModel->get('actor_hero_description','Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.')) ?>,
                 actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
+                // Actor submission messages
+                actor_success_heading: <?= json_encode($settingsModel->get('actor_success_heading','ACTOR SUBMISSION RECEIVED!')) ?>,
+                actor_success_message: <?= json_encode($settingsModel->get('actor_success_message',"Your acting video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
+                actor_success_pdf_button: <?= json_encode($settingsModel->get('actor_success_pdf_button','Download Actor Brief PDF')) ?>,
+                actor_failure_heading: <?= json_encode($settingsModel->get('actor_failure_heading','SUBMISSION FAILED')) ?>,
+                actor_failure_message: <?= json_encode($settingsModel->get('actor_failure_message',"We couldn't process your acting video. Please check your file and try again.")) ?>,
+                actor_failure_retry_button: <?= json_encode($settingsModel->get('actor_failure_retry_button','Try Again')) ?>,
                 // Film Song Card (shown on actor page)
                 film_song_heading:   <?= json_encode($settingsModel->get('film_song_heading','FILM SONG')) ?>,
                 film_song_subtitle:  <?= json_encode($settingsModel->get('film_song_subtitle','Listen to the song before you record your audition')) ?>,
