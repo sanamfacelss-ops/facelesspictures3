@@ -95,7 +95,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
   <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,40px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
   <?php endif; ?>
   <?php if (!empty($heroDescription)): ?>
-  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= format_text_content($heroDescription) ?></p>
+  <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
   <?php endif; ?>
 </section>
 
@@ -180,7 +180,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
     <?php endif; ?>
     <?php if (!empty($formDescription)): ?>
-    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= format_text_content($formDescription) ?></p>
+    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= nl2br(htmlspecialchars($formDescription)) ?></p>
     <?php endif; ?>
 
     <!-- Contact -->
