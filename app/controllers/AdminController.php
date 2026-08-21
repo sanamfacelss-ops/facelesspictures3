@@ -2124,15 +2124,6 @@ class AdminController
 
         $allowed = [
             'site_logo_url', 'site_logo_height',
-    {
-        header('Content-Type: application/json');
-        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
-
-        $key   = trim($_POST['key']   ?? '');
-        $value = trim($_POST['value'] ?? '');
-
-        $allowed = [
-            'site_logo_url', 'site_logo_height',
             'landing_headline', 'site_tagline',
             'landing_header_content', 'landing_footer_content',
             'landing_roles_heading', 'landing_roles_subheading',
