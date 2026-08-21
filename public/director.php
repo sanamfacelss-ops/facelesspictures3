@@ -1,19 +1,19 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
-$settingsModel = new App\Models\Settings();
+require_once __DIR__ . '/../app/helpers/settings_helper.php';
 $scriptModel   = new App\Models\Script();
 
-$logoUrl         = $settingsModel->get('site_logo_url', '');
-$directorBrief   = $settingsModel->get('director_brief', 'You have one actor, one phone camera, and a single location. Cast an actor, give them the script, and shoot the scene.');
+$logoUrl         = setting('site_logo_url', '');
+$directorBrief   = setting('director_brief', 'You have one actor, one phone camera, and a single location. Cast an actor, give them the script, and shoot the scene.');
 $directorScripts = $scriptModel->byCategory('director');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
 
 // Page text settings
-$heroLabel       = $settingsModel->get('director_hero_label', 'Auditions Now Open');
-$heroHeading     = $settingsModel->get('director_hero_heading', 'DIRECTOR AUDITIONS');
-$heroDescription = $settingsModel->get('director_hero_description', 'CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION.');
-$formHeading     = $settingsModel->get('director_form_heading', 'Ready to Direct? Submit Your Scene');
-$formDescription = $settingsModel->get('director_form_description', 'Cast your actor, give them the script, shoot the scene, and upload your video.');
+$heroLabel       = setting('director_hero_label', 'Auditions Now Open');
+$heroHeading     = setting('director_hero_heading', 'DIRECTOR AUDITIONS');
+$heroDescription = setting('director_hero_description', 'CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION.');
+$formHeading     = setting('director_form_heading', 'Ready to Direct? Submit Your Scene');
+$formDescription = setting('director_form_description', 'Cast your actor, give them the script, shoot the scene, and upload your video.');
 ?>
 <!DOCTYPE html>
 <html lang="en">

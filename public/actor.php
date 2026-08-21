@@ -1,16 +1,17 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
-$settingsModel = new App\Models\Settings();
-$scriptModel   = new App\Models\Script();
+require_once __DIR__ . '/../app/helpers/settings_helper.php';
 
-$logoUrl = $settingsModel->get('site_logo_url', '');
+$scriptModel = new App\Models\Script();
+
+$logoUrl = setting('site_logo_url', '');
 
 // Load all actor scripts (dialog + song)
 $actorScripts = $scriptModel->byCategory('actor');
 
 // Fallback global settings (used only if no scripts uploaded yet)
-$globalDialogBrief = $settingsModel->get('actor_dialog_script', 'Perform the following scene with full emotion.');
-$globalSongBrief   = $settingsModel->get('actor_song_script', 'Perform a 60-second song showing emotional range.');
+$globalDialogBrief = setting('actor_dialog_script', 'Perform the following scene with full emotion.');
+$globalSongBrief   = setting('actor_song_script', 'Perform a 60-second song showing emotional range.');
 
 // Split scripts by audition_type: dialog vs song
 $dialogScripts = array_values(array_filter($actorScripts, fn($s) => stripos($s['audition_type'] ?? '', 'song') === false));
@@ -24,16 +25,16 @@ if (empty($songScripts) && !empty($dialogScripts)) {
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
 
 // Page text settings
-$heroLabel       = $settingsModel->get('actor_hero_label', 'Auditions Now Open');
-$heroHeading     = $settingsModel->get('actor_hero_heading', 'ACTOR AUDITIONS');
-$heroDescription = $settingsModel->get('actor_hero_description', 'Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.');
-$formHeading     = $settingsModel->get('actor_form_heading', 'Ready to Perform? Submit Your Auditions');
-$formDescription = $settingsModel->get('actor_form_description', 'Shoot your dialog scene and song audition, then upload both videos below.');
+$heroLabel       = setting('actor_hero_label', 'Auditions Now Open');
+$heroHeading     = setting('actor_hero_heading', 'ACTOR AUDITIONS');
+$heroDescription = setting('actor_hero_description', 'Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.');
+$formHeading     = setting('actor_form_heading', 'Ready to Perform? Submit Your Auditions');
+$formDescription = setting('actor_form_description', 'Shoot your dialog scene and song audition, then upload both videos below.');
 
 // Film Song card text (admin-editable)
-$filmSongHeading  = $settingsModel->get('film_song_heading',  'FILM SONG');
-$filmSongSubtitle = $settingsModel->get('film_song_subtitle', 'Listen to the song before you record your audition');
-$filmSongBtnLabel = $settingsModel->get('film_song_btn_label', 'Get Song');
+$filmSongHeading  = setting('film_song_heading',  'FILM SONG');
+$filmSongSubtitle = setting('film_song_subtitle', 'Listen to the song before you record your audition');
+$filmSongBtnLabel = setting('film_song_btn_label', 'Get Song');
 if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
 if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you record your audition';
 if (empty($filmSongBtnLabel)) $filmSongBtnLabel = 'Get Song';

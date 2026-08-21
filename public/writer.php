@@ -1,19 +1,19 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
-$settingsModel = new App\Models\Settings();
+require_once __DIR__ . '/../app/helpers/settings_helper.php';
 $scriptModel   = new App\Models\Script();
 
-$logoUrl       = $settingsModel->get('site_logo_url', '');
-$writerBrief   = $settingsModel->get('writer_brief', 'We give you the first half of a script. Your job: continue the story, write the second half, then record yourself narrating/performing it on camera.');
+$logoUrl       = setting('site_logo_url', '');
+$writerBrief   = setting('writer_brief', 'We give you the first half of a script. Your job: continue the story, write the second half, then record yourself narrating/performing it on camera.');
 $writerScripts = $scriptModel->byCategory('writer');
 $pageTitle = 'Writer Submissions — Faceless Pictures 3';
 
 // Page text settings
-$heroLabel       = $settingsModel->get('writer_hero_label', 'Submissions Now Open');
-$heroHeading     = $settingsModel->get('writer_hero_heading', 'WRITER SUBMISSIONS');
-$heroDescription = $settingsModel->get('writer_hero_description', 'READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO.');
-$formHeading     = $settingsModel->get('writer_form_heading', 'Ready to Write? Submit Your Continuation');
-$formDescription = $settingsModel->get('writer_form_description', 'Read the given script, write what happens next, then record yourself narrating it on camera.');
+$heroLabel       = setting('writer_hero_label', 'Submissions Now Open');
+$heroHeading     = setting('writer_hero_heading', 'WRITER SUBMISSIONS');
+$heroDescription = setting('writer_hero_description', 'READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO.');
+$formHeading     = setting('writer_form_heading', 'Ready to Write? Submit Your Continuation');
+$formDescription = setting('writer_form_description', 'Read the given script, write what happens next, then record yourself narrating it on camera.');
 ?>
 <!DOCTYPE html>
 <html lang="en">
