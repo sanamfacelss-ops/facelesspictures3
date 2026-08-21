@@ -51,8 +51,10 @@ FILES=(
     "cron/optimize-images-bulk.php"
     "app/services/ImageCompressionService.php"
     "app/helpers/page_cache.php"
+    "app/controllers/AdminController.php"
     "public/home.php"
     "public/admin.php"
+    "public/index.php"
     "public/.htaccess"
 )
 
