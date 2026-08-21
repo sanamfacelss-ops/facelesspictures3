@@ -208,7 +208,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .role-card .btn-black{margin-top:auto}
 .role-icon{width:56px;height:56px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:.875rem}
 .role-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:#111;margin-bottom:.25rem}
-.role-desc{font-size:.8rem;color:#6b7280;margin-bottom:1rem;line-height:1.5}
+.role-desc{font-size:.8rem;color:#6b7280;margin-bottom:1rem;line-height:2.2}
 .role-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem;margin-bottom:1rem}
 .badge{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:4px;border:1px solid #d1d5db;color:#374151;background:#f9fafb}
 
@@ -218,6 +218,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 
 /* SECTION LABEL */
 .section-label{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-bottom:1.25rem}
+
+/* TEXT CONTENT - Make text with line breaks look like spaced list */
+.text-content{line-height:2.2}
 
 /* MARQUEE */
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
@@ -794,7 +797,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,52px);letter-spacing:.02em;color:#111;margin-bottom:1rem"><?= htmlspecialchars($aboutSectionHeading) ?></h2>
     <?php endif; ?>
     <?php if (!empty($aboutText)): ?>
-    <div style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= nl2br(htmlspecialchars($aboutText)) ?></div>
+    <div class="text-content" style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= nl2br(htmlspecialchars($aboutText)) ?></div>
     <?php endif; ?>
   </div>
 </section>
