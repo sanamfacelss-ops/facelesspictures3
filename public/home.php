@@ -1162,5 +1162,43 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') fpCloseMa
 <!-- ══ LANGUAGE SWITCHER ══ -->
 <?php include __DIR__ . '/partials/language-switcher.php'; ?>
 
+<!-- ══ LAZY LOADING FIX ══ -->
+<script>
+// Fix browser lazy loading bug - force load images when visible
+document.addEventListener('DOMContentLoaded', function() {
+    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+    
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    // Force load by touching src
+                    if (img.src) {
+                        const src = img.src;
+                        img.src = '';
+                        img.src = src;
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '50px' // Start loading 50px before entering viewport
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    } else {
+        // Fallback: load all images immediately if IntersectionObserver not supported
+        lazyImages.forEach(img => {
+            if (img.src) {
+                const src = img.src;
+                img.src = '';
+                img.src = src;
+            }
+        });
+    }
+});
+</script>
+
 </body>
 </html>
