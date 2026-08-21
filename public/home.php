@@ -2,13 +2,22 @@
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
 
-$aboutText    = $settingsModel->get('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
-$logoUrl      = $settingsModel->get('site_logo_url', '');
-$logoHeight   = $settingsModel->get('site_logo_height', '44'); // Height in pixels
-$siteTagline  = $settingsModel->get('site_tagline', "India's first film competition. Submit your video. Show your talent.");
-$heroHeadline     = $settingsModel->get('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
-$rolesHeading     = $settingsModel->get('landing_roles_heading', 'Become a Star in 3 Clicks');
-$rolesSubheading  = $settingsModel->get('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
+// Load ALL settings once to avoid multiple database queries
+$allSettings = $settingsModel->getAllCached();
+
+// Helper function to get setting with fallback
+function getSetting($key, $default = '') {
+    global $allSettings;
+    return $allSettings[$key] ?? $default;
+}
+
+$aboutText    = getSetting('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
+$logoUrl      = getSetting('site_logo_url', '');
+$logoHeight   = getSetting('site_logo_height', '44'); // Height in pixels
+$siteTagline  = getSetting('site_tagline', "India's first film competition. Submit your video. Show your talent.");
+$heroHeadline     = getSetting('landing_headline', 'NO FACE. NO CONNECTIONS. JUST TALENT.');
+$rolesHeading     = getSetting('landing_roles_heading', 'Become a Star in 3 Clicks');
+$rolesSubheading  = getSetting('landing_roles_subheading', 'Pick your role. Shoot your video. Submit. That\'s it.');
 
 // Get customizable header menu items (grouped by left/right position)
 try {
@@ -105,14 +114,29 @@ $posterCount = count($posters);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faceless Pictures 3 — No Face. Just Talent.</title>
 <meta name="description" content="India's first anonymous film competition. Actor, Director & Writer auditions open now.">
+
+<!-- Performance Optimizations -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&family=Noto+Sans+Gujarati:wght@400;700&family=Noto+Sans+Gurmukhi:wght@400;700&display=swap" rel="stylesheet">
-<!-- Plyr Video Player -->
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://cdn.plyr.io">
+<link rel="preconnect" href="https://cdn.tailwindcss.com">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://cdn.plyr.io">
+
+<!-- Critical CSS inline (fonts loaded async below) -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+
+<!-- Plyr Video Player (deferred) -->
+<link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"></noscript>
+<script defer src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+<!-- Tailwind and Alpine (deferred) -->
+<script defer src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -321,7 +345,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
     <!-- CENTERED LOGO -->
     <a href="/" class="nav-logo absolute left-1/2 transform -translate-x-1/2">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto" loading="eager">
       <?php else: ?>
         <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span>
         <span class="nav-badge">3</span>
@@ -427,7 +451,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         $hasTrailer = !empty($p['trailer']);
         $btnLabel   = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer Now' : 'Trailer / Teaser Coming Soon');
         $img = $p['url']
-            ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="lazy">'
+            ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="lazy" decoding="async">'
             : '<div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div>';
         $overlay = $hasTrailer
             ? '<div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>'
@@ -502,7 +526,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
             <div class="manifesto-embed"
               @click="openManifestoPlayer(<?= htmlspecialchars(json_encode($mvUrl), ENT_QUOTES) ?>)">
               <?php if ($mvThumb): ?>
-                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="<?= htmlspecialchars($mvTitle ?: 'Video ' . ($idx+1)) ?>">
+                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="<?= htmlspecialchars($mvTitle ?: 'Video ' . ($idx+1)) ?>" loading="lazy" decoding="async">
               <?php else: ?>
                 <div style="position:absolute;inset:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center">
                   <svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -658,7 +682,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
     <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
       <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto">
+        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto" loading="lazy">
       <?php else: ?>
         FACELESS PICTURES
         <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>

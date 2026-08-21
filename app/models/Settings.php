@@ -10,10 +10,43 @@ use PDO;
 class Settings
 {
     private PDO $db;
+    private static ?array $cachedSettings = null;
 
     public function __construct()
     {
         $this->db = Database::getConnection();
+    }
+
+    /**
+     * Get all settings at once (cached for performance)
+     */
+    public function getAllCached(): array
+    {
+        if (self::$cachedSettings !== null) {
+            return self::$cachedSettings;
+        }
+
+        $settings = [];
+        try {
+            // Try new schema first
+            $stmt = $this->db->query("SELECT setting_key, setting_value FROM settings");
+            while ($row = $stmt->fetch()) {
+                $settings[$row['setting_key']] = $row['setting_value'];
+            }
+        } catch (\PDOException $e) {
+            // Try old schema
+            try {
+                $stmt = $this->db->query("SELECT `key`, value FROM settings");
+                while ($row = $stmt->fetch()) {
+                    $settings[$row['key']] = $row['value'];
+                }
+            } catch (\PDOException $e) {
+                // Both failed, return empty array
+            }
+        }
+
+        self::$cachedSettings = $settings;
+        return $settings;
     }
 
     /**
