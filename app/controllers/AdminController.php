@@ -2125,6 +2125,7 @@ class AdminController
         $allowed = [
             'site_logo_url', 'site_logo_height',
             'landing_headline', 'site_tagline',
+            'landing_header_content', 'landing_footer_content',
             'landing_roles_heading', 'landing_roles_subheading',
             'landing_poster_url',   'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label',
             'landing_poster2_url',  'landing_poster2_title', 'landing_trailer2_url', 'landing_poster2_btn_label',
@@ -2175,6 +2176,15 @@ class AdminController
             'director_form_heading', 'director_form_description',
             'actor_hero_label', 'actor_hero_heading', 'actor_hero_description',
             'actor_form_heading', 'actor_form_description',
+            // Header and Footer menu items
+            'header_menu_item_1_text', 'header_menu_item_1_page', 'header_menu_item_1_order',
+            'header_menu_item_2_text', 'header_menu_item_2_page', 'header_menu_item_2_order',
+            'header_menu_item_3_text', 'header_menu_item_3_page', 'header_menu_item_3_order',
+            'header_menu_item_4_text', 'header_menu_item_4_page', 'header_menu_item_4_order',
+            'footer_menu_item_1_text', 'footer_menu_item_1_page', 'footer_menu_item_1_order',
+            'footer_menu_item_2_text', 'footer_menu_item_2_page', 'footer_menu_item_2_order',
+            'footer_menu_item_3_text', 'footer_menu_item_3_page', 'footer_menu_item_3_order',
+            'footer_menu_item_4_text', 'footer_menu_item_4_page', 'footer_menu_item_4_order',
         ];
 
         if (!in_array($key, $allowed)) {
