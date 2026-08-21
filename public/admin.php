@@ -7963,7 +7963,19 @@ if (file_exists($errorLogFile)) {
                 this._saveYtToDB(val);
             },
             saveYtUrl() {
-                this._saveYtToDB(this.ytUrl);
+                // Update the main form with this value
+                document.dispatchEvent(new CustomEvent('image-uploaded', {
+                    detail: { field: this.fieldKey, url: this.ytUrl }
+                }));
+                // Trigger the main save function
+                this._saveViaBatchEndpoint();
+            },
+            async _saveViaBatchEndpoint() {
+                const event = new CustomEvent('trigger-save-all');
+                window.dispatchEvent(event);
+                // Show saved feedback
+                this.ytSaved = true;
+                setTimeout(() => this.ytSaved = false, 2000);
             },
             syncYtToForm() {
                 // Keep parent form in sync so Save All Settings includes this value
@@ -8254,6 +8266,10 @@ if (file_exists($errorLogFile)) {
                     if (this.form.hasOwnProperty(e.detail.field)) {
                         this.form[e.detail.field] = '';
                     }
+                });
+                // Listen for trigger from individual save buttons
+                window.addEventListener('trigger-save-all', () => {
+                    this.saveLandingSettings();
                 });
             },
             async saveLandingSettings() {
