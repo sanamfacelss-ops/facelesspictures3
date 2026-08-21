@@ -485,9 +485,9 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
         $hasTrailer = !empty($p['trailer']);
         $btnLabel   = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer Now' : 'Trailer / Teaser Coming Soon');
         
-        // First 6 posters: eager loading with high priority
+        // First 10 posters: eager loading (all above the fold)
         // Remaining posters: lazy loading
-        $loading = $index < 6 ? 'eager' : 'lazy';
+        $loading = $index < 10 ? 'eager' : 'lazy';
         $fetchpriority = $index < 3 ? 'fetchpriority="high"' : '';
         
         $img = $p['url']
