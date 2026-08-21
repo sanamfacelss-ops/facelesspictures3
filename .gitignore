@@ -29,3 +29,29 @@ Thumbs.db
 *.cache
 tmp/
 temp/
+
+# Documentation (except README)
+*_PLAN.md
+*_GUIDE.md
+*_COMPLETE.md
+*_FIX.md
+*_SUMMARY.md
+*_CHECKLIST.md
+FEATURE_*.md
+ADMIN_*.md
+HORIZONTAL_*.md
+IMAGE_*.md
+LAZY_*.md
+PLAYLIST_*.md
+PRODUCTION_*.md
+ROLE_*.md
+SCRIPTS_*.md
+SETTINGS_*.md
+SIMPLE_*.md
+YOUTUBE_*.md
+
+# Debug/Test Files (Security Risk)
+public/test-*.html
+public/test-*.php
+cron/check-*.php
+cron/test-*.php

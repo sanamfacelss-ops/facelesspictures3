@@ -1194,10 +1194,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lazyImages = Array.from(document.querySelectorAll('img[loading="lazy"]'));
     const eagerImages = Array.from(document.querySelectorAll('img[loading="eager"]'));
     
-    // Load eager images first (already happening automatically)
-    console.log(`Loading ${eagerImages.length} eager images immediately...`);
-    
-    // Then load lazy images in batches of 3
+    // Load lazy images in batches of 3
     const batchSize = 3;
     let currentBatch = 0;
     
@@ -1206,12 +1203,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const end = start + batchSize;
         const batch = lazyImages.slice(start, end);
         
-        if (batch.length === 0) {
-            console.log('All images loaded!');
-            return;
-        }
-        
-        console.log(`Loading batch ${currentBatch + 1}: ${batch.length} images...`);
+        if (batch.length === 0) return;
         
         batch.forEach(img => {
             if (img.src) {
@@ -1222,18 +1214,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         currentBatch++;
-        
-        // Wait 1 second between batches to avoid congestion
         setTimeout(loadNextBatch, 1000);
     }
     
-    // Standard IntersectionObserver as fallback
+    // IntersectionObserver for viewport-based loading
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
-                    // Force load by touching src
                     if (img.src && img.loading === 'lazy') {
                         const src = img.src;
                         img.src = '';
@@ -1243,13 +1232,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }, {
-            rootMargin: '100px' // Increased to 100px for better preloading
+            rootMargin: '100px'
         });
         
         lazyImages.forEach(img => imageObserver.observe(img));
     } else {
-        // Fallback: progressive batch loading
-        setTimeout(loadNextBatch, 2000); // Start after 2 seconds
+        setTimeout(loadNextBatch, 2000);
     }
 });
 </script>

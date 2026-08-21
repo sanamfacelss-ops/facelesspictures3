@@ -48,12 +48,11 @@ download_file() {
 
 # List of critical files to update
 FILES=(
-    "cron/check-image-setup.php"
     "cron/optimize-images-bulk.php"
     "app/services/ImageCompressionService.php"
     "public/home.php"
     "public/admin.php"
-    "public/test-loading.html"
+    "public/.htaccess"
 )
 
 # Download each file
