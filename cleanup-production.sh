@@ -25,6 +25,7 @@ rm -f "$BASE_DIR/cron/test-*.php"
 # Remove documentation files (keep README.md)
 echo "→ Removing documentation files..."
 cd "$BASE_DIR"
+# Exclude deploy.sh and cleanup.sh from deletion
 find . -maxdepth 1 -type f -name "*_PLAN.md" -delete
 find . -maxdepth 1 -type f -name "*_GUIDE.md" -delete
 find . -maxdepth 1 -type f -name "*_COMPLETE.md" -delete
