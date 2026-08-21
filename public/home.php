@@ -382,18 +382,39 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
             </div>
         <?php else: ?>
             <!-- Modern Video Player with Plyr -->
-            <video 
-                id="hero-trailer-player"
-                class="plyr-video"
-                controls 
-                autoplay 
-                muted 
-                loop 
-                playsinline
-                style="width:100%;height:auto;display:block">
-                <source src="<?= htmlspecialchars($heroTrailerUrl) ?>" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+            <div style="position:relative;width:100%;height:auto">
+                <!-- Loading skeleton -->
+                <div id="hero-trailer-skeleton" style="position:absolute;inset:0;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:skeleton-shimmer 1.5s infinite;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:400px">
+                    <div style="text-align:center">
+                        <!-- Modern spinner -->
+                        <div style="width:48px;height:48px;border:4px solid #e5e7eb;border-top-color:#d4a574;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px"></div>
+                        <p style="color:#6b7280;font-size:14px;font-weight:500">Loading trailer...</p>
+                    </div>
+                </div>
+                
+                <video 
+                    id="hero-trailer-player"
+                    class="plyr-video"
+                    controls 
+                    autoplay 
+                    muted 
+                    loop 
+                    playsinline
+                    style="width:100%;height:auto;display:block;opacity:0;transition:opacity 0.3s ease">
+                    <source src="<?= htmlspecialchars($heroTrailerUrl) ?>" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            
+            <style>
+                @keyframes skeleton-shimmer {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            </style>
         <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -1027,6 +1048,8 @@ function manifestoSlider(total) {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const heroPlayer = document.getElementById('hero-trailer-player');
+    const skeleton = document.getElementById('hero-trailer-skeleton');
+    
     if (heroPlayer) {
         const player = new Plyr(heroPlayer, {
             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
@@ -1042,11 +1065,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Auto-play on load
+        // Hide skeleton and show video when ready
         player.on('ready', () => {
+            if (skeleton) {
+                skeleton.style.display = 'none';
+            }
+            heroPlayer.style.opacity = '1';
+            
             player.play().catch(() => {
                 console.log('Autoplay blocked by browser');
             });
+        });
+        
+        // Also handle canplay event as fallback
+        heroPlayer.addEventListener('canplay', () => {
+            if (skeleton) {
+                skeleton.style.display = 'none';
+            }
+            heroPlayer.style.opacity = '1';
         });
     }
 });

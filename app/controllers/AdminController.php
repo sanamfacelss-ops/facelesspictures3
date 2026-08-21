@@ -1923,6 +1923,29 @@ class AdminController
             return;
         }
 
+        // Compress image automatically (skip SVG as it's already optimized)
+        if ($ext !== 'svg') {
+            try {
+                $imageCompression = new \App\Services\ImageCompressionService();
+                $compressionResult = $imageCompression->compressImage($dest, null, true); // Convert to WebP if beneficial
+                
+                if ($compressionResult['success'] && $compressionResult['output_path'] !== $dest) {
+                    // Image was converted (e.g., to WebP), update filename and URL
+                    $filename = basename($compressionResult['output_path']);
+                    $url = '/uploads/settings/' . $filename;
+                    
+                    debug_log(sprintf(
+                        "Script image compressed: %.1f%% reduction",
+                        $compressionResult['compression_ratio']
+                    ), 'ADMIN');
+                } else if ($compressionResult['success']) {
+                    debug_log("Script image compressed in-place", 'ADMIN');
+                }
+            } catch (\Exception $e) {
+                debug_log("Image compression error (continuing with original): " . $e->getMessage(), 'ADMIN');
+            }
+        }
+
         $url = '/uploads/settings/' . $filename;
         debug_log("Admin uploaded script image: {$url}", 'ADMIN');
         echo json_encode(['success' => true, 'url' => $url, 'name' => $filename]);
@@ -2030,6 +2053,48 @@ class AdminController
             http_response_code(500);
             echo json_encode(['error' => 'Failed to save file. Check server permissions.']);
             return;
+        }
+
+        // Compress images/videos automatically
+        if ($isImage && $ext !== 'svg') {
+            try {
+                $imageCompression = new \App\Services\ImageCompressionService();
+                $compressionResult = $imageCompression->compressImage($dest, null, true);
+                
+                if ($compressionResult['success'] && $compressionResult['output_path'] !== $dest) {
+                    // Image was converted (e.g., to WebP), update filename and URL
+                    $filename = basename($compressionResult['output_path']);
+                    $publicUrl = '/uploads/settings/' . $filename;
+                    
+                    debug_log(sprintf(
+                        "Setting image compressed: %.1f%% reduction",
+                        $compressionResult['compression_ratio']
+                    ), 'ADMIN');
+                }
+            } catch (\Exception $e) {
+                debug_log("Image compression error (continuing with original): " . $e->getMessage(), 'ADMIN');
+            }
+        } else if ($isVideo) {
+            try {
+                $videoProcessing = new \App\Services\VideoProcessingService();
+                $compressionResult = $videoProcessing->compressVideo($dest);
+                
+                if ($compressionResult['success']) {
+                    $compressedPath = $compressionResult['output_path'];
+                    if ($compressedPath !== $dest && file_exists($compressedPath)) {
+                        // Replace original with compressed
+                        unlink($dest);
+                        rename($compressedPath, $dest);
+                    }
+                    
+                    debug_log(sprintf(
+                        "Setting video compressed: %.1f%% reduction",
+                        $compressionResult['compression_ratio']
+                    ), 'ADMIN');
+                }
+            } catch (\Exception $e) {
+                debug_log("Video compression error (continuing with original): " . $e->getMessage(), 'ADMIN');
+            }
         }
 
         $publicUrl = '/uploads/settings/' . $filename;

@@ -163,6 +163,35 @@ class UploadController
 
             debug_log("File saved: {$filepath}", 'UPLOAD');
 
+            // Compress video automatically to reduce file size
+            try {
+                $videoProcessingService = new \App\Services\VideoProcessingService();
+                $compressionResult = $videoProcessingService->compressVideo($filepath);
+                
+                if ($compressionResult['success']) {
+                    // Replace original with compressed version
+                    $compressedPath = $compressionResult['output_path'];
+                    if ($compressedPath !== $filepath && file_exists($compressedPath)) {
+                        // Delete original and rename compressed to original filename
+                        unlink($filepath);
+                        rename($compressedPath, $filepath);
+                        
+                        debug_log(sprintf(
+                            "Video compressed: %s → %s (%.1f%% reduction)",
+                            $this->formatBytes($compressionResult['original_size']),
+                            $this->formatBytes($compressionResult['compressed_size']),
+                            $compressionResult['compression_ratio']
+                        ), 'UPLOAD');
+                    }
+                } else {
+                    // Compression failed, but continue with original file
+                    debug_log("Video compression failed, using original file: " . ($compressionResult['error'] ?? 'unknown error'), 'UPLOAD');
+                }
+            } catch (\Exception $e) {
+                // Compression error, but continue with original file
+                debug_log("Video compression error: " . $e->getMessage(), 'UPLOAD');
+            }
+
             // Get optional fields
             $recordingMode = trim($_POST['recording_mode'] ?? 'freeform');
             $scriptContent = trim($_POST['script_content'] ?? '');
@@ -256,5 +285,17 @@ class UploadController
             'k' => $value * 1024,
             default => $value,
         };
+    }
+
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        }
+        return $bytes . ' B';
     }
 }

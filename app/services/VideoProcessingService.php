@@ -76,6 +76,96 @@ class VideoProcessingService
     }
 
     /**
+     * Compress video using FFmpeg with smart quality settings
+     * Reduces file size while maintaining visual quality
+     * 
+     * @param string $inputPath Full path to input video
+     * @param string $outputPath Full path for compressed output (optional)
+     * @return array ['success' => bool, 'output_path' => string, 'original_size' => int, 'compressed_size' => int, 'compression_ratio' => float]
+     */
+    public function compressVideo(string $inputPath, ?string $outputPath = null): array
+    {
+        $startTime = microtime(true);
+        
+        if (!file_exists($inputPath)) {
+            return [
+                'success' => false,
+                'error' => 'Input file not found',
+                'output_path' => null
+            ];
+        }
+
+        // Get original file size
+        $originalSize = filesize($inputPath);
+        
+        // If no output path specified, create temp file
+        if (!$outputPath) {
+            $pathInfo = pathinfo($inputPath);
+            $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_compressed.' . $pathInfo['extension'];
+        }
+
+        // FFmpeg compression command with H.264 codec, CRF 23 (good balance of quality/size)
+        // -crf 23: Constant Rate Factor (18-28 range, 23 is default, lower = better quality)
+        // -preset medium: Encoding speed (slower = better compression)
+        // -movflags +faststart: Optimizes for web streaming
+        $cmd = sprintf(
+            '%s -i %s -vcodec libx264 -crf 23 -preset medium -acodec aac -b:a 128k -movflags +faststart -y %s 2>&1',
+            escapeshellarg($this->ffmpegPath),
+            escapeshellarg($inputPath),
+            escapeshellarg($outputPath)
+        );
+
+        log_message('debug', "Compressing video: $inputPath");
+        exec($cmd, $output, $returnCode);
+
+        if ($returnCode !== 0 || !file_exists($outputPath)) {
+            log_message('error', "Video compression failed: " . implode("\n", $output));
+            return [
+                'success' => false,
+                'error' => 'Compression failed',
+                'ffmpeg_output' => implode("\n", $output),
+                'output_path' => null
+            ];
+        }
+
+        $compressedSize = filesize($outputPath);
+        $compressionRatio = $originalSize > 0 ? (1 - ($compressedSize / $originalSize)) * 100 : 0;
+        $processingTime = round((microtime(true) - $startTime) * 1000);
+
+        log_message('info', sprintf(
+            "Video compressed: %s → %s (%.1f%% reduction, %dms)",
+            $this->formatBytes($originalSize),
+            $this->formatBytes($compressedSize),
+            $compressionRatio,
+            $processingTime
+        ));
+
+        return [
+            'success' => true,
+            'output_path' => $outputPath,
+            'original_size' => $originalSize,
+            'compressed_size' => $compressedSize,
+            'compression_ratio' => round($compressionRatio, 1),
+            'processing_time_ms' => $processingTime
+        ];
+    }
+
+    /**
+     * Format bytes to human readable string
+     */
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        }
+        return $bytes . ' B';
+    }
+
+    /**
      * Process a video through the full AI quality check pipeline
      */
     public function processVideo(int $videoId): array
