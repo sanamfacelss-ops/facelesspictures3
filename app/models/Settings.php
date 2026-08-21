@@ -360,9 +360,11 @@ class Settings
     {
         $items = [];
         for ($i = 1; $i <= 4; $i++) {
+            $page = $this->get("header_menu_item_{$i}_page", '');
             $items[] = [
                 'text' => $this->get("header_menu_item_{$i}_text", ''),
-                'url' => $this->get("header_menu_item_{$i}_url", ''),
+                'page' => $page,
+                'url' => $this->getPageUrl($page),
                 'order' => (int) $this->get("header_menu_item_{$i}_order", (string) $i),
                 'number' => $i
             ];
@@ -374,6 +376,55 @@ class Settings
         });
         
         return $items;
+    }
+
+    /**
+     * Get footer menu items
+     */
+    public function getFooterMenuItems(): array
+    {
+        $items = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $page = $this->get("footer_menu_item_{$i}_page", '');
+            $items[] = [
+                'text' => $this->get("footer_menu_item_{$i}_text", ''),
+                'page' => $page,
+                'url' => $this->getPageUrl($page),
+                'order' => (int) $this->get("footer_menu_item_{$i}_order", (string) $i),
+                'number' => $i
+            ];
+        }
+        
+        // Sort by order
+        usort($items, function($a, $b) {
+            return $a['order'] - $b['order'];
+        });
+        
+        return $items;
+    }
+
+    /**
+     * Convert page name to URL
+     */
+    private function getPageUrl(string $page): string
+    {
+        $pageMap = [
+            'home' => '/',
+            'writer' => '/writer',
+            'director' => '/director',
+            'actor' => '/actor',
+            'about' => '#about'
+        ];
+        
+        return $pageMap[$page] ?? '#';
+    }
+
+    /**
+     * Get footer menu items grouped by order
+     */
+    public function getFooterMenuItemsGrouped(): array
+    {
+        return $this->getFooterMenuItems();
     }
 
     /**
@@ -405,7 +456,7 @@ class Settings
     /**
      * Update a header menu item
      */
-    public function updateHeaderMenuItem(int $itemNumber, string $text, string $url, ?int $order = null): bool
+    public function updateHeaderMenuItem(int $itemNumber, string $text, string $page, ?int $order = null): bool
     {
         if ($itemNumber < 1 || $itemNumber > 4) {
             return false;
@@ -418,7 +469,7 @@ class Settings
         $this->db->beginTransaction();
         try {
             $this->set("header_menu_item_{$itemNumber}_text", $text, 'text', "Header menu item {$itemNumber} text label");
-            $this->set("header_menu_item_{$itemNumber}_url", $url, 'text', "Header menu item {$itemNumber} URL/link");
+            $this->set("header_menu_item_{$itemNumber}_page", $page, 'text', "Header menu item {$itemNumber} page selection");
             if ($order !== null) {
                 $this->set("header_menu_item_{$itemNumber}_order", (string)$order, 'text', "Header menu item {$itemNumber} display order");
             }
@@ -427,6 +478,35 @@ class Settings
         } catch (\Exception $e) {
             $this->db->rollBack();
             debug_log("Failed to update header menu item {$itemNumber}: " . $e->getMessage(), 'SETTINGS');
+            return false;
+        }
+    }
+
+    /**
+     * Update a footer menu item
+     */
+    public function updateFooterMenuItem(int $itemNumber, string $text, string $page, ?int $order = null): bool
+    {
+        if ($itemNumber < 1 || $itemNumber > 4) {
+            return false;
+        }
+
+        if ($order !== null && ($order < 1 || $order > 4)) {
+            return false;
+        }
+
+        $this->db->beginTransaction();
+        try {
+            $this->set("footer_menu_item_{$itemNumber}_text", $text, 'text', "Footer menu item {$itemNumber} text label");
+            $this->set("footer_menu_item_{$itemNumber}_page", $page, 'text', "Footer menu item {$itemNumber} page selection");
+            if ($order !== null) {
+                $this->set("footer_menu_item_{$itemNumber}_order", (string)$order, 'text', "Footer menu item {$itemNumber} display order");
+            }
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            debug_log("Failed to update footer menu item {$itemNumber}: " . $e->getMessage(), 'SETTINGS');
             return false;
         }
     }

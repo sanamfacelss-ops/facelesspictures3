@@ -644,10 +644,22 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
       <?php endif; ?>
     </a>
     <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center">
-      <a href="/actor"    style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">Actors</a>
-      <a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">Directors</a>
-      <a href="/writer"   style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">Writers</a>
-      <a href="#about"    style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#111'" onmouseout="this.style.color='#6b7280'">About</a>
+      <?php 
+      try {
+        $footerMenuItems = $settingsModel->getFooterMenuItems();
+        foreach ($footerMenuItems as $item) {
+          if (!empty($item['text']) && !empty($item['url'])) {
+            echo '<a href="' . htmlspecialchars($item['url']) . '" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">' . htmlspecialchars($item['text']) . '</a>';
+          }
+        }
+      } catch (Exception $e) {
+        // Fallback menu if settings fail
+        echo '<a href="/actor" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">Actors</a>';
+        echo '<a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">Directors</a>';
+        echo '<a href="/writer" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">Writers</a>';
+        echo '<a href="#about" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">About</a>';
+      }
+      ?>
     </div>
     <p style="color:#9ca3af;font-size:.75rem">© <?= date('Y') ?> Faceless Pictures. All rights reserved.</p>
   </div>
