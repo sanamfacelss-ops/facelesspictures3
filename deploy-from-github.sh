@@ -50,6 +50,7 @@ download_file() {
 FILES=(
     "cron/optimize-images-bulk.php"
     "app/services/ImageCompressionService.php"
+    "app/helpers/page_cache.php"
     "public/home.php"
     "public/admin.php"
     "public/.htaccess"
@@ -59,6 +60,13 @@ FILES=(
 for file in "${FILES[@]}"; do
     download_file "$file"
 done
+
+# Create cache directory if it doesn't exist
+echo ""
+echo "→ Creating cache directory..."
+mkdir -p "${BASE_DIR}/cache/pages"
+chmod 755 "${BASE_DIR}/cache/pages"
+echo "  ✓ Cache directory ready"
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
