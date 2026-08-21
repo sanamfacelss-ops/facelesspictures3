@@ -2222,6 +2222,115 @@ class AdminController
     }
 
     /**
+     * Save all landing settings in one batch request (optimized)
+     * POST /api/admin/settings/landing-batch
+     */
+    public function saveLandingSettingsBatch(): void
+    {
+        header('Content-Type: application/json');
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        $allowed = [
+            'site_logo_url', 'site_logo_height',
+            'landing_headline', 'site_tagline',
+            'landing_header_content', 'landing_footer_content',
+            'landing_roles_heading', 'landing_roles_subheading',
+            'landing_poster_url',   'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label',
+            'landing_poster2_url',  'landing_poster2_title', 'landing_trailer2_url', 'landing_poster2_btn_label',
+            'landing_poster3_url',  'landing_poster3_title', 'landing_trailer3_url', 'landing_poster3_btn_label',
+            'landing_poster4_url',  'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label',
+            'landing_poster5_url',  'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label',
+            'landing_poster6_url',  'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label',
+            'landing_poster7_url',  'landing_poster7_title', 'landing_trailer7_url', 'landing_poster7_btn_label',
+            'landing_poster8_url',  'landing_poster8_title', 'landing_trailer8_url', 'landing_poster8_btn_label',
+            'landing_poster9_url',  'landing_poster9_title', 'landing_trailer9_url', 'landing_poster9_btn_label',
+            'landing_poster10_url', 'landing_poster10_title', 'landing_trailer10_url', 'landing_poster10_btn_label',
+            'landing_hero_trailer_url',
+            'landing_about_text',
+            'manifesto_heading', 'manifesto_subheading',
+            'manifesto_video1_url', 'manifesto_video1_title',
+            'manifesto_video2_url', 'manifesto_video2_title',
+            'manifesto_video3_url', 'manifesto_video3_title',
+            'manifesto_video4_url', 'manifesto_video4_title',
+            'manifesto_video5_url', 'manifesto_video5_title',
+            'manifesto_video6_url', 'manifesto_video6_title',
+            'actor_dialog_script', 'actor_song_script',
+            'director_brief', 'writer_brief',
+            'film_song_heading', 'film_song_subtitle', 'film_song_btn_label',
+            'actor_preview_video_url', 'song_preview_video_url',
+            'actor_script_image_url',  'song_lyrics_image_url',
+            'song_tune_youtube_url',   'actor_script_pdf_url', 'song_lyrics_pdf_url',
+            'director_preview_video_url', 'director_script_image_url', 'director_script_pdf_url',
+            'writer_preview_video_url',   'writer_script_image_url',   'writer_script_pdf_url',
+            'about_section_label', 'about_section_heading',
+            'role_writer_title', 'role_writer_icon', 'role_writer_description',
+            'role_writer_badge1', 'role_writer_badge2', 'role_writer_button_text', 'role_writer_button_url',
+            'role_director_title', 'role_director_icon', 'role_director_description',
+            'role_director_badge1', 'role_director_badge2', 'role_director_button_text', 'role_director_button_url',
+            'role_actor_title', 'role_actor_icon', 'role_actor_description',
+            'role_actor_badge1', 'role_actor_badge2', 'role_actor_button_text', 'role_actor_button_url',
+            'marquee_item1', 'marquee_item2', 'marquee_item3', 'marquee_item4', 'marquee_item5',
+            'marquee_item6', 'marquee_item7', 'marquee_item8', 'marquee_item9', 'marquee_item10',
+            'writer_hero_label', 'writer_hero_heading', 'writer_hero_description',
+            'writer_form_heading', 'writer_form_description',
+            'director_hero_label', 'director_hero_heading', 'director_hero_description',
+            'director_form_heading', 'director_form_description',
+            'actor_hero_label', 'actor_hero_heading', 'actor_hero_description',
+            'actor_form_heading', 'actor_form_description',
+            'header_menu_item_1_text', 'header_menu_item_1_page', 'header_menu_item_1_order',
+            'header_menu_item_2_text', 'header_menu_item_2_page', 'header_menu_item_2_order',
+            'header_menu_item_3_text', 'header_menu_item_3_page', 'header_menu_item_3_order',
+            'header_menu_item_4_text', 'header_menu_item_4_page', 'header_menu_item_4_order',
+            'footer_menu_item_1_text', 'footer_menu_item_1_page', 'footer_menu_item_1_order',
+            'footer_menu_item_2_text', 'footer_menu_item_2_page', 'footer_menu_item_2_order',
+            'footer_menu_item_3_text', 'footer_menu_item_3_page', 'footer_menu_item_3_order',
+            'footer_menu_item_4_text', 'footer_menu_item_4_page', 'footer_menu_item_4_order',
+            'actor_success_heading', 'actor_success_message', 'actor_success_pdf_button',
+            'actor_failure_heading', 'actor_failure_message', 'actor_failure_retry_button',
+            'director_success_heading', 'director_success_message', 'director_success_pdf_button',
+            'director_failure_heading', 'director_failure_message', 'director_failure_retry_button',
+            'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
+            'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
+        ];
+
+        try {
+            $settingsModel = new \App\Models\Settings();
+            $saved = 0;
+            $skipped = 0;
+            
+            // Start transaction for atomic save
+            $this->db->beginTransaction();
+            
+            foreach ($_POST as $key => $value) {
+                // Skip CSRF token and non-setting fields
+                if ($key === 'csrf_token') continue;
+                
+                // Only save allowed settings
+                if (in_array($key, $allowed)) {
+                    $settingsModel->set($key, trim($value));
+                    $saved++;
+                } else {
+                    $skipped++;
+                }
+            }
+            
+            $this->db->commit();
+            
+            debug_log("Admin saved {$saved} landing settings in batch (skipped {$skipped})", 'ADMIN');
+            echo json_encode([
+                'success' => true,
+                'saved' => $saved,
+                'skipped' => $skipped
+            ]);
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            log_exception($e, 'ADMIN_LANDING_BATCH');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save settings: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
      * Run pending database migrations
      * POST /api/admin/run-migrations
      */
