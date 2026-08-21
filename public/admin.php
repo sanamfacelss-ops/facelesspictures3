@@ -3536,119 +3536,131 @@ if (file_exists($errorLogFile)) {
                                     </h6>
                                     <p class="text-[11px] text-dark/40 mb-3">Four customizable menu items. Logo displays in center, with 2 items on left and 2 on right based on order (1-4).</p>
                                     
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <!-- Menu Item 1 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 1</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.header_menu_item_1_text" placeholder="About"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <!-- Left Side of Logo -->
+                                    <div class="mb-4">
+                                        <h6 class="text-[11px] font-bold text-dark/70 mb-2 flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                                            Left Side of Logo
+                                        </h6>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <!-- Menu Item 1 -->
+                                            <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                                <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 1</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                        <input type="text" x-model="form.header_menu_item_1_text" placeholder="About"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                        <select x-model="form.header_menu_item_1_page"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                            <option value="home">Home</option>
+                                                            <option value="writer">Writers</option>
+                                                            <option value="director">Directors</option>
+                                                            <option value="actor">Actors</option>
+                                                            <option value="about">About</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-2)</label>
+                                                        <input type="number" x-model="form.header_menu_item_1_order" min="1" max="2" placeholder="1"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.header_menu_item_1_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.header_menu_item_1_order" min="1" max="4" placeholder="1"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                            </div>
+
+                                            <!-- Menu Item 2 -->
+                                            <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                                <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 2</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                        <input type="text" x-model="form.header_menu_item_2_text" placeholder="Writers"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                        <select x-model="form.header_menu_item_2_page"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                            <option value="home">Home</option>
+                                                            <option value="writer">Writers</option>
+                                                            <option value="director">Directors</option>
+                                                            <option value="actor">Actors</option>
+                                                            <option value="about">About</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-2)</label>
+                                                        <input type="number" x-model="form.header_menu_item_2_order" min="1" max="2" placeholder="2"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <!-- Menu Item 2 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 2</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.header_menu_item_2_text" placeholder="Writers"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.header_menu_item_2_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.header_menu_item_2_order" min="1" max="4" placeholder="2"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                    <!-- Right Side of Logo -->
+                                    <div>
+                                        <h6 class="text-[11px] font-bold text-dark/70 mb-2 flex items-center gap-2">
+                                            <svg class="w-3.5 h-3.5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            Right Side of Logo
+                                        </h6>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <!-- Menu Item 3 -->
+                                            <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                                <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 3</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                        <input type="text" x-model="form.header_menu_item_3_text" placeholder="Directors"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                        <select x-model="form.header_menu_item_3_page"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                            <option value="home">Home</option>
+                                                            <option value="writer">Writers</option>
+                                                            <option value="director">Directors</option>
+                                                            <option value="actor">Actors</option>
+                                                            <option value="about">About</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Display Order (3-4)</label>
+                                                        <input type="number" x-model="form.header_menu_item_3_order" min="3" max="4" placeholder="3"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Menu Item 3 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 3</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.header_menu_item_3_text" placeholder="Directors"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.header_menu_item_3_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.header_menu_item_3_order" min="1" max="4" placeholder="3"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Menu Item 4 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 4</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.header_menu_item_4_text" placeholder="Actors"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.header_menu_item_4_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.header_menu_item_4_order" min="1" max="4" placeholder="4"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                    <p class="text-[9px] text-dark/30 mt-0.5">1-2 = Left side, 3-4 = Right side</p>
+                                            <!-- Menu Item 4 -->
+                                            <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                                <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 4</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                        <input type="text" x-model="form.header_menu_item_4_text" placeholder="Actors"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                        <select x-model="form.header_menu_item_4_page"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                            <option value="home">Home</option>
+                                                            <option value="writer">Writers</option>
+                                                            <option value="director">Directors</option>
+                                                            <option value="actor">Actors</option>
+                                                            <option value="about">About</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Display Order (3-4)</label>
+                                                        <input type="number" x-model="form.header_menu_item_4_order" min="3" max="4" placeholder="4"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
