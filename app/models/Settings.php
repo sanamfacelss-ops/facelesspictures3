@@ -363,7 +363,7 @@ class Settings
             $items[] = [
                 'text' => $this->get("header_menu_item_{$i}_text", ''),
                 'url' => $this->get("header_menu_item_{$i}_url", ''),
-                'order' => (int) $this->get("header_menu_item_{$i}_order", $i),
+                'order' => (int) $this->get("header_menu_item_{$i}_order", (string) $i),
                 'number' => $i
             ];
         }
