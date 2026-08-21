@@ -1967,12 +1967,16 @@ class AdminController
             'site_logo_url',
             'landing_poster_url',  'landing_poster2_url', 'landing_poster3_url',
             'landing_poster4_url', 'landing_poster5_url', 'landing_poster6_url',
+            'landing_poster7_url', 'landing_poster8_url', 'landing_poster9_url',
+            'landing_poster10_url',
             'actor_script_image_url', 'song_lyrics_image_url',
             'director_script_image_url', 'writer_script_image_url',
         ];
         $videoFields = [
             'landing_trailer_url',  'landing_trailer2_url', 'landing_trailer3_url',
             'landing_trailer4_url', 'landing_trailer5_url', 'landing_trailer6_url',
+            'landing_trailer7_url', 'landing_trailer8_url', 'landing_trailer9_url',
+            'landing_trailer10_url',
             'landing_hero_trailer_url', // Horizontal auto-play trailer below posters
             'actor_preview_video_url', 'song_preview_video_url',
             'director_preview_video_url', 'writer_preview_video_url',
