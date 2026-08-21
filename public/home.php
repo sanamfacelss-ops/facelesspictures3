@@ -113,11 +113,11 @@ $posterKeys = [
 $posters = [];
 foreach ($posterKeys as $i => $keys) {
     $url      = $settingsModel->get($keys[0], '');
-    $title    = $settingsModel->get($keys[1], $i === 0 ? 'Faceless Pictures 3' : '');
+    $title    = $settingsModel->get($keys[1], '');
     $trailer  = $settingsModel->get($keys[2], '');
     $btnLabel = $settingsModel->get($keys[3], '');
-    // Only include if image is set, or it's the first slot (always show as placeholder)
-    if ($url || $i === 0) {
+    // Only include if poster image URL is set
+    if ($url) {
         $posters[] = ['url' => $url, 'title' => $title, 'trailer' => $trailer, 'btn_label' => $btnLabel, 'idx' => $i];
     }
 }
@@ -584,6 +584,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     }
     ?>
 
+    <?php if (count($posters) > 0): ?>
     <!-- MOBILE: 1-col grid -->
     <div class="poster-mobile-grid" style="display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:3rem">
       <?php foreach ($posters as $idx => $p): ?>
@@ -604,6 +605,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       <div><?= posterCard($p, $idx) ?></div>
       <?php endforeach; ?>
     </div>
+    <?php endif; ?>
     
     <style>
     @media (min-width: 640px) {
