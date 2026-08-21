@@ -1,32 +1,4 @@
 <?php
-// Page cache - serve cached HTML if available (skips all PHP/DB processing)
-require_once __DIR__ . '/../app/helpers/page_cache.php';
-
-$cacheKey = 'home_' . ($_GET['lang'] ?? 'en');
-$cachedPage = PageCache::get($cacheKey);
-
-if ($cachedPage !== null && !isset($_SESSION['user_id'])) {
-    // Serve cached page for non-logged-in users
-    header('X-Cache: HIT');
-    echo $cachedPage;
-    exit;
-}
-
-// Start output buffering to capture page for caching
-ob_start();
-
-require_once __DIR__ . '/../app/config/config.php';
-$settingsModel = new App\Models\Settings();
-
-// Load ALL settings once to avoid multiple database queries
-$allSettings = $settingsModel->getAllCached();
-
-// Helper function to get setting with fallback
-function getSetting($key, $default = '') {
-    global $allSettings;
-    return $allSettings[$key] ?? $default;
-}
-
 // Helper function to format text content with list detection
 function format_text_content($text) {
     if (empty($text)) return '';
@@ -68,6 +40,34 @@ function format_text_content($text) {
     }
     
     return $result;
+}
+
+// Page cache - serve cached HTML if available (skips all PHP/DB processing)
+require_once __DIR__ . '/../app/helpers/page_cache.php';
+
+$cacheKey = 'home_' . ($_GET['lang'] ?? 'en');
+$cachedPage = PageCache::get($cacheKey);
+
+if ($cachedPage !== null && !isset($_SESSION['user_id'])) {
+    // Serve cached page for non-logged-in users
+    header('X-Cache: HIT');
+    echo $cachedPage;
+    exit;
+}
+
+// Start output buffering to capture page for caching
+ob_start();
+
+require_once __DIR__ . '/../app/config/config.php';
+$settingsModel = new App\Models\Settings();
+
+// Load ALL settings once to avoid multiple database queries
+$allSettings = $settingsModel->getAllCached();
+
+// Helper function to get setting with fallback
+function getSetting($key, $default = '') {
+    global $allSettings;
+    return $allSettings[$key] ?? $default;
 }
 
 $aboutText    = getSetting('landing_about_text', "Faceless Pictures is India's first anonymous film competition where talent speaks without a face.");
