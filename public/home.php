@@ -317,9 +317,6 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   .poster-wrap:active .play-overlay{opacity:1!important;pointer-events:auto}
 }
 
-/* FOOTER */
-.fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
-
 /* Manifesto Video Cards */
 .manifesto-video-card{
   position:relative;
@@ -1029,38 +1026,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   </div>
 </section>
 
-<!-- ── FOOTER ── -->
-<footer class="fp-footer">
-  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-    <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
-      <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto" loading="eager" fetchpriority="high">
-      <?php else: ?>
-        FACELESS PICTURES
-        <span style="background:#111;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span>
-      <?php endif; ?>
-    </a>
-    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center">
-      <?php 
-      try {
-        $footerMenuItems = $settingsModel->getFooterMenuItems();
-        foreach ($footerMenuItems as $item) {
-          if (!empty($item['text']) && !empty($item['url'])) {
-            echo '<a href="' . htmlspecialchars($item['url']) . '" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">' . htmlspecialchars($item['text']) . '</a>';
-          }
-        }
-      } catch (Exception $e) {
-        // Fallback menu if settings fail
-        echo '<a href="/actor" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">Actors</a>';
-        echo '<a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">Directors</a>';
-        echo '<a href="/writer" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">Writers</a>';
-        echo '<a href="#about" style="color:#6b7280;font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color=\'#111\'" onmouseout="this.style.color=\'#6b7280\'">About</a>';
-      }
-      ?>
-    </div>
-    <p style="color:#9ca3af;font-size:.75rem">© <?= date('Y') ?> Faceless Pictures. All rights reserved.</p>
-  </div>
-</footer>
 
 <!-- ══ CUSTOM VIDEO PLAYER MODAL ══ -->
 <div x-show="playerOpen" x-cloak class="modal-bg"
