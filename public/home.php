@@ -1021,7 +1021,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <!-- Tagline -->
     <?php $statsTagline = $settingsModel->get('stats_tagline', 'FACELESS TO STAR.'); ?>
     <?php if (!empty($statsTagline)): ?>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);color:#ff5722;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);color:#fff;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">
       <?= htmlspecialchars($statsTagline) ?>
     </div>
     <?php endif; ?>
