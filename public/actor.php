@@ -207,22 +207,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 
 <!-- HERO: Video First, Full Width -->
 <section style="margin-top:<?= $headerHeight ?>px" class="fade-up">
-  <!-- Hero Video - Edge to Edge, Full Width -->
-  <div class="hero-video-wrapper" style="width:100%;margin:0 auto">
-    <div class="hero-video-container" style="width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;position:relative">
-      <!-- Placeholder for hero video - replace with actual YouTube embed -->
-      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:#000">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-          <button class="hero-play-btn" style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s" onmouseover="this.style.transform='scale(1.08)';this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,.1)'">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="margin-left:2px"><path d="M8 5v14l11-7z"/></svg>
-          </button>
-        </div>
-        <p class="hero-play-hint" style="position:absolute;bottom:16px;color:rgba(255,255,255,.35);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500">CLICK TO PLAY</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hero Text Content - Below Video, Centered -->
+  <!-- Hero Text Content - Centered -->
   <div class="hero-text-content" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
     
     <!-- Small uppercase label/subheading -->
