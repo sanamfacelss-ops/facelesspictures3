@@ -175,36 +175,39 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
   <div class="submit-card" style="margin:0" x-data="writerSubmit()">
     
     <!-- 3-STEP PROCESS (inside submission card) -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem;padding-bottom:1.5rem;border-bottom:1px solid #e5e7eb">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #e5e7eb">
       
       <!-- STEP 1 -->
-      <div style="text-align:center">
-        <div style="width:44px;height:44px;background:#D92B3A;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .65rem">
-          <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <div style="display:flex;align-items:flex-start;gap:.75rem">
+        <div style="width:40px;height:40px;background:#D92B3A;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
-        <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.05em;color:#111;margin-bottom:.3rem">WHAT WE GIVE</h4>
-        <p style="color:#4b5563;font-size:.8rem;font-weight:500;margin-bottom:.2rem">One page</p>
-        <p style="color:#6b7280;font-size:.72rem;line-height:1.35">We provide you with one page of script to continue the story</p>
+        <div>
+          <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1">WHAT WE GIVE</h4>
+          <p style="color:#6b7280;font-size:.78rem;line-height:1.4">One page</p>
+        </div>
       </div>
 
       <!-- STEP 2 -->
-      <div style="text-align:center">
-        <div style="width:44px;height:44px;background:#D92B3A;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .65rem">
-          <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+      <div style="display:flex;align-items:flex-start;gap:.75rem">
+        <div style="width:40px;height:40px;background:#D92B3A;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
         </div>
-        <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.05em;color:#111;margin-bottom:.3rem">WHAT YOU DO</h4>
-        <p style="color:#4b5563;font-size:.8rem;font-weight:500;margin-bottom:.2rem">Continue it. One more page only</p>
-        <p style="color:#6b7280;font-size:.72rem;line-height:1.35">Write exactly one page continuing the story from where we left off</p>
+        <div>
+          <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1">WHAT YOU DO</h4>
+          <p style="color:#6b7280;font-size:.78rem;line-height:1.4">Continue it. One more page only</p>
+        </div>
       </div>
 
       <!-- STEP 3 -->
-      <div style="text-align:center">
-        <div style="width:44px;height:44px;background:#D92B3A;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .65rem">
-          <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+      <div style="display:flex;align-items:flex-start;gap:.75rem">
+        <div style="width:40px;height:40px;background:#D92B3A;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
         </div>
-        <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.05em;color:#111;margin-bottom:.3rem">SUBMIT</h4>
-        <p style="color:#4b5563;font-size:.8rem;font-weight:500;margin-bottom:.2rem">Your page PDF plus narration video</p>
-        <p style="color:#6b7280;font-size:.72rem;line-height:1.35">Upload your written page as PDF and record yourself narrating it on camera</p>
+        <div>
+          <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1">SUBMIT</h4>
+          <p style="color:#6b7280;font-size:.78rem;line-height:1.4">Your page PDF plus narration video</p>
+        </div>
       </div>
 
     </div>
