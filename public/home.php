@@ -629,14 +629,16 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
         
         <!-- Section Heading -->
-        <div style="margin-bottom:3rem;text-align:center">
+        <?php if (!empty($posterSectionHeading) || !empty($posterSectionSubtitle)): ?>
+        <div style="margin-bottom:3.5rem;text-align:center">
           <?php if (!empty($posterSectionHeading)): ?>
-          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4.5vw,48px);letter-spacing:.04em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1"><?= htmlspecialchars($posterSectionHeading) ?></h2>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#fff;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
-          <p style="color:#9ca3af;font-size:.9rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+          <p style="color:#94a3b8;font-size:1rem;line-height:1.6;max-width:600px;margin:0 auto"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
           <?php endif; ?>
         </div>
+        <?php endif; ?>
 
         <!-- Poster Grid - 4 columns desktop, 2 tablet, 1 mobile -->
         <div class="rasas-poster-grid">
@@ -666,7 +668,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                   </div>
                 <?php endif; ?>
                 
-                <!-- Bottom Gradient Overlay with Text -->
+                <!-- Bottom Gradient Overlay with Text (only show if title OR subtitle exists) -->
+                <?php if (!empty($p['title']) || !empty($p['subtitle'])): ?>
                 <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.7) 50%,transparent 100%);padding:3rem 1rem 1.25rem;pointer-events:none">
                   <?php if (!empty($p['title'])): ?>
                   <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:.08em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1.1;text-transform:uppercase"><?= htmlspecialchars($p['title']) ?></h3>
@@ -675,6 +678,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                   <p style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;font-weight:600"><?= htmlspecialchars($p['subtitle']) ?></p>
                   <?php endif; ?>
                 </div>
+                <?php endif; ?>
                 
                 <!-- Play Overlay (only if has trailer) -->
                 <?php if ($hasTrailer): ?>
