@@ -55,6 +55,11 @@ try {
 // Manifesto video slider (up to 6 YouTube URLs + optional titles)
 $manifestoHeading    = $settingsModel->get('manifesto_heading', 'OUR MANIFESTO');
 $manifestoSubheading = $settingsModel->get('manifesto_subheading', 'What Faceless Pictures 3 stands for.');
+
+// Poster section text
+$posterSectionHeading  = $settingsModel->get('poster_section_heading', 'RASAS REVEALED.');
+$posterSectionSubtitle = $settingsModel->get('poster_section_subtitle', 'Each film is a rasa. Each rasa is a world. All connected to KHAATA.');
+
 $manifestoVideos = [];
 for ($i = 1; $i <= 6; $i++) {
     $url   = $settingsModel->get('manifesto_video' . $i . '_url', '');
@@ -616,39 +621,99 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     }
     ?>
 
+    
+    <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
     <?php if (count($posters) > 0): ?>
-    <!-- MOBILE: 1-col grid -->
-    <div class="poster-mobile-grid" style="display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:3rem">
-      <?php foreach ($posters as $idx => $p): ?>
-      <div><?= posterCard($p, $idx) ?></div>
-      <?php endforeach; ?>
-    </div>
+    <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;margin-top:3rem">
+      <div style="max-width:1400px;margin:0 auto;padding:0 1.5rem">
+        
+        <!-- Section Heading -->
+        <div style="margin-bottom:3rem">
+          <?php if (!empty($posterSectionHeading)): ?>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4.5vw,48px);letter-spacing:.04em;color:#111;margin-bottom:.5rem"><?= htmlspecialchars($posterSectionHeading) ?></h2>
+          <?php endif; ?>
+          <?php if (!empty($posterSectionSubtitle)): ?>
+          <p style="color:#6b7280;font-size:.9rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+          <?php endif; ?>
+        </div>
 
-    <!-- TABLET: 2-col grid -->
-    <div class="poster-tablet-grid" style="display:none;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:3rem">
-      <?php foreach ($posters as $idx => $p): ?>
-      <div><?= posterCard($p, $idx) ?></div>
-      <?php endforeach; ?>
-    </div>
-
-    <!-- DESKTOP: 3-col grid -->
-    <div class="poster-desktop-grid" style="display:none;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
-      <?php foreach ($posters as $idx => $p): ?>
-      <div><?= posterCard($p, $idx) ?></div>
-      <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
+        <!-- Poster Grid - 4 columns desktop, 2 tablet, 1 mobile -->
+        <div class="rasas-poster-grid">
+          <?php foreach ($posters as $idx => $p): ?>
+            <?php
+            $hasTrailer = !empty($p['trailer']);
+            $btnLabel = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer' : 'Coming Soon');
+            $loading = $idx < 8 ? 'eager' : 'lazy';
+            $fetchpriority = $idx < 4 ? 'fetchpriority="high"' : '';
+            ?>
+            
+            <div class="rasa-poster-card" <?php if($hasTrailer): ?>@click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')" style="cursor:pointer"<?php endif; ?>>
+              <!-- Poster Image with Aspect Ratio Container -->
+              <div class="rasa-poster-image" style="position:relative;width:100%;aspect-ratio:2/3;background:#1a1a1a;border-radius:12px;overflow:hidden">
+                <?php if (!empty($p['url'])): ?>
+                  <img src="<?= htmlspecialchars($p['url']) ?>" 
+                       alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" 
+                       loading="<?= $loading ?>" 
+                       decoding="async" 
+                       <?= $fetchpriority ?>
+                       style="width:100%;height:100%;object-fit:cover;display:block">
+                <?php else: ?>
+                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem">
+                    <svg width="36" height="36" fill="none" stroke="#4b5563" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span style="font-size:.65rem;color:#6b7280;letter-spacing:.06em;text-transform:uppercase">Poster</span>
+                  </div>
+                <?php endif; ?>
+                
+                <!-- Play Overlay (only if has trailer) -->
+                <?php if ($hasTrailer): ?>
+                <div class="rasa-play-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s">
+                  <div class="rasa-play-btn" style="width:56px;height:56px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s">
+                    <svg width="22" height="22" fill="#111" viewBox="0 0 24 24" style="margin-left:2px"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
+                </div>
+                <?php endif; ?>
+              </div>
+              
+              <!-- Title & Date -->
+              <div style="padding:.75rem 0">
+                <?php if (!empty($p['title'])): ?>
+                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;color:#111;margin-bottom:.25rem"><?= htmlspecialchars($p['title']) ?></h3>
+                <?php endif; ?>
+                <p style="font-size:.75rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em"><?= $btnLabel ?></p>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+        
+      </div>
+    </section>
     
     <style>
-    @media (min-width: 640px) {
-      .poster-mobile-grid { display: none !important; }
-      .poster-tablet-grid { display: grid !important; }
+    /* Rasas Poster Grid */
+    .rasas-poster-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:1.5rem;
     }
-    @media (min-width: 1024px) {
-      .poster-tablet-grid { display: none !important; }
-      .poster-desktop-grid { display: grid !important; }
+    .rasa-poster-card:hover .rasa-play-overlay{
+      opacity:1;
+    }
+    .rasa-poster-card:hover .rasa-play-btn{
+      transform:scale(1);
+    }
+    /* Tablet - 2 columns */
+    @media(max-width:1024px){
+      .rasas-poster-grid{grid-template-columns:repeat(2,1fr);gap:1.25rem}
+      .rasas-section{padding:3rem 0 !important}
+    }
+    /* Mobile - 1 column */
+    @media(max-width:640px){
+      .rasas-poster-grid{grid-template-columns:1fr;gap:1.5rem}
+      .rasas-section{padding:2.5rem 0 !important}
+      .rasa-poster-image{border-radius:8px !important}
     }
     </style>
+    <?php endif; ?>
 
     <!-- ══ MANIFESTO VIDEO SLIDER ══ -->
     <?php if (!empty($manifestoVideos)): ?>

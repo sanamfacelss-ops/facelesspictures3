@@ -3916,6 +3916,23 @@ if (file_exists($errorLogFile)) {
                                     <h5 class="text-[14px] font-bold text-dark">Film Poster Cards</h5>
                                 </div>
                                 <p class="text-[11px] text-dark/40 mb-4">Up to 10 poster slots with images, film titles, trailers, and button text</p>
+                                
+                                <!-- Section Heading & Subtitle -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                                    <div>
+                                        <label class="block text-[12px] font-semibold text-dark mb-1.5">Poster Section Heading</label>
+                                        <input type="text" x-model="form.poster_section_heading" placeholder="RASAS REVEALED."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Main heading above poster grid</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-semibold text-dark mb-1.5">Poster Section Subtitle</label>
+                                        <input type="text" x-model="form.poster_section_subtitle" placeholder="Each film is a rasa. Each rasa is a world."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <p class="text-[11px] text-dark/30 mt-1">Subtitle text below heading</p>
+                                    </div>
+                                </div>
+                                
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <?php
                                     $posterSlots = [
@@ -8172,6 +8189,8 @@ if (file_exists($errorLogFile)) {
                 landing_poster5_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_btn_label',''))) ?>',
                 landing_poster6_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_btn_label',''))) ?>',
                 landing_hero_trailer_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_hero_trailer_url',''))) ?>',
+                poster_section_heading:    <?= json_encode($settingsModel->get('poster_section_heading','RASAS REVEALED.')) ?>,
+                poster_section_subtitle:   <?= json_encode($settingsModel->get('poster_section_subtitle','Each film is a rasa. Each rasa is a world. All connected to KHAATA.')) ?>,
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
                 manifesto_heading:     <?= json_encode($settingsModel->get('manifesto_heading','OUR MANIFESTO')) ?>,
                 manifesto_subheading:  <?= json_encode($settingsModel->get('manifesto_subheading','What Faceless Pictures 3 stands for.')) ?>,
