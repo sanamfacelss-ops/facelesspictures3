@@ -3808,6 +3808,14 @@ if (file_exists($errorLogFile)) {
                                     <!-- Logo uploader -->
                                     <div x-data="imageUploader('site_logo_url', '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>')">
                                         <label class="block text-[12px] font-semibold text-dark mb-2">Logo Image</label>
+                                        
+                                        <!-- Browse Existing Button -->
+                                        <button type="button" @click="openMediaBrowser()" 
+                                            class="mb-2 px-3 py-1.5 bg-dark text-white rounded-lg text-xs font-medium hover:bg-dark/90 transition flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            Browse Existing Images
+                                        </button>
+                                        
                                         <div
                                             class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden"
                                             :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30 bg-dark/[.02]'"
@@ -3855,6 +3863,70 @@ if (file_exists($errorLogFile)) {
                                             <p class="text-[11px] text-red-500 mt-1.5" x-text="uploadError"></p>
                                         </template>
                                         <p class="text-[11px] text-dark/30 mt-1.5">Transparent PNG looks best. Displays in nav &amp; footer on all pages.</p>
+                                        
+                                        <!-- Media Browser Modal -->
+                                        <div x-show="showMediaBrowser" x-cloak
+                                            @keydown.escape.window="closeMediaBrowser()"
+                                            @click.self="closeMediaBrowser()"
+                                            class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm">
+                                            <div @click.stop class="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl max-h-[80vh] overflow-hidden">
+                                                <!-- Modal Header -->
+                                                <div class="flex items-center justify-between px-6 py-4 border-b border-dark/10">
+                                                    <div>
+                                                        <h3 class="text-lg font-semibold text-dark">Browse Media Library</h3>
+                                                        <p class="text-xs text-dark/50 mt-0.5" x-text="filteredMedia.length + ' images available'"></p>
+                                                    </div>
+                                                    <button @click="closeMediaBrowser()" type="button"
+                                                        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-dark/5 transition text-dark/50 hover:text-dark">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                
+                                                <!-- Search Bar -->
+                                                <div class="px-6 py-3 border-b border-dark/5 bg-gray-50">
+                                                    <input type="text" x-model="mediaSearch" placeholder="Search images by filename..."
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-dark/20">
+                                                </div>
+                                                
+                                                <!-- Modal Body -->
+                                                <div class="px-6 py-4 max-h-[calc(80vh-160px)] overflow-y-auto">
+                                                    <template x-if="mediaLoading">
+                                                        <div class="flex items-center justify-center py-12">
+                                                            <div class="text-center">
+                                                                <div class="inline-block w-8 h-8 border-3 border-dark/20 border-t-dark rounded-full animate-spin mb-2"></div>
+                                                                <p class="text-sm text-dark/50">Loading images...</p>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    
+                                                    <template x-if="!mediaLoading && filteredMedia.length === 0">
+                                                        <div class="text-center py-12">
+                                                            <svg class="w-16 h-16 text-dark/10 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                            <p class="text-sm text-dark/50">No images found</p>
+                                                        </div>
+                                                    </template>
+                                                    
+                                                    <div x-show="!mediaLoading && filteredMedia.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                                        <template x-for="img in filteredMedia" :key="img.path">
+                                                            <button type="button" @click="selectFromLibrary(img.path)" 
+                                                                class="group relative aspect-square rounded-lg overflow-hidden border-2 transition hover:border-crimson focus:outline-none focus:ring-2 focus:ring-crimson/50"
+                                                                :class="preview === img.path ? 'border-crimson ring-2 ring-crimson/20' : 'border-dark/10'">
+                                                                <img :src="img.path" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
+                                                                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                </div>
+                                                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition">
+                                                                    <p class="text-white text-[10px] font-medium truncate" x-text="img.name"></p>
+                                                                    <p class="text-white/70 text-[9px]" x-text="img.sizeFormatted"></p>
+                                                                </div>
+                                                            </button>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Logo URL (manual fallback) -->
@@ -3956,6 +4028,14 @@ if (file_exists($errorLogFile)) {
                                         <!-- Poster image uploader -->
                                         <div>
                                             <label class="block text-[11px] text-dark/40 mb-1.5">Poster Image</label>
+                                            
+                                            <!-- Browse Existing Button -->
+                                            <button type="button" @click="openMediaBrowser()" 
+                                                class="mb-2 w-full px-3 py-1.5 bg-dark text-white rounded-lg text-xs font-medium hover:bg-dark/90 transition flex items-center justify-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                Browse Existing
+                                            </button>
+                                            
                                             <div
                                                 class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-white"
                                                 :class="dragging ? 'border-dark' : 'border-dashed border-dark/15 hover:border-dark/30'"
@@ -3999,6 +4079,70 @@ if (file_exists($errorLogFile)) {
                                             <template x-if="uploadError">
                                                 <p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p>
                                             </template>
+                                            
+                                            <!-- Media Browser Modal -->
+                                            <div x-show="showMediaBrowser" x-cloak
+                                                @keydown.escape.window="closeMediaBrowser()"
+                                                @click.self="closeMediaBrowser()"
+                                                class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm">
+                                                <div @click.stop class="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl max-h-[80vh] overflow-hidden">
+                                                    <!-- Modal Header -->
+                                                    <div class="flex items-center justify-between px-6 py-4 border-b border-dark/10">
+                                                        <div>
+                                                            <h3 class="text-lg font-semibold text-dark">Browse Media Library</h3>
+                                                            <p class="text-xs text-dark/50 mt-0.5" x-text="filteredMedia.length + ' images available'"></p>
+                                                        </div>
+                                                        <button @click="closeMediaBrowser()" type="button"
+                                                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-dark/5 transition text-dark/50 hover:text-dark">
+                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <!-- Search Bar -->
+                                                    <div class="px-6 py-3 border-b border-dark/5 bg-gray-50">
+                                                        <input type="text" x-model="mediaSearch" placeholder="Search images by filename..."
+                                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-dark/20">
+                                                    </div>
+                                                    
+                                                    <!-- Modal Body -->
+                                                    <div class="px-6 py-4 max-h-[calc(80vh-160px)] overflow-y-auto">
+                                                        <template x-if="mediaLoading">
+                                                            <div class="flex items-center justify-center py-12">
+                                                                <div class="text-center">
+                                                                    <div class="inline-block w-8 h-8 border-3 border-dark/20 border-t-dark rounded-full animate-spin mb-2"></div>
+                                                                    <p class="text-sm text-dark/50">Loading images...</p>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+                                                        
+                                                        <template x-if="!mediaLoading && filteredMedia.length === 0">
+                                                            <div class="text-center py-12">
+                                                                <svg class="w-16 h-16 text-dark/10 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                                <p class="text-sm text-dark/50">No images found</p>
+                                                            </div>
+                                                        </template>
+                                                        
+                                                        <div x-show="!mediaLoading && filteredMedia.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                                            <template x-for="img in filteredMedia" :key="img.path">
+                                                                <button type="button" @click="selectFromLibrary(img.path)" 
+                                                                    class="group relative aspect-square rounded-lg overflow-hidden border-2 transition hover:border-crimson focus:outline-none focus:ring-2 focus:ring-crimson/50"
+                                                                    :class="preview === img.path ? 'border-crimson ring-2 ring-crimson/20' : 'border-dark/10'">
+                                                                    <img :src="img.path" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
+                                                                        <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                    </div>
+                                                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition">
+                                                                        <p class="text-white text-[10px] font-medium truncate" x-text="img.name"></p>
+                                                                        <p class="text-white/70 text-[9px]" x-text="img.sizeFormatted"></p>
+                                                                    </div>
+                                                                </button>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <!-- Film title -->
@@ -7636,6 +7780,20 @@ if (file_exists($errorLogFile)) {
             uploading:   false,
             progress:    0,
             uploadError: '',
+            // Media browser state
+            showMediaBrowser: false,
+            mediaImages: [],
+            mediaLoading: false,
+            mediaSearch: '',
+
+            get filteredMedia() {
+                if (!this.mediaSearch) return this.mediaImages;
+                const search = this.mediaSearch.toLowerCase();
+                return this.mediaImages.filter(img => 
+                    img.name.toLowerCase().includes(search) || 
+                    img.path.toLowerCase().includes(search)
+                );
+            },
 
             onDrop(e) {
                 this.dragging = false;
@@ -7653,6 +7811,39 @@ if (file_exists($errorLogFile)) {
                 // Also clear the parent form binding
                 const ev = new CustomEvent('image-cleared', { detail: { field: this.fieldKey } });
                 document.dispatchEvent(ev);
+            },
+            async openMediaBrowser() {
+                this.showMediaBrowser = true;
+                await this.loadMediaLibrary();
+            },
+            closeMediaBrowser() {
+                this.showMediaBrowser = false;
+                this.mediaSearch = '';
+            },
+            async loadMediaLibrary() {
+                this.mediaLoading = true;
+                try {
+                    const res = await fetch('/api/media-list.php');
+                    const data = await res.json();
+                    if (data.success) {
+                        this.mediaImages = data.images;
+                    } else {
+                        console.error('Failed to load media library:', data.error);
+                    }
+                } catch (e) {
+                    console.error('Error loading media library:', e);
+                }
+                this.mediaLoading = false;
+            },
+            selectFromLibrary(imageUrl) {
+                this.preview = imageUrl;
+                this.filename = imageUrl.split('/').pop();
+                // Update the parent form
+                const ev = new CustomEvent('image-uploaded', {
+                    detail: { field: this.fieldKey, url: imageUrl }
+                });
+                document.dispatchEvent(ev);
+                this.closeMediaBrowser();
             },
             upload(file) {
                 const allowed = ['image/jpeg','image/jpg','image/png','image/webp','image/gif','image/svg+xml','image/bmp'];
