@@ -92,7 +92,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   .hero-play-hint{font-size:.58rem !important;bottom:12px !important;letter-spacing:.1em !important}
   .hero-text-content{padding:2rem 1.25rem 2.5rem !important;max-width:100% !important}
   .hero-label{font-size:.68rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
-  .hero-heading{font-size:clamp(22px,5.5vw,32px) !important;line-height:1.35 !important;margin-bottom:1rem !important}
+  .hero-heading{font-size:clamp(22px,5.5vw,32px) !important;line-height:1.35 !important;margin-bottom:.6rem !important}
   .hero-description{font-size:.75rem !important;letter-spacing:.06em !important}
 }
 @media(max-width:480px){
@@ -101,7 +101,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   .hero-play-hint{font-size:.52rem !important;bottom:10px !important}
   .hero-text-content{padding:1.75rem 1rem 2rem !important}
   .hero-label{font-size:.64rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
-  .hero-heading{font-size:clamp(19px,6vw,26px) !important;line-height:1.4 !important;margin-bottom:.9rem !important}
+  .hero-heading{font-size:clamp(19px,6vw,26px) !important;line-height:1.4 !important;margin-bottom:.55rem !important}
   .hero-description{font-size:.7rem !important}
 }
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
@@ -232,7 +232,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
     
     <!-- Large main heading/question -->
     <?php if (!empty($heroHeading)): ?>
-    <h1 class="hero-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:1.2rem;font-weight:400;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeading) ?></h1>
+    <h1 class="hero-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:.65rem;font-weight:400;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeading) ?></h1>
     <?php endif; ?>
     
     <!-- Small gray tagline at bottom -->
