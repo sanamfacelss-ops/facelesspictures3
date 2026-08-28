@@ -596,7 +596,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         
         <!-- Large main heading/question -->
         <?php if (!empty($heroHeadline)): ?>
-        <h1 class="hero-main-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:.65rem;font-weight:400;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeadline) ?></h1>
+        <h1 class="hero-main-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:.65rem;font-weight:700;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeadline) ?></h1>
         <?php endif; ?>
         
         <!-- Small gray tagline at bottom -->
