@@ -645,7 +645,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             $btnLabel = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer' : 'Coming Soon');
             $loading = $idx < 8 ? 'eager' : 'lazy';
             $fetchpriority = $idx < 4 ? 'fetchpriority="high"' : '';
-            $clickAttr = $hasTrailer ? 'onclick="playPosterVideo(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\')"' : '';
+            $clickAttr = $hasTrailer ? 'onclick="openVideoModal(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\')"' : '';
             ?>
             
             <div class="rasa-poster-card" <?= $clickAttr ?> <?php if($hasTrailer): ?>style="cursor:pointer"<?php endif; ?>>
@@ -733,35 +733,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </style>
     
     <?php endif; ?>
-
-    <script>
-    // Define playPosterVideo function AFTER Alpine loads
-    document.addEventListener('alpine:initialized', () => {
-      window.playPosterVideo = function(url, title) {
-        console.log('✓ playPosterVideo called:', url);
-        
-        if (!url) {
-          console.error('No URL provided');
-          return;
-        }
-        
-        // Get Alpine data from body
-        const body = document.querySelector('body');
-        if (body && window.Alpine) {
-          const data = window.Alpine.$data(body);
-          if (data && typeof data.openPlayer === 'function') {
-            console.log('✓ Calling openPlayer');
-            data.openPlayer(url, title || '');
-          } else {
-            console.error('✗ openPlayer method not found');
-          }
-        } else {
-          console.error('✗ Alpine not available');
-        }
-      };
-      console.log('✓ playPosterVideo function registered');
-    });
-    </script>
 
     <!-- ══ MANIFESTO VIDEO GRID ══ -->
     <?php if (!empty($manifestoVideos)): ?>
@@ -1114,6 +1085,94 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </div><!-- /vp-controls -->
   </div><!-- /vp-wrap -->
 </div><!-- /modal-bg -->
+
+<!-- ══ SIMPLE VIDEO PLAYER FOR SELF-HOSTED VIDEOS ══ -->
+<div id="simpleVideoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:1rem">
+  <div style="position:relative;width:100%;max-width:1200px;background:#000;border-radius:12px;overflow:hidden">
+    <!-- Close Button -->
+    <button onclick="closeVideoModal()" style="position:absolute;top:1rem;right:1rem;z-index:10;width:40px;height:40px;background:rgba(255,255,255,0.1);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.3s" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+      <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    
+    <!-- Video Title -->
+    <div id="videoTitle" style="position:absolute;top:1rem;left:1rem;color:#fff;font-size:1.25rem;font-weight:700;z-index:10;max-width:calc(100% - 120px)"></div>
+    
+    <!-- Video Player -->
+    <video id="simpleVideoPlayer" controls autoplay style="width:100%;height:auto;display:block;max-height:85vh">
+      <source id="videoSource" src="" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+<script>
+function openVideoModal(url, title) {
+  console.log('openVideoModal called:', url, title);
+  
+  if (!url) {
+    console.error('No URL provided');
+    return;
+  }
+  
+  // Check if it's a YouTube URL - if so, use existing Alpine player
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    console.log('YouTube URL detected, using existing player');
+    // Dispatch event for Alpine YouTube modal
+    document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: url } }));
+    return;
+  }
+  
+  // Self-hosted video - use simple modal
+  console.log('Self-hosted video, opening simple modal');
+  const modal = document.getElementById('simpleVideoModal');
+  const video = document.getElementById('simpleVideoPlayer');
+  const source = document.getElementById('videoSource');
+  const titleEl = document.getElementById('videoTitle');
+  
+  // Set video source and title
+  source.src = url;
+  video.load();
+  titleEl.textContent = title || '';
+  
+  // Show modal
+  modal.style.display = 'flex';
+  
+  // Play video
+  video.play().catch(err => {
+    console.error('Error playing video:', err);
+  });
+}
+
+function closeVideoModal() {
+  console.log('closeVideoModal called');
+  const modal = document.getElementById('simpleVideoModal');
+  const video = document.getElementById('simpleVideoPlayer');
+  
+  // Pause and reset video
+  video.pause();
+  video.currentTime = 0;
+  
+  // Hide modal
+  modal.style.display = 'none';
+}
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('simpleVideoModal');
+    if (modal.style.display === 'flex') {
+      closeVideoModal();
+    }
+  }
+});
+
+// Close when clicking outside video
+document.getElementById('simpleVideoModal')?.addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeVideoModal();
+  }
+});
+</script>
 
 <script>
 function homePage() {
