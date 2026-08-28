@@ -185,16 +185,36 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 <?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
 <!-- HERO -->
-<section style="padding:<?= $headerHeight + 8 ?>px 1.5rem 1rem;text-align:center" class="fade-up">
-  <?php if (!empty($heroLabel)): ?>
-  <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:.4rem"><?= htmlspecialchars($heroLabel) ?></p>
-  <?php endif; ?>
-  <?php if (!empty($heroHeading)): ?>
-  <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,40px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.5rem"><?= htmlspecialchars($heroHeading) ?></h1>
-  <?php endif; ?>
-  <?php if (!empty($heroDescription)): ?>
-  <p style="color:#6b7280;font-size:.85rem;max-width:420px;margin:0 auto;line-height:1.55"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
-  <?php endif; ?>
+<section style="padding-top:<?= $headerHeight ?>px" class="fade-up">
+  <!-- Hero Video Container -->
+  <div style="max-width:900px;margin:0 auto;padding:0 1.5rem 2rem">
+    <div style="width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15)">
+      <!-- Placeholder for hero video - can be replaced with actual YouTube embed or video -->
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+          <button style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.5);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s" onmouseover="this.style.transform='scale(1.1)';this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,.15)'">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+        <p style="position:absolute;bottom:20px;color:rgba(255,255,255,.4);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase">CLICK TO PLAY</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Text Content - Below Video -->
+  <div style="text-align:center;padding:0 1.5rem 2.5rem">
+    <?php if (!empty($heroLabel)): ?>
+    <p style="font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#111;margin-bottom:.5rem"><?= htmlspecialchars($heroLabel) ?></p>
+    <?php endif; ?>
+    
+    <?php if (!empty($heroHeading)): ?>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:1.1;color:#111;margin-bottom:.7rem"><?= htmlspecialchars($heroHeading) ?></h1>
+    <?php endif; ?>
+    
+    <?php if (!empty($heroDescription)): ?>
+    <p style="color:#6b7280;font-size:.95rem;max-width:620px;margin:0 auto;line-height:1.65;font-weight:400"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
+    <?php endif; ?>
+  </div>
 </section>
 
 <!-- TWO BRIEF CARDS (Dialog + Song) -->
