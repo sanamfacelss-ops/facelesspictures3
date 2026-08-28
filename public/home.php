@@ -630,12 +630,12 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         
         <!-- Section Heading -->
         <?php if (!empty($posterSectionHeading) || !empty($posterSectionSubtitle)): ?>
-        <div style="margin-bottom:3.5rem;text-align:center">
+        <div style="margin-bottom:3.5rem;text-align:left">
           <?php if (!empty($posterSectionHeading)): ?>
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#fff;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
-          <p style="color:#94a3b8;font-size:1rem;line-height:1.6;max-width:600px;margin:0 auto"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+          <p style="color:#94a3b8;font-size:1rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
           <?php endif; ?>
         </div>
         <?php endif; ?>
