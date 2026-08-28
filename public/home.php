@@ -624,16 +624,16 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
     <?php if (count($posters) > 0): ?>
-    <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;width:100%">
+    <section class="rasas-section" style="background:#000;padding:4rem 0;width:100%">
       <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
         
         <!-- Section Heading -->
-        <div style="margin-bottom:3rem">
+        <div style="margin-bottom:3rem;text-align:center">
           <?php if (!empty($posterSectionHeading)): ?>
-          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4.5vw,48px);letter-spacing:.04em;color:#111;margin-bottom:.35rem;font-weight:700;line-height:1"><?= htmlspecialchars($posterSectionHeading) ?></h2>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4.5vw,48px);letter-spacing:.04em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
-          <p style="color:#6b7280;font-size:.9rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+          <p style="color:#9ca3af;font-size:.9rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
           <?php endif; ?>
         </div>
 
@@ -649,7 +649,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             ?>
             
             <div class="rasa-poster-card" <?= $clickAttr ?> <?php if($hasTrailer): ?>style="cursor:pointer"<?php endif; ?>>
-              <!-- Poster Image with Aspect Ratio Container -->
+              <!-- Poster Image with Text Overlay -->
               <div class="rasa-poster-image" style="position:relative;width:100%;aspect-ratio:2/3;background:#1a1a1a;border-radius:12px;overflow:hidden">
                 <?php if (!empty($p['url'])): ?>
                   <img src="<?= htmlspecialchars($p['url']) ?>" 
@@ -665,22 +665,22 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                   </div>
                 <?php endif; ?>
                 
+                <!-- Bottom Gradient Overlay with Text -->
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.7) 50%,transparent 100%);padding:3rem 1rem 1rem;pointer-events:none">
+                  <?php if (!empty($p['title'])): ?>
+                  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.25rem,2.5vw,1.5rem);letter-spacing:.06em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1.1"><?= htmlspecialchars($p['title']) ?></h3>
+                  <?php endif; ?>
+                  <p style="font-size:.75rem;color:#d1d5db;text-transform:uppercase;letter-spacing:.06em;font-weight:500"><?= $btnLabel ?></p>
+                </div>
+                
                 <!-- Play Overlay (only if has trailer) -->
                 <?php if ($hasTrailer): ?>
-                <div class="rasa-play-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none">
-                  <div class="rasa-play-btn" style="width:56px;height:56px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s;pointer-events:none">
-                    <svg width="22" height="22" fill="#111" viewBox="0 0 24 24" style="margin-left:2px;pointer-events:none"><path d="M8 5v14l11-7z"/></svg>
+                <div class="rasa-play-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none">
+                  <div class="rasa-play-btn" style="width:64px;height:64px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s;pointer-events:none">
+                    <svg width="24" height="24" fill="#111" viewBox="0 0 24 24" style="margin-left:3px;pointer-events:none"><path d="M8 5v14l11-7z"/></svg>
                   </div>
                 </div>
                 <?php endif; ?>
-              </div>
-              
-              <!-- Title & Date -->
-              <div style="padding:.75rem 0">
-                <?php if (!empty($p['title'])): ?>
-                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;color:#111;margin-bottom:.25rem;font-weight:700"><?= htmlspecialchars($p['title']) ?></h3>
-                <?php endif; ?>
-                <p style="font-size:.75rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em"><?= $btnLabel ?></p>
               </div>
             </div>
           <?php endforeach; ?>
@@ -699,13 +699,14 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     .rasas-poster-grid{
       display:grid;
       grid-template-columns:repeat(4,1fr);
-      gap:1.5rem;
+      gap:2rem;
     }
     .rasa-poster-card{
-      transition:transform .2s;
+      position:relative;
+      transition:transform .3s ease;
     }
     .rasa-poster-card:hover{
-      transform:translateY(-4px);
+      transform:translateY(-8px);
     }
     .rasa-poster-card:hover .rasa-play-overlay{
       opacity:1 !important;
@@ -715,7 +716,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     }
     /* Tablet - 2 columns */
     @media(max-width:1024px){
-      .rasas-poster-grid{grid-template-columns:repeat(2,1fr);gap:1.25rem}
+      .rasas-poster-grid{grid-template-columns:repeat(2,1fr);gap:1.75rem}
       .rasas-section{padding:3rem 0 !important}
     }
     /* Mobile - 1 column */
