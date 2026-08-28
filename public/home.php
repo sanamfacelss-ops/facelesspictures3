@@ -857,7 +857,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <?php endif; ?>
 
     <!-- ══ CHOOSE YOUR ROLE ══ -->
-    <section style="background:#7c2d2d;padding:4rem 0;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)">
+    <section style="background:linear-gradient(180deg, #7c2d2d 0%, #4a1a1a 100%);padding:4rem 0;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)">
       <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
         
         <!-- Heading -->
@@ -892,8 +892,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             <?php if (!empty($descLines)): ?>
             <ul style="list-style:none;padding:0;margin:0 0 2rem;flex:1">
               <?php foreach ($descLines as $line): ?>
-              <li style="color:#d1d5db;font-size:0.875rem;line-height:1.6;margin-bottom:0.75rem;padding-left:1.25rem;position:relative">
-                <span style="position:absolute;left:0;top:0.5rem;width:4px;height:4px;background:#d1d5db;border-radius:50%"></span>
+              <li style="color:#e5e7eb;font-size:0.8rem;line-height:1.6;margin-bottom:0.65rem;padding-left:1.25rem;position:relative;text-transform:uppercase;letter-spacing:0.02em">
+                <span style="position:absolute;left:0;top:0.45rem;width:5px;height:5px;background:#e5e7eb;border-radius:50%"></span>
                 <?= htmlspecialchars($line) ?>
               </li>
               <?php endforeach; ?>
