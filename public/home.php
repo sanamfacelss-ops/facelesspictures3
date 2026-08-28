@@ -320,30 +320,6 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 /* FOOTER */
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
 
-/* MANIFESTO SLIDER */
-.manifesto-section{padding:3rem 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;margin-bottom:3rem}
-.manifesto-slider{position:relative;overflow:visible;padding-bottom:.5rem}
-.manifesto-track{display:flex;gap:1.25rem;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
-.manifesto-slide{flex-shrink:0;border-radius:12px;overflow:hidden;background:#fff;position:relative;
-  box-shadow:0 2px 16px rgba(0,0,0,.10);
-  width:calc((100% - 2 * 1.25rem) / 3)} /* desktop: 3 per row */
-@media(max-width:1023px){
-  .manifesto-slide{width:100%} /* mobile/tablet: 1 per row */
-  .manifesto-track{transition:transform .38s cubic-bezier(.22,.68,0,1.2)} /* springy on mobile */
-}
-/* 16:9 YouTube embed inside each slide */
-.manifesto-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;cursor:pointer}
-.manifesto-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none}
-.manifesto-embed img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.manifesto-title{padding:.55rem .75rem;background:#fff;font-size:.78rem;font-weight:600;color:#111;line-height:1.4;border-top:1px solid #f0f0f0}
-.manifesto-play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);transition:background .2s;z-index:2}
-.manifesto-slide:hover .manifesto-play-overlay{background:rgba(0,0,0,.45)}
-.manifesto-play-circle{width:52px;height:52px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:transform .2s,background .2s}
-.manifesto-slide:hover .manifesto-play-circle{transform:scale(1.1);background:rgba(255,255,255,.25)}
-.manifesto-play-circle svg{width:22px;height:22px;fill:#fff;margin-left:3px}
-.manifesto-dots{display:flex;justify-content:center;gap:.4rem;margin-top:.875rem}
-.manifesto-dot{width:6px;height:6px;border-radius:50%;background:#d1d5db;cursor:pointer;transition:background .2s,width .2s}
-.manifesto-dot.active{background:#111;width:16px;border-radius:3px}
 @media(max-width:639px){
   .poster-grid{grid-template-columns:1fr 1fr!important}
   .role-cards-grid{grid-template-columns:1fr!important}
@@ -763,62 +739,71 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </script>
     <?php endif; ?>
 
-    <!-- ══ MANIFESTO VIDEO SLIDER ══ -->
+    <!-- ══ MANIFESTO VIDEO GRID ══ -->
     <?php if (!empty($manifestoVideos)): ?>
-    <div class="manifesto-section" x-data="manifestoSlider(<?= count($manifestoVideos) ?>)">
-      <div style="text-align:center;margin-bottom:1.75rem">
-        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:.02em;line-height:.95;color:#111">
+    <section style="background:#000;padding:4rem 0;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)">
+      <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
+        
+        <!-- Heading -->
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#fff;margin-bottom:3rem;font-weight:700;line-height:1;text-transform:uppercase">
           <?= htmlspecialchars($manifestoHeading) ?>
         </h2>
-      </div>
-      <div class="manifesto-slider">
-        <div style="overflow:hidden;margin:-12px;padding:12px">
-        <div class="manifesto-track" :style="'transform:translateX(-'+offset+'px)'">
-          <?php foreach ($manifestoVideos as $idx => $mv):
+
+        <!-- Video Grid - 3 columns -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem">
+          <?php 
+          // Limit to 3 videos for clean grid
+          $displayVideos = array_slice($manifestoVideos, 0, 3);
+          foreach ($displayVideos as $idx => $mv):
             $mvUrl   = $mv['url'];
             $mvTitle = $mv['title'];
-            // Robust YouTube ID extraction — strip tracking params first
+            // Extract YouTube ID
             $mvId = '';
-            $clean = preg_replace('/[?&]si=[^&]+/', '', $mvUrl); // remove ?si= tracking
+            $clean = preg_replace('/[?&]si=[^&]+/', '', $mvUrl);
             if (preg_match('/youtu\.be\/([A-Za-z0-9_\-]{11})/', $clean, $mm))      $mvId = $mm[1];
             elseif (preg_match('/[?&]v=([A-Za-z0-9_\-]{11})/', $clean, $mm))       $mvId = $mm[1];
             elseif (preg_match('/\/shorts\/([A-Za-z0-9_\-]{11})/', $clean, $mm))   $mvId = $mm[1];
             elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $mvId = $mm[1];
-            $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/hqdefault.jpg' : '';
-            // First 3 videos: eager loading with high priority
+            $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/maxresdefault.jpg' : '';
             $loading = $idx < 3 ? 'eager' : 'lazy';
             $fetchpriority = $idx < 3 ? 'fetchpriority="high"' : '';
           ?>
-          <div class="manifesto-slide">
-            <div class="manifesto-embed"
-              @click="openManifestoPlayer(<?= htmlspecialchars(json_encode($mvUrl), ENT_QUOTES) ?>)">
-              <?php if ($mvThumb): ?>
-                <img src="<?= htmlspecialchars($mvThumb) ?>" alt="<?= htmlspecialchars($mvTitle ?: 'Video ' . ($idx+1)) ?>" loading="<?= $loading ?>" decoding="async" <?= $fetchpriority ?> style="width:100%;height:100%;object-fit:cover">
-              <?php else: ?>
-                <div style="position:absolute;inset:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center">
-                  <svg width="32" height="32" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                </div>
-              <?php endif; ?>
-              <div class="manifesto-play-overlay">
-                <div class="manifesto-play-circle">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </div>
+          <div style="position:relative;cursor:pointer;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a;transition:transform .3s ease"
+               onclick="document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: '<?= htmlspecialchars($mvUrl, ENT_QUOTES) ?>' } }))"
+               onmouseenter="this.style.transform='translateY(-8px)'"
+               onmouseleave="this.style.transform='translateY(0)'">
+            
+            <?php if ($mvThumb): ?>
+              <img src="<?= htmlspecialchars($mvThumb) ?>" 
+                   alt="<?= htmlspecialchars($mvTitle ?: 'Manifesto Video') ?>" 
+                   loading="<?= $loading ?>" 
+                   decoding="async" 
+                   <?= $fetchpriority ?>
+                   style="width:100%;height:100%;object-fit:cover;display:block">
+            <?php else: ?>
+              <div style="position:absolute;inset:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center">
+                <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            <?php endif; ?>
+            
+            <!-- Play Button Overlay -->
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none"
+                 onmouseenter="this.style.opacity='1'"
+                 onmouseleave="this.style.opacity='0'">
+              <div style="width:72px;height:72px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s">
+                <svg width="28" height="28" fill="#111" viewBox="0 0 24 24" style="margin-left:3px">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
               </div>
             </div>
-            <?php if ($mvTitle): ?>
-            <div class="manifesto-title"><?= htmlspecialchars($mvTitle) ?></div>
-            <?php endif; ?>
           </div>
           <?php endforeach; ?>
-        </div><!-- /manifesto-track -->
-        </div><!-- /clip wrapper -->
-      </div><!-- /manifesto-slider -->
-      <div class="manifesto-dots">
-        <template x-for="i in totalPages" :key="i">
-          <div class="manifesto-dot" :class="i-1===currentPage?'active':''" @click="goTo(i-1)"></div>
-        </template>
+        </div>
+        
       </div>
-    </div>
+    </section>
     <?php endif; ?>
 
     <!-- ══ ROW 2: ROLE BOXES ══ -->
@@ -1296,40 +1281,6 @@ function posterSlider(total) {
             const gap = parseFloat(style.gap) || 16;
             const cardW = card.getBoundingClientRect().width + gap;
             this.offset = this.currentPage * this.perPage * cardW;
-        }
-    };
-}
-
-function manifestoSlider(total) {
-    const perPage = () => window.innerWidth >= 1024 ? 3 : 1;
-    return {
-        currentPage: 0,
-        autoTimer: null,
-        get totalPages() { return Math.ceil(total / perPage()); },
-        get offset() {
-            // Calculate pixel offset: each "page" moves by perPage slides
-            const wrap = document.querySelector('.manifesto-slider');
-            if (!wrap) return 0;
-            const pp = perPage();
-            const gap = 20; // 1.25rem gap
-            const slideW = (wrap.offsetWidth - (pp - 1) * gap) / pp;
-            return this.currentPage * pp * (slideW + gap);
-        },
-        init() {
-            this.startAuto();
-            window.addEventListener('resize', () => { this.goTo(0); });
-        },
-        goTo(page) {
-            const tp = this.totalPages;
-            this.currentPage = ((page % tp) + tp) % tp;
-        },
-        next() { this.goTo(this.currentPage + 1); },
-        startAuto() {
-            const interval = window.innerWidth >= 1024 ? 4500 : 2500;
-            this.autoTimer = setInterval(() => this.next(), interval);
-        },
-        openManifestoPlayer(url) {
-            document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url } }));
         }
     };
 }
