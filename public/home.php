@@ -733,19 +733,34 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </style>
     
     <script>
-    // Global function to play poster videos - dispatches custom event for Alpine to handle
+    // Global function to play poster videos
     function playPosterVideo(url, title) {
-      console.log('playPosterVideo called:', { url, title });
+      console.log('playPosterVideo called:', url, title);
+      
       if (!url) {
         console.error('No URL provided');
         return;
       }
       
-      // Dispatch custom event that Alpine component will listen to
-      window.dispatchEvent(new CustomEvent('play-video', { 
-        detail: { url: url, title: title }
-      }));
-      console.log('play-video event dispatched');
+      // Get the body element which has Alpine.js data
+      const body = document.querySelector('body');
+      
+      // Check if Alpine is available
+      if (typeof Alpine !== 'undefined' && Alpine.$data) {
+        try {
+          const alpineData = Alpine.$data(body);
+          if (alpineData && typeof alpineData.openPlayer === 'function') {
+            console.log('Calling openPlayer via Alpine.$data');
+            alpineData.openPlayer(url, title);
+          } else {
+            console.error('openPlayer not found in Alpine data');
+          }
+        } catch(e) {
+          console.error('Error accessing Alpine data:', e);
+        }
+      } else {
+        console.error('Alpine not available');
+      }
     }
     </script>
     <?php endif; ?>
@@ -1126,15 +1141,6 @@ function homePage() {
         init() {
             document.addEventListener('fullscreenchange', () => {
                 this.isFullscreen = !!document.fullscreenElement;
-            });
-            
-            // Listen for play-video events from poster cards
-            window.addEventListener('play-video', (e) => {
-                console.log('play-video event received:', e.detail);
-                if (e.detail && e.detail.url) {
-                    console.log('Calling openPlayer with:', e.detail.url, e.detail.title);
-                    this.openPlayer(e.detail.url, e.detail.title || '');
-                }
             });
         },
 
