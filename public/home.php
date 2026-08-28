@@ -320,6 +320,48 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 /* FOOTER */
 .fp-footer{background:#f3f4f6;color:#111;padding:2.5rem 1rem;border-top:1px solid #e5e7eb}
 
+/* Manifesto Video Cards */
+.manifesto-video-card{
+  position:relative;
+  cursor:pointer;
+  border-radius:12px;
+  overflow:hidden;
+  aspect-ratio:16/9;
+  background:#1a1a1a;
+  transition:transform .3s ease
+}
+.manifesto-video-card:hover{
+  transform:translateY(-8px)
+}
+.manifesto-play-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  transition:opacity .3s;
+  pointer-events:none
+}
+.manifesto-video-card:hover .manifesto-play-overlay{
+  opacity:1
+}
+.manifesto-play-button{
+  width:72px;
+  height:72px;
+  background:rgba(255,255,255,.95);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform:scale(0.9);
+  transition:transform .3s
+}
+.manifesto-video-card:hover .manifesto-play-button{
+  transform:scale(1)
+}
+
 @media(max-width:639px){
   .poster-grid{grid-template-columns:1fr 1fr!important}
   .role-cards-grid{grid-template-columns:1fr!important}
@@ -768,10 +810,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             $loading = $idx < 3 ? 'eager' : 'lazy';
             $fetchpriority = $idx < 3 ? 'fetchpriority="high"' : '';
           ?>
-          <div style="position:relative;cursor:pointer;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#1a1a1a;transition:transform .3s ease"
-               onclick="document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: '<?= htmlspecialchars($mvUrl, ENT_QUOTES) ?>' } }))"
-               onmouseenter="this.style.transform='translateY(-8px)'"
-               onmouseleave="this.style.transform='translateY(0)'">
+          <div class="manifesto-video-card" onclick="document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: '<?= htmlspecialchars($mvUrl, ENT_QUOTES) ?>' } }))">
             
             <?php if ($mvThumb): ?>
               <img src="<?= htmlspecialchars($mvThumb) ?>" 
@@ -789,10 +828,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             <?php endif; ?>
             
             <!-- Play Button Overlay -->
-            <div style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none"
-                 onmouseenter="this.style.opacity='1'"
-                 onmouseleave="this.style.opacity='0'">
-              <div style="width:72px;height:72px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s">
+            <div class="manifesto-play-overlay">
+              <div class="manifesto-play-button">
                 <svg width="28" height="28" fill="#111" viewBox="0 0 24 24" style="margin-left:3px">
                   <path d="M8 5v14l11-7z"/>
                 </svg>
