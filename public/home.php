@@ -594,17 +594,17 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <div class="hero-text-section" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
         <!-- Small uppercase subheading -->
         <?php if (!empty($heroSubheading)): ?>
-        <p class="hero-subheading" style="font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroSubheading) ?></p>
+        <p class="hero-subheading" style="font-size:.85rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroSubheading) ?></p>
         <?php endif; ?>
         
         <!-- Large main heading/question -->
         <?php if (!empty($heroHeadline)): ?>
-        <h1 class="hero-main-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:.65rem;font-weight:700;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeadline) ?></h1>
+        <h1 class="hero-main-heading" style="font-size:clamp(32px,5vw,52px);line-height:1.25;color:#111;margin-bottom:.75rem;font-weight:700;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeadline) ?></h1>
         <?php endif; ?>
         
         <!-- Small gray tagline at bottom -->
         <?php if (!empty($heroTagline)): ?>
-        <p class="hero-tagline" style="color:#9ca3af;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6"><?= nl2br(htmlspecialchars($heroTagline)) ?></p>
+        <p class="hero-tagline" style="color:#9ca3af;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6"><?= nl2br(htmlspecialchars($heroTagline)) ?></p>
         <?php endif; ?>
     </div>
     
@@ -612,15 +612,15 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     /* Hero Mobile Responsive */
     @media(max-width:768px){
       .hero-text-section{padding:2rem 1.25rem 2.5rem !important}
-      .hero-subheading{font-size:.68rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
-      .hero-main-heading{font-size:clamp(22px,5.5vw,32px) !important;line-height:1.35 !important;margin-bottom:.6rem !important}
-      .hero-tagline{font-size:.75rem !important;letter-spacing:.06em !important}
+      .hero-subheading{font-size:.75rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
+      .hero-main-heading{font-size:clamp(26px,6vw,36px) !important;line-height:1.3 !important;margin-bottom:.6rem !important}
+      .hero-tagline{font-size:.82rem !important;letter-spacing:.06em !important}
     }
     @media(max-width:480px){
       .hero-text-section{padding:1.75rem 1rem 2rem !important}
-      .hero-subheading{font-size:.64rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
-      .hero-main-heading{font-size:clamp(19px,6vw,26px) !important;line-height:1.4 !important;margin-bottom:.55rem !important}
-      .hero-tagline{font-size:.7rem !important}
+      .hero-subheading{font-size:.7rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
+      .hero-main-heading{font-size:clamp(22px,6.5vw,30px) !important;line-height:1.35 !important;margin-bottom:.55rem !important}
+      .hero-tagline{font-size:.75rem !important}
     }
     </style>
     
@@ -954,7 +954,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <!-- Tagline -->
     <?php $statsTagline = $settingsModel->get('stats_tagline', 'FACELESS TO STAR.'); ?>
     <?php if (!empty($statsTagline)): ?>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);color:#fff;font-weight:900;letter-spacing:0.08em;text-transform:uppercase">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,6vw,4.5rem);color:#fff;font-weight:900;letter-spacing:0.08em;text-transform:uppercase">
       <?= htmlspecialchars($statsTagline) ?>
     </div>
     <?php endif; ?>
