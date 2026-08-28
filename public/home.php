@@ -481,18 +481,12 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 <main style="padding-top:<?= $navHeight ?>px">
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
-    <!-- ══ HERO HEADLINE — centered ══ -->
-    <div style="text-align:center;padding:2rem 0 1.25rem;border-bottom:1px solid #e5e7eb">
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-        <?= htmlspecialchars($heroHeadline) ?>
-      </h1>
-    </div>
-
-    <div class="py-10 sm:py-12">
-
-    <!-- ══ HORIZONTAL AUTO-PLAY TRAILER ══ -->
+    <!-- ══ NEW HERO LAYOUT: Video First, Then Text Below ══ -->
     <?php
     $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
+    $heroSubheading = $settingsModel->get('landing_hero_subheading', 'KHATAA OFFICIAL TEASER'); // NEW field
+    $heroTagline = $settingsModel->get('landing_hero_tagline', '10 FILMS. 10 RASAS. 10 EMOTIONS. ONE UNIVERSE.'); // NEW field
+    
     if ($heroTrailerUrl):
         // Check if it's a YouTube URL
         $isYoutube = (strpos($heroTrailerUrl, 'youtube.com') !== false || strpos($heroTrailerUrl, 'youtu.be') !== false);
@@ -506,10 +500,10 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $ytId = $mm[1];
         }
     ?>
-    <div class="hero-trailer-wrap" style="margin-bottom:3rem;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#000">
+    <div class="hero-trailer-wrap" style="width:100%;margin:0 auto">
         <?php if ($isYoutube && $ytId): ?>
-            <!-- YouTube Embed with Autoplay -->
-            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
+            <!-- YouTube Embed - Full Width, Edge to Edge -->
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000">
                 <iframe 
                     src="https://www.youtube.com/embed/<?= htmlspecialchars($ytId) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($ytId) ?>&controls=1&modestbranding=1&rel=0"
                     style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
@@ -522,7 +516,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             <!-- Modern Video Player with Plyr -->
             <div style="position:relative;width:100%;height:auto">
                 <!-- Loading skeleton -->
-                <div id="hero-trailer-skeleton" style="position:absolute;inset:0;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:skeleton-shimmer 1.5s infinite;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:400px">
+                <div id="hero-trailer-skeleton" style="position:absolute;inset:0;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:skeleton-shimmer 1.5s infinite;display:flex;align-items:center;justify-content:center;min-height:400px">
                     <div style="text-align:center">
                         <!-- Modern spinner -->
                         <div style="width:48px;height:48px;border:4px solid #e5e7eb;border-top-color:#d4a574;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px"></div>
@@ -555,6 +549,41 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             </style>
         <?php endif; ?>
     </div>
+    
+    <!-- Hero Text Section - Below Video -->
+    <div class="hero-text-section" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
+        <!-- Small uppercase subheading -->
+        <?php if (!empty($heroSubheading)): ?>
+        <p class="hero-subheading" style="font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroSubheading) ?></p>
+        <?php endif; ?>
+        
+        <!-- Large main heading/question -->
+        <?php if (!empty($heroHeadline)): ?>
+        <h1 class="hero-main-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:1.2rem;font-weight:400;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeadline) ?></h1>
+        <?php endif; ?>
+        
+        <!-- Small gray tagline at bottom -->
+        <?php if (!empty($heroTagline)): ?>
+        <p class="hero-tagline" style="color:#9ca3af;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6"><?= nl2br(htmlspecialchars($heroTagline)) ?></p>
+        <?php endif; ?>
+    </div>
+    
+    <style>
+    /* Hero Mobile Responsive */
+    @media(max-width:768px){
+      .hero-text-section{padding:2rem 1.25rem 2.5rem !important}
+      .hero-subheading{font-size:.68rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
+      .hero-main-heading{font-size:clamp(22px,5.5vw,32px) !important;line-height:1.35 !important;margin-bottom:1rem !important}
+      .hero-tagline{font-size:.75rem !important;letter-spacing:.06em !important}
+    }
+    @media(max-width:480px){
+      .hero-text-section{padding:1.75rem 1rem 2rem !important}
+      .hero-subheading{font-size:.64rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
+      .hero-main-heading{font-size:clamp(19px,6vw,26px) !important;line-height:1.4 !important;margin-bottom:.9rem !important}
+      .hero-tagline{font-size:.7rem !important}
+    }
+    </style>
+    
     <?php endif; ?>
 
     <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
