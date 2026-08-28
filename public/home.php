@@ -624,8 +624,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
     <?php if (count($posters) > 0): ?>
-    <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;margin-top:3rem">
-      <div style="max-width:1400px;margin:0 auto;padding:0 1.5rem">
+    <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;width:100%">
+      <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
         
         <!-- Section Heading -->
         <div style="margin-bottom:3rem">
@@ -690,6 +690,11 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     <style>
     /* Rasas Poster Grid */
+    .rasas-section{
+      width:100vw !important;
+      margin-left:calc(50% - 50vw) !important;
+      margin-right:calc(50% - 50vw) !important;
+    }
     .rasas-poster-grid{
       display:grid;
       grid-template-columns:repeat(4,1fr);
@@ -710,6 +715,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     @media(max-width:640px){
       .rasas-poster-grid{grid-template-columns:1fr;gap:1.5rem}
       .rasas-section{padding:2.5rem 0 !important}
+      .rasas-section > div{padding:0 1rem !important}
       .rasa-poster-image{border-radius:8px !important}
     }
     </style>
