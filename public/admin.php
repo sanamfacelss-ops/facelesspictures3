@@ -4167,7 +4167,7 @@ if (file_exists($errorLogFile)) {
                                         </div>
 
                                         <!-- Trailer Video Uploader — local file OR YouTube URL -->
-                                        <div x-data="videoUploader('<?= $p[4] ?>', '<?= addslashes(htmlspecialchars($settingsModel->get($p[4], ''))) ?>')">">
+                                        <div x-data="videoUploader('<?= $p[4] ?>', '<?= addslashes(htmlspecialchars($settingsModel->get($p[4], ''))) ?>')">
                                             <label class="block text-[11px] text-dark/40 mb-1.5">Trailer Video</label>
 
                                             <!-- Toggle tabs -->
