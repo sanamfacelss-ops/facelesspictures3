@@ -83,26 +83,25 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   .brief-card-header p:first-child{font-size:1.45rem !important}
   .brief-card-header p:last-child{font-size:.8rem !important}
 }
-/* Hero Section Mobile Optimizations */
+/* Hero Section Mobile Optimizations - Video First Layout */
 @media(max-width:768px){
-  .hero-video-wrapper{padding:0 1rem 1.5rem !important}
-  .hero-video-container{border-radius:8px !important;box-shadow:0 2px 12px rgba(0,0,0,.12) !important}
+  .hero-video-wrapper{max-width:100% !important}
+  .hero-video-container{border-radius:0 !important}
   .hero-play-btn{width:60px !important;height:60px !important}
   .hero-play-btn svg{width:24px !important;height:24px !important}
-  .hero-play-hint{font-size:.6rem !important;bottom:12px !important}
-  .hero-text-content{padding:0 1rem 2rem !important}
-  .hero-label{font-size:.58rem !important;letter-spacing:.12em !important}
-  .hero-heading{font-size:clamp(24px,7vw,32px) !important;letter-spacing:.01em !important;margin-bottom:.6rem !important}
-  .hero-description{font-size:.85rem !important;line-height:1.6 !important}
+  .hero-play-hint{font-size:.6rem !important;bottom:14px !important}
+  .hero-text-content{padding:2rem 1.25rem !important}
+  .hero-label{font-size:.6rem !important;letter-spacing:.14em !important;margin-bottom:.5rem !important}
+  .hero-heading{font-size:clamp(24px,6vw,36px) !important;line-height:1.2 !important;margin-bottom:.75rem !important}
+  .hero-description{font-size:.85rem !important;line-height:1.6 !important;max-width:100% !important}
 }
 @media(max-width:480px){
-  .hero-video-wrapper{padding:0 .75rem 1rem !important}
-  .hero-video-container{border-radius:6px !important}
   .hero-play-btn{width:50px !important;height:50px !important;border-width:2px !important}
   .hero-play-btn svg{width:20px !important;height:20px !important}
-  .hero-play-hint{font-size:.55rem !important;bottom:10px !important}
-  .hero-text-content{padding:0 .75rem 1.5rem !important}
-  .hero-heading{font-size:clamp(20px,8vw,28px) !important}
+  .hero-play-hint{font-size:.55rem !important;bottom:12px !important}
+  .hero-text-content{padding:1.75rem 1rem !important}
+  .hero-label{font-size:.57rem !important;margin-bottom:.45rem !important}
+  .hero-heading{font-size:clamp(20px,7vw,28px) !important;line-height:1.25 !important}
   .hero-description{font-size:.8rem !important}
 }
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
@@ -206,13 +205,13 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 
 <?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
-<!-- HERO -->
-<section style="padding-top:<?= $headerHeight ?>px" class="fade-up">
-  <!-- Hero Video Container -->
-  <div class="hero-video-wrapper" style="max-width:900px;margin:0 auto;padding:0 1.5rem 2rem">
-    <div class="hero-video-container" style="width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15)">
-      <!-- Placeholder for hero video - can be replaced with actual YouTube embed or video -->
-      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)">
+<!-- HERO: Video First, Full Width -->
+<section style="margin-top:<?= $headerHeight ?>px" class="fade-up">
+  <!-- Hero Video - Edge to Edge, Full Width -->
+  <div class="hero-video-wrapper" style="width:100%;max-width:100%;margin:0 auto">
+    <div class="hero-video-container" style="width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;position:relative">
+      <!-- Placeholder for hero video - replace with actual YouTube embed -->
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:#000">
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
           <button class="hero-play-btn" style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.5);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s" onmouseover="this.style.transform='scale(1.1)';this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,.15)'">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="white" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg>
@@ -223,18 +222,18 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
     </div>
   </div>
 
-  <!-- Hero Text Content - Below Video -->
-  <div class="hero-text-content" style="text-align:center;padding:0 1.5rem 2.5rem">
+  <!-- Hero Text Content - Below Video, Centered -->
+  <div class="hero-text-content" style="text-align:center;padding:2.5rem 1.5rem 2.5rem;background:#f9fafb">
     <?php if (!empty($heroLabel)): ?>
-    <p class="hero-label" style="font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#111;margin-bottom:.5rem"><?= htmlspecialchars($heroLabel) ?></p>
+    <p class="hero-label" style="font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#111;margin-bottom:.6rem"><?= htmlspecialchars($heroLabel) ?></p>
     <?php endif; ?>
     
     <?php if (!empty($heroHeading)): ?>
-    <h1 class="hero-heading" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:1.1;color:#111;margin-bottom:.7rem"><?= htmlspecialchars($heroHeading) ?></h1>
+    <h1 class="hero-heading" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4.5vw,48px);letter-spacing:.02em;line-height:1.15;color:#111;margin-bottom:.85rem;font-weight:400"><?= htmlspecialchars($heroHeading) ?></h1>
     <?php endif; ?>
     
     <?php if (!empty($heroDescription)): ?>
-    <p class="hero-description" style="color:#6b7280;font-size:.95rem;max-width:620px;margin:0 auto;line-height:1.65;font-weight:400"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
+    <p class="hero-description" style="color:#6b7280;font-size:.9rem;max-width:640px;margin:0 auto;line-height:1.65;font-weight:400"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
     <?php endif; ?>
   </div>
 </section>
