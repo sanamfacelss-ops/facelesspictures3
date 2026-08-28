@@ -728,38 +728,28 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </style>
     
     <script>
-    // Simple global function to play poster videos
+    // Global function to play poster videos - calls Alpine's openPlayer method
     function playPosterVideo(url, title) {
       if (!url) return;
       
-      // Check if it's YouTube
-      if (/youtu(\.be|be\.com)/i.test(url)) {
-        // Open YouTube modal
-        document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: url } }));
-      } else {
-        // Open custom video player modal
-        // Find the video element in the player modal
-        const videoEl = document.querySelector('[x-ref="video"]');
-        const modal = document.querySelector('[x-show="playerOpen"]');
-        
-        if (videoEl && modal) {
-          // Set video source and play
-          videoEl.src = url;
-          videoEl.load();
-          
-          // Show modal by dispatching a custom event that Alpine will catch
-          window.dispatchEvent(new CustomEvent('open-video-player', { 
-            detail: { url: url, title: title } 
-          }));
-          
-          // Fallback: directly manipulate if Alpine isn't responding
-          setTimeout(() => {
-            if (modal.style.display === 'none' || !modal.style.display) {
-              modal.style.display = 'flex';
-              videoEl.play().catch(e => console.log('Autoplay prevented:', e));
-            }
-          }, 100);
+      // Find the body element with Alpine data
+      const bodyEl = document.querySelector('body[x-data]');
+      if (!bodyEl) {
+        console.error('Alpine not initialized');
+        return;
+      }
+      
+      // Get Alpine component instance and call openPlayer
+      const alpine = Alpine || window.Alpine;
+      if (alpine && bodyEl._x_dataStack && bodyEl._x_dataStack.length > 0) {
+        const component = bodyEl._x_dataStack[0];
+        if (typeof component.openPlayer === 'function') {
+          component.openPlayer(url, title);
+        } else {
+          console.error('openPlayer method not found');
         }
+      } else {
+        console.error('Alpine component not accessible');
       }
     }
     </script>
