@@ -663,7 +663,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <?php if (!empty($posterSectionHeading) || !empty($posterSectionSubtitle)): ?>
         <div style="margin-bottom:3.5rem;text-align:left">
           <?php if (!empty($posterSectionHeading)): ?>
-          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#111;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#d4b96a;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
           <p style="color:#6b7280;font-size:1rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
@@ -946,7 +946,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 1 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:700;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_1', '10')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -956,7 +956,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 2 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:700;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_2', '100')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -966,7 +966,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 3 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:700;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_3', '30')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -976,7 +976,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 4 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:700;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_4', '20')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -986,7 +986,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 5 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:700;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_5', '150')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
