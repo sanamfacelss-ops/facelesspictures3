@@ -666,9 +666,9 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                 
                 <!-- Play Overlay (only if has trailer) -->
                 <?php if ($hasTrailer): ?>
-                <div class="rasa-play-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s">
-                  <div class="rasa-play-btn" style="width:56px;height:56px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s">
-                    <svg width="22" height="22" fill="#111" viewBox="0 0 24 24" style="margin-left:2px"><path d="M8 5v14l11-7z"/></svg>
+                <div class="rasa-play-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none">
+                  <div class="rasa-play-btn" style="width:56px;height:56px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:scale(0.9);transition:transform .3s;pointer-events:none">
+                    <svg width="22" height="22" fill="#111" viewBox="0 0 24 24" style="margin-left:2px;pointer-events:none"><path d="M8 5v14l11-7z"/></svg>
                   </div>
                 </div>
                 <?php endif; ?>
