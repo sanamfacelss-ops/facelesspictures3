@@ -1090,22 +1090,54 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 <div id="simpleVideoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;align-items:center;justify-content:center;padding:1rem">
   <div style="position:relative;width:100%;max-width:1200px;background:#000;border-radius:12px;overflow:hidden">
     <!-- Close Button -->
-    <button onclick="closeVideoModal()" style="position:absolute;top:1rem;right:1rem;z-index:10;width:40px;height:40px;background:rgba(255,255,255,0.1);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.3s" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-      <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    <button onclick="closeVideoModal()" style="position:absolute;top:1rem;right:1rem;z-index:100;width:44px;height:44px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">
+      <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
     
     <!-- Video Title -->
-    <div id="videoTitle" style="position:absolute;top:1rem;left:1rem;color:#fff;font-size:1.25rem;font-weight:700;z-index:10;max-width:calc(100% - 120px)"></div>
+    <div id="videoTitle" style="position:absolute;top:1.5rem;left:1.5rem;color:#fff;font-size:1.5rem;font-weight:700;z-index:10;max-width:calc(100% - 140px);text-shadow:0 2px 12px rgba(0,0,0,0.8);font-family:'Bebas Neue',sans-serif;letter-spacing:0.05em"></div>
     
-    <!-- Video Player -->
-    <video id="simpleVideoPlayer" controls autoplay style="width:100%;height:auto;display:block;max-height:85vh">
+    <!-- Loading State -->
+    <div id="videoLoadingState" style="position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;z-index:50">
+      <div style="width:60px;height:60px;border:4px solid rgba(255,255,255,0.1);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div>
+      <p style="color:rgba(255,255,255,0.7);font-size:0.95rem;font-weight:500;letter-spacing:0.05em">Loading video...</p>
+    </div>
+    
+    <!-- Video Player (Plyr) -->
+    <video id="simpleVideoPlayer" class="plyr-video" playsinline controls style="width:100%;height:auto;display:block;max-height:85vh">
       <source id="videoSource" src="" type="video/mp4">
-      Your browser does not support the video tag.
     </video>
   </div>
 </div>
 
+<style>
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Plyr custom styling for modal */
+#simpleVideoModal .plyr {
+  --plyr-color-main: #D92B3A;
+}
+
+#simpleVideoModal .plyr video {
+  max-height: 85vh;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  #videoTitle {
+    font-size: 1.1rem !important;
+    top: 1rem !important;
+    left: 1rem !important;
+    max-width: calc(100% - 100px) !important;
+  }
+}
+</style>
+
 <script>
+let videoPlayerInstance = null;
+
 function openVideoModal(url, title) {
   console.log('openVideoModal called:', url, title);
   
@@ -1117,7 +1149,6 @@ function openVideoModal(url, title) {
   // Check if it's a YouTube URL - if so, use existing Alpine player
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
     console.log('YouTube URL detected, using existing player');
-    // Dispatch event for Alpine YouTube modal
     document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: url } }));
     return;
   }
@@ -1128,32 +1159,78 @@ function openVideoModal(url, title) {
   const video = document.getElementById('simpleVideoPlayer');
   const source = document.getElementById('videoSource');
   const titleEl = document.getElementById('videoTitle');
+  const loadingState = document.getElementById('videoLoadingState');
   
-  // Set video source and title
-  source.src = url;
-  video.load();
+  // Show loading state
+  loadingState.style.display = 'flex';
+  
+  // Set title
   titleEl.textContent = title || '';
   
   // Show modal
   modal.style.display = 'flex';
   
-  // Play video
-  video.play().catch(err => {
-    console.error('Error playing video:', err);
+  // Destroy existing player if any
+  if (videoPlayerInstance) {
+    videoPlayerInstance.destroy();
+  }
+  
+  // Set video source
+  source.src = url;
+  video.load();
+  
+  // Initialize Plyr player
+  videoPlayerInstance = new Plyr(video, {
+    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+    autoplay: true,
+    autopause: true,
+    clickToPlay: true,
+    keyboard: { focused: true, global: true },
+    tooltips: { controls: true, seek: true },
+    speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+    quality: {
+      default: 720,
+      options: [1080, 720, 576, 480]
+    }
+  });
+  
+  // Hide loading state when video can play
+  videoPlayerInstance.on('canplay', () => {
+    console.log('Video can play, hiding loading state');
+    loadingState.style.display = 'none';
+  });
+  
+  // Handle errors
+  videoPlayerInstance.on('error', (e) => {
+    console.error('Video error:', e);
+    loadingState.innerHTML = '<div style="text-align:center;color:#fff"><svg style="width:48px;height:48px;margin-bottom:1rem" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p style="font-size:1rem;font-weight:600;margin-bottom:0.5rem">Failed to load video</p><p style="font-size:0.85rem;color:rgba(255,255,255,0.6)">The video file may be corrupted or unsupported</p></div>';
+  });
+  
+  // Auto-play
+  videoPlayerInstance.play().catch(err => {
+    console.warn('Autoplay failed (browser policy):', err);
+    loadingState.style.display = 'none';
   });
 }
 
 function closeVideoModal() {
   console.log('closeVideoModal called');
   const modal = document.getElementById('simpleVideoModal');
-  const video = document.getElementById('simpleVideoPlayer');
+  const loadingState = document.getElementById('videoLoadingState');
   
-  // Pause and reset video
-  video.pause();
-  video.currentTime = 0;
+  // Stop and destroy player
+  if (videoPlayerInstance) {
+    videoPlayerInstance.stop();
+    videoPlayerInstance.destroy();
+    videoPlayerInstance = null;
+  }
   
   // Hide modal
   modal.style.display = 'none';
+  
+  // Reset loading state
+  loadingState.style.display = 'flex';
+  loadingState.innerHTML = '<div style="width:60px;height:60px;border:4px solid rgba(255,255,255,0.1);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div><p style="color:rgba(255,255,255,0.7);font-size:0.95rem;font-weight:500;letter-spacing:0.05em">Loading video...</p>';
 }
 
 // Close on Escape key
