@@ -83,26 +83,26 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   .brief-card-header p:first-child{font-size:1.45rem !important}
   .brief-card-header p:last-child{font-size:.8rem !important}
 }
-/* Hero Section Mobile Optimizations - Video First Layout */
+/* Hero Section Mobile Optimizations - Exact Image 2 Layout */
 @media(max-width:768px){
-  .hero-video-wrapper{max-width:100% !important}
+  .hero-video-wrapper{width:100% !important}
   .hero-video-container{border-radius:0 !important}
-  .hero-play-btn{width:60px !important;height:60px !important}
-  .hero-play-btn svg{width:24px !important;height:24px !important}
-  .hero-play-hint{font-size:.6rem !important;bottom:14px !important}
-  .hero-text-content{padding:2rem 1.25rem !important}
-  .hero-label{font-size:.6rem !important;letter-spacing:.14em !important;margin-bottom:.5rem !important}
-  .hero-heading{font-size:clamp(24px,6vw,36px) !important;line-height:1.2 !important;margin-bottom:.75rem !important}
-  .hero-description{font-size:.85rem !important;line-height:1.6 !important;max-width:100% !important}
+  .hero-play-btn{width:56px !important;height:56px !important;border-width:2px !important}
+  .hero-play-btn svg{width:22px !important;height:22px !important}
+  .hero-play-hint{font-size:.58rem !important;bottom:12px !important;letter-spacing:.1em !important}
+  .hero-text-content{padding:2rem 1.25rem 2.5rem !important;max-width:100% !important}
+  .hero-label{font-size:.68rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
+  .hero-heading{font-size:clamp(22px,5.5vw,32px) !important;line-height:1.35 !important;margin-bottom:1rem !important}
+  .hero-description{font-size:.75rem !important;letter-spacing:.06em !important}
 }
 @media(max-width:480px){
-  .hero-play-btn{width:50px !important;height:50px !important;border-width:2px !important}
-  .hero-play-btn svg{width:20px !important;height:20px !important}
-  .hero-play-hint{font-size:.55rem !important;bottom:12px !important}
-  .hero-text-content{padding:1.75rem 1rem !important}
-  .hero-label{font-size:.57rem !important;margin-bottom:.45rem !important}
-  .hero-heading{font-size:clamp(20px,7vw,28px) !important;line-height:1.25 !important}
-  .hero-description{font-size:.8rem !important}
+  .hero-play-btn{width:48px !important;height:48px !important}
+  .hero-play-btn svg{width:18px !important;height:18px !important}
+  .hero-play-hint{font-size:.52rem !important;bottom:10px !important}
+  .hero-text-content{padding:1.75rem 1rem 2rem !important}
+  .hero-label{font-size:.64rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
+  .hero-heading{font-size:clamp(19px,6vw,26px) !important;line-height:1.4 !important;margin-bottom:.9rem !important}
+  .hero-description{font-size:.7rem !important}
 }
 .sec-label{display:flex;align-items:center;gap:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:.625rem}
 .sec-label::before{content:'';display:inline-block;width:3px;height:10px;border-radius:2px;background:#111;flex-shrink:0}
@@ -208,33 +208,38 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 <!-- HERO: Video First, Full Width -->
 <section style="margin-top:<?= $headerHeight ?>px" class="fade-up">
   <!-- Hero Video - Edge to Edge, Full Width -->
-  <div class="hero-video-wrapper" style="width:100%;max-width:100%;margin:0 auto">
+  <div class="hero-video-wrapper" style="width:100%;margin:0 auto">
     <div class="hero-video-container" style="width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;position:relative">
       <!-- Placeholder for hero video - replace with actual YouTube embed -->
       <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;background:#000">
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-          <button class="hero-play-btn" style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.5);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s" onmouseover="this.style.transform='scale(1.1)';this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,.15)'">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="white" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg>
+          <button class="hero-play-btn" style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s" onmouseover="this.style.transform='scale(1.08)';this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,.1)'">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="margin-left:2px"><path d="M8 5v14l11-7z"/></svg>
           </button>
         </div>
-        <p class="hero-play-hint" style="position:absolute;bottom:20px;color:rgba(255,255,255,.4);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase">CLICK TO PLAY</p>
+        <p class="hero-play-hint" style="position:absolute;bottom:16px;color:rgba(255,255,255,.35);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500">CLICK TO PLAY</p>
       </div>
     </div>
   </div>
 
   <!-- Hero Text Content - Below Video, Centered -->
-  <div class="hero-text-content" style="text-align:center;padding:2.5rem 1.5rem 2.5rem;background:#f9fafb">
+  <div class="hero-text-content" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
+    
+    <!-- Small uppercase label/subheading -->
     <?php if (!empty($heroLabel)): ?>
-    <p class="hero-label" style="font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#111;margin-bottom:.6rem"><?= htmlspecialchars($heroLabel) ?></p>
+    <p class="hero-label" style="font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroLabel) ?></p>
     <?php endif; ?>
     
+    <!-- Large main heading/question -->
     <?php if (!empty($heroHeading)): ?>
-    <h1 class="hero-heading" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4.5vw,48px);letter-spacing:.02em;line-height:1.15;color:#111;margin-bottom:.85rem;font-weight:400"><?= htmlspecialchars($heroHeading) ?></h1>
+    <h1 class="hero-heading" style="font-size:clamp(26px,4.2vw,42px);line-height:1.3;color:#111;margin-bottom:1.2rem;font-weight:400;font-family:'DM Sans',sans-serif"><?= htmlspecialchars($heroHeading) ?></h1>
     <?php endif; ?>
     
+    <!-- Small gray tagline at bottom -->
     <?php if (!empty($heroDescription)): ?>
-    <p class="hero-description" style="color:#6b7280;font-size:.9rem;max-width:640px;margin:0 auto;line-height:1.65;font-weight:400"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
+    <p class="hero-description" style="color:#9ca3af;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
     <?php endif; ?>
+    
   </div>
 </section>
 
