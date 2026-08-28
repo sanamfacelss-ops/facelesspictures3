@@ -647,7 +647,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             $fetchpriority = $idx < 4 ? 'fetchpriority="high"' : '';
             ?>
             
-            <div class="rasa-poster-card" <?php if($hasTrailer): ?>@click="openPlayer('<?= addslashes(htmlspecialchars($p['trailer'])) ?>','<?= addslashes(htmlspecialchars($p['title'])) ?>')" style="cursor:pointer"<?php endif; ?>>
+            <div class="rasa-poster-card" <?php if($hasTrailer): ?>onclick="window.dispatchEvent(new CustomEvent('fp-poster-click', {detail: {url: '<?= addslashes(htmlspecialchars($p['trailer'])) ?>', title: '<?= addslashes(htmlspecialchars($p['title'])) ?>'}}))" style="cursor:pointer"<?php endif; ?>>
               <!-- Poster Image with Aspect Ratio Container -->
               <div class="rasa-poster-image" style="position:relative;width:100%;aspect-ratio:2/3;background:#1a1a1a;border-radius:12px;overflow:hidden">
                 <?php if (!empty($p['url'])): ?>
@@ -725,6 +725,20 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .rasa-poster-image{border-radius:8px !important}
     }
     </style>
+    
+    <script>
+    // Listen for poster clicks and open player
+    window.addEventListener('fp-poster-click', function(e) {
+      const detail = e.detail;
+      if (detail && detail.url) {
+        // Get the Alpine.js component instance
+        const bodyEl = document.querySelector('body[x-data]');
+        if (bodyEl && bodyEl._x_dataStack && bodyEl._x_dataStack[0]) {
+          bodyEl._x_dataStack[0].openPlayer(detail.url, detail.title || '');
+        }
+      }
+    });
+    </script>
     <?php endif; ?>
 
     <!-- ══ MANIFESTO VIDEO SLIDER ══ -->
