@@ -620,38 +620,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </div>
   </section>
 
-  <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
-
-  <?php
-    // Build the poster card HTML as a reusable string
-    function posterCard(array $p, int $index): string {
-        $hasTrailer = !empty($p['trailer']);
-        $btnLabel   = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer Now' : 'Trailer / Teaser Coming Soon');
-        
-        // First 10 posters: eager loading (all above the fold)
-        // Remaining posters: lazy loading
-        $loading = $index < 10 ? 'eager' : 'lazy';
-        $fetchpriority = $index < 3 ? 'fetchpriority="high"' : '';
-        
-        $img = $p['url']
-            ? '<img src="'.htmlspecialchars($p['url']).'" alt="'.htmlspecialchars($p['title'] ?: 'Film Poster').'" loading="'.$loading.'" decoding="async" '.$fetchpriority.' style="width:100%;height:100%;object-fit:cover">'
-            : '<div class="poster-empty"><svg width="36" height="36" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg><span style="font-size:.65rem;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase">Set poster in Admin</span></div>';
-        $overlay = $hasTrailer
-            ? '<div class="play-overlay"><div class="play-circle"><svg width="22" height="22" fill="#111" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>'
-            : '';
-        $title = $p['title'] ? '<div class="poster-title-bar">'.htmlspecialchars($p['title']).'</div>' : '';
-        $ctaClass = $hasTrailer ? 'poster-cta' : 'poster-cta no-trailer';
-        $ctaIcon  = $hasTrailer ? '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>' : '';
-        $cta = '<div class="'.$ctaClass.'">'.$ctaIcon.'<span>'.$btnLabel.'</span></div>';
-        $wrapAttr = $hasTrailer
-            ? 'style="cursor:pointer" @click="openPlayer(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\' )"'
-            : 'style="cursor:default"';
-        return '<div class="poster-wrap" '.$wrapAttr.'><div class="poster-card">'.$img.$overlay.$title.'</div>'.$cta.'</div>';
-    }
-    ?>
-
-    
-    <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
+  <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
     <?php if (count($posters) > 0): ?>
     <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;width:100%">
       <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
