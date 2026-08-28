@@ -509,7 +509,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 <!-- ── MAIN CONTENT ── -->
 <main style="padding-top:<?= $navHeight ?>px">
   <!-- Hero Section with White Background -->
-  <section style="background:#fff;padding-bottom:3rem">
+  <section style="background:#fff;padding:3rem 0 3rem">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
       <!-- ══ NEW HERO LAYOUT: Video First, Then Text Below ══ -->
