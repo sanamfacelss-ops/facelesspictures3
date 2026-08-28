@@ -700,11 +700,17 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       grid-template-columns:repeat(4,1fr);
       gap:1.5rem;
     }
+    .rasa-poster-card{
+      transition:transform .2s;
+    }
+    .rasa-poster-card:hover{
+      transform:translateY(-4px);
+    }
     .rasa-poster-card:hover .rasa-play-overlay{
-      opacity:1;
+      opacity:1 !important;
     }
     .rasa-poster-card:hover .rasa-play-btn{
-      transform:scale(1);
+      transform:scale(1) !important;
     }
     /* Tablet - 2 columns */
     @media(max-width:1024px){
