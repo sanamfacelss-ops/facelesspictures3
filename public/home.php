@@ -733,29 +733,14 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </style>
     
     <script>
-    // Global function to play poster videos - calls Alpine's openPlayer method
+    // Global function to play poster videos - dispatches custom event for Alpine to handle
     function playPosterVideo(url, title) {
       if (!url) return;
       
-      // Find the body element with Alpine data
-      const bodyEl = document.querySelector('body[x-data]');
-      if (!bodyEl) {
-        console.error('Alpine not initialized');
-        return;
-      }
-      
-      // Get Alpine component instance and call openPlayer
-      const alpine = Alpine || window.Alpine;
-      if (alpine && bodyEl._x_dataStack && bodyEl._x_dataStack.length > 0) {
-        const component = bodyEl._x_dataStack[0];
-        if (typeof component.openPlayer === 'function') {
-          component.openPlayer(url, title);
-        } else {
-          console.error('openPlayer method not found');
-        }
-      } else {
-        console.error('Alpine component not accessible');
-      }
+      // Dispatch custom event that Alpine component will listen to
+      window.dispatchEvent(new CustomEvent('play-video', { 
+        detail: { url: url, title: title }
+      }));
     }
     </script>
     <?php endif; ?>
@@ -1136,6 +1121,13 @@ function homePage() {
         init() {
             document.addEventListener('fullscreenchange', () => {
                 this.isFullscreen = !!document.fullscreenElement;
+            });
+            
+            // Listen for play-video events from poster cards
+            window.addEventListener('play-video', (e) => {
+                if (e.detail && e.detail.url) {
+                    this.openPlayer(e.detail.url, e.detail.title || '');
+                }
             });
         },
 
