@@ -175,8 +175,8 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
   <div class="submit-card" style="margin:0" x-data="writerSubmit()">
     
     <!-- 3-STEP PROCESS (inside submission card) -->
-    <div style="background:#fafafa;border-radius:8px;padding:1.25rem;margin-bottom:1.5rem">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem">
+    <div style="margin:-1.5rem -1.5rem 1.5rem;padding:1.5rem;background:#fafafa;border-bottom:1px solid #e5e7eb">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem">
         
         <!-- STEP 1 -->
         <div style="display:flex;align-items:flex-start;gap:.75rem">
