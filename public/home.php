@@ -180,7 +180,7 @@ endforeach;
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans Tamil','Noto Sans Telugu','Noto Sans Kannada','Noto Sans Malayalam','Noto Sans Gujarati','Noto Sans Gurmukhi',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans Tamil','Noto Sans Telugu','Noto Sans Kannada','Noto Sans Malayalam','Noto Sans Gujarati','Noto Sans Gurmukhi',sans-serif;background:#000;color:#111;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 [x-cloak]{display:none!important}
 
 /* NAV */
@@ -914,7 +914,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 </main>
 
 <!-- ── STATS SECTION ── -->
-<section id="about" style="background:#000;padding:4rem 2rem;text-align:center">
+<section id="about" style="background:#000;padding:4rem 2rem 0 2rem;text-align:center;margin:0;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)">
   <div style="max-width:1400px;margin:0 auto">
     
     <!-- Stats Grid -->
