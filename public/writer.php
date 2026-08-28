@@ -176,7 +176,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     
     <!-- 3-STEP PROCESS (inside submission card) -->
     <div style="margin:-1.5rem -1.5rem 1.5rem;padding:1.5rem;background:#fafafa;border-bottom:1px solid #e5e7eb">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem">
         
         <!-- STEP 1 -->
         <div style="display:flex;align-items:flex-start;gap:.75rem">
@@ -213,6 +213,14 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
       </div>
     </div>
+
+    <style>
+      @media (max-width: 768px) {
+        .submit-card > div:first-child > div {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
 
     <?php if (!empty($formHeading)): ?>
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
