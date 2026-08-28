@@ -228,11 +228,6 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 /* TEXT CONTENT - Make text with line breaks look like spaced list */
 .text-content{line-height:2.2}
 
-/* MARQUEE */
-@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.marquee-track{animation:marquee 40s linear infinite;display:flex;white-space:nowrap}
-.marquee-wrap:hover .marquee-track{animation-play-state:paused}
-
 /* MODAL BACKDROP */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
 
@@ -917,22 +912,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </div><!-- /poster+role section -->
   </div><!-- /max-w -->
 </main>
-
-<!-- ── MARQUEE ── -->
-<?php if (!empty($marqueeItems)): ?>
-<div class="marquee-wrap overflow-hidden border-y border-gray-100 py-3 bg-gray-50">
-  <div class="marquee-track">
-    <?php for ($i = 0; $i < 2; $i++): ?>
-    <div class="flex items-center gap-6 px-4">
-      <?php foreach ($marqueeItems as $item): ?>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.18em;color:#9ca3af"><?= htmlspecialchars($item) ?></span>
-        <span style="width:3px;height:3px;background:#d1d5db;border-radius:50%;display:inline-block;flex-shrink:0"></span>
-      <?php endforeach; ?>
-    </div>
-    <?php endfor; ?>
-  </div>
-</div>
-<?php endif; ?>
 
 <!-- ── STATS SECTION ── -->
 <section id="about" style="background:#000;padding:4rem 2rem;text-align:center">
