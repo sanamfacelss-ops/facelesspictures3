@@ -104,26 +104,27 @@ $aboutSectionHeading = $settingsModel->get('about_section_heading', 'WHAT IS FAC
 
 // Up to 10 poster slots
 $posterKeys = [
-    ['landing_poster_url',  'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label'],
-    ['landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url', 'landing_poster2_btn_label'],
-    ['landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url', 'landing_poster3_btn_label'],
-    ['landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label'],
-    ['landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label'],
-    ['landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label'],
-    ['landing_poster7_url', 'landing_poster7_title', 'landing_trailer7_url', 'landing_poster7_btn_label'],
-    ['landing_poster8_url', 'landing_poster8_title', 'landing_trailer8_url', 'landing_poster8_btn_label'],
-    ['landing_poster9_url', 'landing_poster9_title', 'landing_trailer9_url', 'landing_poster9_btn_label'],
-    ['landing_poster10_url', 'landing_poster10_title', 'landing_trailer10_url', 'landing_poster10_btn_label'],
+    ['landing_poster_url',  'landing_poster_title',  'landing_poster_subtitle',  'landing_trailer_url',  'landing_poster_btn_label'],
+    ['landing_poster2_url', 'landing_poster2_title', 'landing_poster2_subtitle', 'landing_trailer2_url', 'landing_poster2_btn_label'],
+    ['landing_poster3_url', 'landing_poster3_title', 'landing_poster3_subtitle', 'landing_trailer3_url', 'landing_poster3_btn_label'],
+    ['landing_poster4_url', 'landing_poster4_title', 'landing_poster4_subtitle', 'landing_trailer4_url', 'landing_poster4_btn_label'],
+    ['landing_poster5_url', 'landing_poster5_title', 'landing_poster5_subtitle', 'landing_trailer5_url', 'landing_poster5_btn_label'],
+    ['landing_poster6_url', 'landing_poster6_title', 'landing_poster6_subtitle', 'landing_trailer6_url', 'landing_poster6_btn_label'],
+    ['landing_poster7_url', 'landing_poster7_title', 'landing_poster7_subtitle', 'landing_trailer7_url', 'landing_poster7_btn_label'],
+    ['landing_poster8_url', 'landing_poster8_title', 'landing_poster8_subtitle', 'landing_trailer8_url', 'landing_poster8_btn_label'],
+    ['landing_poster9_url', 'landing_poster9_title', 'landing_poster9_subtitle', 'landing_trailer9_url', 'landing_poster9_btn_label'],
+    ['landing_poster10_url', 'landing_poster10_title', 'landing_poster10_subtitle', 'landing_trailer10_url', 'landing_poster10_btn_label'],
 ];
 $posters = [];
 foreach ($posterKeys as $i => $keys) {
     $url      = $settingsModel->get($keys[0], '');
     $title    = $settingsModel->get($keys[1], '');
-    $trailer  = $settingsModel->get($keys[2], '');
-    $btnLabel = $settingsModel->get($keys[3], '');
+    $subtitle = $settingsModel->get($keys[2], '');
+    $trailer  = $settingsModel->get($keys[3], '');
+    $btnLabel = $settingsModel->get($keys[4], '');
     // Only include if poster image URL is set
     if ($url) {
-        $posters[] = ['url' => $url, 'title' => $title, 'trailer' => $trailer, 'btn_label' => $btnLabel, 'idx' => $i];
+        $posters[] = ['url' => $url, 'title' => $title, 'subtitle' => $subtitle, 'trailer' => $trailer, 'btn_label' => $btnLabel, 'idx' => $i];
     }
 }
 $posterCount = count($posters);
@@ -666,11 +667,13 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                 <?php endif; ?>
                 
                 <!-- Bottom Gradient Overlay with Text -->
-                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.7) 50%,transparent 100%);padding:3rem 1rem 1rem;pointer-events:none">
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.7) 50%,transparent 100%);padding:3rem 1rem 1.25rem;pointer-events:none">
                   <?php if (!empty($p['title'])): ?>
-                  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.25rem,2.5vw,1.5rem);letter-spacing:.06em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1.1"><?= htmlspecialchars($p['title']) ?></h3>
+                  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:.08em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1.1;text-transform:uppercase"><?= htmlspecialchars($p['title']) ?></h3>
                   <?php endif; ?>
-                  <p style="font-size:.75rem;color:#d1d5db;text-transform:uppercase;letter-spacing:.06em;font-weight:500"><?= $btnLabel ?></p>
+                  <?php if (!empty($p['subtitle'])): ?>
+                  <p style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;font-weight:600"><?= htmlspecialchars($p['subtitle']) ?></p>
+                  <?php endif; ?>
                 </div>
                 
                 <!-- Play Overlay (only if has trailer) -->

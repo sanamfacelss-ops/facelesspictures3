@@ -3936,16 +3936,16 @@ if (file_exists($errorLogFile)) {
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                                     <?php
                                     $posterSlots = [
-                                        ['Poster 1', 'landing_poster_url',  'landing_poster_title',  'landing_trailer_url',  'landing_poster_btn_label'],
-                                        ['Poster 2', 'landing_poster2_url', 'landing_poster2_title', 'landing_trailer2_url', 'landing_poster2_btn_label'],
-                                        ['Poster 3', 'landing_poster3_url', 'landing_poster3_title', 'landing_trailer3_url', 'landing_poster3_btn_label'],
-                                        ['Poster 4', 'landing_poster4_url', 'landing_poster4_title', 'landing_trailer4_url', 'landing_poster4_btn_label'],
-                                        ['Poster 5', 'landing_poster5_url', 'landing_poster5_title', 'landing_trailer5_url', 'landing_poster5_btn_label'],
-                                        ['Poster 6', 'landing_poster6_url', 'landing_poster6_title', 'landing_trailer6_url', 'landing_poster6_btn_label'],
-                                        ['Poster 7', 'landing_poster7_url', 'landing_poster7_title', 'landing_trailer7_url', 'landing_poster7_btn_label'],
-                                        ['Poster 8', 'landing_poster8_url', 'landing_poster8_title', 'landing_trailer8_url', 'landing_poster8_btn_label'],
-                                        ['Poster 9', 'landing_poster9_url', 'landing_poster9_title', 'landing_trailer9_url', 'landing_poster9_btn_label'],
-                                        ['Poster 10', 'landing_poster10_url', 'landing_poster10_title', 'landing_trailer10_url', 'landing_poster10_btn_label'],
+                                        ['Poster 1', 'landing_poster_url',  'landing_poster_title',  'landing_poster_subtitle',  'landing_trailer_url',  'landing_poster_btn_label'],
+                                        ['Poster 2', 'landing_poster2_url', 'landing_poster2_title', 'landing_poster2_subtitle', 'landing_trailer2_url', 'landing_poster2_btn_label'],
+                                        ['Poster 3', 'landing_poster3_url', 'landing_poster3_title', 'landing_poster3_subtitle', 'landing_trailer3_url', 'landing_poster3_btn_label'],
+                                        ['Poster 4', 'landing_poster4_url', 'landing_poster4_title', 'landing_poster4_subtitle', 'landing_trailer4_url', 'landing_poster4_btn_label'],
+                                        ['Poster 5', 'landing_poster5_url', 'landing_poster5_title', 'landing_poster5_subtitle', 'landing_trailer5_url', 'landing_poster5_btn_label'],
+                                        ['Poster 6', 'landing_poster6_url', 'landing_poster6_title', 'landing_poster6_subtitle', 'landing_trailer6_url', 'landing_poster6_btn_label'],
+                                        ['Poster 7', 'landing_poster7_url', 'landing_poster7_title', 'landing_poster7_subtitle', 'landing_trailer7_url', 'landing_poster7_btn_label'],
+                                        ['Poster 8', 'landing_poster8_url', 'landing_poster8_title', 'landing_poster8_subtitle', 'landing_trailer8_url', 'landing_poster8_btn_label'],
+                                        ['Poster 9', 'landing_poster9_url', 'landing_poster9_title', 'landing_poster9_subtitle', 'landing_trailer9_url', 'landing_poster9_btn_label'],
+                                        ['Poster 10', 'landing_poster10_url', 'landing_poster10_title', 'landing_poster10_subtitle', 'landing_trailer10_url', 'landing_poster10_btn_label'],
                                     ];
                                     foreach ($posterSlots as $p):
                                     $currentUrl = $settingsModel->get($p[1], '');
@@ -4008,15 +4008,22 @@ if (file_exists($errorLogFile)) {
                                                 class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         </div>
 
+                                        <!-- Film subtitle -->
+                                        <div>
+                                            <label class="block text-[11px] text-dark/40 mb-1">Film Subtitle <span class="text-dark/25">(e.g., WONDER, PEACE, PARENTAL)</span></label>
+                                            <input type="text" x-model="form.<?= $p[3] ?>" placeholder="Subtitle or category..."
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        </div>
+
                                         <!-- Button label -->
                                         <div>
                                             <label class="block text-[11px] text-dark/40 mb-1">Button Text <span class="text-dark/25">(leave blank for smart default)</span></label>
-                                            <input type="text" x-model="form.<?= $p[4] ?>" placeholder="Watch Trailer Now / Trailer · Teaser Coming Soon..."
+                                            <input type="text" x-model="form.<?= $p[5] ?>" placeholder="Watch Trailer Now / Trailer · Teaser Coming Soon..."
                                                 class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                         </div>
 
                                         <!-- Trailer Video Uploader — local file OR YouTube URL -->
-                                        <div x-data="videoUploader('<?= $p[3] ?>', '<?= addslashes(htmlspecialchars($settingsModel->get($p[3], ''))) ?>')">
+                                        <div x-data="videoUploader('<?= $p[4] ?>', '<?= addslashes(htmlspecialchars($settingsModel->get($p[4], ''))) ?>')">">
                                             <label class="block text-[11px] text-dark/40 mb-1.5">Trailer Video</label>
 
                                             <!-- Toggle tabs -->
@@ -8149,37 +8156,47 @@ if (file_exists($errorLogFile)) {
                 landing_footer_content: <?= json_encode($settingsModel->get('landing_footer_content','© 2024 Faceless Pictures. All rights reserved.')) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
+                landing_poster_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_subtitle',''))) ?>',
                 landing_trailer_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer_url',''))) ?>',
                 landing_poster2_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster2_url',''))) ?>',
                 landing_poster2_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster2_title',''))) ?>',
+                landing_poster2_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster2_subtitle',''))) ?>',
                 landing_trailer2_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer2_url',''))) ?>',
                 landing_poster3_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_url',''))) ?>',
                 landing_poster3_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_title',''))) ?>',
+                landing_poster3_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster3_subtitle',''))) ?>',
                 landing_trailer3_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer3_url',''))) ?>',
                 landing_poster4_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster4_url',''))) ?>',
                 landing_poster4_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster4_title',''))) ?>',
+                landing_poster4_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster4_subtitle',''))) ?>',
                 landing_trailer4_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer4_url',''))) ?>',
                 landing_poster5_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_url',''))) ?>',
                 landing_poster5_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_title',''))) ?>',
+                landing_poster5_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster5_subtitle',''))) ?>',
                 landing_trailer5_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer5_url',''))) ?>',
                 landing_poster6_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_url',''))) ?>',
                 landing_poster6_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_title',''))) ?>',
+                landing_poster6_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_subtitle',''))) ?>',
                 landing_trailer6_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer6_url',''))) ?>',
                 landing_poster6_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster6_btn_label',''))) ?>',
                 landing_poster7_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster7_url',''))) ?>',
                 landing_poster7_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster7_title',''))) ?>',
+                landing_poster7_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster7_subtitle',''))) ?>',
                 landing_trailer7_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer7_url',''))) ?>',
                 landing_poster7_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster7_btn_label',''))) ?>',
                 landing_poster8_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster8_url',''))) ?>',
                 landing_poster8_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster8_title',''))) ?>',
+                landing_poster8_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster8_subtitle',''))) ?>',
                 landing_trailer8_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer8_url',''))) ?>',
                 landing_poster8_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster8_btn_label',''))) ?>',
                 landing_poster9_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster9_url',''))) ?>',
                 landing_poster9_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster9_title',''))) ?>',
+                landing_poster9_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster9_subtitle',''))) ?>',
                 landing_trailer9_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer9_url',''))) ?>',
                 landing_poster9_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster9_btn_label',''))) ?>',
                 landing_poster10_url:   '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster10_url',''))) ?>',
                 landing_poster10_title: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster10_title',''))) ?>',
+                landing_poster10_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster10_subtitle',''))) ?>',
                 landing_trailer10_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_trailer10_url',''))) ?>',
                 landing_poster10_btn_label: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster10_btn_label',''))) ?>',
                 landing_poster_btn_label:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_btn_label',''))) ?>',
