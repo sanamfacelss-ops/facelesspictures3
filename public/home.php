@@ -630,7 +630,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <!-- Section Heading -->
         <div style="margin-bottom:3rem">
           <?php if (!empty($posterSectionHeading)): ?>
-          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4.5vw,48px);letter-spacing:.04em;color:#111;margin-bottom:.5rem"><?= htmlspecialchars($posterSectionHeading) ?></h2>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4.5vw,48px);letter-spacing:.04em;color:#111;margin-bottom:.35rem;font-weight:700;line-height:1"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
           <p style="color:#6b7280;font-size:.9rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
@@ -677,7 +677,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
               <!-- Title & Date -->
               <div style="padding:.75rem 0">
                 <?php if (!empty($p['title'])): ?>
-                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;color:#111;margin-bottom:.25rem"><?= htmlspecialchars($p['title']) ?></h3>
+                <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.06em;color:#111;margin-bottom:.25rem;font-weight:700"><?= htmlspecialchars($p['title']) ?></h3>
                 <?php endif; ?>
                 <p style="font-size:.75rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em"><?= $btnLabel ?></p>
               </div>
