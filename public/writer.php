@@ -97,6 +97,43 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
   <?php endif; ?>
 </section>
 
+<!-- 3-STEP PROCESS -->
+<section style="max-width:1100px;margin:0 auto;padding:3rem 1.5rem 3.5rem">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;align-items:stretch">
+    
+    <!-- STEP 1: WHAT WE GIVE -->
+    <div style="background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:2rem 1.75rem;text-align:center;position:relative;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04)" onmouseover="this.style.borderColor='#D92B3A';this.style.boxShadow='0 8px 20px rgba(217,43,58,0.15)'" onmouseout="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#D92B3A 0%,#c41d2e 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;box-shadow:0 4px 12px rgba(217,43,58,0.25)">
+        <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.08em;color:#111;margin-bottom:.75rem;line-height:1">WHAT WE GIVE</h3>
+      <p style="color:#4b5563;font-size:.95rem;line-height:1.6;font-weight:500">One page</p>
+      <p style="color:#6b7280;font-size:.85rem;line-height:1.5;margin-top:.5rem">We provide you with one page of script to continue the story</p>
+    </div>
+
+    <!-- STEP 2: WHAT YOU DO -->
+    <div style="background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:2rem 1.75rem;text-align:center;position:relative;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04)" onmouseover="this.style.borderColor='#D92B3A';this.style.boxShadow='0 8px 20px rgba(217,43,58,0.15)'" onmouseout="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#D92B3A 0%,#c41d2e 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;box-shadow:0 4px 12px rgba(217,43,58,0.25)">
+        <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+      </div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.08em;color:#111;margin-bottom:.75rem;line-height:1">WHAT YOU DO</h3>
+      <p style="color:#4b5563;font-size:.95rem;line-height:1.6;font-weight:500">Continue it. One more page only</p>
+      <p style="color:#6b7280;font-size:.85rem;line-height:1.5;margin-top:.5rem">Write exactly one page continuing the story from where we left off</p>
+    </div>
+
+    <!-- STEP 3: SUBMIT -->
+    <div style="background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:2rem 1.75rem;text-align:center;position:relative;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04)" onmouseover="this.style.borderColor='#D92B3A';this.style.boxShadow='0 8px 20px rgba(217,43,58,0.15)'" onmouseout="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#D92B3A 0%,#c41d2e 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;box-shadow:0 4px 12px rgba(217,43,58,0.25)">
+        <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+      </div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.08em;color:#111;margin-bottom:.75rem;line-height:1">SUBMIT</h3>
+      <p style="color:#4b5563;font-size:.95rem;line-height:1.6;font-weight:500">Your page PDF plus narration video</p>
+      <p style="color:#6b7280;font-size:.85rem;line-height:1.5;margin-top:.5rem">Upload your written page as PDF and record yourself narrating it on camera</p>
+    </div>
+
+  </div>
+</section>
+
 <!-- BRIEF CARD + SUBMISSION — side by side on desktop -->
 <div class="side-by-side" style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">
 
