@@ -937,18 +937,95 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 </div>
 <?php endif; ?>
 
-<!-- ── ABOUT ── -->
-<section id="about" class="py-16 px-4 bg-white border-t border-gray-100">
-  <div class="max-w-3xl mx-auto text-center">
-    <?php if (!empty($aboutSectionLabel)): ?>
-    <p style="font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9ca3af;margin-bottom:.75rem"><?= htmlspecialchars($aboutSectionLabel) ?></p>
+<!-- ── STATS SECTION ── -->
+<section id="about" style="background:#000;padding:4rem 2rem;text-align:center">
+  <div style="max-width:1400px;margin:0 auto">
+    
+    <!-- Stats Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:3rem;margin-bottom:3rem">
+      
+      <!-- Stat 1 -->
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+          <?= htmlspecialchars($settingsModel->get('stats_number_1', '10')) ?>
+        </div>
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+          <?= htmlspecialchars($settingsModel->get('stats_label_1', 'FILMS')) ?>
+        </div>
+      </div>
+      
+      <!-- Stat 2 -->
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+          <?= htmlspecialchars($settingsModel->get('stats_number_2', '100')) ?>
+        </div>
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+          <?= htmlspecialchars($settingsModel->get('stats_label_2', 'SCENES')) ?>
+        </div>
+      </div>
+      
+      <!-- Stat 3 -->
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+          <?= htmlspecialchars($settingsModel->get('stats_number_3', '30')) ?>
+        </div>
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+          <?= htmlspecialchars($settingsModel->get('stats_label_3', 'DAYS')) ?>
+        </div>
+      </div>
+      
+      <!-- Stat 4 -->
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+          <?= htmlspecialchars($settingsModel->get('stats_number_4', '20')) ?>
+        </div>
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+          <?= htmlspecialchars($settingsModel->get('stats_label_4', 'ARTISTS')) ?>
+        </div>
+      </div>
+      
+      <!-- Stat 5 -->
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#fff;font-weight:700;line-height:1;margin-bottom:0.5rem">
+          <?= htmlspecialchars($settingsModel->get('stats_number_5', '150')) ?>
+        </div>
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+          <?= htmlspecialchars($settingsModel->get('stats_label_5', 'LIVES')) ?>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Description Lines -->
+    <div style="margin-bottom:2.5rem">
+      <?php 
+      $statsLine1 = $settingsModel->get('stats_line_1', 'Many talented people never get their first chance.');
+      $statsLine2 = $settingsModel->get('stats_line_2', 'We are giving them one.');
+      $statsLine3 = $settingsModel->get('stats_line_3', 'We don\'t just make films.');
+      $statsLine4 = $settingsModel->get('stats_line_4', 'We open the door.');
+      ?>
+      <?php if (!empty($statsLine1)): ?>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($statsLine1) ?></p>
+      <?php endif; ?>
+      <?php if (!empty($statsLine2)): ?>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($statsLine2) ?></p>
+      <?php endif; ?>
+      <?php if (!empty($statsLine3)): ?>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($statsLine3) ?></p>
+      <?php endif; ?>
+      <?php if (!empty($statsLine4)): ?>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8"><?= htmlspecialchars($statsLine4) ?></p>
+      <?php endif; ?>
+    </div>
+    
+    <!-- Tagline -->
+    <?php $statsTagline = $settingsModel->get('stats_tagline', 'FACELESS TO STAR.'); ?>
+    <?php if (!empty($statsTagline)): ?>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.5rem);color:#ff5722;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">
+      <?= htmlspecialchars($statsTagline) ?>
+    </div>
     <?php endif; ?>
-    <?php if (!empty($aboutSectionHeading)): ?>
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,52px);letter-spacing:.02em;color:#111;margin-bottom:1rem"><?= htmlspecialchars($aboutSectionHeading) ?></h2>
-    <?php endif; ?>
-    <?php if (!empty($aboutText)): ?>
-    <div class="text-content" style="color:#6b7280;font-size:.95rem;line-height:1.75;max-width:600px;margin:0 auto"><?= nl2br(htmlspecialchars($aboutText)) ?></div>
-    <?php endif; ?>
+    
   </div>
 </section>
 

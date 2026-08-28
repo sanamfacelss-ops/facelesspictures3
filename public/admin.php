@@ -4310,24 +4310,50 @@ if (file_exists($errorLogFile)) {
 
                             <!-- SECTION: About -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">About Section</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Brief company information and description</p>
-                                <div class="space-y-3">
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Stats Section (Replaces About)</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Numbers, labels, description lines and tagline</p>
+                                
+                                <!-- Stats Numbers & Labels -->
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
                                     <div>
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Section Label <span class="text-dark/30">(leave blank to hide)</span></label>
-                                        <input type="text" x-model="form.about_section_label" placeholder="About"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 1</label>
+                                        <input type="text" x-model="form.stats_number_1" placeholder="10" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_1" placeholder="FILMS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">Heading <span class="text-dark/30">(leave blank to hide)</span></label>
-                                        <input type="text" x-model="form.about_section_heading" placeholder="WHAT IS FACELESS PICTURES?"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 2</label>
+                                        <input type="text" x-model="form.stats_number_2" placeholder="100" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_2" placeholder="SCENES" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-dark/60 mb-1.5">About Text <span class="text-dark/30">(supports numbered lists: "1. Item")</span></label>
-                                        <textarea x-model="form.landing_about_text" rows="3" placeholder="Describe Faceless Pictures..."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-y"></textarea>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 3</label>
+                                        <input type="text" x-model="form.stats_number_3" placeholder="30" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_3" placeholder="DAYS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
                                     </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 4</label>
+                                        <input type="text" x-model="form.stats_number_4" placeholder="20" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_4" placeholder="ARTISTS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 5</label>
+                                        <input type="text" x-model="form.stats_number_5" placeholder="150" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_5" placeholder="LIVES" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
+                                    </div>
+                                </div>
+                                
+                                <!-- Description Lines -->
+                                <div class="space-y-2 mb-3">
+                                    <input type="text" x-model="form.stats_line_1" placeholder="Many talented people never get their first chance." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <input type="text" x-model="form.stats_line_2" placeholder="We are giving them one." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <input type="text" x-model="form.stats_line_3" placeholder="We don't just make films." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <input type="text" x-model="form.stats_line_4" placeholder="We open the door." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                </div>
+                                
+                                <!-- Tagline -->
+                                <div>
+                                    <label class="block text-[11px] font-medium text-dark/60 mb-1">Orange Tagline</label>
+                                    <input type="text" x-model="form.stats_tagline" placeholder="FACELESS TO STAR." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                 </div>
                             </div>
 
@@ -8208,6 +8234,24 @@ if (file_exists($errorLogFile)) {
                 landing_hero_trailer_url:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_hero_trailer_url',''))) ?>',
                 poster_section_heading:    <?= json_encode($settingsModel->get('poster_section_heading','RASAS REVEALED.')) ?>,
                 poster_section_subtitle:   <?= json_encode($settingsModel->get('poster_section_subtitle','Each film is a rasa. Each rasa is a world. All connected to KHAATA.')) ?>,
+                
+                // Stats section
+                stats_number_1: <?= json_encode($settingsModel->get('stats_number_1','10')) ?>,
+                stats_label_1:  <?= json_encode($settingsModel->get('stats_label_1','FILMS')) ?>,
+                stats_number_2: <?= json_encode($settingsModel->get('stats_number_2','100')) ?>,
+                stats_label_2:  <?= json_encode($settingsModel->get('stats_label_2','SCENES')) ?>,
+                stats_number_3: <?= json_encode($settingsModel->get('stats_number_3','30')) ?>,
+                stats_label_3:  <?= json_encode($settingsModel->get('stats_label_3','DAYS')) ?>,
+                stats_number_4: <?= json_encode($settingsModel->get('stats_number_4','20')) ?>,
+                stats_label_4:  <?= json_encode($settingsModel->get('stats_label_4','ARTISTS')) ?>,
+                stats_number_5: <?= json_encode($settingsModel->get('stats_number_5','150')) ?>,
+                stats_label_5:  <?= json_encode($settingsModel->get('stats_label_5','LIVES')) ?>,
+                stats_line_1:   <?= json_encode($settingsModel->get('stats_line_1','Many talented people never get their first chance.')) ?>,
+                stats_line_2:   <?= json_encode($settingsModel->get('stats_line_2','We are giving them one.')) ?>,
+                stats_line_3:   <?= json_encode($settingsModel->get('stats_line_3','We don\'t just make films.')) ?>,
+                stats_line_4:   <?= json_encode($settingsModel->get('stats_line_4','We open the door.')) ?>,
+                stats_tagline:  <?= json_encode($settingsModel->get('stats_tagline','FACELESS TO STAR.')) ?>,
+                
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
                 manifesto_heading:     <?= json_encode($settingsModel->get('manifesto_heading','OUR MANIFESTO')) ?>,
                 manifesto_subheading:  <?= json_encode($settingsModel->get('manifesto_subheading','What Faceless Pictures 3 stands for.')) ?>,
