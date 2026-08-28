@@ -3909,17 +3909,17 @@ if (file_exists($errorLogFile)) {
                                                     </template>
                                                     
                                                     <div x-show="!mediaLoading && filteredMedia.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                                        <template x-for="img in filteredMedia" :key="img.path">
-                                                            <button type="button" @click="selectFromLibrary(img.path)" 
+                                                        <template x-for="img in filteredMedia" :key="img.url">
+                                                            <button type="button" @click="selectFromLibrary(img.url)" 
                                                                 class="group relative aspect-square rounded-lg overflow-hidden border-2 transition hover:border-crimson focus:outline-none focus:ring-2 focus:ring-crimson/50"
-                                                                :class="preview === img.path ? 'border-crimson ring-2 ring-crimson/20' : 'border-dark/10'">
-                                                                <img :src="img.path" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                                                :class="preview === img.url ? 'border-crimson ring-2 ring-crimson/20' : 'border-dark/10'">
+                                                                <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
                                                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
                                                                     <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                                                 </div>
                                                                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition">
                                                                     <p class="text-white text-[10px] font-medium truncate" x-text="img.name"></p>
-                                                                    <p class="text-white/70 text-[9px]" x-text="img.sizeFormatted"></p>
+                                                                    <p class="text-white/70 text-[9px]" x-text="(img.size / 1024).toFixed(0) + ' KB'"></p>
                                                                 </div>
                                                             </button>
                                                         </template>
@@ -4125,17 +4125,17 @@ if (file_exists($errorLogFile)) {
                                                         </template>
                                                         
                                                         <div x-show="!mediaLoading && filteredMedia.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                                            <template x-for="img in filteredMedia" :key="img.path">
-                                                                <button type="button" @click="selectFromLibrary(img.path)" 
+                                                            <template x-for="img in filteredMedia" :key="img.url">
+                                                                <button type="button" @click="selectFromLibrary(img.url)" 
                                                                     class="group relative aspect-square rounded-lg overflow-hidden border-2 transition hover:border-crimson focus:outline-none focus:ring-2 focus:ring-crimson/50"
-                                                                    :class="preview === img.path ? 'border-crimson ring-2 ring-crimson/20' : 'border-dark/10'">
-                                                                    <img :src="img.path" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
+                                                                    :class="preview === img.url ? 'border-crimson ring-2 ring-crimson/20' : 'border-dark/10'">
+                                                                    <img :src="img.url" :alt="img.name" loading="lazy" class="w-full h-full object-cover">
                                                                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
                                                                         <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                                                     </div>
                                                                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition">
                                                                         <p class="text-white text-[10px] font-medium truncate" x-text="img.name"></p>
-                                                                        <p class="text-white/70 text-[9px]" x-text="img.sizeFormatted"></p>
+                                                                        <p class="text-white/70 text-[9px]" x-text="(img.size / 1024).toFixed(0) + ' KB'"></p>
                                                                     </div>
                                                                 </button>
                                                             </template>
@@ -7791,7 +7791,7 @@ if (file_exists($errorLogFile)) {
                 const search = this.mediaSearch.toLowerCase();
                 return this.mediaImages.filter(img => 
                     img.name.toLowerCase().includes(search) || 
-                    img.path.toLowerCase().includes(search)
+                    img.url.toLowerCase().includes(search)
                 );
             },
 
@@ -7823,7 +7823,7 @@ if (file_exists($errorLogFile)) {
             async loadMediaLibrary() {
                 this.mediaLoading = true;
                 try {
-                    const res = await fetch('/api/media-list.php');
+                    const res = await fetch('/api/admin/media/images');
                     const data = await res.json();
                     if (data.success) {
                         this.mediaImages = data.images;
