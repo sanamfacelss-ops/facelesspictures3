@@ -656,17 +656,17 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
     <?php if (count($posters) > 0): ?>
-    <section class="rasas-section" style="background:#000;padding:4rem 0;width:100%">
+    <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;width:100%">
       <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
         
         <!-- Section Heading -->
         <?php if (!empty($posterSectionHeading) || !empty($posterSectionSubtitle)): ?>
         <div style="margin-bottom:3.5rem;text-align:left">
           <?php if (!empty($posterSectionHeading)): ?>
-          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#fff;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#111;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
-          <p style="color:#94a3b8;font-size:1rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+          <p style="color:#6b7280;font-size:1rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
           <?php endif; ?>
         </div>
         <?php endif; ?>
