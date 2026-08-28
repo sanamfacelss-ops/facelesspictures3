@@ -645,7 +645,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             $btnLabel = !empty($p['btn_label']) ? htmlspecialchars($p['btn_label']) : ($hasTrailer ? 'Watch Trailer' : 'Coming Soon');
             $loading = $idx < 8 ? 'eager' : 'lazy';
             $fetchpriority = $idx < 4 ? 'fetchpriority="high"' : '';
-            $clickAttr = $hasTrailer ? '@click="openPlayer(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\')"' : '';
+            $clickAttr = $hasTrailer ? 'onclick="playPosterVideo(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\')"' : '';
             ?>
             
             <div class="rasa-poster-card" <?= $clickAttr ?> <?php if($hasTrailer): ?>style="cursor:pointer"<?php endif; ?>>
@@ -726,6 +726,43 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .rasa-poster-image{border-radius:8px !important}
     }
     </style>
+    
+    <script>
+    // Simple global function to play poster videos
+    function playPosterVideo(url, title) {
+      if (!url) return;
+      
+      // Check if it's YouTube
+      if (/youtu(\.be|be\.com)/i.test(url)) {
+        // Open YouTube modal
+        document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: url } }));
+      } else {
+        // Open custom video player modal
+        // Find the video element in the player modal
+        const videoEl = document.querySelector('[x-ref="video"]');
+        const modal = document.querySelector('[x-show="playerOpen"]');
+        
+        if (videoEl && modal) {
+          // Set video source and play
+          videoEl.src = url;
+          videoEl.load();
+          
+          // Show modal by dispatching a custom event that Alpine will catch
+          window.dispatchEvent(new CustomEvent('open-video-player', { 
+            detail: { url: url, title: title } 
+          }));
+          
+          // Fallback: directly manipulate if Alpine isn't responding
+          setTimeout(() => {
+            if (modal.style.display === 'none' || !modal.style.display) {
+              modal.style.display = 'flex';
+              videoEl.play().catch(e => console.log('Autoplay prevented:', e));
+            }
+          }, 100);
+        }
+      }
+    }
+    </script>
     <?php endif; ?>
 
     <!-- ══ MANIFESTO VIDEO SLIDER ══ -->
