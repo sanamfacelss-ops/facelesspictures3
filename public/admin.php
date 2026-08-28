@@ -3891,6 +3891,22 @@ if (file_exists($errorLogFile)) {
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                     <p class="text-[11px] text-dark/30 mt-1">Large centered text displayed at the top of the homepage.</p>
                                 </div>
+                                
+                                <!-- Hero Subheading (NEW) -->
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Subheading (Small Text Above Main Heading)</label>
+                                    <input type="text" x-model="form.landing_hero_subheading" placeholder="KHATAA OFFICIAL TEASER"
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Small uppercase text displayed below the video, above the main heading.</p>
+                                </div>
+                                
+                                <!-- Hero Tagline (NEW) -->
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Tagline (Gray Text Below Main Heading)</label>
+                                    <input type="text" x-model="form.landing_hero_tagline" placeholder="10 FILMS. 10 RASAS. 10 EMOTIONS. ONE UNIVERSE."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text displayed at the bottom of the hero section.</p>
+                                </div>
                             </div>
 
                             <!-- ========== SECTION: Film Posters ========== -->
@@ -8108,6 +8124,8 @@ if (file_exists($errorLogFile)) {
                 footer_menu_item_4_page:  <?= json_encode($settingsModel->get('footer_menu_item_4_page','actor')) ?>,
                 footer_menu_item_4_order: <?= json_encode($settingsModel->get('footer_menu_item_4_order','4')) ?>,
                 landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
+                landing_hero_subheading: <?= json_encode($settingsModel->get('landing_hero_subheading','KHATAA OFFICIAL TEASER')) ?>,
+                landing_hero_tagline:    <?= json_encode($settingsModel->get('landing_hero_tagline','10 FILMS. 10 RASAS. 10 EMOTIONS. ONE UNIVERSE.')) ?>,
                 site_tagline:          <?= json_encode($settingsModel->get('site_tagline',"India's first anonymous film competition — no face, no connections, just raw talent.")) ?>,
                 landing_roles_heading:    <?= json_encode($settingsModel->get('landing_roles_heading','Become a Star in 3 Clicks')) ?>,
                 landing_roles_subheading: <?= json_encode($settingsModel->get('landing_roles_subheading',"Pick your role. Shoot your video. Submit. That's it.")) ?>,
