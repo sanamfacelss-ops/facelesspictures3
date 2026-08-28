@@ -735,12 +735,17 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <script>
     // Global function to play poster videos - dispatches custom event for Alpine to handle
     function playPosterVideo(url, title) {
-      if (!url) return;
+      console.log('playPosterVideo called:', { url, title });
+      if (!url) {
+        console.error('No URL provided');
+        return;
+      }
       
       // Dispatch custom event that Alpine component will listen to
       window.dispatchEvent(new CustomEvent('play-video', { 
         detail: { url: url, title: title }
       }));
+      console.log('play-video event dispatched');
     }
     </script>
     <?php endif; ?>
@@ -1125,14 +1130,18 @@ function homePage() {
             
             // Listen for play-video events from poster cards
             window.addEventListener('play-video', (e) => {
+                console.log('play-video event received:', e.detail);
                 if (e.detail && e.detail.url) {
+                    console.log('Calling openPlayer with:', e.detail.url, e.detail.title);
                     this.openPlayer(e.detail.url, e.detail.title || '');
                 }
             });
         },
 
         openPlayer(src, title) {
+            console.log('openPlayer called with:', { src, title });
             if (!src || src.trim() === '') {
+                console.log('No trailer URL - showing toast');
                 // No trailer set — show a gentle toast instead of silently doing nothing
                 const toast = document.getElementById('fp-no-trailer-toast');
                 if (toast) {
@@ -1144,12 +1153,15 @@ function homePage() {
             }
             // YouTube URL → use the manifesto YouTube modal instead of local player
             if (/youtu(\.be|be\.com)/i.test(src)) {
+                console.log('YouTube URL detected, dispatching fp-open-yt event');
                 document.dispatchEvent(new CustomEvent('fp-open-yt', { detail: { url: src } }));
                 return;
             }
+            console.log('Opening local video player');
             this.playerSrc   = src;
             this.playerTitle = title || '';
             this.playerOpen  = true;
+            console.log('Player state:', { playerOpen: this.playerOpen, playerSrc: this.playerSrc });
             this.$nextTick(() => {
                 const v = this.$refs.video;
                 v.src     = src;
