@@ -301,15 +301,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 #fp-no-trailer-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;font-size:.8rem;font-weight:600;padding:.6rem 1.25rem;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:500;white-space:nowrap;display:flex;align-items:center;gap:.5rem}
 #fp-no-trailer-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Poster play hint — always visible on touch/mobile */
-@media(hover:none){
-  .play-overlay{opacity:1!important;background:rgba(0,0,0,.18)!important}
-  .play-circle{opacity:.85}
-}
-/* Mobile/touch: only suppress the big dark overlay, badge always visible */
-@media(hover:none){
-  .play-overlay{opacity:0!important;pointer-events:none}
-  .poster-wrap:active .play-overlay{opacity:1!important;pointer-events:auto}
+/* Mobile: Show play button by default on touch devices */
+@media (max-width: 768px), (hover: none) {
+  .play-overlay {
+    opacity: 1 !important;
+    background: rgba(0,0,0,.3) !important;
+  }
+  .play-circle {
+    opacity: 1;
+  }
 }
 
 /* Manifesto Video Cards */
@@ -352,6 +352,15 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 }
 .manifesto-video-card:hover .manifesto-play-button{
   transform:scale(1)
+}
+/* Mobile: Show play button by default */
+@media (max-width: 768px) {
+  .manifesto-play-overlay {
+    opacity: 1;
+  }
+  .manifesto-play-button {
+    transform: scale(1);
+  }
 }
 
 /* Modern Role Cards */
