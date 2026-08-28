@@ -732,38 +732,36 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     }
     </style>
     
-    <script>
-    // Global function to play poster videos
-    function playPosterVideo(url, title) {
-      console.log('playPosterVideo called:', url, title);
-      
-      if (!url) {
-        console.error('No URL provided');
-        return;
-      }
-      
-      // Get the body element which has Alpine.js data
-      const body = document.querySelector('body');
-      
-      // Check if Alpine is available
-      if (typeof Alpine !== 'undefined' && Alpine.$data) {
-        try {
-          const alpineData = Alpine.$data(body);
-          if (alpineData && typeof alpineData.openPlayer === 'function') {
-            console.log('Calling openPlayer via Alpine.$data');
-            alpineData.openPlayer(url, title);
-          } else {
-            console.error('openPlayer not found in Alpine data');
-          }
-        } catch(e) {
-          console.error('Error accessing Alpine data:', e);
-        }
-      } else {
-        console.error('Alpine not available');
-      }
-    }
-    </script>
     <?php endif; ?>
+
+    <script>
+    // Define playPosterVideo function AFTER Alpine loads
+    document.addEventListener('alpine:initialized', () => {
+      window.playPosterVideo = function(url, title) {
+        console.log('✓ playPosterVideo called:', url);
+        
+        if (!url) {
+          console.error('No URL provided');
+          return;
+        }
+        
+        // Get Alpine data from body
+        const body = document.querySelector('body');
+        if (body && window.Alpine) {
+          const data = window.Alpine.$data(body);
+          if (data && typeof data.openPlayer === 'function') {
+            console.log('✓ Calling openPlayer');
+            data.openPlayer(url, title || '');
+          } else {
+            console.error('✗ openPlayer method not found');
+          }
+        } else {
+          console.error('✗ Alpine not available');
+        }
+      };
+      console.log('✓ playPosterVideo function registered');
+    });
+    </script>
 
     <!-- ══ MANIFESTO VIDEO GRID ══ -->
     <?php if (!empty($manifestoVideos)): ?>
