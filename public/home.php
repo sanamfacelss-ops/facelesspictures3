@@ -362,6 +362,19 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
   transform:scale(1)
 }
 
+/* Modern Role Cards */
+.role-card-modern{
+  background:#1a1a1a;
+  border-radius:16px;
+  padding:2rem;
+  display:flex;
+  flex-direction:column;
+  transition:transform .3s ease
+}
+.role-card-modern:hover{
+  transform:translateY(-6px)
+}
+
 @media(max-width:639px){
   .poster-grid{grid-template-columns:1fr 1fr!important}
   .role-cards-grid{grid-template-columns:1fr!important}
@@ -843,93 +856,66 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </section>
     <?php endif; ?>
 
-    <!-- ══ ROW 2: ROLE BOXES ══ -->
-    <div style="text-align:center;margin-bottom:2rem;padding-top:0">
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,56px);letter-spacing:.02em;line-height:.95;color:#111">
-        <?= htmlspecialchars($rolesHeading) ?>
-      </h2>
-    </div>
-    <div class="role-cards-grid grid grid-cols-3 gap-4 sm:gap-6" style="align-items:stretch">
+    <!-- ══ CHOOSE YOUR ROLE ══ -->
+    <section style="background:#7c2d2d;padding:4rem 0;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)">
+      <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
+        
+        <!-- Heading -->
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#fff;margin-bottom:3rem;font-weight:700;line-height:1;text-transform:uppercase">
+          <?= htmlspecialchars($rolesHeading) ?>
+        </h2>
 
-      <!-- WRITER -->
-      <div class="role-card" style="height:100%">
-        <?php if (!empty($roles['writer']['icon'])): ?>
-        <div class="role-icon"><?= htmlspecialchars($roles['writer']['icon']) ?></div>
-        <?php endif; ?>
-        <?php if (!empty($roles['writer']['title'])): ?>
-        <p class="role-name"><?= htmlspecialchars($roles['writer']['title']) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($roles['writer']['description'])): ?>
-        <div class="role-desc"><?= nl2br(htmlspecialchars($roles['writer']['description'])) ?></div>
-        <?php endif; ?>
-        <?php if (!empty($roles['writer']['badge1']) || !empty($roles['writer']['badge2'])): ?>
-        <div class="role-badges">
-          <?php if (!empty($roles['writer']['badge1']) && trim($roles['writer']['badge1']) !== ''): ?>
-          <span class="badge"><?= htmlspecialchars($roles['writer']['badge1']) ?></span>
-          <?php endif; ?>
-          <?php if (!empty($roles['writer']['badge2']) && trim($roles['writer']['badge2']) !== ''): ?>
-          <span class="badge"><?= htmlspecialchars($roles['writer']['badge2']) ?></span>
-          <?php endif; ?>
+        <!-- Role Cards Grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem">
+          
+          <?php foreach (['writer', 'director', 'actor'] as $role): 
+            $roleData = $roles[$role];
+            // Convert description to bullet list (split by newline)
+            $descLines = array_filter(array_map('trim', explode("\n", $roleData['description'])));
+          ?>
+          <div class="role-card-modern">
+            <!-- Icon -->
+            <?php if (!empty($roleData['icon'])): ?>
+            <div style="font-size:2rem;margin-bottom:1rem;opacity:0.9">
+              <?= htmlspecialchars($roleData['icon']) ?>
+            </div>
+            <?php endif; ?>
+            
+            <!-- Role Title -->
+            <?php if (!empty($roleData['title'])): ?>
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:.06em;color:#fff;margin-bottom:1.5rem;font-weight:700;text-transform:uppercase">
+              <?= htmlspecialchars($roleData['title']) ?>
+            </h3>
+            <?php endif; ?>
+            
+            <!-- Bullet List -->
+            <?php if (!empty($descLines)): ?>
+            <ul style="list-style:none;padding:0;margin:0 0 2rem;flex:1">
+              <?php foreach ($descLines as $line): ?>
+              <li style="color:#d1d5db;font-size:0.875rem;line-height:1.6;margin-bottom:0.75rem;padding-left:1.25rem;position:relative">
+                <span style="position:absolute;left:0;top:0.5rem;width:4px;height:4px;background:#d1d5db;border-radius:50%"></span>
+                <?= htmlspecialchars($line) ?>
+              </li>
+              <?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
+            
+            <!-- Button -->
+            <?php if (!empty($roleData['button_text']) && !empty($roleData['button_url'])): ?>
+            <a href="<?= htmlspecialchars($roleData['button_url']) ?>" 
+               style="display:inline-block;width:100%;padding:0.875rem 1.5rem;background:#fff;color:#111;text-align:center;text-decoration:none;font-size:0.875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;border-radius:8px;transition:all .3s ease"
+               onmouseenter="this.style.background='#f0f0f0';this.style.transform='translateY(-2px)'"
+               onmouseleave="this.style.background='#fff';this.style.transform='translateY(0)'">
+              <?= htmlspecialchars($roleData['button_text']) ?>
+            </a>
+            <?php endif; ?>
+          </div>
+          <?php endforeach; ?>
+          
         </div>
-        <?php endif; ?>
-        <?php if (!empty($roles['writer']['button_text']) && !empty($roles['writer']['button_url'])): ?>
-        <a href="<?= htmlspecialchars($roles['writer']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['writer']['button_text']) ?></a>
-        <?php endif; ?>
       </div>
+    </section>
 
-      <!-- DIRECTOR -->
-      <div class="role-card" style="height:100%">
-        <?php if (!empty($roles['director']['icon'])): ?>
-        <div class="role-icon"><?= htmlspecialchars($roles['director']['icon']) ?></div>
-        <?php endif; ?>
-        <?php if (!empty($roles['director']['title'])): ?>
-        <p class="role-name"><?= htmlspecialchars($roles['director']['title']) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($roles['director']['description'])): ?>
-        <div class="role-desc"><?= nl2br(htmlspecialchars($roles['director']['description'])) ?></div>
-        <?php endif; ?>
-        <?php if (!empty($roles['director']['badge1']) || !empty($roles['director']['badge2'])): ?>
-        <div class="role-badges">
-          <?php if (!empty($roles['director']['badge1']) && trim($roles['director']['badge1']) !== ''): ?>
-          <span class="badge"><?= htmlspecialchars($roles['director']['badge1']) ?></span>
-          <?php endif; ?>
-          <?php if (!empty($roles['director']['badge2']) && trim($roles['director']['badge2']) !== ''): ?>
-          <span class="badge"><?= htmlspecialchars($roles['director']['badge2']) ?></span>
-          <?php endif; ?>
-        </div>
-        <?php endif; ?>
-        <?php if (!empty($roles['director']['button_text']) && !empty($roles['director']['button_url'])): ?>
-        <a href="<?= htmlspecialchars($roles['director']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['director']['button_text']) ?></a>
-        <?php endif; ?>
-      </div>
-
-      <!-- ACTOR -->
-      <div class="role-card" style="height:100%">
-        <?php if (!empty($roles['actor']['icon'])): ?>
-        <div class="role-icon"><?= htmlspecialchars($roles['actor']['icon']) ?></div>
-        <?php endif; ?>
-        <?php if (!empty($roles['actor']['title'])): ?>
-        <p class="role-name"><?= htmlspecialchars($roles['actor']['title']) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($roles['actor']['description'])): ?>
-        <div class="role-desc"><?= nl2br(htmlspecialchars($roles['actor']['description'])) ?></div>
-        <?php endif; ?>
-        <?php if (!empty($roles['actor']['badge1']) || !empty($roles['actor']['badge2'])): ?>
-        <div class="role-badges">
-          <?php if (!empty($roles['actor']['badge1']) && trim($roles['actor']['badge1']) !== ''): ?>
-          <span class="badge"><?= htmlspecialchars($roles['actor']['badge1']) ?></span>
-          <?php endif; ?>
-          <?php if (!empty($roles['actor']['badge2']) && trim($roles['actor']['badge2']) !== ''): ?>
-          <span class="badge"><?= htmlspecialchars($roles['actor']['badge2']) ?></span>
-          <?php endif; ?>
-        </div>
-        <?php endif; ?>
-        <?php if (!empty($roles['actor']['button_text']) && !empty($roles['actor']['button_url'])): ?>
-        <a href="<?= htmlspecialchars($roles['actor']['button_url']) ?>" class="btn-black"><?= htmlspecialchars($roles['actor']['button_text']) ?></a>
-        <?php endif; ?>
-      </div>
-
-    </div>
 
     </div><!-- /poster+role section -->
   </div><!-- /max-w -->
