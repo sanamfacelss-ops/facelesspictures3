@@ -4697,6 +4697,41 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">3-Step Process</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 1 Title</label>
+                                                        <input type="text" x-model="form.writer_step1_title" placeholder="WHAT WE GIVE"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 1 Text</label>
+                                                        <input type="text" x-model="form.writer_step1_text" placeholder="One page"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 2 Title</label>
+                                                        <input type="text" x-model="form.writer_step2_title" placeholder="WHAT YOU DO"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 2 Text</label>
+                                                        <input type="text" x-model="form.writer_step2_text" placeholder="Continue it. One more page only"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 3 Title</label>
+                                                        <input type="text" x-model="form.writer_step3_title" placeholder="SUBMIT"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 3 Text</label>
+                                                        <input type="text" x-model="form.writer_step3_text" placeholder="Your page PDF plus narration video"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
                                                 <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
                                                 <div class="space-y-2">
                                                     <div>
@@ -4808,6 +4843,41 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">3-Step Process</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 1 Title</label>
+                                                        <input type="text" x-model="form.director_step1_title" placeholder="WHAT WE GIVE"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 1 Text</label>
+                                                        <input type="text" x-model="form.director_step1_text" placeholder="Script and actor"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 2 Title</label>
+                                                        <input type="text" x-model="form.director_step2_title" placeholder="WHAT YOU DO"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 2 Text</label>
+                                                        <input type="text" x-model="form.director_step2_text" placeholder="Direct the scene"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 3 Title</label>
+                                                        <input type="text" x-model="form.director_step3_title" placeholder="SUBMIT"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 3 Text</label>
+                                                        <input type="text" x-model="form.director_step3_text" placeholder="Your scene video"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
                                                 <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
                                                 <div class="space-y-2">
                                                     <div>
@@ -4917,6 +4987,41 @@ if (file_exists($errorLogFile)) {
                                                 <label class="block text-[10px] text-dark/50 mb-1">Hero Description</label>
                                                 <textarea x-model="form.actor_hero_description" rows="2" placeholder="Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos."
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">3-Step Process</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 1 Title</label>
+                                                        <input type="text" x-model="form.actor_step1_title" placeholder="WHAT WE GIVE"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 1 Text</label>
+                                                        <input type="text" x-model="form.actor_step1_text" placeholder="Dialog brief and song"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 2 Title</label>
+                                                        <input type="text" x-model="form.actor_step2_title" placeholder="WHAT YOU DO"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 2 Text</label>
+                                                        <input type="text" x-model="form.actor_step2_text" placeholder="Perform both auditions"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 3 Title</label>
+                                                        <input type="text" x-model="form.actor_step3_title" placeholder="SUBMIT"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Step 3 Text</label>
+                                                        <input type="text" x-model="form.actor_step3_text" placeholder="Two audition videos"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
                                                 <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
@@ -8504,6 +8609,12 @@ if (file_exists($errorLogFile)) {
                 writer_hero_label:       <?= json_encode($settingsModel->get('writer_hero_label','Submissions Now Open')) ?>,
                 writer_hero_heading:     <?= json_encode($settingsModel->get('writer_hero_heading','WRITER SUBMISSIONS')) ?>,
                 writer_hero_description: <?= json_encode($settingsModel->get('writer_hero_description','READ THE SCENE. WRITE THE NEXT PAGE. RECORD YOUR NARRATION. UPLOAD YOUR VIDEO.')) ?>,
+                writer_step1_title:      <?= json_encode($settingsModel->get('writer_step1_title','WHAT WE GIVE')) ?>,
+                writer_step1_text:       <?= json_encode($settingsModel->get('writer_step1_text','One page')) ?>,
+                writer_step2_title:      <?= json_encode($settingsModel->get('writer_step2_title','WHAT YOU DO')) ?>,
+                writer_step2_text:       <?= json_encode($settingsModel->get('writer_step2_text','Continue it. One more page only')) ?>,
+                writer_step3_title:      <?= json_encode($settingsModel->get('writer_step3_title','SUBMIT')) ?>,
+                writer_step3_text:       <?= json_encode($settingsModel->get('writer_step3_text','Your page PDF plus narration video')) ?>,
                 writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
                 writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
                 // Writer submission messages
@@ -8517,6 +8628,12 @@ if (file_exists($errorLogFile)) {
                 director_hero_label:       <?= json_encode($settingsModel->get('director_hero_label','Auditions Now Open')) ?>,
                 director_hero_heading:     <?= json_encode($settingsModel->get('director_hero_heading','DIRECTOR AUDITIONS')) ?>,
                 director_hero_description: <?= json_encode($settingsModel->get('director_hero_description','CAST YOUR ACTOR. SHOOT YOUR SCENE. SHOW US YOUR VISION.')) ?>,
+                director_step1_title:      <?= json_encode($settingsModel->get('director_step1_title','WHAT WE GIVE')) ?>,
+                director_step1_text:       <?= json_encode($settingsModel->get('director_step1_text','Script and actor')) ?>,
+                director_step2_title:      <?= json_encode($settingsModel->get('director_step2_title','WHAT YOU DO')) ?>,
+                director_step2_text:       <?= json_encode($settingsModel->get('director_step2_text','Direct the scene')) ?>,
+                director_step3_title:      <?= json_encode($settingsModel->get('director_step3_title','SUBMIT')) ?>,
+                director_step3_text:       <?= json_encode($settingsModel->get('director_step3_text','Your scene video')) ?>,
                 director_form_heading:     <?= json_encode($settingsModel->get('director_form_heading','Ready to Direct? Submit Your Scene')) ?>,
                 director_form_description: <?= json_encode($settingsModel->get('director_form_description','Cast your actor, give them the script, shoot the scene, and upload your video.')) ?>,
                 // Director submission messages
@@ -8530,6 +8647,12 @@ if (file_exists($errorLogFile)) {
                 actor_hero_label:       <?= json_encode($settingsModel->get('actor_hero_label','Auditions Now Open')) ?>,
                 actor_hero_heading:     <?= json_encode($settingsModel->get('actor_hero_heading','ACTOR AUDITIONS')) ?>,
                 actor_hero_description: <?= json_encode($settingsModel->get('actor_hero_description','Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.')) ?>,
+                actor_step1_title:      <?= json_encode($settingsModel->get('actor_step1_title','WHAT WE GIVE')) ?>,
+                actor_step1_text:       <?= json_encode($settingsModel->get('actor_step1_text','Dialog brief and song')) ?>,
+                actor_step2_title:      <?= json_encode($settingsModel->get('actor_step2_title','WHAT YOU DO')) ?>,
+                actor_step2_text:       <?= json_encode($settingsModel->get('actor_step2_text','Perform both auditions')) ?>,
+                actor_step3_title:      <?= json_encode($settingsModel->get('actor_step3_title','SUBMIT')) ?>,
+                actor_step3_text:       <?= json_encode($settingsModel->get('actor_step3_text','Two audition videos')) ?>,
                 actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
                 // Actor submission messages
