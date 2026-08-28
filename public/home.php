@@ -508,11 +508,13 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 
 <!-- ── MAIN CONTENT ── -->
 <main style="padding-top:<?= $navHeight ?>px">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+  <!-- Hero Section with White Background -->
+  <section style="background:#fff;padding-bottom:3rem">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
-    <!-- ══ NEW HERO LAYOUT: Video First, Then Text Below ══ -->
-    <?php
-    $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
+      <!-- ══ NEW HERO LAYOUT: Video First, Then Text Below ══ -->
+      <?php
+      $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
     $heroSubheading = $settingsModel->get('landing_hero_subheading', 'KHATAA OFFICIAL TEASER'); // NEW field
     $heroTagline = $settingsModel->get('landing_hero_tagline', '10 FILMS. 10 RASAS. 10 EMOTIONS. ONE UNIVERSE.'); // NEW field
     
@@ -614,10 +616,13 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </style>
     
     <?php endif; ?>
+    
+    </div>
+  </section>
 
-    <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
+  <!-- ══ ROW 1: FILM POSTER BOXES ══ -->
 
-    <?php
+  <?php
     // Build the poster card HTML as a reusable string
     function posterCard(array $p, int $index): string {
         $hasTrailer = !empty($p['trailer']);
