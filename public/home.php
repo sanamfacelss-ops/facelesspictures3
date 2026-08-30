@@ -1617,28 +1617,59 @@ ob_end_flush();
   const overlay = document.getElementById('sidebar-overlay');
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
   
-  // Set active link based on current page - simpler version
+  // Set active link based on current page and scroll position
   const currentPath = window.location.pathname;
   const currentHash = window.location.hash;
+  const isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
   
-  sidebarLinks.forEach(link => {
-    const linkHref = link.getAttribute('href');
-    const linkUrl = new URL(link.href, window.location.origin);
-    const linkPath = linkUrl.pathname;
-    const linkHash = linkUrl.hash;
-    
-    // For hash links like /#about - only active if on home AND hash matches
-    if (linkHash && (linkHref.includes('/#') || linkHref.startsWith('#'))) {
-      const isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
-      if (isHomePage && currentHash === linkHash) {
+  function updateActiveLinks() {
+    sidebarLinks.forEach(link => {
+      const linkHref = link.getAttribute('href');
+      const linkUrl = new URL(link.href, window.location.origin);
+      const linkPath = linkUrl.pathname;
+      const linkHash = linkUrl.hash;
+      
+      // Remove active class first
+      link.classList.remove('active');
+      
+      // For hash links like /#about - check if we're on home page AND in that section
+      if (linkHash && (linkHref.includes('/#') || linkHref.startsWith('#'))) {
+        if (isHomePage) {
+          const sectionId = linkHash.substring(1); // Remove #
+          const section = document.getElementById(sectionId);
+          
+          if (section) {
+            const rect = section.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            // Section is visible if its middle is in viewport
+            if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
+              link.classList.add('active');
+            }
+          }
+        }
+        // Never active on non-home pages - already handled by skip
+      }
+      // For other pages - exact match
+      else if (!linkHash && currentPath === linkPath) {
         link.classList.add('active');
       }
-    }
-    // For other pages - exact match
-    else if (!linkHash && currentPath === linkPath) {
-      link.classList.add('active');
-    }
-  });
+    });
+  }
+  
+  // Initial update
+  updateActiveLinks();
+  
+  // Update on scroll (only on home page)
+  if (isHomePage) {
+    let scrollTimeout;
+    window.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(updateActiveLinks, 100);
+    }, { passive: true });
+  }
+  
+  // Update on hash change
+  window.addEventListener('hashchange', updateActiveLinks);
   
   function openMenu() {
     sidebar.classList.add('active');
