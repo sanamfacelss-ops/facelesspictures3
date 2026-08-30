@@ -2,6 +2,13 @@
 // Page cache - serve cached HTML if available (skips all PHP/DB processing)
 require_once __DIR__ . '/../app/helpers/page_cache.php';
 
+// Add cache control headers for logged-in users or when cache is disabled
+if (isset($_SESSION['user_id']) || isset($_GET['nocache'])) {
+    header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+}
+
 $cacheKey = 'home_' . ($_GET['lang'] ?? 'en');
 $cachedPage = PageCache::get($cacheKey);
 
@@ -17,6 +24,9 @@ ob_start();
 
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
+
+// Get cache version for cache busting
+$cacheVersion = $settingsModel->getCacheVersion();
 
 // Load ALL settings once to avoid multiple database queries
 $allSettings = $settingsModel->getAllCached();
@@ -645,13 +655,19 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             $loading = $idx < 8 ? 'eager' : 'lazy';
             $fetchpriority = $idx < 4 ? 'fetchpriority="high"' : '';
             $clickAttr = $hasTrailer ? 'onclick="openVideoModal(\''.addslashes(htmlspecialchars($p['trailer'])).'\',\''.addslashes(htmlspecialchars($p['title'])).'\')"' : '';
+            
+            // Add cache buster to poster URL
+            $posterUrl = $p['url'];
+            if ($posterUrl && strpos($posterUrl, '?') === false) {
+                $posterUrl .= '?v=' . $cacheVersion;
+            }
             ?>
             
             <div class="rasa-poster-card" <?= $clickAttr ?> <?php if($hasTrailer): ?>style="cursor:pointer"<?php endif; ?>>
               <!-- Poster Image with Text Overlay -->
               <div class="rasa-poster-image" style="position:relative;width:100%;aspect-ratio:2/3;background:#1a1a1a;border-radius:12px;overflow:hidden">
                 <?php if (!empty($p['url'])): ?>
-                  <img src="<?= htmlspecialchars($p['url']) ?>" 
+                  <img src="<?= htmlspecialchars($posterUrl) ?>" 
                        alt="<?= htmlspecialchars($p['title'] ?: 'Film Poster') ?>" 
                        loading="<?= $loading ?>" 
                        decoding="async" 

@@ -86,6 +86,9 @@ class Settings
      */
     public function set(string $key, string $value, string $type = 'text', ?string $description = null): bool
     {
+        // Clear cached settings when any setting is updated
+        self::$cachedSettings = null;
+        
         // Ensure type is valid for ENUM
         if (!in_array($type, ['text', 'html', 'json'])) {
             $type = 'text';
@@ -118,6 +121,47 @@ class Settings
             debug_log("Settings set error (old schema): " . $e->getMessage(), 'SETTINGS');
             return false;
         }
+    }
+    
+    /**
+     * Clear the settings cache
+     */
+    public static function clearCache(): void
+    {
+        self::$cachedSettings = null;
+    }
+    
+    /**
+     * Get cache version for busting browser cache
+     */
+    public function getCacheVersion(): string
+    {
+        // Use settings last updated time as version
+        try {
+            $stmt = $this->db->query("SELECT MAX(updated_at) as last_update FROM settings");
+            $result = $stmt->fetch();
+            if ($result && $result['last_update']) {
+                return strtotime($result['last_update']);
+            }
+        } catch (\PDOException $e) {
+            // If no updated_at column, use current timestamp
+        }
+        
+        // Fallback to a file-based version
+        $versionFile = __DIR__ . '/../../cache/.version';
+        if (!file_exists($versionFile)) {
+            file_put_contents($versionFile, time());
+        }
+        return file_get_contents($versionFile);
+    }
+    
+    /**
+     * Bump cache version to force frontend refresh
+     */
+    public function bumpCacheVersion(): void
+    {
+        $versionFile = __DIR__ . '/../../cache/.version';
+        file_put_contents($versionFile, time());
     }
 
     /**

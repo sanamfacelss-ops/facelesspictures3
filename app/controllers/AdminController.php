@@ -2347,6 +2347,18 @@ class AdminController
             
             $this->db->commit();
             
+            // Clear settings cache
+            \App\Models\Settings::clearCache();
+            
+            // Bump cache version to force frontend refresh
+            $settingsModel->bumpCacheVersion();
+            
+            // Clear page cache so frontend updates immediately
+            if (class_exists('PageCache')) {
+                \PageCache::clear();
+                debug_log("Cleared page cache after saving settings", 'ADMIN');
+            }
+            
             debug_log("Admin saved {$saved} landing settings in batch (skipped {$skipped})", 'ADMIN');
             echo json_encode([
                 'success' => true,
