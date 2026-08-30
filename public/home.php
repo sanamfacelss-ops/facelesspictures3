@@ -705,16 +705,18 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       padding:0 2rem;
     }
     .rasas-poster-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
+      display:flex;
+      flex-wrap:wrap;
       gap:2rem;
-      justify-items:stretch;
+      justify-content:center;
       width:100%;
       margin:0 auto;
     }
     .rasa-poster-card{
       position:relative;
       transition:transform .3s ease;
+      flex:0 0 calc(33.333% - 1.5rem);
+      max-width:calc(33.333% - 1.5rem);
     }
     .rasa-poster-card:hover{
       transform:translateY(-8px);
@@ -727,12 +729,20 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     }
     /* Tablet - 2 columns */
     @media(max-width:1024px){
-      .rasas-poster-grid{grid-template-columns:repeat(2,1fr);gap:1.75rem}
+      .rasa-poster-card{
+        flex:0 0 calc(50% - 1rem);
+        max-width:calc(50% - 1rem);
+      }
+      .rasas-poster-grid{gap:1.75rem}
       .rasas-section{padding:3rem 0 !important}
     }
     /* Mobile - 1 column */
     @media(max-width:640px){
-      .rasas-poster-grid{grid-template-columns:1fr;gap:1.5rem}
+      .rasa-poster-card{
+        flex:0 0 100%;
+        max-width:100%;
+      }
+      .rasas-poster-grid{gap:1.5rem}
       .rasas-section{padding:2.5rem 0 !important}
       .rasas-section > div{padding:0 1rem !important}
       .rasa-poster-image{border-radius:8px !important}

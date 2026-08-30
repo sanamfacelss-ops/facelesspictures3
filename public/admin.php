@@ -7916,6 +7916,10 @@ if (file_exists($errorLogFile)) {
                 // Also clear the parent form binding
                 const ev = new CustomEvent('image-cleared', { detail: { field: this.fieldKey } });
                 document.dispatchEvent(ev);
+                // Auto-save the empty value
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('trigger-save-all'));
+                }, 100);
             },
             async openMediaBrowser() {
                 this.showMediaBrowser = true;
