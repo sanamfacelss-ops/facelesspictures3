@@ -339,18 +339,21 @@ body.menu-open {
   
   // Set active link based on current page
   const currentPath = window.location.pathname;
+  const currentHash = window.location.hash;
+  
   sidebarLinks.forEach(link => {
     const linkHref = link.getAttribute('href');
-    const linkUrl = new URL(link.href, window.location.origin);
-    const linkPath = linkUrl.pathname;
     
-    // For hash links like /#about - never active on non-home pages
+    // Skip hash links on non-home pages (like /#about)
     if (linkHref.includes('/#')) {
-      // These only work on home page, handled by home.php
+      // Never show as active on non-home pages
       return;
     }
     
-    // Exact match for other pages
+    const linkUrl = new URL(link.href, window.location.origin);
+    const linkPath = linkUrl.pathname;
+    
+    // Exact match for pages
     if (currentPath === linkPath) {
       link.classList.add('active');
     }
