@@ -73,11 +73,12 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <div x-show="mobileMenuOpen" 
        x-cloak
        @click="mobileMenuOpen = false" 
-       class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-       x-transition:enter="transition-opacity ease-out duration-200"
+       style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 40;"
+       class="lg:hidden"
+       x-transition:enter="transition-opacity ease-out duration-300"
        x-transition:enter-start="opacity-0"
        x-transition:enter-end="opacity-100"
-       x-transition:leave="transition-opacity ease-in duration-150"
+       x-transition:leave="transition-opacity ease-in duration-200"
        x-transition:leave-start="opacity-100"
        x-transition:leave-end="opacity-0">
   </div>
@@ -85,17 +86,19 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <!-- Mobile Sidebar Menu -->
   <aside x-show="mobileMenuOpen"
          x-cloak
-         class="fixed top-0 left-0 bottom-0 w-[280px] bg-white shadow-2xl z-50 lg:hidden"
-         @click.away="mobileMenuOpen = false"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="-translate-x-full"
-         x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="-translate-x-full">
-    <div class="flex flex-col h-full">
+         @click.outside="mobileMenuOpen = false"
+         style="position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: #ffffff; box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15); z-index: 50; transform: translateX(-100%);"
+         class="lg:hidden sidebar-menu"
+         :class="{ 'sidebar-open': mobileMenuOpen }"
+         x-transition:enter="transition-transform ease-out duration-300"
+         x-transition:enter-start="transform -translate-x-full"
+         x-transition:enter-end="transform translate-x-0"
+         x-transition:leave="transition-transform ease-in duration-200"
+         x-transition:leave-start="transform translate-x-0"
+         x-transition:leave-end="transform -translate-x-full">
+    <div style="display: flex; flex-direction: column; height: 100%;">
       <!-- Sidebar Header -->
-      <div class="flex items-center justify-between p-4 border-b border-dark/10">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
         <a href="/" class="nav-logo">
           <?php if ($logoUrl): ?>
             <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= max(32, (int)$logoHeight * 0.75) ?>px;width:auto">
@@ -104,18 +107,19 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             <span class="nav-badge">3</span>
           <?php endif; ?>
         </a>
-        <button @click="mobileMenuOpen = false" class="p-2 hover:bg-dark/5 rounded-lg transition">
-          <svg class="w-5 h-5 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button @click="mobileMenuOpen = false" style="padding: 0.5rem; border-radius: 0.5rem; transition: background 0.2s; background: transparent; border: none; cursor: pointer;">
+          <svg style="width: 20px; height: 20px; color: #111;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
       
       <!-- Menu Items -->
-      <nav class="flex-1 overflow-y-auto py-4">
+      <nav style="flex: 1; overflow-y: auto; padding: 1rem 0;">
         <?php foreach ($allMenuItems as $item): ?>
           <a href="<?= htmlspecialchars($item['url']) ?>" 
-             class="mobile-nav-link block px-6 py-3 text-dark/70 hover:bg-dark/5 hover:text-dark transition text-sm font-medium">
+             class="mobile-nav-link"
+             style="display: block; padding: 0.75rem 1.5rem; color: rgba(17, 17, 17, 0.7); text-decoration: none; font-size: 0.875rem; font-weight: 500; border-left: 3px solid transparent; transition: all 0.2s;">
             <?= htmlspecialchars($item['text']) ?>
           </a>
         <?php endforeach; ?>
@@ -132,9 +136,12 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 .nav-badge{background:#111;color:#fff;font-size:10px;font-weight:700;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .nav-link{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;text-decoration:none;transition:color .2s;white-space:nowrap}
 .nav-link:hover{color:#111}
-.mobile-nav-link{border-left:3px solid transparent}
-.mobile-nav-link:hover{border-left-color:#D92B3A}
+.mobile-nav-link:hover{background:rgba(0,0,0,0.05);color:#111;border-left-color:#D92B3A}
 [x-cloak]{display:none!important}
+
+/* Sidebar Menu Animation */
+.sidebar-menu{transition:transform 0.3s ease-out}
+.sidebar-menu.sidebar-open{transform:translateX(0) !important}
 </style>
 
 <!-- Alpine.js for mobile menu (inline to avoid conflicts) -->
