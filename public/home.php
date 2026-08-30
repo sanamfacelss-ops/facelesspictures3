@@ -1620,8 +1620,18 @@ ob_end_flush();
   // Set active link based on current page
   const currentPath = window.location.pathname;
   sidebarLinks.forEach(link => {
-    const linkPath = new URL(link.href).pathname;
-    if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+    const linkHref = link.getAttribute('href');
+    const linkUrl = new URL(link.href, window.location.origin);
+    const linkPath = linkUrl.pathname;
+    
+    // Exact match for home page or hash links
+    if (linkHref === '/' || linkHref.startsWith('/#') || linkHref.startsWith('#')) {
+      if (currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php') {
+        link.classList.add('active');
+      }
+    } 
+    // Exact match for other pages
+    else if (currentPath === linkPath) {
       link.classList.add('active');
     }
   });
