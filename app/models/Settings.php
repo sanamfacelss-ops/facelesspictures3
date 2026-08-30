@@ -136,23 +136,12 @@ class Settings
      */
     public function getCacheVersion(): string
     {
-        // Use settings last updated time as version
-        try {
-            $stmt = $this->db->query("SELECT MAX(updated_at) as last_update FROM settings");
-            $result = $stmt->fetch();
-            if ($result && $result['last_update']) {
-                return strtotime($result['last_update']);
-            }
-        } catch (\PDOException $e) {
-            // If no updated_at column, use current timestamp
-        }
-        
-        // Fallback to a file-based version
+        // Use a file-based version for simplicity
         $versionFile = __DIR__ . '/../../cache/.version';
         if (!file_exists($versionFile)) {
-            file_put_contents($versionFile, time());
+            @file_put_contents($versionFile, time());
         }
-        return file_get_contents($versionFile);
+        return @file_get_contents($versionFile) ?: time();
     }
     
     /**
@@ -161,7 +150,7 @@ class Settings
     public function bumpCacheVersion(): void
     {
         $versionFile = __DIR__ . '/../../cache/.version';
-        file_put_contents($versionFile, time());
+        @file_put_contents($versionFile, time());
     }
 
     /**

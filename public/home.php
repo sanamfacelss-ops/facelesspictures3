@@ -25,8 +25,12 @@ ob_start();
 require_once __DIR__ . '/../app/config/config.php';
 $settingsModel = new App\Models\Settings();
 
-// Get cache version for cache busting
-$cacheVersion = $settingsModel->getCacheVersion();
+// Get cache version for cache busting (with fallback)
+try {
+    $cacheVersion = $settingsModel->getCacheVersion();
+} catch (\Exception $e) {
+    $cacheVersion = time(); // Fallback to current time
+}
 
 // Load ALL settings once to avoid multiple database queries
 $allSettings = $settingsModel->getAllCached();
