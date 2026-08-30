@@ -291,7 +291,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <div class="card-sec" style="padding:0 0 1.5rem">
       <?php if ($previewUrl && $isYT): ?>
         <div class="media-16-9">
-          <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1"
+          <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1&showinfo=0"
             allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
             allowfullscreen title="<?= $title ?> preview"></iframe>
         </div>
@@ -643,7 +643,7 @@ function songSliderPlay(idx){
     _songSliderActive = idx;
     // update iframe
     var e = _embedUrl(tunes[idx].url);
-    document.getElementById('tuneIframe').src = e ? e+'?autoplay=1' : '';
+    document.getElementById('tuneIframe').src = e ? e+'?autoplay=1&rel=0&modestbranding=1' : '';
     // label
     document.getElementById('songLabel').textContent = tunes[idx].label || '';
     // highlight active tab

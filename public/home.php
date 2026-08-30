@@ -1516,7 +1516,7 @@ function fpYtEmbed(u){
 document.addEventListener('fp-open-yt', function(e){
     var modal = document.getElementById('fp-manifesto-modal');
     var iframe = document.getElementById('fp-manifesto-iframe');
-    iframe.src = fpYtEmbed(e.detail.url) + '?autoplay=1&rel=0';
+    iframe.src = fpYtEmbed(e.detail.url) + '?autoplay=1&rel=0&modestbranding=1&showinfo=0';
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 });

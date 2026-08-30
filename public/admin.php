@@ -1821,7 +1821,7 @@ if (file_exists($errorLogFile)) {
                                                             </button>
                                                         </div>
                                                         <div x-show="ytUrl && isYoutube(ytUrl)" class="mt-2 rounded-lg overflow-hidden border border-dark/10" style="aspect-ratio:9/16;max-height:150px">
-                                                            <iframe :src="ytEmbedUrl(ytUrl)+'?mute=1'" class="w-full h-full" frameborder="0" allowfullscreen title="Preview"></iframe>
+                                                            <iframe :src="ytEmbedUrl(ytUrl)+'?mute=1&rel=0&modestbranding=1'" class="w-full h-full" frameborder="0" allowfullscreen title="Preview"></iframe>
                                                         </div>
                                                         <p x-show="ytUrl && !isYoutube(ytUrl)" class="text-[10px] text-red-500 mt-1">Invalid YouTube URL</p>
                                                     </div>

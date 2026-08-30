@@ -139,7 +139,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         }
       ?>
         <div style="width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:#000">
-          <iframe src="<?= htmlspecialchars($embedUrl) ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%"></iframe>
+          <iframe src="<?= htmlspecialchars($embedUrl) ?>?rel=0&modestbranding=1&showinfo=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%"></iframe>
         </div>
       <?php elseif ($previewUrl): ?>
         <video class="preview-video" controls muted preload="metadata" style="width:100%;max-height:400px;object-fit:contain;background:#000"><source src="<?= htmlspecialchars($previewUrl) ?>" type="video/mp4">Your browser does not support video.</video>
