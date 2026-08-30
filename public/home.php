@@ -699,10 +699,18 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       margin-left:calc(50% - 50vw) !important;
       margin-right:calc(50% - 50vw) !important;
     }
+    .rasas-section > div {
+      max-width:1400px;
+      margin:0 auto;
+      padding:0 2rem;
+    }
     .rasas-poster-grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:2rem;
+      justify-items:stretch;
+      width:100%;
+      margin:0 auto;
     }
     .rasa-poster-card{
       position:relative;
