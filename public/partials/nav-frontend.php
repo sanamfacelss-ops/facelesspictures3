@@ -30,11 +30,21 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 ?>
 
 <!-- Frontend Navigation Bar -->
-<nav class="fp-nav" style="height:<?= $headerHeight ?>px" x-data="{ mobileMenuOpen: false }">
+<nav class="fp-nav" style="height:<?= $headerHeight ?>px" x-data="{ 
+  mobileMenuOpen: false,
+  toggleMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+    if (this.mobileMenuOpen) {
+      document.body.classList.add('sidebar-open');
+    } else {
+      document.body.classList.remove('sidebar-open');
+    }
+  }
+}">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-center gap-8 sm:gap-12 md:gap-16">
     
     <!-- Mobile: Hamburger Button (Left) -->
-    <button @click="mobileMenuOpen = true" class="lg:hidden absolute left-4 text-dark p-2 hover:bg-dark/5 rounded-lg transition">
+    <button @click="toggleMenu()" class="lg:hidden absolute left-4 text-dark p-2 hover:bg-dark/5 rounded-lg transition">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
@@ -72,7 +82,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <!-- Mobile Sidebar Overlay -->
   <div x-show="mobileMenuOpen" 
        x-cloak
-       @click="mobileMenuOpen = false" 
+       @click="toggleMenu()" 
        class="mobile-overlay lg:hidden"
        x-transition:enter="transition-opacity ease-out duration-300"
        x-transition:enter-start="opacity-0"
@@ -85,7 +95,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <!-- Mobile Sidebar Menu -->
   <aside x-show="mobileMenuOpen"
          x-cloak
-         @click.outside="mobileMenuOpen = false"
+         @click.outside="toggleMenu()"
          class="mobile-sidebar lg:hidden"
          x-transition:enter="transition-transform ease-out duration-300"
          x-transition:enter-start="-translate-x-full"
@@ -96,7 +106,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <div class="mobile-sidebar-inner">
       <!-- Sidebar Header -->
       <div class="mobile-sidebar-header">
-        <a href="/" class="nav-logo">
+        <a href="/" class="nav-logo" @click="toggleMenu()">
           <?php if ($logoUrl): ?>
             <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= max(32, (int)$logoHeight * 0.75) ?>px;width:auto">
           <?php else: ?>
@@ -104,7 +114,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             <span class="nav-badge">3</span>
           <?php endif; ?>
         </a>
-        <button @click="mobileMenuOpen = false" class="mobile-close-btn">
+        <button @click="toggleMenu()" class="mobile-close-btn">
           <svg style="width: 20px; height: 20px; color: #111;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -114,7 +124,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       <!-- Menu Items -->
       <nav class="mobile-sidebar-nav">
         <?php foreach ($allMenuItems as $item): ?>
-          <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-nav-link">
+          <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-nav-link" @click="toggleMenu()">
             <?= htmlspecialchars($item['text']) ?>
           </a>
         <?php endforeach; ?>
@@ -134,17 +144,20 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 [x-cloak]{display:none!important}
 
 /* Mobile Sidebar Overlay */
-.mobile-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:40}
+.mobile-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9998;width:100%;height:100vh}
 
 /* Mobile Sidebar */
-.mobile-sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;background:#ffffff;box-shadow:2px 0 20px rgba(0,0,0,0.15);z-index:50}
-.mobile-sidebar-inner{display:flex;flex-direction:column;height:100%}
-.mobile-sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid rgba(0,0,0,0.1);background:#fff}
-.mobile-close-btn{padding:0.5rem;border-radius:0.5rem;background:transparent;border:none;cursor:pointer;transition:background 0.2s}
+.mobile-sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:85vw;background:#ffffff;box-shadow:2px 0 20px rgba(0,0,0,0.3);z-index:9999;height:100vh;overflow:hidden}
+.mobile-sidebar-inner{display:flex;flex-direction:column;height:100%;background:#ffffff}
+.mobile-sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid rgba(0,0,0,0.1);background:#ffffff;flex-shrink:0}
+.mobile-close-btn{padding:0.5rem;border-radius:0.5rem;background:transparent;border:none;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;justify-content:center}
 .mobile-close-btn:hover{background:rgba(0,0,0,0.05)}
-.mobile-sidebar-nav{flex:1;overflow-y:auto;padding:1rem 0;background:#fff}
-.mobile-nav-link{display:block;padding:0.75rem 1.5rem;color:rgba(17,17,17,0.7);text-decoration:none;font-size:0.875rem;font-weight:500;border-left:3px solid transparent;transition:all 0.2s}
+.mobile-sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:1rem 0;background:#ffffff}
+.mobile-nav-link{display:block;padding:0.75rem 1.5rem;color:rgba(17,17,17,0.7);text-decoration:none;font-size:0.875rem;font-weight:500;border-left:3px solid transparent;transition:all 0.2s;background:#ffffff}
 .mobile-nav-link:hover{background:rgba(0,0,0,0.05);color:#111;border-left-color:#D92B3A}
+
+/* Prevent body scroll when sidebar is open */
+body.sidebar-open{overflow:hidden}
 </style>
 
 <!-- Alpine.js for mobile menu (inline to avoid conflicts) -->
