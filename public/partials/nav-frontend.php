@@ -386,7 +386,15 @@ body.menu-open {
   
   // Close when clicking sidebar links
   sidebarLinks.forEach(link => {
-    link.addEventListener('click', closeMenu);
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      console.log('Link clicked:', href);
+      console.log('Current path:', window.location.pathname);
+      console.log('Is home page:', isHomePage);
+      
+      // Let the browser handle navigation naturally
+      closeMenu();
+    });
   });
   
   // Close on Escape key
