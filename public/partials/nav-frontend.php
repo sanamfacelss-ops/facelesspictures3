@@ -388,11 +388,16 @@ body.menu-open {
   sidebarLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
-      console.log('Link clicked:', href);
-      console.log('Current path:', window.location.pathname);
-      console.log('Is home page:', isHomePage);
       
-      // Let the browser handle navigation naturally
+      // Special handling for About link on non-home pages
+      if (!isHomePage && href.includes('#about')) {
+        e.preventDefault();
+        // Force navigation to home page with hash
+        window.location.href = '/home.php#about';
+        return;
+      }
+      
+      // Let the browser handle navigation naturally for other links
       closeMenu();
     });
   });
