@@ -310,6 +310,18 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   border-left-color: #d92b3a;
 }
 
+.sidebar-link.active {
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+  border-left-color: #d92b3a;
+  margin: 0.5rem 0;
+}
+
+.sidebar-link.active:hover {
+  background: #000;
+}
+
 /* Prevent body scroll when menu open */
 body.menu-open {
   overflow: hidden;
@@ -324,6 +336,15 @@ body.menu-open {
   const sidebar = document.getElementById('mobile-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  
+  // Set active link based on current page
+  const currentPath = window.location.pathname;
+  sidebarLinks.forEach(link => {
+    const linkPath = new URL(link.href).pathname;
+    if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+      link.classList.add('active');
+    }
+  });
   
   // Open menu
   function openMenu() {

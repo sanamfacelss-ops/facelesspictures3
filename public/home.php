@@ -207,6 +207,8 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .sidebar-menu{flex:1;overflow-y:auto;padding:1rem 0}
 .sidebar-link{display:block;padding:.75rem 1.5rem;color:rgba(17,17,17,.7);text-decoration:none;font-size:.875rem;font-weight:500;border-left:3px solid transparent;transition:all .2s}
 .sidebar-link:hover{background:rgba(0,0,0,.05);color:#111;border-left-color:#d92b3a}
+.sidebar-link.active{background:#111;color:#fff;font-weight:600;border-left-color:#d92b3a;margin:.5rem 0}
+.sidebar-link.active:hover{background:#000}
 body.menu-open{overflow:hidden}
 .mobile-nav-link{display:block;transition:all .2s;border-radius:8px;margin:0 12px}
 
@@ -1614,6 +1616,15 @@ ob_end_flush();
   const sidebar = document.getElementById('mobile-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  
+  // Set active link based on current page
+  const currentPath = window.location.pathname;
+  sidebarLinks.forEach(link => {
+    const linkPath = new URL(link.href).pathname;
+    if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+      link.classList.add('active');
+    }
+  });
   
   function openMenu() {
     sidebar.classList.add('active');
