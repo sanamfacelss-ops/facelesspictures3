@@ -84,12 +84,12 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
        x-cloak
        @click="toggleMenu()" 
        class="mobile-overlay lg:hidden"
-       x-transition:enter="transition-opacity ease-out duration-300"
-       x-transition:enter-start="opacity-0"
-       x-transition:enter-end="opacity-100"
-       x-transition:leave="transition-opacity ease-in duration-200"
-       x-transition:leave-start="opacity-100"
-       x-transition:leave-end="opacity-0">
+       x-transition:enter="overlay-enter"
+       x-transition:enter-start="overlay-enter-start"
+       x-transition:enter-end="overlay-enter-end"
+       x-transition:leave="overlay-leave"
+       x-transition:leave-start="overlay-leave-start"
+       x-transition:leave-end="overlay-leave-end">
   </div>
   
   <!-- Mobile Sidebar Menu -->
@@ -97,12 +97,12 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
          x-cloak
          @click.outside="toggleMenu()"
          class="mobile-sidebar lg:hidden"
-         x-transition:enter="transition-transform ease-out duration-300"
-         x-transition:enter-start="-translate-x-full"
-         x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition-transform ease-in duration-200"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="-translate-x-full">
+         x-transition:enter="sidebar-enter"
+         x-transition:enter-start="sidebar-enter-start"
+         x-transition:enter-end="sidebar-enter-end"
+         x-transition:leave="sidebar-leave"
+         x-transition:leave-start="sidebar-leave-start"
+         x-transition:leave-end="sidebar-leave-end">
     <div class="mobile-sidebar-inner">
       <!-- Sidebar Header -->
       <div class="mobile-sidebar-header">
@@ -158,11 +158,31 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 
 /* Prevent body scroll when sidebar is open */
 body.sidebar-open{overflow:hidden}
+
+/* Debug: ensure sidebar can be seen when testing */
+.mobile-sidebar[style*="display: none"]{display:none!important}
+.mobile-overlay[style*="display: none"]{display:none!important}
+
+/* Transition classes for overlay */
+.overlay-enter{transition:opacity 300ms ease-out}
+.overlay-enter-start{opacity:0}
+.overlay-enter-end{opacity:1}
+.overlay-leave{transition:opacity 200ms ease-in}
+.overlay-leave-start{opacity:1}
+.overlay-leave-end{opacity:0}
+
+/* Transition classes for sidebar */
+.sidebar-enter{transition:transform 300ms ease-out}
+.sidebar-enter-start{transform:translateX(-100%)}
+.sidebar-enter-end{transform:translateX(0)}
+.sidebar-leave{transition:transform 200ms ease-in}
+.sidebar-leave-start{transform:translateX(0)}
+.sidebar-leave-end{transform:translateX(-100%)}
 </style>
 
-<!-- Alpine.js for mobile menu (inline to avoid conflicts) -->
+<!-- Debug Alpine.js -->
 <script>
-if (typeof Alpine === 'undefined') {
-  document.write('<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"><\/script>');
-}
+document.addEventListener('alpine:init', () => {
+  console.log('Alpine.js initialized for navigation');
+});
 </script>
