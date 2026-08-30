@@ -701,7 +701,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     }
     .rasas-poster-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:2rem;
     }
     .rasa-poster-card{
