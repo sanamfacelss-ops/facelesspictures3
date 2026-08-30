@@ -344,9 +344,9 @@ body.menu-open {
     const linkUrl = new URL(link.href, window.location.origin);
     const linkPath = linkUrl.pathname;
     
-    // For hash links - never active on other pages
-    if (linkHref.startsWith('#') || linkHref.includes('/#')) {
-      // Only active on home page - will be handled separately
+    // For hash links like /#about - never active on non-home pages
+    if (linkHref.includes('/#')) {
+      // These only work on home page, handled by home.php
       return;
     }
     

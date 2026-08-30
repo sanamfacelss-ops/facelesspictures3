@@ -42,7 +42,7 @@ try {
     // Fallback if method fails or database not updated yet
     $headerMenuItems = [
         'left' => [
-            ['text' => 'About', 'url' => '#about', 'order' => 1],
+            ['text' => 'About', 'url' => '/#about', 'order' => 1],
             ['text' => 'Writers', 'url' => '/writer', 'order' => 2],
         ],
         'right' => [
@@ -1625,13 +1625,17 @@ ob_end_flush();
     const linkHref = link.getAttribute('href');
     const linkUrl = new URL(link.href, window.location.origin);
     const linkPath = linkUrl.pathname;
+    const linkHash = linkUrl.hash;
     
-    // For hash links like #about - only active if hash matches
-    if (linkHref.startsWith('#') && currentHash === linkHref) {
-      link.classList.add('active');
+    // For hash links like /#about - only active if on home AND hash matches
+    if (linkHash && (linkHref.includes('/#') || linkHref.startsWith('#'))) {
+      const isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
+      if (isHomePage && currentHash === linkHash) {
+        link.classList.add('active');
+      }
     }
     // For other pages - exact match
-    else if (!linkHref.startsWith('#') && currentPath === linkPath) {
+    else if (!linkHash && currentPath === linkPath) {
       link.classList.add('active');
     }
   });
