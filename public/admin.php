@@ -8702,23 +8702,38 @@ if (file_exists($errorLogFile)) {
                 }
                 
                 try {
+                    // Add timeout wrapper
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                    
                     const res = await fetch('/api/admin/settings/landing-batch', {
                         method: 'POST', 
                         body: fd, 
-                        credentials: 'same-origin'
+                        credentials: 'same-origin',
+                        signal: controller.signal
                     });
                     
+                    clearTimeout(timeoutId);
+                    
                     if (res.ok) {
+                        const data = await res.json();
+                        console.log('Save response:', data);
                         this.saving = false; 
                         this.saved = true;
                         setTimeout(() => this.saved = false, 2500);
                     } else {
-                        const err = await res.json();
+                        const err = await res.json().catch(() => ({ error: 'Server error' }));
+                        console.error('Save failed:', err);
                         alert('Save failed: ' + (err.error || 'Unknown error'));
                         this.saving = false;
                     }
                 } catch (error) {
-                    alert('Network error: ' + error.message);
+                    console.error('Save error:', error);
+                    if (error.name === 'AbortError') {
+                        alert('Save timed out. Please try again or check your internet connection.');
+                    } else {
+                        alert('Network error: ' + error.message);
+                    }
                     this.saving = false;
                 }
             }
