@@ -343,14 +343,13 @@ body.menu-open {
   
   sidebarLinks.forEach(link => {
     const linkHref = link.getAttribute('href');
-    
-    // If NOT on home page, skip About link completely
-    if (!isHomePage && linkHref.includes('#about')) {
-      return;
-    }
-    
     const linkUrl = new URL(link.href, window.location.origin);
     const linkPath = linkUrl.pathname;
+    
+    // Skip About link on non-home pages (don't show it as active)
+    if (!isHomePage && linkHref.includes('#about')) {
+      return; // Skip setting active, but still let the link work
+    }
     
     // Exact match for pages
     if (currentPath === linkPath) {
