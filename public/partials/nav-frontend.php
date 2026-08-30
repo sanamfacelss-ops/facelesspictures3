@@ -344,14 +344,14 @@ body.menu-open {
     const linkUrl = new URL(link.href, window.location.origin);
     const linkPath = linkUrl.pathname;
     
-    // Exact match for home page or hash links
-    if (linkHref === '/' || linkHref.startsWith('/#')) {
-      if (currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php') {
-        link.classList.add('active');
-      }
-    } 
+    // For hash links - never active on other pages
+    if (linkHref.startsWith('#') || linkHref.includes('/#')) {
+      // Only active on home page - will be handled separately
+      return;
+    }
+    
     // Exact match for other pages
-    else if (currentPath === linkPath) {
+    if (currentPath === linkPath) {
       link.classList.add('active');
     }
   });

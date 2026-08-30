@@ -1617,21 +1617,21 @@ ob_end_flush();
   const overlay = document.getElementById('sidebar-overlay');
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
   
-  // Set active link based on current page
+  // Set active link based on current page - simpler version
   const currentPath = window.location.pathname;
+  const currentHash = window.location.hash;
+  
   sidebarLinks.forEach(link => {
     const linkHref = link.getAttribute('href');
     const linkUrl = new URL(link.href, window.location.origin);
     const linkPath = linkUrl.pathname;
     
-    // Exact match for home page or hash links
-    if (linkHref === '/' || linkHref.startsWith('/#') || linkHref.startsWith('#')) {
-      if (currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php') {
-        link.classList.add('active');
-      }
-    } 
-    // Exact match for other pages
-    else if (currentPath === linkPath) {
+    // For hash links like #about - only active if hash matches
+    if (linkHref.startsWith('#') && currentHash === linkHref) {
+      link.classList.add('active');
+    }
+    // For other pages - exact match
+    else if (!linkHref.startsWith('#') && currentPath === linkPath) {
       link.classList.add('active');
     }
   });
