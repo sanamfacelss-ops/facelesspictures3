@@ -4570,8 +4570,13 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
-                                                <input type="text" x-model="form.role_writer_button_url" placeholder="/writer"
+                                                <select x-model="form.role_writer_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    <option value="/writer">Writer Page (/writer)</option>
+                                                    <option value="/director">Director Page (/director)</option>
+                                                    <option value="/actor">Actor Page (/actor)</option>
+                                                    <option value="/">Home Page (/)</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -4612,8 +4617,13 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
-                                                <input type="text" x-model="form.role_director_button_url" placeholder="/director"
+                                                <select x-model="form.role_director_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    <option value="/writer">Writer Page (/writer)</option>
+                                                    <option value="/director">Director Page (/director)</option>
+                                                    <option value="/actor">Actor Page (/actor)</option>
+                                                    <option value="/">Home Page (/)</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -4654,8 +4664,13 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
-                                                <input type="text" x-model="form.role_actor_button_url" placeholder="/actor"
+                                                <select x-model="form.role_actor_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    <option value="/writer">Writer Page (/writer)</option>
+                                                    <option value="/director">Director Page (/director)</option>
+                                                    <option value="/actor">Actor Page (/actor)</option>
+                                                    <option value="/">Home Page (/)</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
