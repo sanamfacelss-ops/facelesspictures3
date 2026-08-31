@@ -3501,7 +3501,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div x-data="{showHome: false, showRoleCards: false, showWriter: false, showDirector: false, showActor: false}">
+                            <div x-data="{showHome: false, showRoleCards: true, showWriter: false, showDirector: false, showActor: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
                             <div class="mt-6 mb-6">
@@ -4531,7 +4531,7 @@ if (file_exists($errorLogFile)) {
                             <!-- SECTION: Role Cards -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">Role Cards (Writer, Director, Actor)</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Leave title blank to hide entire card. <strong>Descriptions support:</strong> Regular line breaks (use \n) OR numbered lists (type "1. Item" on each line)</p>
+                                <p class="text-[11px] text-dark/40 mb-4">✨ <strong>CUSTOMIZE EVERYTHING:</strong> Card titles, icons, descriptions (bullet points), button text, and button URLs. Leave title blank to hide entire card. <strong>Descriptions support:</strong> Regular line breaks (use \n) OR numbered lists (type "1. Item" on each line)</p>
                                 
                                 <div class="space-y-6">
                                     <!-- WRITER -->
