@@ -2344,6 +2344,11 @@ class AdminController
                 
                 // Only save allowed settings
                 if (in_array($key, $allowed)) {
+                    // Force lowercase for role button URLs to prevent 404 errors
+                    if (in_array($key, ['role_writer_button_url', 'role_director_button_url', 'role_actor_button_url'])) {
+                        $value = strtolower(trim($value));
+                    }
+                    
                     $settingsModel->set($key, trim($value));
                     $saved++;
                 } else {

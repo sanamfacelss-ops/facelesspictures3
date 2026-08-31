@@ -1,6 +1,20 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
 
+/**
+ * Get available page routes from index.php for dropdown options
+ * Returns array of routes suitable for role card button URLs
+ */
+function getAvailablePageRoutes() {
+    // These are the actual public submission pages from index.php $pageRoutes
+    return [
+        '/' => 'Home Page',
+        '/actor' => 'Actor Submission Page',
+        '/director' => 'Director Submission Page',
+        '/writer' => 'Writer Submission Page',
+    ];
+}
+
 if (!is_admin()) {
     if (!headers_sent()) {
         header('Location: /login');
@@ -125,6 +139,9 @@ try {
 }
 
 $title = 'Admin Dashboard — ' . APP_NAME;
+
+// Get available page routes for role card button URL dropdowns
+$availablePageRoutes = getAvailablePageRoutes();
 
 
 // Handle debug toggle
@@ -4569,13 +4586,12 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL <span class="text-[9px] text-orange-600 font-semibold">(Re-select to fix old links!)</span></label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
                                                 <select x-model="form.role_writer_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    <option value="/writer">Writer Page (/writer)</option>
-                                                    <option value="/director">Director Page (/director)</option>
-                                                    <option value="/actor">Actor Page (/actor)</option>
-                                                    <option value="/">Home Page (/)</option>
+                                                    <?php foreach ($availablePageRoutes as $url => $label): ?>
+                                                        <option value="<?= htmlspecialchars($url) ?>"><?= htmlspecialchars($label) ?> (<?= htmlspecialchars($url) ?>)</option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -4616,13 +4632,12 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL <span class="text-[9px] text-orange-600 font-semibold">(Re-select to fix old links!)</span></label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
                                                 <select x-model="form.role_director_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    <option value="/writer">Writer Page (/writer)</option>
-                                                    <option value="/director">Director Page (/director)</option>
-                                                    <option value="/actor">Actor Page (/actor)</option>
-                                                    <option value="/">Home Page (/)</option>
+                                                    <?php foreach ($availablePageRoutes as $url => $label): ?>
+                                                        <option value="<?= htmlspecialchars($url) ?>"><?= htmlspecialchars($label) ?> (<?= htmlspecialchars($url) ?>)</option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -4663,13 +4678,12 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL <span class="text-[9px] text-orange-600 font-semibold">(Re-select to fix old links!)</span></label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
                                                 <select x-model="form.role_actor_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    <option value="/writer">Writer Page (/writer)</option>
-                                                    <option value="/director">Director Page (/director)</option>
-                                                    <option value="/actor">Actor Page (/actor)</option>
-                                                    <option value="/">Home Page (/)</option>
+                                                    <?php foreach ($availablePageRoutes as $url => $label): ?>
+                                                        <option value="<?= htmlspecialchars($url) ?>"><?= htmlspecialchars($label) ?> (<?= htmlspecialchars($url) ?>)</option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -8689,29 +8703,6 @@ if (file_exists($errorLogFile)) {
                 film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','Get Song')) ?>,
             },
             init() {
-                // Auto-fix capital letter URLs if present
-                let fixed = false;
-                if (this.form.role_writer_button_url && this.form.role_writer_button_url.includes('/Writer')) {
-                    this.form.role_writer_button_url = '/writer';
-                    fixed = true;
-                }
-                if (this.form.role_director_button_url && this.form.role_director_button_url.includes('/Director')) {
-                    this.form.role_director_button_url = '/director';
-                    fixed = true;
-                }
-                if (this.form.role_actor_button_url && this.form.role_actor_button_url.includes('/Actor')) {
-                    this.form.role_actor_button_url = '/actor';
-                    fixed = true;
-                }
-                
-                // Auto-save if we fixed URLs
-                if (fixed) {
-                    setTimeout(() => {
-                        console.log('Auto-fixing capital letter URLs...');
-                        this.saveLandingSettings();
-                    }, 1000);
-                }
-                
                 // Sync uploaded image URLs back into the form
                 document.addEventListener('image-uploaded', e => {
                     if (this.form.hasOwnProperty(e.detail.field)) {
