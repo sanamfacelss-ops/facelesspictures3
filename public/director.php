@@ -125,7 +125,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
   <div class="brief-card">
     <!-- Card heading -->
     <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1">DIRECTOR AUDITION</p>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1"><?= strtoupper($cardTitle) ?></p>
     </div>
     <div class="card-sec" style="padding:0 0 1.5rem">
       <?php 
