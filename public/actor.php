@@ -535,7 +535,7 @@ if (!empty($songScripts)) {
       <a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none">Director</a>
       <a href="/writer" style="color:#6b7280;font-size:.8rem;text-decoration:none">Writer</a>
     </div>
-    <span style="color:#9ca3af;font-size:.75rem">No face. Just talent.</span>
+    <span style="color:#9ca3af;font-size:.75rem"><?= htmlspecialchars($settingsModel->get('footer_tagline', 'No face. Just talent.')) ?></span>
   </div>
 </footer>
 

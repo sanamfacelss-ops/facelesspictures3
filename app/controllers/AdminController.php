@@ -2212,6 +2212,9 @@ class AdminController
             'director_failure_heading', 'director_failure_message', 'director_failure_retry_button',
             'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
             'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
+            'writer_card_title',
+            // Footer
+            'footer_tagline',
         ];
 
         if (!in_array($key, $allowed)) {
@@ -2322,6 +2325,9 @@ class AdminController
             'director_failure_heading', 'director_failure_message', 'director_failure_retry_button',
             'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
             'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
+            'writer_card_title',
+            // Footer
+            'footer_tagline',
         ];
 
         try {

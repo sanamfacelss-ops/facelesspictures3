@@ -4405,6 +4405,13 @@ if (file_exists($errorLogFile)) {
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition resize-none"></textarea>
                                     <p class="text-[11px] text-dark/30 mt-1">Text displayed in the footer area. Supports multiple lines.</p>
                                 </div>
+                                
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Footer Tagline</label>
+                                    <input type="text" x-model="form.footer_tagline" placeholder="No face. Just talent."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Small tagline shown at bottom of Actor/Director/Writer pages.</p>
+                                </div>
                             </div>
 
                             <!-- SECTION: Manifesto Videos -->
@@ -4751,6 +4758,14 @@ if (file_exists($errorLogFile)) {
 
                                     <!-- Submission Messages -->
                                     <div class="border-t border-dark/10 pt-4 mt-4 px-4">
+                                        <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-3">Submission Card Title</p>
+                                        <div class="mb-4">
+                                            <label class="block text-[11px] font-semibold text-dark mb-1.5">Card Title</label>
+                                            <input type="text" x-model="form.writer_card_title" placeholder="WRITER SUBMISSION"
+                                                class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                            <p class="text-[10px] text-dark/30 mt-1">Title shown at top of the submission form card</p>
+                                        </div>
+                                        
                                         <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-3">Submission Messages</p>
                                         <p class="text-[11px] text-dark/50 mb-3">Customize success and failure messages shown after writer submissions.</p>
                                         
@@ -8480,6 +8495,7 @@ if (file_exists($errorLogFile)) {
                 landing_roles_heading:    <?= json_encode($settingsModel->get('landing_roles_heading','Become a Star in 3 Clicks')) ?>,
                 landing_roles_subheading: <?= json_encode($settingsModel->get('landing_roles_subheading',"Pick your role. Shoot your video. Submit. That's it.")) ?>,
                 landing_footer_content: <?= json_encode($settingsModel->get('landing_footer_content','© 2024 Faceless Pictures. All rights reserved.')) ?>,
+                footer_tagline: <?= json_encode($settingsModel->get('footer_tagline','No face. Just talent.')) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
                 landing_poster_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_subtitle',''))) ?>',
@@ -8621,7 +8637,8 @@ if (file_exists($errorLogFile)) {
                 writer_step3_text:       <?= json_encode($settingsModel->get('writer_step3_text','Your page PDF plus narration video')) ?>,
                 writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
                 writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
-                // Writer submission messages
+                // Writer submission card and messages
+                writer_card_title: <?= json_encode($settingsModel->get('writer_card_title','WRITER SUBMISSION')) ?>,
                 writer_success_heading: <?= json_encode($settingsModel->get('writer_success_heading','WRITER SUBMISSION RECEIVED!')) ?>,
                 writer_success_message: <?= json_encode($settingsModel->get('writer_success_message',"Your writer video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
                 writer_success_pdf_button: <?= json_encode($settingsModel->get('writer_success_pdf_button','Download Writer Brief PDF')) ?>,
