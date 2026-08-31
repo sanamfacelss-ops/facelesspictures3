@@ -8737,6 +8737,10 @@ if (file_exists($errorLogFile)) {
                         console.log('Save response:', data);
                         this.saving = false; 
                         this.saved = true;
+                        
+                        // Show reminder to refresh frontend
+                        alert('✅ Settings saved!\n\n🔄 To see changes on frontend:\nPress Ctrl+Shift+R to hard refresh the page');
+                        
                         setTimeout(() => this.saved = false, 2500);
                     } else {
                         const err = await res.json().catch(() => ({ error: 'Server error' }));

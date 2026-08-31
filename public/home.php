@@ -150,6 +150,10 @@ $posterCount = count($posters);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faceless Pictures 3 — No Face. Just Talent.</title>
 <meta name="description" content="India's first anonymous film competition. Actor, Director & Writer auditions open now.">
+<!-- Cache busting - forces browser to reload on settings change -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="alternate icon" href="/favicon.ico">
 
