@@ -4569,7 +4569,7 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL <span class="text-[9px] text-orange-600 font-semibold">(Re-select to fix old links!)</span></label>
                                                 <select x-model="form.role_writer_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     <option value="/writer">Writer Page (/writer)</option>
@@ -4616,7 +4616,7 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL <span class="text-[9px] text-orange-600 font-semibold">(Re-select to fix old links!)</span></label>
                                                 <select x-model="form.role_director_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     <option value="/writer">Writer Page (/writer)</option>
@@ -4663,7 +4663,7 @@ if (file_exists($errorLogFile)) {
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL</label>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Button URL <span class="text-[9px] text-orange-600 font-semibold">(Re-select to fix old links!)</span></label>
                                                 <select x-model="form.role_actor_button_url"
                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     <option value="/writer">Writer Page (/writer)</option>
