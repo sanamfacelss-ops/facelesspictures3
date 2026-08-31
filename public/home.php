@@ -971,23 +971,35 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <!-- Description Lines -->
     <div style="margin-bottom:2.5rem">
       <?php 
-      $statsLine1 = $settingsModel->get('stats_line_1', 'Many talented people never get their first chance.');
-      $statsLine2 = $settingsModel->get('stats_line_2', 'We are giving them one.');
-      $statsLine3 = $settingsModel->get('stats_line_3', 'We don\'t just make films.');
-      $statsLine4 = $settingsModel->get('stats_line_4', 'We open the door.');
+      // Try new JSON format first, fallback to old individual fields
+      $statsLinesJson = $settingsModel->get('stats_lines_json', '');
+      $statsLines = [];
+      
+      if (!empty($statsLinesJson)) {
+          $decoded = json_decode($statsLinesJson, true);
+          if (is_array($decoded)) {
+              $statsLines = array_filter($decoded, fn($l) => !empty(trim($l)));
+          }
+      }
+      
+      // Fallback to old format if JSON is empty
+      if (empty($statsLines)) {
+          $statsLines = array_filter([
+              $settingsModel->get('stats_line_1', 'Many talented people never get their first chance.'),
+              $settingsModel->get('stats_line_2', 'We are giving them one.'),
+              $settingsModel->get('stats_line_3', 'We don\'t just make films.'),
+              $settingsModel->get('stats_line_4', 'We open the door.')
+          ], fn($l) => !empty(trim($l)));
+      }
+      
+      foreach ($statsLines as $line):
+          if (!empty(trim($line))):
       ?>
-      <?php if (!empty($statsLine1)): ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($statsLine1) ?></p>
-      <?php endif; ?>
-      <?php if (!empty($statsLine2)): ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($statsLine2) ?></p>
-      <?php endif; ?>
-      <?php if (!empty($statsLine3)): ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($statsLine3) ?></p>
-      <?php endif; ?>
-      <?php if (!empty($statsLine4)): ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8"><?= htmlspecialchars($statsLine4) ?></p>
-      <?php endif; ?>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem"><?= htmlspecialchars($line) ?></p>
+      <?php 
+          endif;
+      endforeach;
+      ?>
     </div>
     
     <!-- Tagline -->

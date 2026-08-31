@@ -4480,12 +4480,29 @@ if (file_exists($errorLogFile)) {
                             <div class="mb-6 pb-6 border-b border-dark/5" x-data="{
                                 statsLines: [],
                                 initStatsLines() {
-                                    this.statsLines = [
-                                        this.form.stats_line_1 || '',
-                                        this.form.stats_line_2 || '',
-                                        this.form.stats_line_3 || '',
-                                        this.form.stats_line_4 || ''
-                                    ].filter(line => line !== '');
+                                    // Try to load from JSON first (new format), fallback to individual fields (old format)
+                                    if (this.form.stats_lines_json) {
+                                        try {
+                                            const parsed = JSON.parse(this.form.stats_lines_json);
+                                            this.statsLines = Array.isArray(parsed) ? parsed.filter(l => l) : [''];
+                                        } catch(e) {
+                                            // Fallback to old format
+                                            this.statsLines = [
+                                                this.form.stats_line_1 || '',
+                                                this.form.stats_line_2 || '',
+                                                this.form.stats_line_3 || '',
+                                                this.form.stats_line_4 || ''
+                                            ].filter(line => line !== '');
+                                        }
+                                    } else {
+                                        // Fallback to old format
+                                        this.statsLines = [
+                                            this.form.stats_line_1 || '',
+                                            this.form.stats_line_2 || '',
+                                            this.form.stats_line_3 || '',
+                                            this.form.stats_line_4 || ''
+                                        ].filter(line => line !== '');
+                                    }
                                     if (this.statsLines.length === 0) {
                                         this.statsLines = [''];
                                     }
@@ -8629,6 +8646,7 @@ if (file_exists($errorLogFile)) {
                 stats_line_2:   <?= json_encode($settingsModel->get('stats_line_2','We are giving them one.')) ?>,
                 stats_line_3:   <?= json_encode($settingsModel->get('stats_line_3','We don\'t just make films.')) ?>,
                 stats_line_4:   <?= json_encode($settingsModel->get('stats_line_4','We open the door.')) ?>,
+                stats_lines_json: <?= json_encode($settingsModel->get('stats_lines_json','')) ?>,
                 stats_tagline:  <?= json_encode($settingsModel->get('stats_tagline','FACELESS TO STAR.')) ?>,
                 
                 landing_about_text:    <?= json_encode($settingsModel->get('landing_about_text',"Faceless Pictures is India's first anonymous film competition.")) ?>,
@@ -8771,6 +8789,11 @@ if (file_exists($errorLogFile)) {
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;
                 const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                
+                // Compile stats lines from dynamic array into JSON before saving
+                if (this.statsLines) {
+                    this.form.stats_lines_json = JSON.stringify(this.statsLines.filter(line => line.trim() !== ''));
+                }
                 
                 // Send all settings in ONE batch request
                 const fd = new FormData();

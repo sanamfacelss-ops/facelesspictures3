@@ -2149,6 +2149,7 @@ class AdminController
             'stats_number_4', 'stats_label_4',
             'stats_number_5', 'stats_label_5',
             'stats_line_1', 'stats_line_2', 'stats_line_3', 'stats_line_4',
+            'stats_lines_json', // Dynamic unlimited lines stored as JSON
             'stats_tagline',
             'manifesto_heading', 'manifesto_subheading',
             'manifesto_video1_url', 'manifesto_video1_title',
@@ -2271,6 +2272,7 @@ class AdminController
             'stats_number_4', 'stats_label_4',
             'stats_number_5', 'stats_label_5',
             'stats_line_1', 'stats_line_2', 'stats_line_3', 'stats_line_4',
+            'stats_lines_json', // Dynamic unlimited lines stored as JSON
             'stats_tagline',
             'manifesto_heading', 'manifesto_subheading',
             'manifesto_video1_url', 'manifesto_video1_title',
