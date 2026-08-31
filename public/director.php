@@ -8,6 +8,13 @@ $directorBrief   = setting('director_brief', 'You have one actor, one phone came
 $directorScripts = $scriptModel->byCategory('director');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
 
+// Get cache version for asset cache-busting
+$cacheVersion = '1';
+$versionFile = __DIR__ . '/../cache/.version';
+if (file_exists($versionFile)) {
+    $cacheVersion = trim(file_get_contents($versionFile)) ?: '1';
+}
+
 // Page text settings
 $heroLabel       = setting('director_hero_label', 'Auditions Now Open');
 $heroHeading     = setting('director_hero_heading', 'DIRECTOR AUDITIONS');
@@ -27,6 +34,10 @@ $formDescription = setting('director_form_description', 'Cast your actor, give t
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= htmlspecialchars($pageTitle) ?></title>
+<!-- Cache busting - forces browser to reload on settings change -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&family=Noto+Sans+Gujarati:wght@400;700&family=Noto+Sans+Gurmukhi:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
