@@ -4477,7 +4477,36 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- SECTION: About -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
+                            <div class="mb-6 pb-6 border-b border-dark/5" x-data="{
+                                statsLines: [],
+                                initStatsLines() {
+                                    this.statsLines = [
+                                        this.form.stats_line_1 || '',
+                                        this.form.stats_line_2 || '',
+                                        this.form.stats_line_3 || '',
+                                        this.form.stats_line_4 || ''
+                                    ].filter(line => line !== '');
+                                    if (this.statsLines.length === 0) {
+                                        this.statsLines = [''];
+                                    }
+                                },
+                                addStatsLine() {
+                                    this.statsLines.push('');
+                                },
+                                removeStatsLine(index) {
+                                    this.statsLines.splice(index, 1);
+                                    if (this.statsLines.length === 0) {
+                                        this.statsLines = [''];
+                                    }
+                                    this.syncStatsLinesToForm();
+                                },
+                                syncStatsLinesToForm() {
+                                    this.form.stats_line_1 = this.statsLines[0] || '';
+                                    this.form.stats_line_2 = this.statsLines[1] || '';
+                                    this.form.stats_line_3 = this.statsLines[2] || '';
+                                    this.form.stats_line_4 = this.statsLines[3] || '';
+                                }
+                            }" x-init="initStatsLines()">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">Stats Section (Replaces About)</h5>
                                 <p class="text-[11px] text-dark/40 mb-4">Numbers, labels, description lines and tagline</p>
                                 
@@ -4510,12 +4539,32 @@ if (file_exists($errorLogFile)) {
                                     </div>
                                 </div>
                                 
-                                <!-- Description Lines -->
-                                <div class="space-y-2 mb-3">
-                                    <input type="text" x-model="form.stats_line_1" placeholder="Many talented people never get their first chance." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <input type="text" x-model="form.stats_line_2" placeholder="We are giving them one." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <input type="text" x-model="form.stats_line_3" placeholder="We don't just make films." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <input type="text" x-model="form.stats_line_4" placeholder="We open the door." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                <!-- Description Lines (Dynamic) -->
+                                <div class="mb-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines</label>
+                                        <button type="button" @click="addStatsLine()" class="text-[11px] bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                            Add Line
+                                        </button>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <template x-for="(line, index) in statsLines" :key="index">
+                                            <div class="flex items-center gap-2">
+                                                <input type="text" 
+                                                    x-model="statsLines[index]" 
+                                                    @input="syncStatsLinesToForm()"
+                                                    :placeholder="'Description line ' + (index + 1)"
+                                                    class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                <button type="button" 
+                                                    @click="removeStatsLine(index)" 
+                                                    x-show="statsLines.length > 1"
+                                                    class="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center justify-center">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                                 
                                 <!-- Tagline -->
