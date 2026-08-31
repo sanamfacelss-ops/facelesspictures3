@@ -796,7 +796,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
             elseif (preg_match('/[?&]v=([A-Za-z0-9_\-]{11})/', $clean, $mm))       $mvId = $mm[1];
             elseif (preg_match('/\/shorts\/([A-Za-z0-9_\-]{11})/', $clean, $mm))   $mvId = $mm[1];
             elseif (preg_match('/\/embed\/([A-Za-z0-9_\-]{11})/', $clean, $mm))    $mvId = $mm[1];
-            $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/maxresdefault.jpg' : '';
+            $mvThumb = $mvId ? 'https://img.youtube.com/vi/' . $mvId . '/hqdefault.jpg' : '';
             $loading = $idx < 3 ? 'eager' : 'lazy';
             $fetchpriority = $idx < 3 ? 'fetchpriority="high"' : '';
           ?>
@@ -825,6 +825,13 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                 </svg>
               </div>
             </div>
+            
+            <!-- Video Title (if provided) -->
+            <?php if (!empty($mvTitle)): ?>
+            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,.6),transparent);padding:2rem 1rem .75rem;pointer-events:none">
+              <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.04em;color:#fff;font-weight:600;line-height:1.2"><?= htmlspecialchars($mvTitle) ?></p>
+            </div>
+            <?php endif; ?>
           </div>
           <?php endforeach; ?>
         </div>
