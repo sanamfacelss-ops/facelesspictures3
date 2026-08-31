@@ -123,9 +123,12 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
   <!-- LEFT: Brief card -->
   <div class="brief-card">
-    <!-- Card heading -->
-    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1"><?= strtoupper($cardTitle) ?></p>
+    <!-- Card heading + subheading — both from Scripts backend (same as Actor page) -->
+    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem;text-align:center">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1;margin-bottom:.45rem"><?= strtoupper($cardTitle) ?></p>
+      <?php if ($sc && !empty($sc['content'])): ?>
+      <p style="font-size:.85rem;font-weight:500;color:#6b7280;line-height:1.5"><?= htmlspecialchars($sc['content']) ?></p>
+      <?php endif; ?>
     </div>
     <div class="card-sec" style="padding:0 0 1.5rem">
       <?php 
