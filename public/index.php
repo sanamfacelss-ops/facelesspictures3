@@ -263,6 +263,7 @@ $pageRoutes = [
     '' => 'home.php',
     'home' => 'home.php',
     'admin-login' => 'admin-login.php',
+    'admin-logout' => 'admin-logout.php',
 
     // Public audition pages (no login required)
     'actor'    => 'actor.php',
