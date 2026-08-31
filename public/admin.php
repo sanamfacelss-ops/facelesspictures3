@@ -17,11 +17,11 @@ function getAvailablePageRoutes() {
 
 if (!is_admin()) {
     if (!headers_sent()) {
-        header('Location: /');
+        header('Location: /admin-login');
         exit;
     }
     // Fallback if headers already sent
-    echo '<script>window.location.href="/";</script>';
+    echo '<script>window.location.href="/admin-login";</script>';
     exit;
 }
 

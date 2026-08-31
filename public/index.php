@@ -262,6 +262,7 @@ debug_log("ROUTER: No API route matched for '$uri'", 'ROUTER');
 $pageRoutes = [
     '' => 'home.php',
     'home' => 'home.php',
+    'admin-login' => 'admin-login.php',
 
     // Public audition pages (no login required)
     'actor'    => 'actor.php',
