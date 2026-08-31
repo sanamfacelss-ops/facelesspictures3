@@ -4477,53 +4477,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- SECTION: About -->
-                            <div class="mb-6 pb-6 border-b border-dark/5" x-data="{
-                                statsLines: [],
-                                initStatsLines() {
-                                    // Try to load from JSON first (new format), fallback to individual fields (old format)
-                                    if (this.form.stats_lines_json) {
-                                        try {
-                                            const parsed = JSON.parse(this.form.stats_lines_json);
-                                            this.statsLines = Array.isArray(parsed) ? parsed.filter(l => l) : [''];
-                                        } catch(e) {
-                                            // Fallback to old format
-                                            this.statsLines = [
-                                                this.form.stats_line_1 || '',
-                                                this.form.stats_line_2 || '',
-                                                this.form.stats_line_3 || '',
-                                                this.form.stats_line_4 || ''
-                                            ].filter(line => line !== '');
-                                        }
-                                    } else {
-                                        // Fallback to old format
-                                        this.statsLines = [
-                                            this.form.stats_line_1 || '',
-                                            this.form.stats_line_2 || '',
-                                            this.form.stats_line_3 || '',
-                                            this.form.stats_line_4 || ''
-                                        ].filter(line => line !== '');
-                                    }
-                                    if (this.statsLines.length === 0) {
-                                        this.statsLines = [''];
-                                    }
-                                },
-                                addStatsLine() {
-                                    this.statsLines.push('');
-                                },
-                                removeStatsLine(index) {
-                                    this.statsLines.splice(index, 1);
-                                    if (this.statsLines.length === 0) {
-                                        this.statsLines = [''];
-                                    }
-                                    this.syncStatsLinesToForm();
-                                },
-                                syncStatsLinesToForm() {
-                                    this.form.stats_line_1 = this.statsLines[0] || '';
-                                    this.form.stats_line_2 = this.statsLines[1] || '';
-                                    this.form.stats_line_3 = this.statsLines[2] || '';
-                                    this.form.stats_line_4 = this.statsLines[3] || '';
-                                }
-                            }" x-init="initStatsLines()">
+                            <div class="mb-6 pb-6 border-b border-dark/5">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">Stats Section (Replaces About)</h5>
                                 <p class="text-[11px] text-dark/40 mb-4">Numbers, labels, description lines and tagline</p>
                                 
@@ -8540,6 +8494,7 @@ if (file_exists($errorLogFile)) {
         return {
             saving: false, saved: false,
             csrf: document.querySelector('meta[name="csrf-token"]')?.content || '',
+            statsLines: [], // Dynamic stats description lines
             form: {
                 site_logo_url:         '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>',
                 site_logo_height:      '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_height','44'))) ?>',
@@ -8770,6 +8725,9 @@ if (file_exists($errorLogFile)) {
                 film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','Get Song')) ?>,
             },
             init() {
+                // Initialize stats lines from JSON or fallback to individual fields
+                this.initStatsLines();
+                
                 // Sync uploaded image URLs back into the form
                 document.addEventListener('image-uploaded', e => {
                     if (this.form.hasOwnProperty(e.detail.field)) {
@@ -8785,6 +8743,50 @@ if (file_exists($errorLogFile)) {
                 window.addEventListener('trigger-save-all', () => {
                     this.saveLandingSettings();
                 });
+            },
+            initStatsLines() {
+                // Try to load from JSON first (new format), fallback to individual fields (old format)
+                if (this.form.stats_lines_json) {
+                    try {
+                        const parsed = JSON.parse(this.form.stats_lines_json);
+                        this.statsLines = Array.isArray(parsed) ? parsed.filter(l => l) : [''];
+                    } catch(e) {
+                        // Fallback to old format
+                        this.statsLines = [
+                            this.form.stats_line_1 || '',
+                            this.form.stats_line_2 || '',
+                            this.form.stats_line_3 || '',
+                            this.form.stats_line_4 || ''
+                        ].filter(line => line !== '');
+                    }
+                } else {
+                    // Fallback to old format
+                    this.statsLines = [
+                        this.form.stats_line_1 || '',
+                        this.form.stats_line_2 || '',
+                        this.form.stats_line_3 || '',
+                        this.form.stats_line_4 || ''
+                    ].filter(line => line !== '');
+                }
+                if (this.statsLines.length === 0) {
+                    this.statsLines = [''];
+                }
+            },
+            addStatsLine() {
+                this.statsLines.push('');
+            },
+            removeStatsLine(index) {
+                this.statsLines.splice(index, 1);
+                if (this.statsLines.length === 0) {
+                    this.statsLines = [''];
+                }
+                this.syncStatsLinesToForm();
+            },
+            syncStatsLinesToForm() {
+                this.form.stats_line_1 = this.statsLines[0] || '';
+                this.form.stats_line_2 = this.statsLines[1] || '';
+                this.form.stats_line_3 = this.statsLines[2] || '';
+                this.form.stats_line_4 = this.statsLines[3] || '';
             },
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;
