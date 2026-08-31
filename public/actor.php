@@ -466,10 +466,7 @@ if (!empty($songScripts)) {
     </style>
 
     <?php if (!empty($formHeading)): ?>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
-    <?php endif; ?>
-    <?php if (!empty($formDescription)): ?>
-    <p style="font-size:.85rem;color:#6b7280;margin-bottom:1.5rem;line-height:1.55"><?= nl2br(htmlspecialchars($formDescription)) ?></p>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:1.5rem"><?= htmlspecialchars($formHeading) ?></p>
     <?php endif; ?>
 
     <!-- Contact -->

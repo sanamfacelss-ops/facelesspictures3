@@ -4746,11 +4746,6 @@ if (file_exists($errorLogFile)) {
                                                         <input type="text" x-model="form.writer_form_heading" placeholder="Ready to Write? Submit Your Continuation"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
-                                                        <textarea x-model="form.writer_form_description" rows="2" placeholder="Read the given script, write what happens next, then record yourself narrating it on camera."
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -4900,11 +4895,6 @@ if (file_exists($errorLogFile)) {
                                                         <input type="text" x-model="form.director_form_heading" placeholder="Ready to Direct? Submit Your Scene"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
-                                                        <textarea x-model="form.director_form_description" rows="2" placeholder="Cast your actor, give them the script, shoot the scene, and upload your video."
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -5045,11 +5035,6 @@ if (file_exists($errorLogFile)) {
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
                                                         <input type="text" x-model="form.actor_form_heading" placeholder="Ready to Perform? Submit Your Auditions"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description</label>
-                                                        <textarea x-model="form.actor_form_description" rows="2" placeholder="Shoot your dialog scene and song audition, then upload both videos below."
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                     </div>
                                                 </div>
                                             </div>

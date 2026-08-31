@@ -227,10 +227,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     </style>
 
     <?php if (!empty($formHeading)): ?>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:.3rem"><?= htmlspecialchars($formHeading) ?></p>
-    <?php endif; ?>
-    <?php if (!empty($formDescription)): ?>
-    <p style="font-size:.82rem;color:#6b7280;margin-bottom:1.25rem;line-height:1.55"><?= nl2br(htmlspecialchars($formDescription)) ?></p>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:1.25rem"><?= htmlspecialchars($formHeading) ?></p>
     <?php endif; ?>
 
     <!-- Contact -->
