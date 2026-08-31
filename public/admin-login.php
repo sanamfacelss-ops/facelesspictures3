@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../app/config/config.php';
+require_once __DIR__ . '/../app/helpers/settings_helper.php';
 
 // If already logged in as admin, redirect to admin panel
 if (is_admin()) {
