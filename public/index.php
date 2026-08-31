@@ -6,7 +6,6 @@
 
 require_once __DIR__ . '/../app/config/config.php';
 
-use App\Controllers\AuthController;
 use App\Controllers\UploadController;
 use App\Controllers\ModerationController;
 use App\Controllers\AIController;
@@ -141,21 +140,7 @@ if ($uri === 'api/debug') {
 
 // API routes
 $routes = [
-    // Auth API
-    'api/register' => [AuthController::class, 'register', 'POST'],
-    'api/login' => [AuthController::class, 'login', 'POST'],
-    'api/logout' => [AuthController::class, 'logout', 'POST'],
-    'api/delete-account' => [AuthController::class, 'deleteAccount', 'POST'],
-    'api/forgot-password' => [AuthController::class, 'forgotPassword', 'POST'],
-    'api/verify-otp' => [AuthController::class, 'verifyOTP', 'POST'],
-    'api/reset-password' => [AuthController::class, 'resetPassword', 'POST'],
-    
-    // Google OAuth API
-    'api/auth/google' => [AuthController::class, 'googleAuth', 'GET'],
-    'api/auth/google/callback' => [AuthController::class, 'googleCallback', 'GET'],
-    'api/auth/google/complete' => [AuthController::class, 'googleComplete', 'POST'],
-
-    // Upload API
+    // Upload API (kept for admin use if needed)
     'api/upload' => [UploadController::class, 'store', 'POST'],
 
     // Public guest submission API (no login required)
@@ -277,19 +262,6 @@ debug_log("ROUTER: No API route matched for '$uri'", 'ROUTER');
 $pageRoutes = [
     '' => 'home.php',
     'home' => 'home.php',
-    'login' => 'login.php',
-    'register' => 'register.php',
-    'forgot-password' => 'forgot-password.php',
-    'reset-password' => 'reset-password.php',
-    'dashboard' => 'dashboard.php',
-    'upload' => 'upload.php',
-
-    // Creator studio routes
-    'creator/dashboard' => 'creator/dashboard.php',
-    'creator/record' => 'creator/record.php',
-    'creator/videos' => 'creator/videos.php',
-    // Onboarding
-    'onboarding' => 'onboarding.php',
 
     // Public audition pages (no login required)
     'actor'    => 'actor.php',
