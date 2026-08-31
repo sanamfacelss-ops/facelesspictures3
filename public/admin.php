@@ -8689,6 +8689,29 @@ if (file_exists($errorLogFile)) {
                 film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','Get Song')) ?>,
             },
             init() {
+                // Auto-fix capital letter URLs if present
+                let fixed = false;
+                if (this.form.role_writer_button_url && this.form.role_writer_button_url.includes('/Writer')) {
+                    this.form.role_writer_button_url = '/writer';
+                    fixed = true;
+                }
+                if (this.form.role_director_button_url && this.form.role_director_button_url.includes('/Director')) {
+                    this.form.role_director_button_url = '/director';
+                    fixed = true;
+                }
+                if (this.form.role_actor_button_url && this.form.role_actor_button_url.includes('/Actor')) {
+                    this.form.role_actor_button_url = '/actor';
+                    fixed = true;
+                }
+                
+                // Auto-save if we fixed URLs
+                if (fixed) {
+                    setTimeout(() => {
+                        console.log('Auto-fixing capital letter URLs...');
+                        this.saveLandingSettings();
+                    }, 1000);
+                }
+                
                 // Sync uploaded image URLs back into the form
                 document.addEventListener('image-uploaded', e => {
                     if (this.form.hasOwnProperty(e.detail.field)) {
