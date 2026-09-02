@@ -134,15 +134,8 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
   <!-- LEFT: Brief card -->
   <div class="brief-card">
-    <!-- Card heading + subheading — both from Scripts backend (same as Actor page) -->
-    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem;text-align:center">
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1;margin-bottom:.45rem"><?= strtoupper($cardTitle) ?></p>
-      <?php if ($sc && !empty($sc['content'])): ?>
-      <p style="font-size:.85rem;font-weight:500;color:#6b7280;line-height:1.5"><?= htmlspecialchars($sc['content']) ?></p>
-      <?php endif; ?>
-    </div>
     
-    <!-- 3-STEP PROCESS BAR (below heading, above video) -->
+    <!-- 3-STEP PROCESS BAR (at top) -->
     <div class="card-sec" style="background:#fafafa;border-bottom:1px solid #e5e7eb">
       <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:1.25rem">
         
@@ -217,6 +210,15 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         </div>
       <?php endif; ?>
     </div>
+    
+    <!-- Card heading + subheading — moved below video -->
+    <div class="card-sec" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem;text-align:center">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1;margin-bottom:.45rem"><?= strtoupper($cardTitle) ?></p>
+      <?php if ($sc && !empty($sc['content'])): ?>
+      <p style="font-size:.85rem;font-weight:500;color:#6b7280;line-height:1.5"><?= htmlspecialchars($sc['content']) ?></p>
+      <?php endif; ?>
+    </div>
+    
     <?php if ($scriptImage): ?>
     <div class="card-sec" style="padding:1.25rem 0 0;border-top:1px solid #e5e7eb;background:#fff">
       <img src="<?= htmlspecialchars($scriptImage) ?>" alt="Director script" style="width:100%;height:auto;display:block;object-fit:contain;background:#fff">
