@@ -4788,20 +4788,80 @@ if (file_exists($errorLogFile)) {
                                                 </div>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
-                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
-                                                <div class="space-y-2">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form</p>
+                                                <div class="space-y-3">
+                                                    <!-- 1. Form Heading -->
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
                                                         <input type="text" x-model="form.writer_form_heading" placeholder="Ready to Write? Submit Your Continuation"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
+                                                    
+                                                    <!-- 2. Form Description -->
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Description (Hint Text)</label>
                                                         <textarea x-model="form.writer_form_description" rows="2" placeholder="Read the given script, write what happens next..."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Shows below form heading as instruction text</p>
                                                     </div>
-                                                    <div>
+                                                    
+                                                    <!-- 3. Form Field Customization -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <p class="text-[10px] font-semibold text-dark/70 mb-2">Form Field Labels & Placeholders</p>
+                                                        <div class="space-y-2">
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Name Label</label>
+                                                                    <input type="text" x-model="form.writer_field_name_label" placeholder="Name *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Name Placeholder</label>
+                                                                    <input type="text" x-model="form.writer_field_name_placeholder" placeholder="Your full name"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Email Label</label>
+                                                                    <input type="text" x-model="form.writer_field_email_label" placeholder="Email *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Email Placeholder</label>
+                                                                    <input type="text" x-model="form.writer_field_email_placeholder" placeholder="you@email.com"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Phone Label</label>
+                                                                    <input type="text" x-model="form.writer_field_phone_label" placeholder="Phone *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Phone Placeholder</label>
+                                                                    <input type="text" x-model="form.writer_field_phone_placeholder" placeholder="+91 98765 43210"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Video Label</label>
+                                                                    <input type="text" x-model="form.writer_field_video_label" placeholder="Narration Video *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Video Upload Hint</label>
+                                                                    <input type="text" x-model="form.writer_field_video_hint" placeholder="your narration video"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- 4. Terms & Conditions -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
                                                         <textarea x-model="form.writer_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
@@ -4949,20 +5009,80 @@ if (file_exists($errorLogFile)) {
                                                 </div>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
-                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
-                                                <div class="space-y-2">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form</p>
+                                                <div class="space-y-3">
+                                                    <!-- 1. Form Heading -->
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
                                                         <input type="text" x-model="form.director_form_heading" placeholder="Ready to Direct? Submit Your Scene"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
+                                                    
+                                                    <!-- 2. Form Description -->
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Description (Hint Text)</label>
                                                         <textarea x-model="form.director_form_description" rows="2" placeholder="Cast your actor, give them the script, shoot the scene..."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Shows below form heading as instruction text (currently hidden on frontend)</p>
                                                     </div>
-                                                    <div>
+                                                    
+                                                    <!-- 3. Form Field Customization -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <p class="text-[10px] font-semibold text-dark/70 mb-2">Form Field Labels & Placeholders</p>
+                                                        <div class="space-y-2">
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Name Label</label>
+                                                                    <input type="text" x-model="form.director_field_name_label" placeholder="Name *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Name Placeholder</label>
+                                                                    <input type="text" x-model="form.director_field_name_placeholder" placeholder="Your full name"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Email Label</label>
+                                                                    <input type="text" x-model="form.director_field_email_label" placeholder="Email *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Email Placeholder</label>
+                                                                    <input type="text" x-model="form.director_field_email_placeholder" placeholder="you@email.com"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Phone Label</label>
+                                                                    <input type="text" x-model="form.director_field_phone_label" placeholder="Phone *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Phone Placeholder</label>
+                                                                    <input type="text" x-model="form.director_field_phone_placeholder" placeholder="+91 98765 43210"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Video Label</label>
+                                                                    <input type="text" x-model="form.director_field_video_label" placeholder="Director Scene Video *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Video Upload Hint</label>
+                                                                    <input type="text" x-model="form.director_field_video_hint" placeholder="your scene video"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- 4. Terms & Conditions -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
                                                         <textarea x-model="form.director_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
