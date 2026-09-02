@@ -4796,6 +4796,12 @@ if (file_exists($errorLogFile)) {
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
                                                     <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description (Hint Text)</label>
+                                                        <textarea x-model="form.writer_form_description" rows="2" placeholder="Read the given script, write what happens next..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Shows below form heading as instruction text</p>
+                                                    </div>
+                                                    <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
                                                         <textarea x-model="form.writer_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
@@ -4951,6 +4957,12 @@ if (file_exists($errorLogFile)) {
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
                                                     <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description (Hint Text)</label>
+                                                        <textarea x-model="form.director_form_description" rows="2" placeholder="Cast your actor, give them the script, shoot the scene..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Shows below form heading as instruction text (currently hidden on frontend)</p>
+                                                    </div>
+                                                    <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
                                                         <textarea x-model="form.director_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
@@ -5096,6 +5108,12 @@ if (file_exists($errorLogFile)) {
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
                                                         <input type="text" x-model="form.actor_form_heading" placeholder="Ready to Perform? Submit Your Auditions"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Form Description (Hint Text)</label>
+                                                        <textarea x-model="form.actor_form_description" rows="2" placeholder="Shoot your dialog scene and song audition, then upload both videos..."
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Shows below form heading as instruction text</p>
                                                     </div>
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
