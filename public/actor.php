@@ -522,9 +522,9 @@ if (!empty($songScripts)) {
 
     <!-- Terms & Conditions Checkbox -->
     <div style="margin-top:1.25rem">
-      <label style="display:flex;align-items:start;gap:.75rem;cursor:pointer;user-select:none">
-        <input type="checkbox" x-model="termsAccepted" style="margin-top:.25rem;width:18px;height:18px;cursor:pointer;accent-color:#111">
-        <span style="color:#374151;font-size:.85rem;line-height:1.5"><?= htmlspecialchars($settingsModel->get('actor_terms_text', 'I agree to the terms and conditions and confirm all information provided is accurate')) ?></span>
+      <label style="display:flex;align-items:center;gap:.85rem;cursor:pointer;user-select:none">
+        <input type="checkbox" x-model="termsAccepted" style="width:20px;height:20px;cursor:pointer;accent-color:#111;flex-shrink:0">
+        <span style="color:#111;font-size:1rem;font-weight:600;line-height:1.5"><?= htmlspecialchars($settingsModel->get('actor_terms_text', 'I agree to the terms and conditions and confirm all information provided is accurate')) ?></span>
       </label>
     </div>
 
