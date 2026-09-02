@@ -44,6 +44,18 @@ $step3Text       = setting('actor_step3_text', 'Two audition videos');
 $formHeading     = setting('actor_form_heading', 'Ready to Perform? Submit Your Auditions');
 $formDescription = setting('actor_form_description', 'Shoot your dialog scene and song audition, then upload both videos below.');
 
+// Form field labels and placeholders
+$fieldNameLabel = setting('actor_field_name_label', 'Name *');
+$fieldNamePlaceholder = setting('actor_field_name_placeholder', 'Your full name');
+$fieldEmailLabel = setting('actor_field_email_label', 'Email *');
+$fieldEmailPlaceholder = setting('actor_field_email_placeholder', 'you@email.com');
+$fieldPhoneLabel = setting('actor_field_phone_label', 'Phone *');
+$fieldPhonePlaceholder = setting('actor_field_phone_placeholder', '+91 98765 43210');
+$fieldDialogVideoLabel = setting('actor_field_dialog_video_label', 'Dialog Audition Video *');
+$fieldDialogVideoHint = setting('actor_field_dialog_video_hint', 'dialog video');
+$fieldSongVideoLabel = setting('actor_field_song_video_label', 'Song Audition Video *');
+$fieldSongVideoHint = setting('actor_field_song_video_hint', 'song video');
+
 // Film Song card text (admin-editable)
 $filmSongHeading  = setting('film_song_heading',  'FILM SONG');
 $filmSongSubtitle = setting('film_song_subtitle', 'Listen to the song before you record your audition');
@@ -487,9 +499,9 @@ if (!empty($songScripts)) {
 
     <!-- Contact -->
     <div class="form3">
-      <div><label class="fp-label-dark">Name *</label><input type="text" x-model="form.name" class="fp-input-dark" placeholder="Your full name" required autocomplete="name"></div>
-      <div><label class="fp-label-dark">Email *</label><input type="email" x-model="form.email" class="fp-input-dark" placeholder="you@email.com" required autocomplete="email"></div>
-      <div><label class="fp-label-dark">Phone *</label><input type="tel" x-model="form.phone" class="fp-input-dark" placeholder="+91 98765 43210" required autocomplete="tel"></div>
+      <div><label class="fp-label-dark"><?= htmlspecialchars($fieldNameLabel) ?></label><input type="text" x-model="form.name" class="fp-input-dark" placeholder="<?= htmlspecialchars($fieldNamePlaceholder) ?>" required autocomplete="name"></div>
+      <div><label class="fp-label-dark"><?= htmlspecialchars($fieldEmailLabel) ?></label><input type="email" x-model="form.email" class="fp-input-dark" placeholder="<?= htmlspecialchars($fieldEmailPlaceholder) ?>" required autocomplete="email"></div>
+      <div><label class="fp-label-dark"><?= htmlspecialchars($fieldPhoneLabel) ?></label><input type="tel" x-model="form.phone" class="fp-input-dark" placeholder="<?= htmlspecialchars($fieldPhonePlaceholder) ?>" required autocomplete="tel"></div>
     </div>
 
     <div class="divider-dark"></div>
@@ -497,21 +509,21 @@ if (!empty($songScripts)) {
     <!-- Dual upload -->
     <div class="upload2">
       <div>
-        <label class="fp-label-dark" style="margin-bottom:.5rem">Dialog Audition Video *</label>
+        <label class="fp-label-dark" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldDialogVideoLabel) ?></label>
         <div class="uzone" :class="[dragD?'drag':'',dialogFile?'has-file':'']" @click="$refs.dv.click()" @dragover.prevent="dragD=true" @dragleave="dragD=false" @drop.prevent="dropD($event)">
           <input type="file" x-ref="dv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="dialogFile=$event.target.files[0]">
           <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> dialog video</p>
+          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> <?= htmlspecialchars($fieldDialogVideoHint) ?></p>
           <p style="color:#9ca3af;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
           <p x-show="dialogFile" x-text="'✓ '+(dialogFile?dialogFile.name:'')" style="display:none;color:#16a34a;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
       </div>
       <div>
-        <label class="fp-label-dark" style="margin-bottom:.5rem">Song Audition Video *</label>
+        <label class="fp-label-dark" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldSongVideoLabel) ?></label>
         <div class="uzone" :class="[dragS?'drag':'',songFile?'has-file':'']" @click="$refs.sv.click()" @dragover.prevent="dragS=true" @dragleave="dragS=false" @drop.prevent="dropS($event)">
           <input type="file" x-ref="sv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="songFile=$event.target.files[0]">
           <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> song video</p>
+          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> <?= htmlspecialchars($fieldSongVideoHint) ?></p>
           <p style="color:#9ca3af;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
           <p x-show="songFile" x-text="'✓ '+(songFile?songFile.name:'')" style="display:none;color:#16a34a;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>

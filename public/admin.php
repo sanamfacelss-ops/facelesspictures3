@@ -5124,6 +5124,74 @@ if (file_exists($errorLogFile)) {
                                                 </div>
                                             </div>
 
+                                            <!-- Form Field Labels & Placeholders -->
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Form Field Customization</p>
+                                                <p class="text-[10px] text-dark/50 mb-3">Customize labels and placeholder text for each form field</p>
+                                                <div class="space-y-3">
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Name Label</label>
+                                                            <input type="text" x-model="form.actor_field_name_label" placeholder="Name *"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Name Placeholder</label>
+                                                            <input type="text" x-model="form.actor_field_name_placeholder" placeholder="Your full name"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Email Label</label>
+                                                            <input type="text" x-model="form.actor_field_email_label" placeholder="Email *"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Email Placeholder</label>
+                                                            <input type="text" x-model="form.actor_field_email_placeholder" placeholder="you@email.com"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Phone Label</label>
+                                                            <input type="text" x-model="form.actor_field_phone_label" placeholder="Phone *"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Phone Placeholder</label>
+                                                            <input type="text" x-model="form.actor_field_phone_placeholder" placeholder="+91 98765 43210"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Dialog Video Label</label>
+                                                            <input type="text" x-model="form.actor_field_dialog_video_label" placeholder="Dialog Audition Video *"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Dialog Video Hint</label>
+                                                            <input type="text" x-model="form.actor_field_dialog_video_hint" placeholder="dialog video"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Song Video Label</label>
+                                                            <input type="text" x-model="form.actor_field_song_video_label" placeholder="Song Audition Video *"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Song Video Hint</label>
+                                                            <input type="text" x-model="form.actor_field_song_video_hint" placeholder="song video"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <!-- Submission Messages -->
                                             <div class="border-t border-dark/10 pt-4 mt-4">
                                                 <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-3">Submission Messages</p>
@@ -8751,6 +8819,16 @@ if (file_exists($errorLogFile)) {
                 actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
                 actor_terms_text:       <?= json_encode($settingsModel->get('actor_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
+                actor_field_name_label: <?= json_encode($settingsModel->get('actor_field_name_label','Name *')) ?>,
+                actor_field_name_placeholder: <?= json_encode($settingsModel->get('actor_field_name_placeholder','Your full name')) ?>,
+                actor_field_email_label: <?= json_encode($settingsModel->get('actor_field_email_label','Email *')) ?>,
+                actor_field_email_placeholder: <?= json_encode($settingsModel->get('actor_field_email_placeholder','you@email.com')) ?>,
+                actor_field_phone_label: <?= json_encode($settingsModel->get('actor_field_phone_label','Phone *')) ?>,
+                actor_field_phone_placeholder: <?= json_encode($settingsModel->get('actor_field_phone_placeholder','+91 98765 43210')) ?>,
+                actor_field_dialog_video_label: <?= json_encode($settingsModel->get('actor_field_dialog_video_label','Dialog Audition Video *')) ?>,
+                actor_field_dialog_video_hint: <?= json_encode($settingsModel->get('actor_field_dialog_video_hint','dialog video')) ?>,
+                actor_field_song_video_label: <?= json_encode($settingsModel->get('actor_field_song_video_label','Song Audition Video *')) ?>,
+                actor_field_song_video_hint: <?= json_encode($settingsModel->get('actor_field_song_video_hint','song video')) ?>,
                 // Actor submission messages
                 actor_success_heading: <?= json_encode($settingsModel->get('actor_success_heading','ACTOR SUBMISSION RECEIVED!')) ?>,
                 actor_success_message: <?= json_encode($settingsModel->get('actor_success_message',"Your acting video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
