@@ -222,24 +222,23 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 
 <?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
-<!-- HERO: Video First, Full Width -->
-<section style="margin-top:<?= $headerHeight ?>px" class="fade-up">
-  <!-- Hero Text Content - Centered -->
-  <div class="hero-text-content" style="text-align:center;padding:1.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
+<!-- HERO -->
+<section style="padding:<?= $headerHeight + 8 ?>px 1.5rem 3rem;text-align:center" class="fade-up">
+  <div style="max-width:900px;margin:0 auto">
     
     <!-- Small uppercase label/subheading -->
     <?php if (!empty($heroLabel)): ?>
-    <p class="hero-label" style="font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroLabel) ?></p>
+    <p style="font-size:.63rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9ca3af;margin-bottom:1rem"><?= htmlspecialchars($heroLabel) ?></p>
     <?php endif; ?>
     
     <!-- Large main heading/question -->
     <?php if (!empty($heroHeading)): ?>
-    <h1 class="hero-heading" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,40px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.65rem;font-weight:400;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,40px);letter-spacing:.04em;line-height:1;color:#111;margin-bottom:.65rem;white-space:nowrap"><?= htmlspecialchars($heroHeading) ?></h1>
     <?php endif; ?>
     
     <!-- Small gray tagline at bottom -->
     <?php if (!empty($heroDescription)): ?>
-    <p class="hero-description" style="color:#9ca3af;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
+    <p style="color:#6b7280;font-size:.85rem;max-width:480px;margin:0 auto;line-height:1.55"><?= nl2br(htmlspecialchars($heroDescription)) ?></p>
     <?php endif; ?>
     
   </div>
