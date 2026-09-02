@@ -5102,92 +5102,96 @@ if (file_exists($errorLogFile)) {
                                                 </div>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
-                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form Text</p>
-                                                <div class="space-y-2">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form</p>
+                                                <div class="space-y-3">
+                                                    <!-- 1. Form Heading -->
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
                                                         <input type="text" x-model="form.actor_form_heading" placeholder="Ready to Perform? Submit Your Auditions"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
+                                                    
+                                                    <!-- 2. Form Description -->
                                                     <div>
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Description (Hint Text)</label>
                                                         <textarea x-model="form.actor_form_description" rows="2" placeholder="Shoot your dialog scene and song audition, then upload both videos..."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Shows below form heading as instruction text</p>
                                                     </div>
-                                                    <div>
+                                                    
+                                                    <!-- 3. Form Field Customization -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <p class="text-[10px] font-semibold text-dark/70 mb-2">Form Field Labels & Placeholders</p>
+                                                        <div class="space-y-2">
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Name Label</label>
+                                                                    <input type="text" x-model="form.actor_field_name_label" placeholder="Name *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Name Placeholder</label>
+                                                                    <input type="text" x-model="form.actor_field_name_placeholder" placeholder="Your full name"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Email Label</label>
+                                                                    <input type="text" x-model="form.actor_field_email_label" placeholder="Email *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Email Placeholder</label>
+                                                                    <input type="text" x-model="form.actor_field_email_placeholder" placeholder="you@email.com"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Phone Label</label>
+                                                                    <input type="text" x-model="form.actor_field_phone_label" placeholder="Phone *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Phone Placeholder</label>
+                                                                    <input type="text" x-model="form.actor_field_phone_placeholder" placeholder="+91 98765 43210"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Dialog Video Label</label>
+                                                                    <input type="text" x-model="form.actor_field_dialog_video_label" placeholder="Dialog Audition Video *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Dialog Video Hint</label>
+                                                                    <input type="text" x-model="form.actor_field_dialog_video_hint" placeholder="dialog video"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-2">
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Song Video Label</label>
+                                                                    <input type="text" x-model="form.actor_field_song_video_label" placeholder="Song Audition Video *"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[10px] text-dark/50 mb-1">Song Video Hint</label>
+                                                                    <input type="text" x-model="form.actor_field_song_video_hint" placeholder="song video"
+                                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- 4. Terms & Conditions -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
                                                         <textarea x-model="form.actor_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Form Field Labels & Placeholders -->
-                                            <div class="border-t border-dark/10 pt-3 mt-3">
-                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Form Field Customization</p>
-                                                <p class="text-[10px] text-dark/50 mb-3">Customize labels and placeholder text for each form field</p>
-                                                <div class="space-y-3">
-                                                    <div class="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Name Label</label>
-                                                            <input type="text" x-model="form.actor_field_name_label" placeholder="Name *"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Name Placeholder</label>
-                                                            <input type="text" x-model="form.actor_field_name_placeholder" placeholder="Your full name"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                    </div>
-                                                    <div class="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Email Label</label>
-                                                            <input type="text" x-model="form.actor_field_email_label" placeholder="Email *"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Email Placeholder</label>
-                                                            <input type="text" x-model="form.actor_field_email_placeholder" placeholder="you@email.com"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                    </div>
-                                                    <div class="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Phone Label</label>
-                                                            <input type="text" x-model="form.actor_field_phone_label" placeholder="Phone *"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Phone Placeholder</label>
-                                                            <input type="text" x-model="form.actor_field_phone_placeholder" placeholder="+91 98765 43210"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                    </div>
-                                                    <div class="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Dialog Video Label</label>
-                                                            <input type="text" x-model="form.actor_field_dialog_video_label" placeholder="Dialog Audition Video *"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Dialog Video Hint</label>
-                                                            <input type="text" x-model="form.actor_field_dialog_video_hint" placeholder="dialog video"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                    </div>
-                                                    <div class="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Song Video Label</label>
-                                                            <input type="text" x-model="form.actor_field_song_video_label" placeholder="Song Audition Video *"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Song Video Hint</label>
-                                                            <input type="text" x-model="form.actor_field_song_video_hint" placeholder="song video"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -8778,6 +8782,14 @@ if (file_exists($errorLogFile)) {
                 writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
                 writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
                 writer_terms_text:       <?= json_encode($settingsModel->get('writer_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
+                writer_field_name_label: <?= json_encode($settingsModel->get('writer_field_name_label','Name *')) ?>,
+                writer_field_name_placeholder: <?= json_encode($settingsModel->get('writer_field_name_placeholder','Your full name')) ?>,
+                writer_field_email_label: <?= json_encode($settingsModel->get('writer_field_email_label','Email *')) ?>,
+                writer_field_email_placeholder: <?= json_encode($settingsModel->get('writer_field_email_placeholder','you@email.com')) ?>,
+                writer_field_phone_label: <?= json_encode($settingsModel->get('writer_field_phone_label','Phone *')) ?>,
+                writer_field_phone_placeholder: <?= json_encode($settingsModel->get('writer_field_phone_placeholder','+91 98765 43210')) ?>,
+                writer_field_video_label: <?= json_encode($settingsModel->get('writer_field_video_label','Narration Video *')) ?>,
+                writer_field_video_hint: <?= json_encode($settingsModel->get('writer_field_video_hint','your narration video')) ?>,
                 // Writer submission card and messages
                 writer_card_title: <?= json_encode($settingsModel->get('writer_card_title','WRITER SUBMISSION')) ?>,
                 writer_success_heading: <?= json_encode($settingsModel->get('writer_success_heading','WRITER SUBMISSION RECEIVED!')) ?>,
@@ -8799,6 +8811,14 @@ if (file_exists($errorLogFile)) {
                 director_form_heading:     <?= json_encode($settingsModel->get('director_form_heading','Ready to Direct? Submit Your Scene')) ?>,
                 director_form_description: <?= json_encode($settingsModel->get('director_form_description','Cast your actor, give them the script, shoot the scene, and upload your video.')) ?>,
                 director_terms_text:       <?= json_encode($settingsModel->get('director_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
+                director_field_name_label: <?= json_encode($settingsModel->get('director_field_name_label','Name *')) ?>,
+                director_field_name_placeholder: <?= json_encode($settingsModel->get('director_field_name_placeholder','Your full name')) ?>,
+                director_field_email_label: <?= json_encode($settingsModel->get('director_field_email_label','Email *')) ?>,
+                director_field_email_placeholder: <?= json_encode($settingsModel->get('director_field_email_placeholder','you@email.com')) ?>,
+                director_field_phone_label: <?= json_encode($settingsModel->get('director_field_phone_label','Phone *')) ?>,
+                director_field_phone_placeholder: <?= json_encode($settingsModel->get('director_field_phone_placeholder','+91 98765 43210')) ?>,
+                director_field_video_label: <?= json_encode($settingsModel->get('director_field_video_label','Director Scene Video *')) ?>,
+                director_field_video_hint: <?= json_encode($settingsModel->get('director_field_video_hint','your scene video')) ?>,
                 // Director submission messages
                 director_success_heading: <?= json_encode($settingsModel->get('director_success_heading','DIRECTOR SUBMISSION RECEIVED!')) ?>,
                 director_success_message: <?= json_encode($settingsModel->get('director_success_message',"Your director video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
