@@ -183,14 +183,9 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         </button>
       <?php endif; ?>
     </div>
-    <div class="card-sec tinted" style="flex:1"></div>
-  </div><!-- /brief-card -->
-
-  <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
-  <div class="submit-card" style="margin:0" x-data="writerSubmit()">
     
-    <!-- 3-STEP PROCESS (inside submission card) -->
-    <div style="margin:-1.5rem -1.5rem 1.5rem;padding:1.5rem;background:#fafafa;border-bottom:1px solid #e5e7eb">
+    <!-- 3-STEP PROCESS BAR (moved from right submission card) -->
+    <div class="card-sec" style="background:#fafafa;border-top:1px solid #e5e7eb">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem">
         
         <!-- STEP 1 -->
@@ -227,16 +222,23 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         </div>
 
       </div>
-    </div>
-
-    <style>
-      @media (max-width: 768px) {
-        .submit-card > div:first-child > div {
-          grid-template-columns: 1fr !important;
+      
+      <!-- Mobile: stack vertically -->
+      <style>
+        @media (max-width: 768px) {
+          .brief-card .card-sec > div[style*="grid-template-columns:repeat(3,1fr)"] {
+            grid-template-columns: 1fr !important;
+          }
         }
-      }
-    </style>
+      </style>
+    </div>
+    
+    <div class="card-sec tinted" style="flex:1"></div>
+  </div><!-- /brief-card -->
 
+  <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
+  <div class="submit-card" style="margin:0" x-data="writerSubmit()">
+    
     <?php if (!empty($formHeading)): ?>
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:1.25rem"><?= htmlspecialchars($formHeading) ?></p>
     <?php endif; ?>
