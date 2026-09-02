@@ -68,7 +68,7 @@ class UploadController
             }
 
             $errors = [];
-            if (strlen($title) < 3) $errors[] = 'Title must be at least 3 characters.';
+            if (empty(trim($title))) $errors[] = 'Title is required.';
             if (!$seasonId) $errors[] = 'Season is required.';
             if (!$this->seasonModel->findById($seasonId)) $errors[] = 'Invalid season.';
             

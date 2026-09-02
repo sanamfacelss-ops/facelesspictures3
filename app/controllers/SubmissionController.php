@@ -72,8 +72,8 @@ class SubmissionController
             if (empty($auditionType)) {
                 $errors[] = 'Audition type is required.';
             }
-            if (strlen($name) < 2) {
-                $errors[] = 'Full name must be at least 2 characters.';
+            if (empty(trim($name))) {
+                $errors[] = 'Full name is required.';
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'A valid email address is required.';
