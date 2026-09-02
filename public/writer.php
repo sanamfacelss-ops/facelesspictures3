@@ -272,6 +272,14 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
       <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
     </div>
 
+    <!-- Terms & Conditions Checkbox -->
+    <div style="margin-top:1.25rem">
+      <label style="display:flex;align-items:start;gap:.75rem;cursor:pointer;user-select:none">
+        <input type="checkbox" x-model="termsAccepted" style="margin-top:.25rem;width:18px;height:18px;cursor:pointer;accent-color:#111">
+        <span style="color:#374151;font-size:.85rem;line-height:1.5"><?= htmlspecialchars($settingsModel->get('writer_terms_text', 'I agree to the terms and conditions and confirm all information provided is accurate')) ?></span>
+      </label>
+    </div>
+
     <!-- Errors -->
     <div x-show="errors.length" style="display:none" class="err-dark">
       <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
@@ -306,6 +314,7 @@ function writerSubmit(){
         videoFile:null,
         loading:false,progress:0,errors:[],
         drag:false,
+        termsAccepted:false,
         form:{name:'',email:'',phone:''},
         onDrop(e){this.drag=false;var f=e.dataTransfer.files[0];if(f)this.videoFile=f;},
         submit(){
@@ -314,6 +323,7 @@ function writerSubmit(){
             if(!this.form.email.trim()) this.errors.push('Email is required.');
             if(!this.form.phone.trim()) this.errors.push('Phone is required.');
             if(!this.videoFile) this.errors.push('Narration video is required.');
+            if(!this.termsAccepted) this.errors.push('You must accept the terms and conditions.');
             if(this.errors.length) return;
             this.loading=true; this.progress=0;
             var fd=new FormData();

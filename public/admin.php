@@ -4795,6 +4795,12 @@ if (file_exists($errorLogFile)) {
                                                         <input type="text" x-model="form.writer_form_heading" placeholder="Ready to Write? Submit Your Continuation"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
+                                                        <textarea x-model="form.writer_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -4944,6 +4950,12 @@ if (file_exists($errorLogFile)) {
                                                         <input type="text" x-model="form.director_form_heading" placeholder="Ready to Direct? Submit Your Scene"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
+                                                        <textarea x-model="form.director_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -5084,6 +5096,12 @@ if (file_exists($errorLogFile)) {
                                                         <label class="block text-[10px] text-dark/50 mb-1">Form Heading</label>
                                                         <input type="text" x-model="form.actor_form_heading" placeholder="Ready to Perform? Submit Your Auditions"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
+                                                        <textarea x-model="form.actor_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -8673,6 +8691,7 @@ if (file_exists($errorLogFile)) {
                 writer_step3_text:       <?= json_encode($settingsModel->get('writer_step3_text','Your page PDF plus narration video')) ?>,
                 writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
                 writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
+                writer_terms_text:       <?= json_encode($settingsModel->get('writer_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
                 // Writer submission card and messages
                 writer_card_title: <?= json_encode($settingsModel->get('writer_card_title','WRITER SUBMISSION')) ?>,
                 writer_success_heading: <?= json_encode($settingsModel->get('writer_success_heading','WRITER SUBMISSION RECEIVED!')) ?>,
@@ -8693,6 +8712,7 @@ if (file_exists($errorLogFile)) {
                 director_step3_text:       <?= json_encode($settingsModel->get('director_step3_text','Your scene video')) ?>,
                 director_form_heading:     <?= json_encode($settingsModel->get('director_form_heading','Ready to Direct? Submit Your Scene')) ?>,
                 director_form_description: <?= json_encode($settingsModel->get('director_form_description','Cast your actor, give them the script, shoot the scene, and upload your video.')) ?>,
+                director_terms_text:       <?= json_encode($settingsModel->get('director_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
                 // Director submission messages
                 director_success_heading: <?= json_encode($settingsModel->get('director_success_heading','DIRECTOR SUBMISSION RECEIVED!')) ?>,
                 director_success_message: <?= json_encode($settingsModel->get('director_success_message',"Your director video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
@@ -8712,6 +8732,7 @@ if (file_exists($errorLogFile)) {
                 actor_step3_text:       <?= json_encode($settingsModel->get('actor_step3_text','Two audition videos')) ?>,
                 actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
+                actor_terms_text:       <?= json_encode($settingsModel->get('actor_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
                 // Actor submission messages
                 actor_success_heading: <?= json_encode($settingsModel->get('actor_success_heading','ACTOR SUBMISSION RECEIVED!')) ?>,
                 actor_success_message: <?= json_encode($settingsModel->get('actor_success_message',"Your acting video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
