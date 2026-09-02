@@ -349,7 +349,6 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     </div>
     <?php endif; ?>
     <div class="card-sec">
-      <div class="sec-label"><?= $isSong ? 'Lyrics' : 'Script' ?></div>
       <div class="btn-row">
         <?php if ($isSong): ?>
           <?php if ($pdfUrl): ?>
