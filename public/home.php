@@ -914,7 +914,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <div style="max-width:1400px;margin:0 auto">
     
     <!-- Stats Grid -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:3rem;margin-bottom:3rem">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:3rem;margin-bottom:5rem">
       
       <!-- Stat 1 -->
       <div>
