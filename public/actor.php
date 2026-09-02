@@ -223,7 +223,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 <?php require_once __DIR__ . '/partials/nav-frontend.php'; ?>
 
 <!-- HERO -->
-<section style="padding:<?= $headerHeight + 8 ?>px 1.5rem 3rem;text-align:center" class="fade-up">
+<section style="padding:<?= $headerHeight + 32 ?>px 1.5rem 3rem;text-align:center" class="fade-up">
   <div style="max-width:900px;margin:0 auto">
     
     <!-- Small uppercase label/subheading -->
