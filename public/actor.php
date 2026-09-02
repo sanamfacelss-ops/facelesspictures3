@@ -480,6 +480,10 @@ if (!empty($songScripts)) {
     <?php if (!empty($formHeading)): ?>
     <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3.5vw,32px);letter-spacing:.04em;color:#111;margin-bottom:1.5rem"><?= htmlspecialchars($formHeading) ?></p>
     <?php endif; ?>
+    
+    <?php if (!empty($formDescription)): ?>
+    <p style="color:#6b7280;font-size:.95rem;line-height:1.6;margin-bottom:1.75rem"><?= nl2br(htmlspecialchars($formDescription)) ?></p>
+    <?php endif; ?>
 
     <!-- Contact -->
     <div class="form3">
