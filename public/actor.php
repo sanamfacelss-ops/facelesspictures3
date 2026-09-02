@@ -386,7 +386,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
           </div>
         </div>
       <?php else: ?>
-        <div class="media-9-16 placeholder-bg">
+        <div style="width:100%;height:160px;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase">
           <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           Preview video coming soon
         </div>
