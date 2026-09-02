@@ -186,16 +186,16 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     
     <!-- 3-STEP PROCESS BAR (moved from right submission card) -->
     <div class="card-sec" style="background:#fafafa;border-top:1px solid #e5e7eb">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:1.25rem">
         
         <!-- STEP 1 -->
         <div style="display:flex;align-items:flex-start;gap:.75rem;min-width:0">
           <div style="width:40px;height:40px;background:#fff;border:1px solid #e5e7eb;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
-          <div style="min-width:0;flex:1">
-            <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1"><?= htmlspecialchars($step1Title) ?></h4>
-            <p style="color:#6b7280;font-size:.78rem;line-height:1.4;word-wrap:break-word"><?= htmlspecialchars($step1Text) ?></p>
+          <div style="min-width:0;flex:1;overflow:hidden">
+            <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><?= htmlspecialchars($step1Title) ?></h4>
+            <p style="color:#6b7280;font-size:.78rem;line-height:1.4;overflow-wrap:break-word"><?= htmlspecialchars($step1Text) ?></p>
           </div>
         </div>
 
@@ -204,9 +204,9 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
           <div style="width:40px;height:40px;background:#fff;border:1px solid #e5e7eb;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
           </div>
-          <div style="min-width:0;flex:1">
-            <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1"><?= htmlspecialchars($step2Title) ?></h4>
-            <p style="color:#6b7280;font-size:.78rem;line-height:1.4;word-wrap:break-word"><?= htmlspecialchars($step2Text) ?></p>
+          <div style="min-width:0;flex:1;overflow:hidden">
+            <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><?= htmlspecialchars($step2Title) ?></h4>
+            <p style="color:#6b7280;font-size:.78rem;line-height:1.4;overflow-wrap:break-word"><?= htmlspecialchars($step2Text) ?></p>
           </div>
         </div>
 
@@ -215,9 +215,9 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
           <div style="width:40px;height:40px;background:#fff;border:1px solid #e5e7eb;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
           </div>
-          <div style="min-width:0;flex:1">
-            <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1"><?= htmlspecialchars($step3Title) ?></h4>
-            <p style="color:#6b7280;font-size:.78rem;line-height:1.4;word-wrap:break-word"><?= htmlspecialchars($step3Text) ?></p>
+          <div style="min-width:0;flex:1;overflow:hidden">
+            <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.05em;color:#111;margin-bottom:.25rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><?= htmlspecialchars($step3Title) ?></h4>
+            <p style="color:#6b7280;font-size:.78rem;line-height:1.4;overflow-wrap:break-word"><?= htmlspecialchars($step3Text) ?></p>
           </div>
         </div>
 
