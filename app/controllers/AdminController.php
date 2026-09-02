@@ -80,7 +80,7 @@ class AdminController
 
         $errors = [];
         if (strlen($title) < 2) $errors[] = 'Title is required';
-        if (strlen($content) < 10) $errors[] = 'Content must be at least 10 characters';
+        if (strlen($content) < 3) $errors[] = 'Content must be at least 3 characters';
         if (!in_array($category, ['actor', 'director', 'writer'])) $errors[] = 'Invalid category';
         if (!in_array($difficulty, ['beginner', 'intermediate', 'advanced'])) $errors[] = 'Invalid difficulty';
 
@@ -136,7 +136,7 @@ class AdminController
 
         $errors = [];
         if (strlen($title) < 2) $errors[] = 'Title is required';
-        if (strlen($content) < 10) $errors[] = 'Content must be at least 10 characters';
+        if (strlen($content) < 3) $errors[] = 'Content must be at least 3 characters';
         if (!in_array($category, ['actor', 'director', 'writer'])) $errors[] = 'Invalid category';
         if (!in_array($difficulty, ['beginner', 'intermediate', 'advanced'])) $errors[] = 'Invalid difficulty';
 
@@ -473,11 +473,9 @@ class AdminController
             return;
         }
 
-        if (strlen($content) < 10) {
-            http_response_code(422);
-            echo json_encode(['error' => 'Guide content must be at least 10 characters']);
-            return;
-        }
+        // Content validation removed - allow any length
+
+        http_response_code(200);
 
         try {
             $settingsModel = new \App\Models\Settings();
