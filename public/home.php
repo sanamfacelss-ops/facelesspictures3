@@ -995,7 +995,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       foreach ($statsLines as $line):
           if (!empty(trim($line))):
       ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem;font-weight:600 !important"><?= htmlspecialchars($line) ?></p>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem;font-weight:800 !important"><?= htmlspecialchars($line) ?></p>
       <?php 
           endif;
       endforeach;

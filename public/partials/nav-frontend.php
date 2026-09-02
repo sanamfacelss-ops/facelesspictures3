@@ -402,6 +402,23 @@ body.menu-open {
     });
   });
   
+  // Desktop navigation: About link handler for non-home pages
+  const desktopLinks = document.querySelectorAll('.desktop-menu .nav-link');
+  desktopLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      
+      // Special handling for About link on non-home pages
+      if (!isHomePage && href.includes('#about')) {
+        e.preventDefault();
+        // Force navigation to home page with hash
+        window.location.href = '/#about';
+      }
+      
+      // Let other links work normally
+    });
+  });
+  
   // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {

@@ -225,7 +225,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 <!-- HERO: Video First, Full Width -->
 <section style="margin-top:<?= $headerHeight ?>px" class="fade-up">
   <!-- Hero Text Content - Centered -->
-  <div class="hero-text-content" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
+  <div class="hero-text-content" style="text-align:center;padding:1.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
     
     <!-- Small uppercase label/subheading -->
     <?php if (!empty($heroLabel)): ?>
