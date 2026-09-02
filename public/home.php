@@ -921,7 +921,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_1', '10')) ?>
         </div>
-        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:800">
           <?= htmlspecialchars($settingsModel->get('stats_label_1', 'FILMS')) ?>
         </div>
       </div>
@@ -931,7 +931,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_2', '100')) ?>
         </div>
-        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:800">
           <?= htmlspecialchars($settingsModel->get('stats_label_2', 'SCENES')) ?>
         </div>
       </div>
@@ -941,7 +941,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_3', '30')) ?>
         </div>
-        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:800">
           <?= htmlspecialchars($settingsModel->get('stats_label_3', 'DAYS')) ?>
         </div>
       </div>
@@ -951,7 +951,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_4', '20')) ?>
         </div>
-        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:800">
           <?= htmlspecialchars($settingsModel->get('stats_label_4', 'ARTISTS')) ?>
         </div>
       </div>
@@ -961,7 +961,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_5', '150')) ?>
         </div>
-        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
+        <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:800">
           <?= htmlspecialchars($settingsModel->get('stats_label_5', 'LIVES')) ?>
         </div>
       </div>
