@@ -918,7 +918,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 1 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900;line-height:1;margin-bottom:0.25rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_1', '10')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -928,7 +928,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 2 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900;line-height:1;margin-bottom:0.25rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_2', '100')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -938,7 +938,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 3 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900;line-height:1;margin-bottom:0.25rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_3', '30')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -948,7 +948,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 4 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900;line-height:1;margin-bottom:0.25rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_4', '20')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -958,7 +958,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       
       <!-- Stat 5 -->
       <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900;line-height:1;margin-bottom:0.25rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5rem);color:#f5e6a3;font-weight:900 !important;line-height:1;margin-bottom:0.25rem">
           <?= htmlspecialchars($settingsModel->get('stats_number_5', '150')) ?>
         </div>
         <div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">
@@ -995,7 +995,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       foreach ($statsLines as $line):
           if (!empty(trim($line))):
       ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem;font-weight:600"><?= htmlspecialchars($line) ?></p>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem;font-weight:600 !important"><?= htmlspecialchars($line) ?></p>
       <?php 
           endif;
       endforeach;

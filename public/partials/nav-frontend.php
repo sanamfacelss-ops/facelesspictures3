@@ -393,7 +393,7 @@ body.menu-open {
       if (!isHomePage && href.includes('#about')) {
         e.preventDefault();
         // Force navigation to home page with hash
-        window.location.href = '/home.php#about';
+        window.location.href = '/#about';
         return;
       }
       
