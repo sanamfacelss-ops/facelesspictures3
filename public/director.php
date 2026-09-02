@@ -186,8 +186,18 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
       <?php endif; ?>
     </div>
     
-    <!-- 3-STEP PROCESS BAR (moved from right submission card) -->
-    <div class="card-sec" style="background:#fafafa;border-top:1px solid #e5e7eb">
+    <div class="card-sec tinted" style="flex:1"></div>
+  </div><!-- /brief-card -->
+
+  <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
+  <div class="submit-card" style="margin:0" x-data="directorSubmit()">
+    
+    <?php if (!empty($formHeading)): ?>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:1.25rem"><?= htmlspecialchars($formHeading) ?></p>
+    <?php endif; ?>
+
+    <!-- 3-STEP PROCESS BAR (moved below heading, above video field) -->
+    <div style="margin-bottom:1.5rem;padding:1.5rem;background:#fafafa;border:1px solid #e5e7eb;border-radius:10px">
       <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:1.25rem">
         
         <!-- STEP 1 -->
@@ -228,22 +238,12 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
       <!-- Mobile: stack vertically -->
       <style>
         @media (max-width: 768px) {
-          .brief-card .card-sec > div[style*="grid-template-columns:repeat(3,1fr)"] {
+          .submit-card > div > div[style*="grid-template-columns"] {
             grid-template-columns: 1fr !important;
           }
         }
       </style>
     </div>
-    
-    <div class="card-sec tinted" style="flex:1"></div>
-  </div><!-- /brief-card -->
-
-  <!-- RIGHT: SUBMISSION CARD (direct grid child) -->
-  <div class="submit-card" style="margin:0" x-data="directorSubmit()">
-    
-    <?php if (!empty($formHeading)): ?>
-    <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,28px);letter-spacing:.04em;color:#111;margin-bottom:1.25rem"><?= htmlspecialchars($formHeading) ?></p>
-    <?php endif; ?>
 
     <!-- Contact -->
     <div class="form3">
