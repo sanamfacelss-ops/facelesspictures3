@@ -79,8 +79,8 @@ class AdminController
         $rules            = trim($_POST['rules']             ?? '');
 
         $errors = [];
-        if (strlen($title) < 2) $errors[] = 'Title is required';
-        if (strlen($content) < 3) $errors[] = 'Content must be at least 3 characters';
+        if (empty(trim($title))) $errors[] = 'Title is required';
+        // No character minimum - allow any length
         if (!in_array($category, ['actor', 'director', 'writer'])) $errors[] = 'Invalid category';
         if (!in_array($difficulty, ['beginner', 'intermediate', 'advanced'])) $errors[] = 'Invalid difficulty';
 
@@ -135,8 +135,8 @@ class AdminController
         $rules        = trim($_POST['rules']         ?? '');
 
         $errors = [];
-        if (strlen($title) < 2) $errors[] = 'Title is required';
-        if (strlen($content) < 3) $errors[] = 'Content must be at least 3 characters';
+        if (empty(trim($title))) $errors[] = 'Title is required';
+        // No character minimum - allow any length
         if (!in_array($category, ['actor', 'director', 'writer'])) $errors[] = 'Invalid category';
         if (!in_array($difficulty, ['beginner', 'intermediate', 'advanced'])) $errors[] = 'Invalid difficulty';
 
@@ -208,7 +208,7 @@ class AdminController
         $status = trim($_POST['status'] ?? 'active');
 
         $errors = [];
-        if (strlen($title) < 2) $errors[] = 'Title is required';
+        if (empty(trim($title))) $errors[] = 'Title is required';
         if (empty($startDate)) $errors[] = 'Start date is required';
         if (empty($endDate)) $errors[] = 'End date is required';
         if (!in_array($status, ['active', 'closed', 'upcoming'])) $errors[] = 'Invalid status';
@@ -253,7 +253,7 @@ class AdminController
         $status = trim($_POST['status'] ?? 'active');
 
         $errors = [];
-        if (strlen($title) < 2) $errors[] = 'Title is required';
+        if (empty(trim($title))) $errors[] = 'Title is required';
         if (empty($startDate)) $errors[] = 'Start date is required';
         if (empty($endDate)) $errors[] = 'End date is required';
         if (!in_array($status, ['active', 'closed', 'upcoming'])) $errors[] = 'Invalid status';
