@@ -3196,11 +3196,10 @@ class AdminController
     }
 
     /**
-     * Extract text from uploaded legal document (PDF, TXT)
+     * Extract text from uploaded legal document (DOCX, DOC, PDF, TXT)
      * POST /api/admin/extract-legal-document
      * 
-     * Note: DOCX not supported due to server ZipArchive extension requirement
-     * Users should save Word docs as .txt first
+     * Uses manual ZIP parsing for DOCX to avoid ZipArchive dependency
      */
     public function extractLegalDocument(): void
     {
@@ -3254,28 +3253,21 @@ class AdminController
                     throw new \Exception('Failed to read TXT file');
                 }
             }
+            // Handle DOCX files (without ZipArchive - manual extraction)
+            else if (str_ends_with($fileName, '.docx')) {
+                $content = $this->extractDocxText($tmpPath);
+            }
+            // Handle old DOC files (binary format)
+            else if (str_ends_with($fileName, '.doc')) {
+                $content = $this->extractDocText($tmpPath);
+            }
             // Handle PDF files
             else if (str_ends_with($fileName, '.pdf')) {
-                // Try to read as text
-                $rawContent = file_get_contents($tmpPath);
-                if ($rawContent === false) {
-                    throw new \Exception('Failed to read PDF file');
-                }
-                
-                // Basic PDF text extraction (extract text between parentheses)
-                if (preg_match_all('/\(([^)]+)\)/i', $rawContent, $matches)) {
-                    $content = implode(' ', $matches[1]);
-                    // Clean up PDF encoding artifacts
-                    $content = str_replace(['\\(', '\\)', '\\\\', '\\n', '\\r'], ['(', ')', '\\', "\n", "\r"], $content);
-                }
-                
-                if (empty(trim($content))) {
-                    throw new \Exception('PDF appears to be scanned/image-based. Please:\n1. Copy text from PDF manually, OR\n2. Convert PDF to text using an online tool, OR\n3. Save as .txt file from Word/Google Docs');
-                }
+                $content = $this->extractPdfText($tmpPath);
             }
             else {
                 http_response_code(422);
-                echo json_encode(['error' => 'Unsupported file type. Please upload .txt or .pdf\n\n💡 For Word documents:\nOpen in Word → File → Save As → Choose "Plain Text (.txt)"']);
+                echo json_encode(['error' => 'Unsupported file type. Please upload .docx, .doc, .pdf, or .txt']);
                 return;
             }
             
@@ -3303,6 +3295,119 @@ class AdminController
             http_response_code(500);
             echo json_encode(['error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Extract text from DOCX file without ZipArchive
+     * Manually parses ZIP structure and extracts document.xml
+     */
+    private function extractDocxText(string $filePath): string
+    {
+        $fileContent = file_get_contents($filePath);
+        if ($fileContent === false) {
+            throw new \Exception('Failed to read DOCX file');
+        }
+        
+        // DOCX is a ZIP file, find document.xml in it
+        // Look for the local file header signature (PK\x03\x04) and document.xml
+        $xmlContent = '';
+        
+        // Try to extract using ZipArchive if available
+        if (class_exists('ZipArchive')) {
+            $zip = new \ZipArchive();
+            if ($zip->open($filePath) === true) {
+                $xmlContent = $zip->getFromName('word/document.xml');
+                $zip->close();
+            }
+        }
+        
+        // Fallback: Manual extraction by searching for XML content
+        if (empty($xmlContent)) {
+            // Find document.xml content between ZIP entries
+            if (preg_match('/word\/document\.xml.*?<\?xml.*?<\/w:document>/s', $fileContent, $matches)) {
+                $xmlContent = $matches[0];
+                // Clean up binary data before XML
+                $xmlContent = preg_replace('/^.*?(<\?xml)/s', '$1', $xmlContent);
+            } else {
+                throw new \Exception('Could not extract document.xml from DOCX file. File may be corrupted.');
+            }
+        }
+        
+        if (empty($xmlContent)) {
+            throw new \Exception('DOCX file appears to be empty or corrupted');
+        }
+        
+        // Parse XML and extract text with structure
+        $dom = new \DOMDocument();
+        @$dom->loadXML($xmlContent);
+        
+        $paragraphs = [];
+        $paras = $dom->getElementsByTagName('p');
+        
+        foreach ($paras as $para) {
+            $textNodes = $para->getElementsByTagName('t');
+            $paraText = '';
+            foreach ($textNodes as $t) {
+                $paraText .= $t->nodeValue;
+            }
+            if (trim($paraText)) {
+                $paragraphs[] = trim($paraText);
+            }
+        }
+        
+        return implode("\n\n", $paragraphs);
+    }
+
+    /**
+     * Extract text from old DOC file (binary format)
+     */
+    private function extractDocText(string $filePath): string
+    {
+        $fileContent = file_get_contents($filePath);
+        if ($fileContent === false) {
+            throw new \Exception('Failed to read DOC file');
+        }
+        
+        // Old DOC format is binary, extract printable ASCII text
+        // Remove binary characters and extract readable text
+        $text = preg_replace('/[^\x20-\x7E\x0A\x0D]/', ' ', $fileContent);
+        
+        // Clean up multiple spaces
+        $text = preg_replace('/\s+/', ' ', $text);
+        
+        // Try to identify paragraph breaks (heuristic)
+        $text = preg_replace('/(\w)\s{10,}(\w)/', "$1\n\n$2", $text);
+        
+        if (strlen(trim($text)) < 100) {
+            throw new \Exception('Could not extract readable text from DOC file. Please save as DOCX format for better results.');
+        }
+        
+        return $text;
+    }
+
+    /**
+     * Extract text from PDF file
+     */
+    private function extractPdfText(string $filePath): string
+    {
+        $rawContent = file_get_contents($filePath);
+        if ($rawContent === false) {
+            throw new \Exception('Failed to read PDF file');
+        }
+        
+        // Basic PDF text extraction (extract text between parentheses)
+        $content = '';
+        if (preg_match_all('/\(([^)]+)\)/i', $rawContent, $matches)) {
+            $content = implode(' ', $matches[1]);
+            // Clean up PDF encoding artifacts
+            $content = str_replace(['\\(', '\\)', '\\\\', '\\n', '\\r'], ['(', ')', '\\', "\n", "\r"], $content);
+        }
+        
+        if (empty(trim($content))) {
+            throw new \Exception('PDF appears to be scanned/image-based. Please use a text-based PDF or save as DOCX from Word.');
+        }
+        
+        return $content;
     }
 }
 
