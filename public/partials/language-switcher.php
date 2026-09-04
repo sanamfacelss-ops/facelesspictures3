@@ -16,19 +16,20 @@ iframe.skiptranslate{display:none!important}
   display:flex;align-items:center;gap:.45rem;
   font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);
-  transition:all .3s ease;user-select:none;
+  transition:all .5s ease;user-select:none;
 }
 #fp-lang-btn:hover{background:#333;transform:translateY(-2px)}
-#fp-lang-btn svg{width:15px;height:15px;flex-shrink:0}
+#fp-lang-btn svg{width:15px;height:15px;flex-shrink:0;transition:all .5s ease;}
 
 /* Mobile: auto-hide text after 3 seconds, center icon */
 @media(max-width:768px){
   #fp-lang-btn{bottom:1rem;right:1rem;}
   #fp-lang-btn.icon-only{padding:.7rem;border-radius:50%;width:44px;height:44px;justify-content:center;align-items:center;display:flex;}
   #fp-lang-btn.icon-only #fp-lang-label{
-    opacity:0;width:0;overflow:hidden;margin:0;padding:0;display:none;
+    opacity:0;width:0;overflow:hidden;margin:0;padding:0;transition:opacity .5s ease, width .5s ease;
   }
   #fp-lang-btn.icon-only svg{margin:0;}
+  #fp-lang-label{transition:opacity .5s ease, width .5s ease;}
 }
 
 /* Desktop: always show icon + text (no auto-hide) */
