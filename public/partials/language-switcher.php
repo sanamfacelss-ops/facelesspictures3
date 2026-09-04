@@ -20,12 +20,22 @@ iframe.skiptranslate{display:none!important}
 }
 #fp-lang-btn:hover{background:#333;transform:translateY(-2px)}
 #fp-lang-btn svg{width:15px;height:15px;flex-shrink:0}
-#fp-lang-btn.icon-only{padding:.7rem;border-radius:50%;width:44px;height:44px;justify-content:center;}
-#fp-lang-btn.icon-only #fp-lang-label{
-  opacity:0;width:0;overflow:hidden;margin:0;padding:0;
-}
+
+/* Mobile: auto-hide text after 3 seconds, center icon */
 @media(max-width:768px){
   #fp-lang-btn{bottom:1rem;right:1rem;}
+  #fp-lang-btn.icon-only{padding:.7rem;border-radius:50%;width:44px;height:44px;justify-content:center;}
+  #fp-lang-btn.icon-only #fp-lang-label{
+    opacity:0;width:0;overflow:hidden;margin:0;padding:0;
+  }
+}
+
+/* Desktop: always show icon + text (no auto-hide) */
+@media(min-width:769px){
+  #fp-lang-btn.icon-only{padding:.5rem 1rem .5rem .75rem!important;border-radius:999px!important;width:auto!important;height:auto!important;}
+  #fp-lang-btn.icon-only #fp-lang-label{
+    opacity:1!important;width:auto!important;overflow:visible!important;
+  }
 }
 
 /* Dropdown */
