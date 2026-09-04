@@ -100,6 +100,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .btn-go{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.9rem 1.5rem;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .15s;margin-top:1.25rem}
 .btn-go:hover{background:#333}
 .btn-go:disabled{opacity:.4;cursor:not-allowed}
+.pill-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border:1.5px solid #111;border-radius:999px;font-size:.8rem;color:#111;text-decoration:none;font-weight:600;background:#fff;transition:all .2s;white-space:nowrap;cursor:pointer}
+.pill-btn:hover{background:#111;color:#fff}
+.pill-btn svg{transition:all .2s}
+.pill-btn:hover svg{color:#fff}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .4s ease forwards}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -287,15 +291,15 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     </div>
 
     <!-- Terms & Conditions Checkbox -->
-    <div style="margin-top:1.25rem">
-      <label style="display:flex;align-items:center;gap:.85rem;cursor:pointer;user-select:none;flex-wrap:wrap">
+    <div style="margin-top:1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:.85rem;cursor:pointer;user-select:none">
         <input type="checkbox" x-model="termsAccepted" style="width:20px;height:20px;cursor:pointer;accent-color:#111;flex-shrink:0">
         <span style="color:#111;font-size:1rem;font-weight:600;line-height:1.5"><?= $termsText ?></span>
-        <a href="/legal" target="_blank" style="display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;color:#2563eb;text-decoration:none;font-weight:600;margin-left:auto;white-space:nowrap">
-          <svg style="width:13px;height:13px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Read Terms
-        </a>
       </label>
+      <a href="/legal" target="_blank" class="pill-btn">
+        <svg style="width:13px;height:13px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Read Terms
+      </a>
     </div>
 
     <!-- Errors -->
