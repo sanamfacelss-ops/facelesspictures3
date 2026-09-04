@@ -212,6 +212,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .divider-dark{height:1px;background:#e5e7eb;margin:1.25rem 0}
 .upload2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 @media(max-width:580px){.upload2{grid-template-columns:1fr}}
+.fp-label-dark{display:block;color:#111;font-size:.875rem;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:.01em}
 .uzone{border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;background:#fff;text-align:center;padding:1.25rem 1rem;transition:border-color .2s,background .2s}
 .uzone:hover,.uzone.drag{border-color:#111;background:#f9fafb}
 .uzone.has-file{border-color:#16a34a;border-style:solid;background:#f0fdf4}
