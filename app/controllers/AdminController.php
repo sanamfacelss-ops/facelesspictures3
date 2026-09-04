@@ -3299,77 +3299,85 @@ class AdminController
 
     /**
      * Extract text from DOCX file without ZipArchive
-     * Manually parses ZIP structure and extracts document.xml
+     * Uses phar:// stream wrapper or manual ZIP parsing
      */
     private function extractDocxText(string $filePath): string
     {
-        $fileContent = file_get_contents($filePath);
-        if ($fileContent === false) {
-            throw new \Exception('Failed to read DOCX file');
-        }
-        
-        // DOCX is a ZIP file, find document.xml in it
         $xmlContent = '';
         
-        // Try to extract using ZipArchive if available
+        // Method 1: Try ZipArchive if available
         if (class_exists('ZipArchive')) {
             $zip = new \ZipArchive();
             if ($zip->open($filePath) === true) {
                 $xmlContent = $zip->getFromName('word/document.xml');
                 $zip->close();
-                
-                if (!$xmlContent) {
-                    throw new \Exception('Could not find document.xml in DOCX file');
-                }
             }
         }
         
-        // Fallback: Manual extraction from ZIP structure
+        // Method 2: Try phar:// stream wrapper (works without ZipArchive)
         if (empty($xmlContent)) {
-            // Find the central directory to locate document.xml
-            // Look for the file entry in the ZIP
-            $docXmlPos = strpos($fileContent, 'word/document.xml');
-            
-            if ($docXmlPos === false) {
-                throw new \Exception('This DOCX file structure is not recognized. Try opening in Word and saving as a new DOCX file.');
+            try {
+                // Rename to .zip temporarily to use phar://
+                $zipPath = $filePath . '.zip';
+                copy($filePath, $zipPath);
+                
+                $xmlContent = @file_get_contents('zip://' . $zipPath . '#word/document.xml');
+                
+                unlink($zipPath); // Clean up
+            } catch (\Exception $e) {
+                // Continue to next method
+            }
+        }
+        
+        // Method 3: Manual binary extraction
+        if (empty($xmlContent)) {
+            $fileContent = file_get_contents($filePath);
+            if ($fileContent === false) {
+                throw new \Exception('Failed to read DOCX file');
             }
             
-            // Find the actual XML content
-            // Look for <?xml or <w:document which marks the start of document.xml
-            $xmlStartPos = strpos($fileContent, '<?xml version', $docXmlPos);
-            if ($xmlStartPos === false) {
-                // Try alternative start
-                $xmlStartPos = strpos($fileContent, '<w:document', $docXmlPos);
+            // Find where document.xml starts in the ZIP
+            $marker = 'word/document.xml';
+            $pos = strpos($fileContent, $marker);
+            
+            if ($pos === false) {
+                throw new \Exception('This file does not appear to be a valid DOCX format. Please ensure it was saved as .docx in Word.');
             }
             
-            if ($xmlStartPos === false) {
+            // Look for XML start after the filename
+            $searchStart = $pos + strlen($marker);
+            
+            // Find <?xml declaration
+            $xmlStart = strpos($fileContent, '<?xml', $searchStart);
+            if ($xmlStart === false) {
+                // Try alternate start tag
+                $xmlStart = strpos($fileContent, '<w:document', $searchStart);
+            }
+            
+            if ($xmlStart === false || $xmlStart > $searchStart + 1000) {
                 throw new \Exception('Could not locate XML content in DOCX. Please save the file again in Word.');
             }
             
-            // Find the end of the XML (</w:document>)
-            $xmlEndPos = strpos($fileContent, '</w:document>', $xmlStartPos);
-            if ($xmlEndPos === false) {
-                throw new \Exception('DOCX XML structure is incomplete');
+            // Find XML end
+            $xmlEnd = strpos($fileContent, '</w:document>', $xmlStart);
+            if ($xmlEnd === false) {
+                throw new \Exception('DOCX XML structure is incomplete. File may be corrupted.');
             }
             
-            $xmlEndPos += strlen('</w:document>');
-            $xmlContent = substr($fileContent, $xmlStartPos, $xmlEndPos - $xmlStartPos);
+            $xmlEnd += strlen('</w:document>');
+            $xmlContent = substr($fileContent, $xmlStart, $xmlEnd - $xmlStart);
             
-            // Clean up any binary data that might be mixed in
-            $xmlContent = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $xmlContent);
+            // Remove any binary/control characters
+            $xmlContent = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $xmlContent);
         }
         
         if (empty($xmlContent)) {
-            throw new \Exception('DOCX file appears to be empty or corrupted. Try saving it again.');
+            throw new \Exception('Could not extract content from DOCX. Try copying the text manually.');
         }
         
-        // Parse XML and extract text with structure
+        // Parse XML and extract text
         $dom = new \DOMDocument();
-        $loaded = @$dom->loadXML($xmlContent);
-        
-        if (!$loaded) {
-            throw new \Exception('Could not parse DOCX XML structure. File may be corrupted.');
-        }
+        @$dom->loadXML($xmlContent);
         
         $paragraphs = [];
         $paras = $dom->getElementsByTagName('p');
@@ -3387,7 +3395,7 @@ class AdminController
         }
         
         if (empty($paragraphs)) {
-            throw new \Exception('No text found in DOCX file. Document may be empty.');
+            throw new \Exception('No text found in DOCX. Document may be empty or only contain images.');
         }
         
         return implode("\n\n", $paragraphs);
