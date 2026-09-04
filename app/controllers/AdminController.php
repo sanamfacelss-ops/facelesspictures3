@@ -2356,6 +2356,13 @@ class AdminController
             'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
             'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
             'writer_card_title',
+            // Actor Page Text Fields
+            'actor_field_name_label', 'actor_field_name_placeholder',
+            'actor_field_email_label', 'actor_field_email_placeholder',
+            'actor_field_phone_label', 'actor_field_phone_placeholder',
+            'actor_field_dialog_video_label', 'actor_field_dialog_video_hint',
+            'actor_field_song_video_label', 'actor_field_song_video_hint',
+            'actor_terms_text',
             // Legal page
             'legal_heading', 'legal_content',
             // Social Media
