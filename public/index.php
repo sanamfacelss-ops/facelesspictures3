@@ -269,6 +269,7 @@ $pageRoutes = [
     'actor'    => 'actor.php',
     'director' => 'director.php',
     'writer'   => 'writer.php',
+    'legal'    => 'legal.php',
 ];
 
 if (isset($pageRoutes[$uri])) {

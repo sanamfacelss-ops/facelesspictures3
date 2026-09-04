@@ -36,7 +36,6 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;overflow-x:hidden}
 body{font-family:'DM Sans','Noto Sans Devanagari',sans-serif;background:#f9fafb;color:#111;-webkit-font-smoothing:antialiased;line-height:1.7}
-.fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50}
 .legal-container{max-width:900px;margin:0 auto;padding:0 2rem 5rem}
 .legal-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,48px);letter-spacing:.06em;color:#111;margin-bottom:2rem;text-align:center}
 .legal-content{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:3rem;box-shadow:0 1px 4px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.06)}
