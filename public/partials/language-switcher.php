@@ -24,10 +24,11 @@ iframe.skiptranslate{display:none!important}
 /* Mobile: auto-hide text after 3 seconds, center icon */
 @media(max-width:768px){
   #fp-lang-btn{bottom:1rem;right:1rem;}
-  #fp-lang-btn.icon-only{padding:.7rem;border-radius:50%;width:44px;height:44px;justify-content:center;}
+  #fp-lang-btn.icon-only{padding:.7rem;border-radius:50%;width:44px;height:44px;justify-content:center;align-items:center;display:flex;}
   #fp-lang-btn.icon-only #fp-lang-label{
-    opacity:0;width:0;overflow:hidden;margin:0;padding:0;
+    opacity:0;width:0;overflow:hidden;margin:0;padding:0;display:none;
   }
+  #fp-lang-btn.icon-only svg{margin:0;}
 }
 
 /* Desktop: always show icon + text (no auto-hide) */
