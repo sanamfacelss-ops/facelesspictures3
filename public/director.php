@@ -37,7 +37,7 @@ $fieldPhoneLabel = setting('director_field_phone_label', 'Phone *');
 $fieldPhonePlaceholder = setting('director_field_phone_placeholder', '+91 98765 43210');
 $fieldVideoLabel = setting('director_field_video_label', 'Director Scene Video *');
 $fieldVideoHint = setting('director_field_video_hint', 'your scene video');
-$termsText = setting('director_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#111;text-decoration:underline">terms and conditions</a> and confirm all information provided is accurate');
+$termsText = setting('director_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate');
 ?>
 <!DOCTYPE html>
 <html lang="en">

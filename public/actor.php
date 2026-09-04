@@ -55,7 +55,7 @@ $fieldDialogueVideoLabel = setting('actor_field_dialog_video_label', 'Dialogue A
 $fieldDialogueVideoHint = setting('actor_field_dialog_video_hint', 'dialogue video');
 $fieldSongVideoLabel = setting('actor_field_song_video_label', 'Song Audition Video *');
 $fieldSongVideoHint = setting('actor_field_song_video_hint', 'song video');
-$termsText = setting('actor_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#111;text-decoration:underline">terms and conditions</a> and confirm all information provided is accurate');
+$termsText = setting('actor_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate');
 
 // Film Song card text (admin-editable)
 $filmSongHeading  = setting('film_song_heading',  'FILM SONG');

@@ -37,7 +37,7 @@ $fieldPhoneLabel = setting('writer_field_phone_label', 'Phone *');
 $fieldPhonePlaceholder = setting('writer_field_phone_placeholder', '+91 98765 43210');
 $fieldVideoLabel = setting('writer_field_video_label', 'Narration Video *');
 $fieldVideoHint = setting('writer_field_video_hint', 'your narration video');
-$termsText = setting('writer_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#111;text-decoration:underline">terms and conditions</a> and confirm all information provided is accurate');
+$termsText = setting('writer_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate');
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -4951,9 +4951,9 @@ The page will automatically format headings and paragraphs."
                                                     <!-- 4. Terms & Conditions -->
                                                     <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
-                                                        <textarea x-model="form.writer_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
+                                                        <textarea x-model="form.writer_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
-                                                        <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -5172,9 +5172,9 @@ The page will automatically format headings and paragraphs."
                                                     <!-- 4. Terms & Conditions -->
                                                     <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
-                                                        <textarea x-model="form.director_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
+                                                        <textarea x-model="form.director_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
-                                                        <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -5397,9 +5397,9 @@ The page will automatically format headings and paragraphs."
                                                     <!-- 4. Terms & Conditions -->
                                                     <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
-                                                        <textarea x-model="form.actor_terms_text" rows="2" placeholder="I agree to the terms and conditions and confirm all information is accurate"
+                                                        <textarea x-model="form.actor_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
-                                                        <p class="text-[9px] text-dark/30 mt-1">Mandatory checkbox users must check before submitting</p>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
                                                     </div>
                                                 </div>
                                             </div>
