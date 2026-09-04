@@ -38,7 +38,9 @@ html,body{width:100%;overflow-x:hidden}
 body{font-family:'DM Sans','Noto Sans Devanagari',sans-serif;background:#f9fafb;color:#111;-webkit-font-smoothing:antialiased;line-height:1.7}
 .legal-container{max-width:1200px;margin:0 auto;padding:0 2rem 5rem}
 .legal-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,48px);letter-spacing:.06em;color:#111;margin-bottom:2rem;text-align:center}
-.legal-content{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:4rem;box-shadow:0 1px 4px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.06);line-height:1.9;white-space:pre-wrap;font-size:1rem;color:#374151}
+.legal-content{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:4rem;box-shadow:0 1px 4px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.06);font-size:1rem;color:#374151;line-height:1.7}
+.legal-content br{display:block;margin-top:0.5rem}
+.legal-content br+br{margin-top:1.5rem}
 @media(max-width:1024px){
   .legal-container{max-width:900px}
   .legal-content{padding:3rem}
