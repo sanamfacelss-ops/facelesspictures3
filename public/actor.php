@@ -511,7 +511,7 @@ if (!empty($songScripts)) {
     <!-- Dual upload -->
     <div class="upload2">
       <div>
-        <label class="fp-label-dark" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldDialogVideoLabel) ?></label>
+        <label class="fp-label-dark" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldDialogueVideoLabel) ?></label>
         <div class="uzone" :class="[dragD?'drag':'',dialogFile?'has-file':'']" @click="$refs.dv.click()" @dragover.prevent="dragD=true" @dragleave="dragD=false" @drop.prevent="dropD($event)">
           <input type="file" x-ref="dv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="dialogFile=$event.target.files[0]">
           <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
