@@ -543,14 +543,14 @@ if (!empty($songScripts)) {
     </div>
 
     <!-- Terms & Conditions Checkbox -->
-    <div style="margin-top:1.25rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-      <label style="display:flex;align-items:center;gap:.85rem;cursor:pointer;user-select:none">
-        <input type="checkbox" x-model="termsAccepted" style="width:20px;height:20px;cursor:pointer;accent-color:#111;flex-shrink:0">
-        <span style="color:#111;font-size:1rem;font-weight:600;line-height:1.5"><?= $termsText ?></span>
+    <div style="margin-top:1.25rem;border:1px solid #e5e7eb;border-radius:12px;padding:1rem 1.25rem;background:#fafafa;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <label style="display:flex;align-items:flex-start;gap:.75rem;cursor:pointer;user-select:none;flex:1">
+        <input type="checkbox" x-model="termsAccepted" style="width:18px;height:18px;margin-top:2px;cursor:pointer;accent-color:#111;flex-shrink:0">
+        <span style="color:#111;font-size:.95rem;font-weight:500;line-height:1.5">By clicking submit I agree to all terms and conditions</span>
       </label>
-      <a href="/legal" target="_blank" class="pill-btn">
-        <svg style="width:13px;height:13px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Read Terms
+      <a href="/legal" target="_blank" style="display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;color:#6b7280;text-decoration:none;font-weight:500;white-space:nowrap;transition:color .2s">
+        <svg style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+        Read terms
       </a>
     </div>
 
