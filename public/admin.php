@@ -4447,7 +4447,7 @@ if (file_exists($errorLogFile)) {
                                 <div x-show="showLegal" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
                                         <div class="mb-6 pb-6 border-b border-dark/5">
-                                            <p class="text-xs text-dark/40 mb-4">This is linked from the checkbox on all submission forms (Actor, Director, Writer).</p>
+                                            <p class="text-xs text-dark/40 mb-4">This content is linked from the checkbox on all submission forms (Actor, Director, Writer).</p>
                                             <div class="space-y-3">
                                                 <div>
                                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Page Heading</label>
@@ -4455,26 +4455,14 @@ if (file_exists($errorLogFile)) {
                                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                                 </div>
                                                 
-                                                <!-- File Upload Option -->
-                                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                                    <label class="block text-[12px] font-semibold text-dark mb-2">📄 Upload Legal Document (Optional)</label>
-                                                    <p class="text-[11px] text-dark/50 mb-3">Upload a Word (.docx), PDF (.pdf), or text (.txt) file - we'll extract and preserve the formatting</p>
-                                                    <div class="flex items-center gap-3">
-                                                        <input type="file" id="legalFileUpload" accept=".docx,.doc,.pdf,.txt" 
-                                                            class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-dark file:text-white hover:file:bg-dark/80 file:cursor-pointer">
-                                                        <button type="button" @click="uploadLegalFile()" 
-                                                            class="px-4 py-2 bg-dark text-white text-xs font-semibold rounded-lg hover:bg-dark/80 transition">
-                                                            Extract Text
-                                                        </button>
-                                                    </div>
-                                                    <p class="text-[10px] text-dark/40 mt-2">Headings, paragraphs, and structure will be preserved. After extracting, you can edit in the textarea below.</p>
-                                                </div>
-                                                
                                                 <div>
                                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Legal Content</label>
-                                                    <textarea x-model="form.legal_content" rows="12" placeholder="Paste your full legal terms and conditions here..."
-                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition font-mono text-xs leading-relaxed"></textarea>
-                                                    <p class="text-[11px] text-dark/30 mt-1">This text will be displayed on the /legal page. You can paste the full legal terms here or upload a document above.</p>
+                                                    <textarea x-model="form.legal_content" rows="20" placeholder="Paste your full legal terms and conditions here...
+
+Use double line breaks to separate sections.
+The page will automatically format headings and paragraphs."
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition leading-relaxed"></textarea>
+                                                    <p class="text-[11px] text-dark/30 mt-1">💡 Copy text from Word → Paste here → Separate sections with double line breaks → Save</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -9153,69 +9141,6 @@ if (file_exists($errorLogFile)) {
                 this.form.stats_line_2 = this.statsLines[1] || '';
                 this.form.stats_line_3 = this.statsLines[2] || '';
                 this.form.stats_line_4 = this.statsLines[3] || '';
-            },
-            async uploadLegalFile() {
-                const fileInput = document.getElementById('legalFileUpload');
-                const file = fileInput.files[0];
-                
-                if (!file) {
-                    alert('Please select a file first');
-                    return;
-                }
-                
-                // Check file type
-                const allowedTypes = ['.docx', '.doc', '.pdf', '.txt'];
-                const fileName = file.name.toLowerCase();
-                const isAllowed = allowedTypes.some(ext => fileName.endsWith(ext));
-                
-                if (!isAllowed) {
-                    alert('Please upload a Word (.docx/.doc), PDF (.pdf), or text (.txt) file');
-                    return;
-                }
-                
-                // Check file size (max 10MB)
-                if (file.size > 10 * 1024 * 1024) {
-                    alert('File is too large. Maximum size is 10MB.');
-                    return;
-                }
-                
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
-                
-                // Show loading state
-                const extractBtn = event.target;
-                const originalText = extractBtn.textContent;
-                extractBtn.disabled = true;
-                extractBtn.textContent = 'Extracting...';
-                
-                try {
-                    const response = await fetch('/api/admin/extract-legal-document', {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'same-origin'
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        this.form.legal_content = data.content;
-                        alert('✅ Document text extracted successfully!\n\n' + 
-                              'Extracted ' + data.chars + ' characters from ' + data.filename + '\n\n' +
-                              'You can now edit it in the textarea below and click "Save All Settings".');
-                        fileInput.value = ''; // Clear file input
-                    } else {
-                        alert('❌ Failed to extract text:\n\n' + (data.error || 'Unknown error') + 
-                              '\n\nPlease paste the text manually in the textarea below.');
-                    }
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    alert('❌ Upload failed:\n\n' + error.message + 
-                          '\n\nPlease try again or paste the text manually in the textarea below.');
-                } finally {
-                    extractBtn.disabled = false;
-                    extractBtn.textContent = originalText;
-                }
             },
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;
