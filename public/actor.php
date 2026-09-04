@@ -230,7 +230,10 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .terms-label{display:flex;align-items:flex-start;gap:.75rem;cursor:pointer;user-select:none;flex:1}
 .terms-label input{width:18px;height:18px;margin-top:2px;cursor:pointer;accent-color:#111;flex-shrink:0}
 .terms-label span{color:#111;font-size:.95rem;font-weight:500;line-height:1.5}
-.terms-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;color:#6b7280;text-decoration:none;font-weight:500;white-space:nowrap;transition:color .2s}
+.terms-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;color:#111;text-decoration:none;font-weight:500;white-space:nowrap;transition:all .2s;border:1.5px solid #e5e7eb;border-radius:999px;padding:.45rem .95rem;background:#fff}
+.terms-link:hover{background:#111;color:#fff;border-color:#111}
+.terms-link svg{transition:all .2s}
+.terms-link:hover svg{color:#fff}
 @media(max-width:768px){
   .terms-box{padding:.85rem 1rem;gap:.75rem}
   .terms-label{flex:1 1 100%;min-width:100%}
