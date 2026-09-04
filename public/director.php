@@ -100,7 +100,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .btn-go{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;background:#111;color:#fff;font-weight:700;border:none;border-radius:9px;padding:.9rem 1.5rem;font-size:.95rem;cursor:pointer;font-family:inherit;letter-spacing:.01em;transition:background .15s;margin-top:1.25rem}
 .btn-go:hover{background:#333}
 .btn-go:disabled{opacity:.4;cursor:not-allowed}
-.pill-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border:1.5px solid #111;border-radius:999px;font-size:.8rem;color:#111;text-decoration:none;font-weight:600;background:#fff;transition:all .2s;white-space:nowrap;cursor:pointer}
+.pill-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .85rem;border:1.5px solid #111;border-radius:999px;font-size:.75rem;color:#111;text-decoration:none;font-weight:600;background:#fff;transition:all .2s;white-space:nowrap;cursor:pointer}
 .pill-btn:hover{background:#111;color:#fff}
 .pill-btn svg{transition:all .2s}
 .pill-btn:hover svg{color:#fff}
