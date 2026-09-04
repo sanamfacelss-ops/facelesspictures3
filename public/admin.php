@@ -9173,28 +9173,48 @@ if (file_exists($errorLogFile)) {
                     return;
                 }
                 
+                // Check file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File is too large. Maximum size is 10MB.');
+                    return;
+                }
+                
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
                 
+                // Show loading state
+                const extractBtn = event.target;
+                const originalText = extractBtn.textContent;
+                extractBtn.disabled = true;
+                extractBtn.textContent = 'Extracting...';
+                
                 try {
                     const response = await fetch('/api/admin/extract-legal-document', {
                         method: 'POST',
-                        body: formData
+                        body: formData,
+                        credentials: 'same-origin'
                     });
                     
                     const data = await response.json();
                     
                     if (data.success) {
                         this.form.legal_content = data.content;
-                        alert('✅ Document text extracted successfully! You can now edit it in the textarea below.');
+                        alert('✅ Document text extracted successfully!\n\n' + 
+                              'Extracted ' + data.chars + ' characters from ' + data.filename + '\n\n' +
+                              'You can now edit it in the textarea below and click "Save All Settings".');
                         fileInput.value = ''; // Clear file input
                     } else {
-                        alert('❌ Failed to extract text: ' + (data.error || 'Unknown error'));
+                        alert('❌ Failed to extract text:\n\n' + (data.error || 'Unknown error') + 
+                              '\n\nPlease paste the text manually in the textarea below.');
                     }
                 } catch (error) {
                     console.error('Upload error:', error);
-                    alert('❌ Upload failed. Please try again or paste the text manually.');
+                    alert('❌ Upload failed:\n\n' + error.message + 
+                          '\n\nPlease try again or paste the text manually in the textarea below.');
+                } finally {
+                    extractBtn.disabled = false;
+                    extractBtn.textContent = originalText;
                 }
             },
             async saveLandingSettings() {

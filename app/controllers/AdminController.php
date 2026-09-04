@@ -3205,15 +3205,41 @@ class AdminController
         
         if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
 
-        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        if (!isset($_FILES['file'])) {
             http_response_code(422);
-            echo json_encode(['error' => 'No file uploaded or upload error']);
+            echo json_encode(['error' => 'No file uploaded']);
             return;
         }
 
         $file = $_FILES['file'];
+        
+        // Check for upload errors
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $errorMessages = [
+                UPLOAD_ERR_INI_SIZE => 'File exceeds server upload_max_filesize limit',
+                UPLOAD_ERR_FORM_SIZE => 'File exceeds form MAX_FILE_SIZE limit',
+                UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+                UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder on server',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+                UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload',
+            ];
+            $errorMsg = $errorMessages[$file['error']] ?? 'Unknown upload error (code: ' . $file['error'] . ')';
+            http_response_code(422);
+            echo json_encode(['error' => $errorMsg]);
+            return;
+        }
+
         $fileName = strtolower($file['name']);
         $tmpPath = $file['tmp_name'];
+        $fileSize = $file['size'];
+        
+        // File size check (10MB max)
+        if ($fileSize > 10 * 1024 * 1024) {
+            http_response_code(422);
+            echo json_encode(['error' => 'File too large. Maximum size is 10MB.']);
+            return;
+        }
         
         try {
             $content = '';
@@ -3221,72 +3247,69 @@ class AdminController
             // Handle TXT files
             if (str_ends_with($fileName, '.txt')) {
                 $content = file_get_contents($tmpPath);
+                if ($content === false) {
+                    throw new \Exception('Failed to read TXT file');
+                }
             }
             // Handle PDF files
             else if (str_ends_with($fileName, '.pdf')) {
-                // For PDF: Try to extract using pdftotext if available, otherwise read raw
-                if (function_exists('shell_exec') && stripos(ini_get('disable_functions'), 'shell_exec') === false) {
-                    $pdftext = shell_exec("pdftotext " . escapeshellarg($tmpPath) . " -");
-                    if ($pdftext) {
-                        $content = $pdftext;
-                    }
+                // Try to read as text
+                $rawContent = file_get_contents($tmpPath);
+                if ($rawContent === false) {
+                    throw new \Exception('Failed to read PDF file');
                 }
                 
-                // Fallback: Basic PDF text extraction
-                if (empty($content)) {
-                    $rawContent = file_get_contents($tmpPath);
-                    // Extract text between text markers (basic approach)
-                    if (preg_match_all('/\(([^)]+)\)/i', $rawContent, $matches)) {
-                        $content = implode("\n", $matches[1]);
-                    } else {
-                        $content = "Unable to extract text from PDF. Please use a text-based PDF or paste the content manually.";
-                    }
+                // Basic PDF text extraction (extract text between parentheses)
+                if (preg_match_all('/\(([^)]+)\)/i', $rawContent, $matches)) {
+                    $content = implode(' ', $matches[1]);
+                    // Clean up PDF encoding artifacts
+                    $content = str_replace(['\\(', '\\)', '\\\\'], ['(', ')', '\\'], $content);
+                }
+                
+                if (empty(trim($content))) {
+                    throw new \Exception('PDF appears to be scanned/image-based. Please use a text-based PDF or convert to .txt/.docx first.');
                 }
             }
             // Handle DOCX files
             else if (str_ends_with($fileName, '.docx')) {
-                // DOCX is a ZIP file containing XML
-                $zip = new \ZipArchive();
-                if ($zip->open($tmpPath) === true) {
-                    // Extract document.xml which contains the text
-                    $xml = $zip->getFromName('word/document.xml');
-                    $zip->close();
-                    
-                    if ($xml) {
-                        // Parse XML and extract text
-                        $dom = new \DOMDocument();
-                        $dom->loadXML($xml);
-                        
-                        // Get all text nodes
-                        $texts = $dom->getElementsByTagName('t');
-                        $paragraphs = [];
-                        $currentParagraph = '';
-                        
-                        foreach ($texts as $text) {
-                            $currentParagraph .= $text->nodeValue;
-                        }
-                        
-                        // Better approach: extract by paragraphs
-                        $paras = $dom->getElementsByTagName('p');
-                        $paragraphs = [];
-                        foreach ($paras as $para) {
-                            $textNodes = $para->getElementsByTagName('t');
-                            $paraText = '';
-                            foreach ($textNodes as $t) {
-                                $paraText .= $t->nodeValue;
-                            }
-                            if (trim($paraText)) {
-                                $paragraphs[] = trim($paraText);
-                            }
-                        }
-                        
-                        $content = implode("\n\n", $paragraphs);
-                    } else {
-                        $content = "Unable to extract text from DOCX file.";
-                    }
-                } else {
-                    $content = "Unable to open DOCX file.";
+                if (!class_exists('ZipArchive')) {
+                    throw new \Exception('ZipArchive extension not available on server. Please upload .txt or .pdf instead.');
                 }
+                
+                $zip = new \ZipArchive();
+                $zipStatus = $zip->open($tmpPath);
+                
+                if ($zipStatus !== true) {
+                    throw new \Exception('Failed to open DOCX file (error code: ' . $zipStatus . ')');
+                }
+                
+                // Extract document.xml which contains the text
+                $xml = $zip->getFromName('word/document.xml');
+                $zip->close();
+                
+                if (!$xml) {
+                    throw new \Exception('DOCX file structure is invalid or corrupted');
+                }
+                
+                // Parse XML and extract text
+                $dom = new \DOMDocument();
+                @$dom->loadXML($xml); // Suppress warnings
+                
+                // Extract by paragraphs
+                $paras = $dom->getElementsByTagName('p');
+                $paragraphs = [];
+                foreach ($paras as $para) {
+                    $textNodes = $para->getElementsByTagName('t');
+                    $paraText = '';
+                    foreach ($textNodes as $t) {
+                        $paraText .= $t->nodeValue;
+                    }
+                    if (trim($paraText)) {
+                        $paragraphs[] = trim($paraText);
+                    }
+                }
+                
+                $content = implode("\n\n", $paragraphs);
             }
             else {
                 http_response_code(422);
@@ -3296,14 +3319,14 @@ class AdminController
             
             // Clean up extracted content
             $content = trim($content);
-            $content = str_replace(["\r\n", "\r"], "\n", $content); // Normalize line breaks
-            $content = preg_replace('/\n{3,}/', "\n\n", $content); // Max 2 consecutive line breaks
-            
             if (empty($content)) {
-                http_response_code(422);
-                echo json_encode(['error' => 'No text could be extracted from the document']);
-                return;
+                throw new \Exception('No text could be extracted from the document');
             }
+            
+            // Normalize line breaks
+            $content = str_replace(["\r\n", "\r"], "\n", $content);
+            // Max 2 consecutive line breaks
+            $content = preg_replace('/\n{3,}/', "\n\n", $content);
             
             debug_log("Admin extracted legal document: {$fileName} (" . strlen($content) . " chars)", 'ADMIN');
             echo json_encode([
@@ -3316,7 +3339,7 @@ class AdminController
         } catch (\Exception $e) {
             log_exception($e, 'ADMIN_EXTRACT_LEGAL_DOC');
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to extract document: ' . $e->getMessage()]);
+            echo json_encode(['error' => $e->getMessage()]);
         }
     }
 }
