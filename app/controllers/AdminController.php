@@ -3196,8 +3196,11 @@ class AdminController
     }
 
     /**
-     * Extract text from uploaded legal document (DOCX, PDF, TXT)
+     * Extract text from uploaded legal document (PDF, TXT)
      * POST /api/admin/extract-legal-document
+     * 
+     * Note: DOCX not supported due to server ZipArchive extension requirement
+     * Users should save Word docs as .txt first
      */
     public function extractLegalDocument(): void
     {
@@ -3263,57 +3266,16 @@ class AdminController
                 if (preg_match_all('/\(([^)]+)\)/i', $rawContent, $matches)) {
                     $content = implode(' ', $matches[1]);
                     // Clean up PDF encoding artifacts
-                    $content = str_replace(['\\(', '\\)', '\\\\'], ['(', ')', '\\'], $content);
+                    $content = str_replace(['\\(', '\\)', '\\\\', '\\n', '\\r'], ['(', ')', '\\', "\n", "\r"], $content);
                 }
                 
                 if (empty(trim($content))) {
-                    throw new \Exception('PDF appears to be scanned/image-based. Please use a text-based PDF or convert to .txt/.docx first.');
+                    throw new \Exception('PDF appears to be scanned/image-based. Please:\n1. Copy text from PDF manually, OR\n2. Convert PDF to text using an online tool, OR\n3. Save as .txt file from Word/Google Docs');
                 }
-            }
-            // Handle DOCX files
-            else if (str_ends_with($fileName, '.docx')) {
-                if (!class_exists('ZipArchive')) {
-                    throw new \Exception('ZipArchive extension not available on server. Please upload .txt or .pdf instead.');
-                }
-                
-                $zip = new \ZipArchive();
-                $zipStatus = $zip->open($tmpPath);
-                
-                if ($zipStatus !== true) {
-                    throw new \Exception('Failed to open DOCX file (error code: ' . $zipStatus . ')');
-                }
-                
-                // Extract document.xml which contains the text
-                $xml = $zip->getFromName('word/document.xml');
-                $zip->close();
-                
-                if (!$xml) {
-                    throw new \Exception('DOCX file structure is invalid or corrupted');
-                }
-                
-                // Parse XML and extract text
-                $dom = new \DOMDocument();
-                @$dom->loadXML($xml); // Suppress warnings
-                
-                // Extract by paragraphs
-                $paras = $dom->getElementsByTagName('p');
-                $paragraphs = [];
-                foreach ($paras as $para) {
-                    $textNodes = $para->getElementsByTagName('t');
-                    $paraText = '';
-                    foreach ($textNodes as $t) {
-                        $paraText .= $t->nodeValue;
-                    }
-                    if (trim($paraText)) {
-                        $paragraphs[] = trim($paraText);
-                    }
-                }
-                
-                $content = implode("\n\n", $paragraphs);
             }
             else {
                 http_response_code(422);
-                echo json_encode(['error' => 'Unsupported file type. Please upload .docx, .pdf, or .txt']);
+                echo json_encode(['error' => 'Unsupported file type. Please upload .txt or .pdf\n\n💡 For Word documents:\nOpen in Word → File → Save As → Choose "Plain Text (.txt)"']);
                 return;
             }
             

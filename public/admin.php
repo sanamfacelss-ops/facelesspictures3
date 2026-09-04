@@ -4458,16 +4458,17 @@ if (file_exists($errorLogFile)) {
                                                 <!-- File Upload Option -->
                                                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                                     <label class="block text-[12px] font-semibold text-dark mb-2">📄 Upload Legal Document (Optional)</label>
-                                                    <p class="text-[11px] text-dark/50 mb-3">Upload a Word (.docx) or PDF (.pdf) file and we'll extract the text automatically</p>
+                                                    <p class="text-[11px] text-dark/50 mb-3">Upload a text (.txt) or PDF (.pdf) file. For Word documents, save as .txt first (File → Save As → Plain Text).</p>
                                                     <div class="flex items-center gap-3">
-                                                        <input type="file" id="legalFileUpload" accept=".docx,.pdf,.txt" 
+                                                        <input type="file" id="legalFileUpload" accept=".txt,.pdf" 
                                                             class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-dark file:text-white hover:file:bg-dark/80 file:cursor-pointer">
                                                         <button type="button" @click="uploadLegalFile()" 
                                                             class="px-4 py-2 bg-dark text-white text-xs font-semibold rounded-lg hover:bg-dark/80 transition">
                                                             Extract Text
                                                         </button>
                                                     </div>
-                                                    <p class="text-[10px] text-dark/40 mt-2">After extracting, the text will appear in the textarea below. You can then edit it if needed.</p>
+                                                    <p class="text-[10px] text-dark/40 mt-2">💡 <strong>For Word documents:</strong> Open in Word → File → Save As → Choose "Plain Text (.txt)" → Upload the .txt file here</p>
+                                                    <p class="text-[10px] text-dark/40 mt-1">After extracting, the text will appear in the textarea below for editing.</p>
                                                 </div>
                                                 
                                                 <div>
@@ -9164,12 +9165,12 @@ if (file_exists($errorLogFile)) {
                 }
                 
                 // Check file type
-                const allowedTypes = ['.docx', '.pdf', '.txt'];
+                const allowedTypes = ['.txt', '.pdf'];
                 const fileName = file.name.toLowerCase();
                 const isAllowed = allowedTypes.some(ext => fileName.endsWith(ext));
                 
                 if (!isAllowed) {
-                    alert('Please upload a .docx, .pdf, or .txt file');
+                    alert('Please upload a .txt or .pdf file.\n\n💡 For Word documents:\nOpen in Word → File → Save As → Choose "Plain Text (.txt)" → Upload the .txt file');
                     return;
                 }
                 
