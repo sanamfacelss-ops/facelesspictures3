@@ -102,9 +102,9 @@ $socialLinks = array_filter([
 
 <style>
 .fp-footer {
-  background: #0A0E1A;
-  border-top: 1px solid #1F2840;
-  color: #8B92A5;
+  background: #F5F5F5;
+  border-top: 1px solid #E0E0E0;
+  color: #4A5568;
   padding: 3rem 1.5rem 2rem;
   margin-top: auto;
 }
@@ -120,7 +120,7 @@ $socialLinks = array_filter([
   grid-template-columns: 1fr 2fr;
   gap: 3rem;
   padding-bottom: 2.5rem;
-  border-bottom: 1px solid #1F2840;
+  border-bottom: 1px solid #E0E0E0;
   margin-bottom: 2rem;
 }
 
@@ -150,12 +150,12 @@ $socialLinks = array_filter([
   font-family: 'Bebas Neue', sans-serif;
   font-size: 20px;
   letter-spacing: 0.06em;
-  color: #F0EBE0;
+  color: #1A202C;
 }
 
 .footer-badge {
-  background: #F0EBE0;
-  color: #0A0E1A;
+  background: #1A202C;
+  color: #FFFFFF;
   font-size: 10px;
   font-weight: 700;
   width: 19px;
@@ -168,7 +168,7 @@ $socialLinks = array_filter([
 }
 
 .footer-tagline {
-  color: #8B92A5;
+  color: #718096;
   font-size: 0.875rem;
   line-height: 1.5;
   max-width: 280px;
@@ -198,13 +198,13 @@ $socialLinks = array_filter([
   font-family: 'Bebas Neue', sans-serif;
   font-size: 0.875rem;
   letter-spacing: 0.08em;
-  color: #F0EBE0;
+  color: #1A202C;
   margin-bottom: 0.25rem;
   text-transform: uppercase;
 }
 
 .footer-link {
-  color: #8B92A5;
+  color: #4A5568;
   text-decoration: none;
   font-size: 0.875rem;
   transition: color 0.2s;
@@ -212,7 +212,7 @@ $socialLinks = array_filter([
 }
 
 .footer-link:hover {
-  color: #F0EBE0;
+  color: #1A202C;
 }
 
 /* Bottom Section */
@@ -233,7 +233,7 @@ $socialLinks = array_filter([
 
 .footer-copyright {
   font-size: 0.875rem;
-  color: #8B92A5;
+  color: #718096;
 }
 
 /* Social Links */
@@ -249,18 +249,18 @@ $socialLinks = array_filter([
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #FFFFFF;
+  border: 1px solid #E0E0E0;
   border-radius: 50%;
-  color: #8B92A5;
+  color: #4A5568;
   text-decoration: none;
   transition: all 0.2s;
 }
 
 .social-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #F0EBE0;
+  background: #E0E0E0;
+  border-color: #CBD5E0;
+  color: #1A202C;
   transform: translateY(-2px);
 }
 
