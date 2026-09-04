@@ -6,20 +6,20 @@ $scriptModel = new App\Models\Script();
 
 $logoUrl = setting('site_logo_url', '');
 
-// Load all actor scripts (dialog + song)
+// Load all actor scripts (dialogue + song)
 $actorScripts = $scriptModel->byCategory('actor');
 
 // Fallback global settings (used only if no scripts uploaded yet)
-$globalDialogBrief = setting('actor_dialog_script', 'Perform the following scene with full emotion.');
+$globalDialogueBrief = setting('actor_dialog_script', 'Perform the following scene with full emotion.');
 $globalSongBrief   = setting('actor_song_script', 'Perform a 60-second song showing emotional range.');
 
-// Split scripts by audition_type: dialog vs song
-$dialogScripts = array_values(array_filter($actorScripts, fn($s) => stripos($s['audition_type'] ?? '', 'song') === false));
+// Split scripts by audition_type: dialogue vs song
+$dialogueScripts = array_values(array_filter($actorScripts, fn($s) => stripos($s['audition_type'] ?? '', 'song') === false));
 $songScripts   = array_values(array_filter($actorScripts, fn($s) => stripos($s['audition_type'] ?? '', 'song') !== false));
 
-// If no song scripts, put all in dialog
-if (empty($songScripts) && !empty($dialogScripts)) {
-    // keep as is — two columns both dialog if needed
+// If no song scripts, put all in dialogue
+if (empty($songScripts) && !empty($dialogueScripts)) {
+    // keep as is — two columns both dialogue if needed
 }
 
 $pageTitle = 'Actor Auditions — Faceless Pictures 3';
@@ -34,15 +34,15 @@ if (file_exists($versionFile)) {
 // Page text settings
 $heroLabel       = setting('actor_hero_label', 'Auditions Now Open');
 $heroHeading     = setting('actor_hero_heading', 'ACTOR AUDITIONS');
-$heroDescription = setting('actor_hero_description', 'Two auditions, one submission. Read the dialog brief, learn the song, then shoot both videos.');
+$heroDescription = setting('actor_hero_description', 'Two auditions, one submission. Read the dialogue brief, learn the song, then shoot both videos.');
 $step1Title      = setting('actor_step1_title', 'WHAT WE GIVE');
-$step1Text       = setting('actor_step1_text', 'Dialog brief and song');
+$step1Text       = setting('actor_step1_text', 'Dialogue brief and song');
 $step2Title      = setting('actor_step2_title', 'WHAT YOU DO');
 $step2Text       = setting('actor_step2_text', 'Perform both auditions');
 $step3Title      = setting('actor_step3_title', 'SUBMIT');
 $step3Text       = setting('actor_step3_text', 'Two audition videos');
 $formHeading     = setting('actor_form_heading', 'Ready to Perform? Submit Your Auditions');
-$formDescription = setting('actor_form_description', 'Shoot your dialog scene and song audition, then upload both videos below.');
+$formDescription = setting('actor_form_description', 'Shoot your dialogue scene and song audition, then upload both videos below.');
 
 // Form field labels and placeholders
 $fieldNameLabel = setting('actor_field_name_label', 'Name *');
@@ -51,8 +51,8 @@ $fieldEmailLabel = setting('actor_field_email_label', 'Email *');
 $fieldEmailPlaceholder = setting('actor_field_email_placeholder', 'you@email.com');
 $fieldPhoneLabel = setting('actor_field_phone_label', 'Phone *');
 $fieldPhonePlaceholder = setting('actor_field_phone_placeholder', '+91 98765 43210');
-$fieldDialogVideoLabel = setting('actor_field_dialog_video_label', 'Dialog Audition Video *');
-$fieldDialogVideoHint = setting('actor_field_dialog_video_hint', 'dialog video');
+$fieldDialogueVideoLabel = setting('actor_field_dialog_video_label', 'Dialogue Audition Video *');
+$fieldDialogueVideoHint = setting('actor_field_dialog_video_hint', 'dialogue video');
 $fieldSongVideoLabel = setting('actor_field_song_video_label', 'Song Audition Video *');
 $fieldSongVideoHint = setting('actor_field_song_video_hint', 'song video');
 
@@ -307,7 +307,7 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
   </div>
 </section>
 
-<!-- TWO BRIEF CARDS (Dialog + Song) -->
+<!-- TWO BRIEF CARDS (Dialogue + Song) -->
 <div class="brief-grid">
 
 <?php
@@ -329,7 +329,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     $pdfUrl      = $sc['script_pdf_url']    ?? '';
     $tuneRaw     = $sc['tune_youtube_url']  ?? '';
     $title       = htmlspecialchars($sc['title']);
-    $audType     = htmlspecialchars($sc['audition_type'] ?? ($isSong ? 'Song Audition' : 'Dialog Audition'));
+    $audType     = htmlspecialchars($sc['audition_type'] ?? ($isSong ? 'Song Audition' : 'Dialogue Audition'));
     $brief       = htmlspecialchars($sc['content'] ?: $fallbackBrief);
     $rulesRaw    = $sc['rules'] ?? "Video under 3 minutes\nFace must not be visible\nClear audio required";
     $ruleList    = array_filter(array_map('trim', explode("\n", $rulesRaw)));
@@ -407,7 +407,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     <?php if ($imageUrl): ?>
     <div class="card-sec" style="padding:1.25rem 0 0;border-top:1px solid #e5e7eb;background:#fff">
       <div class="portrait-img-wrap" onclick="openImgLightbox('<?= addslashes(htmlspecialchars($imageUrl)) ?>')">
-        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialog script' ?>">
+        <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= $isSong ? 'Song lyrics' : 'Dialogue script' ?>">
       </div>
     </div>
     <?php endif; ?>
@@ -445,9 +445,9 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
 <?php
 }
 
-// Render dialog scripts — only if scripts exist
-if (!empty($dialogScripts)) {
-    foreach ($dialogScripts as $sc) renderActorBriefCard($sc, $globalDialogBrief, false);
+// Render dialogue scripts — only if scripts exist
+if (!empty($dialogueScripts)) {
+    foreach ($dialogueScripts as $sc) renderActorBriefCard($sc, $globalDialogueBrief, false);
 }
 
 // Render song scripts — only if scripts exist
