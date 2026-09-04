@@ -3309,7 +3309,6 @@ class AdminController
         }
         
         // DOCX is a ZIP file, find document.xml in it
-        // Look for the local file header signature (PK\x03\x04) and document.xml
         $xmlContent = '';
         
         // Try to extract using ZipArchive if available
@@ -3318,28 +3317,59 @@ class AdminController
             if ($zip->open($filePath) === true) {
                 $xmlContent = $zip->getFromName('word/document.xml');
                 $zip->close();
+                
+                if (!$xmlContent) {
+                    throw new \Exception('Could not find document.xml in DOCX file');
+                }
             }
         }
         
-        // Fallback: Manual extraction by searching for XML content
+        // Fallback: Manual extraction from ZIP structure
         if (empty($xmlContent)) {
-            // Find document.xml content between ZIP entries
-            if (preg_match('/word\/document\.xml.*?<\?xml.*?<\/w:document>/s', $fileContent, $matches)) {
-                $xmlContent = $matches[0];
-                // Clean up binary data before XML
-                $xmlContent = preg_replace('/^.*?(<\?xml)/s', '$1', $xmlContent);
-            } else {
-                throw new \Exception('Could not extract document.xml from DOCX file. File may be corrupted.');
+            // Find the central directory to locate document.xml
+            // Look for the file entry in the ZIP
+            $docXmlPos = strpos($fileContent, 'word/document.xml');
+            
+            if ($docXmlPos === false) {
+                throw new \Exception('This DOCX file structure is not recognized. Try opening in Word and saving as a new DOCX file.');
             }
+            
+            // Find the actual XML content
+            // Look for <?xml or <w:document which marks the start of document.xml
+            $xmlStartPos = strpos($fileContent, '<?xml version', $docXmlPos);
+            if ($xmlStartPos === false) {
+                // Try alternative start
+                $xmlStartPos = strpos($fileContent, '<w:document', $docXmlPos);
+            }
+            
+            if ($xmlStartPos === false) {
+                throw new \Exception('Could not locate XML content in DOCX. Please save the file again in Word.');
+            }
+            
+            // Find the end of the XML (</w:document>)
+            $xmlEndPos = strpos($fileContent, '</w:document>', $xmlStartPos);
+            if ($xmlEndPos === false) {
+                throw new \Exception('DOCX XML structure is incomplete');
+            }
+            
+            $xmlEndPos += strlen('</w:document>');
+            $xmlContent = substr($fileContent, $xmlStartPos, $xmlEndPos - $xmlStartPos);
+            
+            // Clean up any binary data that might be mixed in
+            $xmlContent = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $xmlContent);
         }
         
         if (empty($xmlContent)) {
-            throw new \Exception('DOCX file appears to be empty or corrupted');
+            throw new \Exception('DOCX file appears to be empty or corrupted. Try saving it again.');
         }
         
         // Parse XML and extract text with structure
         $dom = new \DOMDocument();
-        @$dom->loadXML($xmlContent);
+        $loaded = @$dom->loadXML($xmlContent);
+        
+        if (!$loaded) {
+            throw new \Exception('Could not parse DOCX XML structure. File may be corrupted.');
+        }
         
         $paragraphs = [];
         $paras = $dom->getElementsByTagName('p');
@@ -3350,9 +3380,14 @@ class AdminController
             foreach ($textNodes as $t) {
                 $paraText .= $t->nodeValue;
             }
-            if (trim($paraText)) {
-                $paragraphs[] = trim($paraText);
+            $paraText = trim($paraText);
+            if (!empty($paraText)) {
+                $paragraphs[] = $paraText;
             }
+        }
+        
+        if (empty($paragraphs)) {
+            throw new \Exception('No text found in DOCX file. Document may be empty.');
         }
         
         return implode("\n\n", $paragraphs);
