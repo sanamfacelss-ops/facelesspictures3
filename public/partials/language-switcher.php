@@ -16,10 +16,17 @@ iframe.skiptranslate{display:none!important}
   display:flex;align-items:center;gap:.45rem;
   font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);
-  transition:background .2s,transform .2s;user-select:none;
+  transition:all .3s ease;user-select:none;
 }
 #fp-lang-btn:hover{background:#333;transform:translateY(-2px)}
 #fp-lang-btn svg{width:15px;height:15px;flex-shrink:0}
+#fp-lang-btn.icon-only{padding:.7rem;border-radius:50%;width:44px;height:44px;justify-content:center;}
+#fp-lang-btn.icon-only #fp-lang-label{
+  opacity:0;width:0;overflow:hidden;margin:0;padding:0;
+}
+@media(max-width:768px){
+  #fp-lang-btn{bottom:1rem;right:1rem;}
+}
 
 /* Dropdown */
 #fp-lang-menu{
@@ -307,5 +314,20 @@ function googleTranslateElementInit(){
     autoDisplay:false
   },'google_translate_element');
 }
+
+// Auto-hide label after 3 seconds on page load (show icon+text first, then just icon)
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(function(){
+    var btn=document.getElementById('fp-lang-btn');
+    if(btn && !fpOpen){
+      btn.classList.add('icon-only');
+    }
+  },3000); // 3 seconds
+  
+  // When menu opens, show full button again
+  document.getElementById('fp-lang-btn').addEventListener('click',function(){
+    this.classList.remove('icon-only');
+  });
+});
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>

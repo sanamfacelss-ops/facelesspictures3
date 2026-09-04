@@ -557,20 +557,7 @@ if (!empty($songScripts)) {
 </div>
 
 <!-- FOOTER -->
-<footer style="border-top:1px solid #e5e7eb;padding:1.75rem 1.5rem;background:#f3f4f6">
-  <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem">
-    <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none">
-      <?php if ($logoUrl): ?><img src="<?= htmlspecialchars($logoUrl) ?>" style="height:44px;width:auto">
-      <?php else: ?><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:#111">FACELESS PICTURES</span><span style="background:#111;color:#fff;font-size:9px;font-weight:700;width:17px;height:17px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">3</span><?php endif; ?>
-    </a>
-    <div style="display:flex;gap:1.5rem">
-      <a href="/actor" style="color:#6b7280;font-size:.8rem;text-decoration:none">Actor</a>
-      <a href="/director" style="color:#6b7280;font-size:.8rem;text-decoration:none">Director</a>
-      <a href="/writer" style="color:#6b7280;font-size:.8rem;text-decoration:none">Writer</a>
-    </div>
-    <span style="color:#9ca3af;font-size:.75rem"><?= htmlspecialchars($settingsModel->get('footer_tagline', 'No face. Just talent.')) ?></span>
-  </div>
-</footer>
+<?php require_once __DIR__ . '/partials/footer-frontend.php'; ?>
 
 <!-- SONG SLIDER MODAL -->
 <div id="tuneModal">

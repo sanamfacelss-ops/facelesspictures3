@@ -2230,6 +2230,8 @@ class AdminController
             'writer_card_title',
             // Legal page
             'legal_heading', 'legal_content',
+            // Social Media
+            'social_youtube', 'social_facebook', 'social_instagram', 'social_x', 'social_linkedin',
             // Footer
             'footer_tagline',
         ];
@@ -2356,6 +2358,8 @@ class AdminController
             'writer_card_title',
             // Legal page
             'legal_heading', 'legal_content',
+            // Social Media
+            'social_youtube', 'social_facebook', 'social_instagram', 'social_x', 'social_linkedin',
             // Footer
             'footer_tagline',
         ];

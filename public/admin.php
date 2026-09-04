@@ -4450,6 +4450,39 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- SECTION: Social Media Links -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Social Media Links</h5>
+                                <p class="text-[11px] text-dark/40 mb-3">Add your social media profile URLs. Leave blank to hide from footer.</p>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1.5">YouTube Channel URL</label>
+                                        <input type="url" x-model="form.social_youtube" placeholder="https://youtube.com/@yourchanne"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1.5">Facebook Page URL</label>
+                                        <input type="url" x-model="form.social_facebook" placeholder="https://facebook.com/yourpage"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1.5">Instagram Profile URL</label>
+                                        <input type="url" x-model="form.social_instagram" placeholder="https://instagram.com/yourprofile"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1.5">X (Twitter) Profile URL</label>
+                                        <input type="url" x-model="form.social_x" placeholder="https://x.com/yourprofile"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-dark/50 mb-1.5">LinkedIn Profile URL</label>
+                                        <input type="url" x-model="form.social_linkedin" placeholder="https://linkedin.com/company/yourcompany"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- SECTION: Manifesto Videos -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">Manifesto Video Slider</h5>
@@ -8781,6 +8814,12 @@ if (file_exists($errorLogFile)) {
                 // Legal page
                 legal_heading: <?= json_encode($settingsModel->get('legal_heading','SUBMISSION TERMS & RIGHTS')) ?>,
                 legal_content: <?= json_encode($settingsModel->get('legal_content','Legal terms and conditions will appear here.')) ?>,
+                // Social Media
+                social_youtube: <?= json_encode($settingsModel->get('social_youtube','')) ?>,
+                social_facebook: <?= json_encode($settingsModel->get('social_facebook','')) ?>,
+                social_instagram: <?= json_encode($settingsModel->get('social_instagram','')) ?>,
+                social_x: <?= json_encode($settingsModel->get('social_x','')) ?>,
+                social_linkedin: <?= json_encode($settingsModel->get('social_linkedin','')) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
                 landing_poster_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_subtitle',''))) ?>',
