@@ -3518,7 +3518,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div x-data="{showHome: false, showRoleCards: true, showWriter: false, showDirector: false, showActor: false}">
+                            <div x-data="{showHome: false, showRoleCards: true, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
                             <div class="mt-6 mb-6">
@@ -4431,54 +4431,86 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
-                            <!-- SECTION: Legal Page -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Legal / Terms & Conditions Page</h5>
-                                <p class="text-[11px] text-dark/40 mb-3">Content for the /legal page. This is linked from the checkbox on all submission forms.</p>
-                                <div class="space-y-3">
-                                    <div>
-                                        <label class="block text-[12px] font-semibold text-dark mb-1.5">Page Heading</label>
-                                        <input type="text" x-model="form.legal_heading" placeholder="SUBMISSION TERMS & RIGHTS"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                            <!-- ========== LEGAL PAGE ========== -->
+                            <div class="mt-6 mb-6">
+                                <div @click="showLegal = !showLegal" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg cursor-pointer hover:from-purple-100 hover:to-purple-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">⚖️</span>
+                                        <h4 class="font-semibold text-dark text-sm">LEGAL / TERMS & CONDITIONS</h4>
+                                        <span class="text-xs text-dark/40">(Content for <a href="/legal" target="_blank" class="underline">/legal</a> page)</span>
                                     </div>
-                                    <div>
-                                        <label class="block text-[12px] font-semibold text-dark mb-1.5">Legal Content</label>
-                                        <textarea x-model="form.legal_content" rows="12" placeholder="Paste your full legal terms and conditions here..."
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition font-mono text-xs leading-relaxed"></textarea>
-                                        <p class="text-[11px] text-dark/30 mt-1">This text will be displayed on the /legal page. You can paste the full legal terms here.</p>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showLegal}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showLegal" x-transition>
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
+                                        <div class="mb-6 pb-6 border-b border-dark/5">
+                                            <p class="text-xs text-dark/40 mb-4">This is linked from the checkbox on all submission forms (Actor, Director, Writer).</p>
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Page Heading</label>
+                                                    <input type="text" x-model="form.legal_heading" placeholder="SUBMISSION TERMS & RIGHTS"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Legal Content</label>
+                                                    <textarea x-model="form.legal_content" rows="12" placeholder="Paste your full legal terms and conditions here..."
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition font-mono text-xs leading-relaxed"></textarea>
+                                                    <p class="text-[11px] text-dark/30 mt-1">This text will be displayed on the /legal page. You can paste the full legal terms here.</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- SECTION: Social Media Links -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Social Media Links</h5>
-                                <p class="text-[11px] text-dark/40 mb-3">Add your social media profile URLs. Leave blank to hide from footer.</p>
-                                <div class="space-y-3">
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1.5">YouTube Channel URL</label>
-                                        <input type="url" x-model="form.social_youtube" placeholder="https://youtube.com/@yourchanne"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                            <!-- ========== SOCIAL MEDIA LINKS ========== -->
+                            <div class="mt-6 mb-6">
+                                <div @click="showSocial = !showSocial" 
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg cursor-pointer hover:from-blue-100 hover:to-blue-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">🔗</span>
+                                        <h4 class="font-semibold text-dark text-sm">SOCIAL MEDIA LINKS</h4>
+                                        <span class="text-xs text-dark/40">(Footer social icons)</span>
                                     </div>
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1.5">Facebook Page URL</label>
-                                        <input type="url" x-model="form.social_facebook" placeholder="https://facebook.com/yourpage"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1.5">Instagram Profile URL</label>
-                                        <input type="url" x-model="form.social_instagram" placeholder="https://instagram.com/yourprofile"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1.5">X (Twitter) Profile URL</label>
-                                        <input type="url" x-model="form.social_x" placeholder="https://x.com/yourprofile"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] text-dark/50 mb-1.5">LinkedIn Profile URL</label>
-                                        <input type="url" x-model="form.social_linkedin" placeholder="https://linkedin.com/company/yourcompany"
-                                            class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showSocial}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showSocial" x-transition>
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
+                                        <div class="mb-6 pb-6 border-b border-dark/5">
+                                            <p class="text-xs text-dark/40 mb-4">Add your social media profile URLs. Leave blank to hide from footer.</p>
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1.5">🎥 YouTube Channel URL</label>
+                                                    <input type="url" x-model="form.social_youtube" placeholder="https://youtube.com/@yourchannel"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1.5">👍 Facebook Page URL</label>
+                                                    <input type="url" x-model="form.social_facebook" placeholder="https://facebook.com/yourpage"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1.5">📸 Instagram Profile URL</label>
+                                                    <input type="url" x-model="form.social_instagram" placeholder="https://instagram.com/yourprofile"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1.5">𝕏 X (Twitter) Profile URL</label>
+                                                    <input type="url" x-model="form.social_x" placeholder="https://x.com/yourprofile"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] text-dark/50 mb-1.5">💼 LinkedIn Profile URL</label>
+                                                    <input type="url" x-model="form.social_linkedin" placeholder="https://linkedin.com/company/yourcompany"
+                                                        class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
