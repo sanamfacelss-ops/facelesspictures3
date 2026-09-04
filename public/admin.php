@@ -4454,11 +4454,27 @@ if (file_exists($errorLogFile)) {
                                                     <input type="text" x-model="form.legal_heading" placeholder="SUBMISSION TERMS & RIGHTS"
                                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                                 </div>
+                                                
+                                                <!-- File Upload Option -->
+                                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                    <label class="block text-[12px] font-semibold text-dark mb-2">📄 Upload Legal Document (Optional)</label>
+                                                    <p class="text-[11px] text-dark/50 mb-3">Upload a Word (.docx) or PDF (.pdf) file and we'll extract the text automatically</p>
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="file" id="legalFileUpload" accept=".docx,.pdf,.txt" 
+                                                            class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-dark file:text-white hover:file:bg-dark/80 file:cursor-pointer">
+                                                        <button type="button" @click="uploadLegalFile()" 
+                                                            class="px-4 py-2 bg-dark text-white text-xs font-semibold rounded-lg hover:bg-dark/80 transition">
+                                                            Extract Text
+                                                        </button>
+                                                    </div>
+                                                    <p class="text-[10px] text-dark/40 mt-2">After extracting, the text will appear in the textarea below. You can then edit it if needed.</p>
+                                                </div>
+                                                
                                                 <div>
                                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Legal Content</label>
                                                     <textarea x-model="form.legal_content" rows="12" placeholder="Paste your full legal terms and conditions here..."
                                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition font-mono text-xs leading-relaxed"></textarea>
-                                                    <p class="text-[11px] text-dark/30 mt-1">This text will be displayed on the /legal page. You can paste the full legal terms here.</p>
+                                                    <p class="text-[11px] text-dark/30 mt-1">This text will be displayed on the /legal page. You can paste the full legal terms here or upload a document above.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -9137,6 +9153,49 @@ if (file_exists($errorLogFile)) {
                 this.form.stats_line_2 = this.statsLines[1] || '';
                 this.form.stats_line_3 = this.statsLines[2] || '';
                 this.form.stats_line_4 = this.statsLines[3] || '';
+            },
+            async uploadLegalFile() {
+                const fileInput = document.getElementById('legalFileUpload');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    alert('Please select a file first');
+                    return;
+                }
+                
+                // Check file type
+                const allowedTypes = ['.docx', '.pdf', '.txt'];
+                const fileName = file.name.toLowerCase();
+                const isAllowed = allowedTypes.some(ext => fileName.endsWith(ext));
+                
+                if (!isAllowed) {
+                    alert('Please upload a .docx, .pdf, or .txt file');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
+                
+                try {
+                    const response = await fetch('/api/admin/extract-legal-document', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.form.legal_content = data.content;
+                        alert('✅ Document text extracted successfully! You can now edit it in the textarea below.');
+                        fileInput.value = ''; // Clear file input
+                    } else {
+                        alert('❌ Failed to extract text: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('❌ Upload failed. Please try again or paste the text manually.');
+                }
             },
             async saveLandingSettings() {
                 this.saving = true; this.saved = false;

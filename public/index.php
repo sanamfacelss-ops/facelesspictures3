@@ -160,6 +160,7 @@ $routes = [
     'api/admin/settings/landing'         => [AdminController::class, 'saveLandingSetting',  'POST'],
     'api/admin/settings/landing-batch'   => [AdminController::class, 'saveLandingSettingsBatch', 'POST'],
     'api/admin/settings/upload-image'    => [AdminController::class, 'uploadSettingImage',  'POST'],
+    'api/admin/extract-legal-document'   => [AdminController::class, 'extractLegalDocument', 'POST'],
     'api/admin/media/images'             => [AdminController::class, 'listUploadedImages',  'GET'],
     'api/admin/media/upload-script-image' => [AdminController::class, 'uploadScriptImage', 'POST'],
     'api/admin/media/upload-script-file'  => [AdminController::class, 'uploadScriptFile',  'POST'],

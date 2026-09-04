@@ -3194,5 +3194,130 @@ class AdminController
             echo json_encode(['error' => 'Failed to delete playlists: ' . $e->getMessage()]);
         }
     }
+
+    /**
+     * Extract text from uploaded legal document (DOCX, PDF, TXT)
+     * POST /api/admin/extract-legal-document
+     */
+    public function extractLegalDocument(): void
+    {
+        header('Content-Type: application/json');
+        
+        if (!$this->requireAdmin() || !$this->verifyCsrf()) return;
+
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            http_response_code(422);
+            echo json_encode(['error' => 'No file uploaded or upload error']);
+            return;
+        }
+
+        $file = $_FILES['file'];
+        $fileName = strtolower($file['name']);
+        $tmpPath = $file['tmp_name'];
+        
+        try {
+            $content = '';
+            
+            // Handle TXT files
+            if (str_ends_with($fileName, '.txt')) {
+                $content = file_get_contents($tmpPath);
+            }
+            // Handle PDF files
+            else if (str_ends_with($fileName, '.pdf')) {
+                // For PDF: Try to extract using pdftotext if available, otherwise read raw
+                if (function_exists('shell_exec') && stripos(ini_get('disable_functions'), 'shell_exec') === false) {
+                    $pdftext = shell_exec("pdftotext " . escapeshellarg($tmpPath) . " -");
+                    if ($pdftext) {
+                        $content = $pdftext;
+                    }
+                }
+                
+                // Fallback: Basic PDF text extraction
+                if (empty($content)) {
+                    $rawContent = file_get_contents($tmpPath);
+                    // Extract text between text markers (basic approach)
+                    if (preg_match_all('/\(([^)]+)\)/i', $rawContent, $matches)) {
+                        $content = implode("\n", $matches[1]);
+                    } else {
+                        $content = "Unable to extract text from PDF. Please use a text-based PDF or paste the content manually.";
+                    }
+                }
+            }
+            // Handle DOCX files
+            else if (str_ends_with($fileName, '.docx')) {
+                // DOCX is a ZIP file containing XML
+                $zip = new \ZipArchive();
+                if ($zip->open($tmpPath) === true) {
+                    // Extract document.xml which contains the text
+                    $xml = $zip->getFromName('word/document.xml');
+                    $zip->close();
+                    
+                    if ($xml) {
+                        // Parse XML and extract text
+                        $dom = new \DOMDocument();
+                        $dom->loadXML($xml);
+                        
+                        // Get all text nodes
+                        $texts = $dom->getElementsByTagName('t');
+                        $paragraphs = [];
+                        $currentParagraph = '';
+                        
+                        foreach ($texts as $text) {
+                            $currentParagraph .= $text->nodeValue;
+                        }
+                        
+                        // Better approach: extract by paragraphs
+                        $paras = $dom->getElementsByTagName('p');
+                        $paragraphs = [];
+                        foreach ($paras as $para) {
+                            $textNodes = $para->getElementsByTagName('t');
+                            $paraText = '';
+                            foreach ($textNodes as $t) {
+                                $paraText .= $t->nodeValue;
+                            }
+                            if (trim($paraText)) {
+                                $paragraphs[] = trim($paraText);
+                            }
+                        }
+                        
+                        $content = implode("\n\n", $paragraphs);
+                    } else {
+                        $content = "Unable to extract text from DOCX file.";
+                    }
+                } else {
+                    $content = "Unable to open DOCX file.";
+                }
+            }
+            else {
+                http_response_code(422);
+                echo json_encode(['error' => 'Unsupported file type. Please upload .docx, .pdf, or .txt']);
+                return;
+            }
+            
+            // Clean up extracted content
+            $content = trim($content);
+            $content = str_replace(["\r\n", "\r"], "\n", $content); // Normalize line breaks
+            $content = preg_replace('/\n{3,}/', "\n\n", $content); // Max 2 consecutive line breaks
+            
+            if (empty($content)) {
+                http_response_code(422);
+                echo json_encode(['error' => 'No text could be extracted from the document']);
+                return;
+            }
+            
+            debug_log("Admin extracted legal document: {$fileName} (" . strlen($content) . " chars)", 'ADMIN');
+            echo json_encode([
+                'success' => true,
+                'content' => $content,
+                'filename' => $fileName,
+                'chars' => strlen($content)
+            ]);
+            
+        } catch (\Exception $e) {
+            log_exception($e, 'ADMIN_EXTRACT_LEGAL_DOC');
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to extract document: ' . $e->getMessage()]);
+        }
+    }
 }
 
