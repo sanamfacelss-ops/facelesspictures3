@@ -4431,6 +4431,25 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
+                            <!-- SECTION: Legal Page -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Legal / Terms & Conditions Page</h5>
+                                <p class="text-[11px] text-dark/40 mb-3">Content for the /legal page. This is linked from the checkbox on all submission forms.</p>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-[12px] font-semibold text-dark mb-1.5">Page Heading</label>
+                                        <input type="text" x-model="form.legal_heading" placeholder="SUBMISSION TERMS & RIGHTS"
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[12px] font-semibold text-dark mb-1.5">Legal Content</label>
+                                        <textarea x-model="form.legal_content" rows="12" placeholder="Paste your full legal terms and conditions here..."
+                                            class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition font-mono text-xs leading-relaxed"></textarea>
+                                        <p class="text-[11px] text-dark/30 mt-1">This text will be displayed on the /legal page. You can paste the full legal terms here.</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- SECTION: Manifesto Videos -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">Manifesto Video Slider</h5>
@@ -8759,6 +8778,9 @@ if (file_exists($errorLogFile)) {
                 landing_roles_subheading: <?= json_encode($settingsModel->get('landing_roles_subheading',"Pick your role. Shoot your video. Submit. That's it.")) ?>,
                 landing_footer_content: <?= json_encode($settingsModel->get('landing_footer_content','© 2024 Faceless Pictures. All rights reserved.')) ?>,
                 footer_tagline: <?= json_encode($settingsModel->get('footer_tagline','No face. Just talent.')) ?>,
+                // Legal page
+                legal_heading: <?= json_encode($settingsModel->get('legal_heading','SUBMISSION TERMS & RIGHTS')) ?>,
+                legal_content: <?= json_encode($settingsModel->get('legal_content','Legal terms and conditions will appear here.')) ?>,
                 landing_poster_url:    '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_url',''))) ?>',
                 landing_poster_title:  '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_title','Faceless Pictures 3'))) ?>',
                 landing_poster_subtitle: '<?= addslashes(htmlspecialchars($settingsModel->get('landing_poster_subtitle',''))) ?>',

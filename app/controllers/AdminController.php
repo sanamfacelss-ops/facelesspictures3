@@ -2228,6 +2228,8 @@ class AdminController
             'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
             'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
             'writer_card_title',
+            // Legal page
+            'legal_heading', 'legal_content',
             // Footer
             'footer_tagline',
         ];
@@ -2352,6 +2354,8 @@ class AdminController
             'writer_success_heading', 'writer_success_message', 'writer_success_pdf_button',
             'writer_failure_heading', 'writer_failure_message', 'writer_failure_retry_button',
             'writer_card_title',
+            // Legal page
+            'legal_heading', 'legal_content',
             // Footer
             'footer_tagline',
         ];

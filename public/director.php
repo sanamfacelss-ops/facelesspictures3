@@ -289,7 +289,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     <div style="margin-top:1.25rem">
       <label style="display:flex;align-items:center;gap:.85rem;cursor:pointer;user-select:none">
         <input type="checkbox" x-model="termsAccepted" style="width:20px;height:20px;cursor:pointer;accent-color:#111;flex-shrink:0">
-        <span style="color:#111;font-size:1rem;font-weight:600;line-height:1.5"><?= htmlspecialchars($settingsModel->get('director_terms_text', 'I agree to the terms and conditions and confirm all information provided is accurate')) ?></span>
+        <span style="color:#111;font-size:1rem;font-weight:600;line-height:1.5">I agree to the <a href="/legal" target="_blank" style="color:#111;text-decoration:underline">terms and conditions</a> and confirm all information provided is accurate</span>
       </label>
     </div>
 
