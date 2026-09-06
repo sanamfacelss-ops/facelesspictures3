@@ -34,7 +34,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <div class="fp-nav-container">
     
     <!-- Mobile: Hamburger Button -->
-    <button id="hamburger-btn" class="hamburger-btn" aria-label="Open menu">
+    <button id="hamburger-btn" class="hamburger-btn" aria-label="Open menu" onclick="window.openMobileMenu()">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
@@ -71,7 +71,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 </nav>
 
 <!-- Mobile Sidebar Overlay -->
-<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="window.closeMobileMenu()"></div>
 
 <!-- Mobile Sidebar -->
 <div id="mobile-sidebar" class="mobile-sidebar">
@@ -84,7 +84,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <span class="nav-badge">3</span>
       <?php endif; ?>
     </a>
-    <button id="close-btn" class="close-btn" aria-label="Close menu">
+    <button id="close-btn" class="close-btn" aria-label="Close menu" onclick="window.closeMobileMenu()">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
       </svg>
@@ -269,6 +269,22 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .sidebar-header {
+    justify-content: center;
+    position: relative;
+  }
+  
+  .sidebar-header .nav-logo {
+    margin: 0 auto;
+  }
+  
+  .sidebar-header .close-btn {
+    position: absolute;
+    right: 1rem;
+  }
+}
+
 .close-btn {
   background: transparent;
   border: none;
@@ -291,6 +307,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   flex: 1;
   overflow-y: auto;
   padding: 1rem 0;
+  text-align: center;
 }
 
 .sidebar-link {
@@ -302,6 +319,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   font-weight: 500;
   border-left: 3px solid transparent;
   transition: all 0.2s;
+  text-align: center;
 }
 
 .sidebar-link:hover {
@@ -329,34 +347,47 @@ body.menu-open {
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Get elements
-  const hamburgerBtn = document.getElementById('hamburger-btn');
-  const closeBtn = document.getElementById('close-btn');
+// Global functions for mobile menu (accessible immediately)
+window.openMobileMenu = function() {
+  console.log('Opening mobile menu');
   const sidebar = document.getElementById('mobile-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar && overlay) {
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+    document.body.classList.add('menu-open');
+  } else {
+    console.error('Sidebar or overlay not found!', { sidebar: !!sidebar, overlay: !!overlay });
+  }
+};
+
+window.closeMobileMenu = function() {
+  console.log('Closing mobile menu');
+  const sidebar = document.getElementById('mobile-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (sidebar && overlay) {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.classList.remove('menu-open');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Nav frontend script loaded');
+  
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  
-  // Debug: Check if elements exist
-  console.log('Hamburger menu initialized:', {
-    hamburgerBtn: !!hamburgerBtn,
-    closeBtn: !!closeBtn,
-    sidebar: !!sidebar,
-    overlay: !!overlay
-  });
-  
-  // Set active link based on current page
   const currentPath = window.location.pathname;
   const isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
   
+  // Set active link based on current page
   sidebarLinks.forEach(link => {
     const linkHref = link.getAttribute('href');
     const linkUrl = new URL(link.href, window.location.origin);
     const linkPath = linkUrl.pathname;
     
-    // Skip About link on non-home pages (don't show it as active)
+    // Skip About link on non-home pages
     if (!isHomePage && linkHref.includes('#about')) {
-      return; // Skip setting active, but still let the link work
+      return;
     }
     
     // Exact match for pages
@@ -364,48 +395,6 @@ document.addEventListener('DOMContentLoaded', function() {
       link.classList.add('active');
     }
   });
-  
-  // Open menu
-  function openMenu() {
-    console.log('Opening menu');
-    if (sidebar && overlay) {
-      sidebar.classList.add('active');
-      overlay.classList.add('active');
-      document.body.classList.add('menu-open');
-    }
-  }
-  
-  // Close menu
-  function closeMenu() {
-    console.log('Closing menu');
-    if (sidebar && overlay) {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.classList.remove('menu-open');
-    }
-  }
-  
-  // Event listeners
-  if (hamburgerBtn) {
-    hamburgerBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      console.log('Hamburger clicked');
-      openMenu();
-    });
-  } else {
-    console.error('Hamburger button not found!');
-  }
-  
-  if (closeBtn) {
-    closeBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      closeMenu();
-    });
-  }
-  
-  if (overlay) {
-    overlay.addEventListener('click', closeMenu);
-  }
   
   // Close when clicking sidebar links
   sidebarLinks.forEach(link => {
@@ -415,13 +404,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Special handling for About link on non-home pages
       if (!isHomePage && href.includes('#about')) {
         e.preventDefault();
-        // Force navigation to home page with hash
         window.location.href = '/#about';
         return;
       }
       
-      // Let the browser handle navigation naturally for other links
-      closeMenu();
+      // Close menu
+      window.closeMobileMenu();
     });
   });
   
@@ -431,21 +419,17 @@ document.addEventListener('DOMContentLoaded', function() {
     link.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
       
-      // Special handling for About link on non-home pages
       if (!isHomePage && href.includes('#about')) {
         e.preventDefault();
-        // Force navigation to home page with hash
         window.location.href = '/#about';
       }
-      
-      // Let other links work normally
     });
   });
   
   // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      closeMenu();
+      window.closeMobileMenu();
     }
   });
 });
