@@ -4955,6 +4955,14 @@ The page will automatically format headings and paragraphs."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
                                                     </div>
+                                                    
+                                                    <!-- 5. Submit Button Text -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Submit Button Text</label>
+                                                        <input type="text" x-model="form.writer_submit_button_text" placeholder="Submit Writer Narration →"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        <p class="text-[9px] text-dark/30 mt-1">Text shown on the main submit button</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -5175,6 +5183,14 @@ The page will automatically format headings and paragraphs."
                                                         <textarea x-model="form.director_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
+                                                    </div>
+                                                    
+                                                    <!-- 5. Submit Button Text -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Submit Button Text</label>
+                                                        <input type="text" x-model="form.director_submit_button_text" placeholder="Submit Director Scene →"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        <p class="text-[9px] text-dark/30 mt-1">Text shown on the main submit button</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -5400,6 +5416,14 @@ The page will automatically format headings and paragraphs."
                                                         <textarea x-model="form.actor_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
                                                         <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
+                                                    </div>
+                                                    
+                                                    <!-- 5. Submit Button Text -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Submit Button Text</label>
+                                                        <input type="text" x-model="form.actor_submit_button_text" placeholder="Submit Both Auditions →"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        <p class="text-[9px] text-dark/30 mt-1">Text shown on the main submit button</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -8999,6 +9023,7 @@ The page will automatically format headings and paragraphs."
                 writer_form_heading:     <?= json_encode($settingsModel->get('writer_form_heading','Ready to Write? Submit Your Continuation')) ?>,
                 writer_form_description: <?= json_encode($settingsModel->get('writer_form_description','Read the given script, write what happens next, then record yourself narrating it on camera.')) ?>,
                 writer_terms_text:       <?= json_encode($settingsModel->get('writer_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
+                writer_submit_button_text: <?= json_encode($settingsModel->get('writer_submit_button_text','Submit Writer Narration →')) ?>,
                 writer_field_name_label: <?= json_encode($settingsModel->get('writer_field_name_label','Name *')) ?>,
                 writer_field_name_placeholder: <?= json_encode($settingsModel->get('writer_field_name_placeholder','Your full name')) ?>,
                 writer_field_email_label: <?= json_encode($settingsModel->get('writer_field_email_label','Email *')) ?>,
@@ -9028,6 +9053,7 @@ The page will automatically format headings and paragraphs."
                 director_form_heading:     <?= json_encode($settingsModel->get('director_form_heading','Ready to Direct? Submit Your Scene')) ?>,
                 director_form_description: <?= json_encode($settingsModel->get('director_form_description','Cast your actor, give them the script, shoot the scene, and upload your video.')) ?>,
                 director_terms_text:       <?= json_encode($settingsModel->get('director_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
+                director_submit_button_text: <?= json_encode($settingsModel->get('director_submit_button_text','Submit Director Scene →')) ?>,
                 director_field_name_label: <?= json_encode($settingsModel->get('director_field_name_label','Name *')) ?>,
                 director_field_name_placeholder: <?= json_encode($settingsModel->get('director_field_name_placeholder','Your full name')) ?>,
                 director_field_email_label: <?= json_encode($settingsModel->get('director_field_email_label','Email *')) ?>,
@@ -9056,6 +9082,7 @@ The page will automatically format headings and paragraphs."
                 actor_form_heading:     <?= json_encode($settingsModel->get('actor_form_heading','Ready to Perform? Submit Your Auditions')) ?>,
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
                 actor_terms_text:       <?= json_encode($settingsModel->get('actor_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
+                actor_submit_button_text: <?= json_encode($settingsModel->get('actor_submit_button_text','Submit Both Auditions →')) ?>,
                 actor_field_name_label: <?= json_encode($settingsModel->get('actor_field_name_label','Name *')) ?>,
                 actor_field_name_placeholder: <?= json_encode($settingsModel->get('actor_field_name_placeholder','Your full name')) ?>,
                 actor_field_email_label: <?= json_encode($settingsModel->get('actor_field_email_label','Email *')) ?>,

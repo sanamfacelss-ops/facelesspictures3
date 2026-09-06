@@ -320,7 +320,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
     <!-- Submit (opens terms modal first) -->
     <button type="button" class="btn-go" @click="openTermsModal()" :disabled="loading">
-      Submit Director Scene →
+      <?= htmlspecialchars($settingsModel->get('director_submit_button_text', 'Submit Director Scene →')) ?>
     </button>
   </div><!-- /submit-card -->
 </div><!-- /side-by-side grid -->

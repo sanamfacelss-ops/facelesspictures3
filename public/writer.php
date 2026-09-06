@@ -317,7 +317,7 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
 
     <!-- Submit (opens terms modal first) -->
     <button type="button" class="btn-go" @click="openTermsModal()" :disabled="loading">
-      Submit Writer Narration →
+      <?= htmlspecialchars($settingsModel->get('writer_submit_button_text', 'Submit Writer Narration →')) ?>
     </button>
   </div><!-- /submit-card -->
 </div><!-- /side-by-side grid -->

@@ -2362,7 +2362,8 @@ class AdminController
             'actor_field_phone_label', 'actor_field_phone_placeholder',
             'actor_field_dialog_video_label', 'actor_field_dialog_video_hint',
             'actor_field_song_video_label', 'actor_field_song_video_hint',
-            'actor_terms_text',
+            'actor_terms_text', 'actor_submit_button_text',
+            'director_submit_button_text', 'writer_submit_button_text',
             // Legal page
             'legal_heading', 'legal_content',
             // Social Media

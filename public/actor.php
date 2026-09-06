@@ -572,7 +572,7 @@ if (!empty($songScripts)) {
 
     <!-- Submit (opens terms modal first) -->
     <button type="button" class="btn-go" @click="openTermsModal()" :disabled="loading">
-      Submit Both Auditions →
+      <?= htmlspecialchars($settingsModel->get('actor_submit_button_text', 'Submit Both Auditions →')) ?>
     </button>
   </div>
 </div>
