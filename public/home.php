@@ -689,7 +689,26 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
           <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.08em;color:#000;margin-bottom:.5rem;font-weight:700;line-height:1;text-transform:uppercase"><?= htmlspecialchars($posterSectionHeading) ?></h2>
           <?php endif; ?>
           <?php if (!empty($posterSectionSubtitle)): ?>
-          <p style="color:#6b7280;font-size:1rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+            <?php 
+            // Split by $ delimiter - mobile shows as separate lines
+            $posterSubItems = array_filter(array_map('trim', explode('$', $posterSectionSubtitle)));
+            ?>
+            <?php if (count($posterSubItems) > 1): ?>
+              <!-- Multiple items: Desktop single line, Mobile separate lines -->
+              <div class="poster-section-subtitle-wrapper">
+                <!-- Desktop: Show as single line with spaces -->
+                <p class="poster-section-subtitle poster-section-subtitle-desktop" style="color:#6b7280;font-size:1rem;line-height:1.6"><?= implode(' ', array_map('htmlspecialchars', $posterSubItems)) ?></p>
+                <!-- Mobile: Show as separate lines -->
+                <div class="poster-section-subtitle poster-section-subtitle-mobile" style="color:#6b7280;font-size:1rem;line-height:1.8;display:none">
+                  <?php foreach ($posterSubItems as $item): ?>
+                    <div><?= htmlspecialchars($item) ?></div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+            <?php else: ?>
+              <!-- Single item: Show as normal -->
+              <p class="poster-section-subtitle" style="color:#6b7280;font-size:1rem;line-height:1.6"><?= htmlspecialchars($posterSectionSubtitle) ?></p>
+            <?php endif; ?>
           <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -832,10 +851,14 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       /* Show mobile poster subtitle, hide desktop */
       .poster-subtitle-desktop{display:none !important}
       .poster-subtitle-mobile{display:block !important}
+      /* Show mobile section subtitle, hide desktop */
+      .poster-section-subtitle-desktop{display:none !important}
+      .poster-section-subtitle-mobile{display:block !important}
     }
-    /* Desktop - hide mobile poster subtitle */
+    /* Desktop - hide mobile versions */
     @media(min-width:641px){
       .poster-subtitle-mobile{display:none !important}
+      .poster-section-subtitle-mobile{display:none !important}
     }
     </style>
     

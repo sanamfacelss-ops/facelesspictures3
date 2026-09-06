@@ -4026,7 +4026,7 @@ if (file_exists($errorLogFile)) {
                                         <label class="block text-[12px] font-semibold text-dark mb-1.5">Poster Section Subtitle</label>
                                         <input type="text" x-model="form.poster_section_subtitle" placeholder="Each film is a rasa. Each rasa is a world."
                                             class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <p class="text-[11px] text-dark/30 mt-1">Subtitle text below heading</p>
+                                        <p class="text-[11px] text-dark/30 mt-1">Subtitle text below heading. Use $ to separate items for line breaks on mobile</p>
                                     </div>
                                 </div>
                                 
