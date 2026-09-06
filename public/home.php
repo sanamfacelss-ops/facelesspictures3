@@ -532,19 +532,10 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       <!-- ══ NEW HERO LAYOUT: Video First, Then Text Below ══ -->
       <?php
       $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
-    $heroTopText = $settingsModel->get('landing_hero_top_text', ''); // NEW: Text above video
-    $heroSubheading = $settingsModel->get('landing_hero_subheading', 'KHATAA OFFICIAL TEASER'); // NEW field
+    $heroTopText = $settingsModel->get('landing_hero_top_text', ''); // Text below video
     $heroTagline = $settingsModel->get('landing_hero_tagline', 'YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR'); // NEW field
     
-    // Display top text above video if it exists
-    if (!empty($heroTopText)):
-    ?>
-    <div class="hero-top-text" style="text-align:center;padding:1.5rem 1rem 1rem;background:#000;color:#fff">
-        <p style="font-size:.75rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin:0"><?= htmlspecialchars($heroTopText) ?></p>
-    </div>
-    <?php endif; ?>
-    
-    <?php if ($heroTrailerUrl):
+    if ($heroTrailerUrl):
         // Check if it's a YouTube URL
         $isYoutube = (strpos($heroTrailerUrl, 'youtube.com') !== false || strpos($heroTrailerUrl, 'youtu.be') !== false);
         $ytId = '';
@@ -609,9 +600,9 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     <!-- Hero Text Section - Below Video -->
     <div class="hero-text-section" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
-        <!-- Small uppercase subheading -->
-        <?php if (!empty($heroSubheading)): ?>
-        <p class="hero-subheading" style="font-size:.85rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroSubheading) ?></p>
+        <!-- Small uppercase text below video (replaces old subheading) -->
+        <?php if (!empty($heroTopText)): ?>
+        <p class="hero-subheading" style="font-size:.85rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroTopText) ?></p>
         <?php endif; ?>
         
         <!-- Large main heading/question -->
@@ -622,21 +613,20 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <!-- Small gray tagline at bottom -->
         <?php if (!empty($heroTagline)): ?>
             <?php 
-            // Split by $ delimiter for list items
+            // Split by $ delimiter for mobile line breaks
             $taglineItems = array_filter(array_map('trim', explode('$', $heroTagline)));
             ?>
             <?php if (count($taglineItems) > 1): ?>
-                <!-- Multiple items: Show as arrows on desktop, list on mobile -->
+                <!-- Multiple items: Keep as-is on desktop, separate lines on mobile -->
                 <div class="hero-tagline-wrapper">
+                    <!-- Desktop: Show original text with $ as-is or with arrows -->
                     <p class="hero-tagline hero-tagline-desktop" style="color:#9ca3af;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6">
                         <?= implode(' → ', array_map('htmlspecialchars', $taglineItems)) ?>
                     </p>
+                    <!-- Mobile: Show as separate lines without arrows -->
                     <div class="hero-tagline hero-tagline-mobile" style="color:#9ca3af;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:2;display:none">
-                        <?php foreach ($taglineItems as $index => $item): ?>
-                            <div style="margin-bottom:<?= $index < count($taglineItems) - 1 ? '0.5rem' : '0' ?>"><?= htmlspecialchars($item) ?></div>
-                            <?php if ($index < count($taglineItems) - 1): ?>
-                                <div style="text-align:center;margin:0.3rem 0">↓</div>
-                            <?php endif; ?>
+                        <?php foreach ($taglineItems as $item): ?>
+                            <div><?= htmlspecialchars($item) ?></div>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -650,7 +640,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <style>
     /* Hero Mobile Responsive */
     @media(max-width:768px){
-      .hero-top-text p{font-size:.7rem !important;letter-spacing:.12em !important}
       .hero-text-section{padding:2rem 1.25rem 2.5rem !important}
       .hero-subheading{font-size:.75rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
       .hero-main-heading{font-size:clamp(26px,6vw,36px) !important;line-height:1.3 !important;margin-bottom:.6rem !important}
@@ -660,8 +649,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .hero-tagline-mobile{display:block !important}
     }
     @media(max-width:480px){
-      .hero-top-text{padding:1rem .75rem !important}
-      .hero-top-text p{font-size:.65rem !important;letter-spacing:.1em !important}
       .hero-text-section{padding:1.75rem 1rem 2rem !important}
       .hero-subheading{font-size:.7rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
       .hero-main-heading{font-size:clamp(22px,6.5vw,30px) !important;line-height:1.35 !important;margin-bottom:.55rem !important}

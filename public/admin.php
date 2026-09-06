@@ -3981,20 +3981,12 @@ if (file_exists($errorLogFile)) {
                                     <p class="text-[11px] text-dark/30 mt-1">Large centered text displayed at the top of the homepage.</p>
                                 </div>
                                 
-                                <!-- Hero Top Text (ABOVE VIDEO) -->
+                                <!-- Hero Top Text (BELOW VIDEO) -->
                                 <div>
-                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Top Text (Above Video)</label>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Top Text (Below Video)</label>
                                     <input type="text" x-model="form.landing_hero_top_text" placeholder="KHAFAA — OFFICIAL TEASER | AUDITION FOR KHAFAA OPENS SOON"
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Text displayed above the hero video (desktop & mobile)</p>
-                                </div>
-                                
-                                <!-- Hero Subheading (NEW) -->
-                                <div>
-                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Subheading (Small Text Above Main Heading)</label>
-                                    <input type="text" x-model="form.landing_hero_subheading" placeholder="KHATAA OFFICIAL TEASER"
-                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Small uppercase text displayed below the video, above the main heading.</p>
+                                    <p class="text-[11px] text-dark/30 mt-1">Small uppercase text displayed below the video, above the main heading</p>
                                 </div>
                                 
                                 <!-- Hero Tagline (NEW) -->
@@ -4002,7 +3994,7 @@ if (file_exists($errorLogFile)) {
                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Tagline (Gray Text Below Main Heading)</label>
                                     <input type="text" x-model="form.landing_hero_tagline" placeholder="YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR"
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text. Use $ to separate items (will show as arrows on desktop, list on mobile)</p>
+                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text. Use $ to separate items for line breaks on mobile only</p>
                                 </div>
                             </div>
 
