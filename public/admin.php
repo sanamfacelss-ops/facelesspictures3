@@ -3981,6 +3981,14 @@ if (file_exists($errorLogFile)) {
                                     <p class="text-[11px] text-dark/30 mt-1">Large centered text displayed at the top of the homepage.</p>
                                 </div>
                                 
+                                <!-- Hero Pre-Video Text (ABOVE VIDEO) - NEW -->
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Pre-Video Text (Above Video)</label>
+                                    <input type="text" x-model="form.landing_hero_pre_video_text" placeholder="ANNOUNCING KHAFAA SEASON 3"
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Optional text displayed ABOVE the hero video</p>
+                                </div>
+                                
                                 <!-- Hero Top Text (BELOW VIDEO) -->
                                 <div>
                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Top Text (Below Video)</label>
@@ -3994,7 +4002,7 @@ if (file_exists($errorLogFile)) {
                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Tagline (Gray Text Below Main Heading)</label>
                                     <input type="text" x-model="form.landing_hero_tagline" placeholder="YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR"
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text. Use $ to separate items for line breaks on mobile only</p>
+                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text. Use $ to separate items - mobile shows as separate lines, desktop shows as single line</p>
                                 </div>
                             </div>
 
@@ -8864,6 +8872,7 @@ The page will automatically format headings and paragraphs."
                 footer_menu_item_4_page:  <?= json_encode($settingsModel->get('footer_menu_item_4_page','actor')) ?>,
                 footer_menu_item_4_order: <?= json_encode($settingsModel->get('footer_menu_item_4_order','4')) ?>,
                 landing_headline:      <?= json_encode($settingsModel->get('landing_headline','NO FACE. NO CONNECTIONS. JUST TALENT.')) ?>,
+                landing_hero_pre_video_text: <?= json_encode($settingsModel->get('landing_hero_pre_video_text','')) ?>,
                 landing_hero_top_text: <?= json_encode($settingsModel->get('landing_hero_top_text','KHAFAA — OFFICIAL TEASER | AUDITION FOR KHAFAA OPENS SOON')) ?>,
                 landing_hero_subheading: <?= json_encode($settingsModel->get('landing_hero_subheading','KHATAA OFFICIAL TEASER')) ?>,
                 landing_hero_tagline:    <?= json_encode($settingsModel->get('landing_hero_tagline','YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR')) ?>,

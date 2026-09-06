@@ -529,11 +529,19 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <section style="background:#fff;padding:3rem 0 3rem">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
-      <!-- ══ NEW HERO LAYOUT: Video First, Then Text Below ══ -->
+      <!-- ══ NEW HERO LAYOUT: Optional Text Above Video, Video, Then Text Below ══ -->
       <?php
       $heroTrailerUrl = $settingsModel->get('landing_hero_trailer_url', '');
+    $heroPreVideoText = $settingsModel->get('landing_hero_pre_video_text', ''); // NEW: Text ABOVE video
     $heroTopText = $settingsModel->get('landing_hero_top_text', ''); // Text below video
-    $heroTagline = $settingsModel->get('landing_hero_tagline', 'YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR'); // NEW field
+    $heroTagline = $settingsModel->get('landing_hero_tagline', 'YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR'); // Tagline with $ delimiter
+    
+    // Show text ABOVE video if set
+    if (!empty($heroPreVideoText)): ?>
+    <div class="hero-pre-video-text" style="text-align:center;padding:1.5rem 1.5rem 1rem;max-width:900px;margin:0 auto">
+        <p style="font-size:.9rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#111"><?= htmlspecialchars($heroPreVideoText) ?></p>
+    </div>
+    <?php endif;
     
     if ($heroTrailerUrl):
         // Check if it's a YouTube URL
@@ -613,17 +621,17 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <!-- Small gray tagline at bottom -->
         <?php if (!empty($heroTagline)): ?>
             <?php 
-            // Split by $ delimiter for mobile line breaks
+            // Split by $ delimiter - mobile only shows separate lines
             $taglineItems = array_filter(array_map('trim', explode('$', $heroTagline)));
             ?>
             <?php if (count($taglineItems) > 1): ?>
-                <!-- Multiple items: Keep as-is on desktop, separate lines on mobile -->
+                <!-- Multiple items: Desktop shows as single line with spaces, Mobile shows separate lines -->
                 <div class="hero-tagline-wrapper">
-                    <!-- Desktop: Show original text with $ as-is or with arrows -->
+                    <!-- Desktop: Show as single line (no arrows, just spaces) -->
                     <p class="hero-tagline hero-tagline-desktop" style="color:#9ca3af;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:1.6">
-                        <?= implode(' → ', array_map('htmlspecialchars', $taglineItems)) ?>
+                        <?= implode(' ', array_map('htmlspecialchars', $taglineItems)) ?>
                     </p>
-                    <!-- Mobile: Show as separate lines without arrows -->
+                    <!-- Mobile: Show as separate lines -->
                     <div class="hero-tagline hero-tagline-mobile" style="color:#9ca3af;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;line-height:2;display:none">
                         <?php foreach ($taglineItems as $item): ?>
                             <div><?= htmlspecialchars($item) ?></div>
@@ -640,6 +648,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <style>
     /* Hero Mobile Responsive */
     @media(max-width:768px){
+      .hero-pre-video-text{padding:1.25rem 1rem .75rem !important}
+      .hero-pre-video-text p{font-size:.78rem !important;letter-spacing:.12em !important}
       .hero-text-section{padding:2rem 1.25rem 2.5rem !important}
       .hero-subheading{font-size:.75rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
       .hero-main-heading{font-size:clamp(26px,6vw,36px) !important;line-height:1.3 !important;margin-bottom:.6rem !important}
@@ -649,6 +659,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .hero-tagline-mobile{display:block !important}
     }
     @media(max-width:480px){
+      .hero-pre-video-text{padding:1rem .85rem .6rem !important}
+      .hero-pre-video-text p{font-size:.72rem !important;letter-spacing:.1em !important}
       .hero-text-section{padding:1.75rem 1rem 2rem !important}
       .hero-subheading{font-size:.7rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
       .hero-main-heading{font-size:clamp(22px,6.5vw,30px) !important;line-height:1.35 !important;margin-bottom:.55rem !important}
