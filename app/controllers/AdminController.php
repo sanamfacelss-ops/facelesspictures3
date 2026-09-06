@@ -2122,7 +2122,7 @@ class AdminController
 
         $allowed = [
             'site_logo_url', 'site_logo_height',
-            'landing_headline', 'landing_hero_subheading', 'landing_hero_tagline', 'site_tagline',
+            'landing_headline', 'landing_hero_top_text', 'landing_hero_subheading', 'landing_hero_tagline', 'site_tagline',
             'landing_header_content', 'landing_footer_content',
             'landing_roles_heading', 'landing_roles_subheading',
             // Poster section headings
@@ -2265,7 +2265,7 @@ class AdminController
 
         $allowed = [
             'site_logo_url', 'site_logo_height',
-            'landing_headline', 'landing_hero_subheading', 'landing_hero_tagline', 'site_tagline',
+            'landing_headline', 'landing_hero_top_text', 'landing_hero_subheading', 'landing_hero_tagline', 'site_tagline',
             'landing_header_content', 'landing_footer_content',
             'landing_roles_heading', 'landing_roles_subheading',
             // Poster section headings
