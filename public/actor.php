@@ -739,7 +739,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeTuneMod
 document.getElementById('tuneModal').addEventListener('click',function(e){if(e.target===this)closeTuneModal();});
 
 function actorSubmit(){
-    return{
+    var component = {
         dialogFile:null,songFile:null,
         loading:false,progress:0,errors:[],
         dragD:false,dragS:false,
@@ -754,6 +754,8 @@ function actorSubmit(){
             if(!this.dialogFile) this.errors.push('Dialog audition video is required.');
             if(!this.songFile)   this.errors.push('Song audition video is required.');
             if(this.errors.length) return;
+            // Store submit function globally so modal can access it
+            window.actorSubmitFn = this.submit.bind(this);
             // Show terms modal
             document.getElementById('termsModal').style.display='flex';
             document.body.style.overflow='hidden';
@@ -787,6 +789,7 @@ function actorSubmit(){
             xhr.send(fd);
         }
     };
+    return component;
 }
 
 // Terms modal functions
@@ -797,22 +800,11 @@ function closeTermsModal() {
 
 function acceptTermsAndSubmit() {
     closeTermsModal();
-    // Get the Alpine component instance and call submit
-    var submitCard = document.getElementById('submit-form');
-    if (submitCard) {
-        // Try multiple ways to access Alpine data
-        if (submitCard._x_dataStack && submitCard._x_dataStack.length > 0) {
-            // Alpine 3.x
-            submitCard._x_dataStack[0].submit();
-        } else if (submitCard.__x && submitCard.__x.$data) {
-            // Older Alpine
-            submitCard.__x.$data.submit();
-        } else if (window.Alpine) {
-            // Direct Alpine access
-            Alpine.$data(submitCard).submit();
-        } else {
-            console.error('Could not access Alpine component');
-        }
+    // Call the globally stored submit function
+    if (window.actorSubmitFn) {
+        window.actorSubmitFn();
+    } else {
+        console.error('Submit function not found');
     }
 }
 
