@@ -672,9 +672,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .hero-tagline-mobile{display:none !important}
     }
     </style>
-      .hero-tagline{font-size:.75rem !important}
-    }
-    </style>
     
     <?php endif; ?>
     
