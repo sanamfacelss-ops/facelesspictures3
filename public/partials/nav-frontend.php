@@ -329,13 +329,21 @@ body.menu-open {
 </style>
 
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
   // Get elements
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const closeBtn = document.getElementById('close-btn');
   const sidebar = document.getElementById('mobile-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  
+  // Debug: Check if elements exist
+  console.log('Hamburger menu initialized:', {
+    hamburgerBtn: !!hamburgerBtn,
+    closeBtn: !!closeBtn,
+    sidebar: !!sidebar,
+    overlay: !!overlay
+  });
   
   // Set active link based on current page
   const currentPath = window.location.pathname;
@@ -359,25 +367,40 @@ body.menu-open {
   
   // Open menu
   function openMenu() {
-    sidebar.classList.add('active');
-    overlay.classList.add('active');
-    document.body.classList.add('menu-open');
+    console.log('Opening menu');
+    if (sidebar && overlay) {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      document.body.classList.add('menu-open');
+    }
   }
   
   // Close menu
   function closeMenu() {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-    document.body.classList.remove('menu-open');
+    console.log('Closing menu');
+    if (sidebar && overlay) {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.classList.remove('menu-open');
+    }
   }
   
   // Event listeners
   if (hamburgerBtn) {
-    hamburgerBtn.addEventListener('click', openMenu);
+    hamburgerBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('Hamburger clicked');
+      openMenu();
+    });
+  } else {
+    console.error('Hamburger button not found!');
   }
   
   if (closeBtn) {
-    closeBtn.addEventListener('click', closeMenu);
+    closeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      closeMenu();
+    });
   }
   
   if (overlay) {
@@ -425,5 +448,5 @@ body.menu-open {
       closeMenu();
     }
   });
-})();
+});
 </script>
