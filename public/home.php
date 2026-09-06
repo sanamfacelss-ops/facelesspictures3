@@ -1067,26 +1067,27 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       if (!empty($statsLinesJson)) {
           $decoded = json_decode($statsLinesJson, true);
           if (is_array($decoded)) {
-              $statsLines = array_filter($decoded, fn($l) => !empty(trim($l)));
+              // DON'T filter empty lines - keep them for spacing
+              $statsLines = $decoded;
           }
       }
       
       // Fallback to old format if JSON is empty
       if (empty($statsLines)) {
-          $statsLines = array_filter([
+          // DON'T filter empty lines - keep them for spacing
+          $statsLines = [
               $settingsModel->get('stats_line_1', 'Many talented people never get their first chance.'),
               $settingsModel->get('stats_line_2', 'We are giving them one.'),
               $settingsModel->get('stats_line_3', 'We don\'t just make films.'),
               $settingsModel->get('stats_line_4', 'We open the door.')
-          ], fn($l) => !empty(trim($l)));
+          ];
       }
       
       foreach ($statsLines as $line):
-          if (!empty(trim($line))):
+          // Always render a line, even if empty (for spacing)
       ?>
-      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem;font-weight:800 !important"><?= nl2br(htmlspecialchars($line)) ?></p>
+      <p style="color:#d1d5db;font-size:0.95rem;line-height:1.8;margin-bottom:0.5rem;font-weight:800 !important"><?= !empty(trim($line)) ? nl2br(htmlspecialchars($line)) : '&nbsp;' ?></p>
       <?php 
-          endif;
       endforeach;
       ?>
     </div>
