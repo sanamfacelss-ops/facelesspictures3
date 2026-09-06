@@ -226,19 +226,28 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .pill-btn:hover{background:#111;color:#fff}
 .pill-btn svg{transition:all .2s}
 .pill-btn:hover svg{color:#fff}
-.terms-box{margin-top:1.25rem;border:1px solid #e5e7eb;border-radius:12px;padding:1rem 1.25rem;background:#fafafa;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.terms-label{display:flex;align-items:flex-start;gap:.75rem;cursor:pointer;user-select:none;flex:1}
-.terms-label input{width:18px;height:18px;margin-top:2px;cursor:pointer;accent-color:#111;flex-shrink:0}
-.terms-label span{color:#111;font-size:.95rem;font-weight:500;line-height:1.5}
-.terms-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.875rem;color:#111;text-decoration:none;font-weight:500;white-space:nowrap;transition:all .2s;border:1.5px solid #e5e7eb;border-radius:999px;padding:.45rem .95rem;background:#fff}
-.terms-link:hover{background:#111;color:#fff;border-color:#111}
-.terms-link svg{transition:all .2s}
-.terms-link:hover svg{color:#fff}
+/* Terms Modal */
+.terms-modal{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem}
+.terms-modal-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px)}
+.terms-modal-content{position:relative;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.terms-modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.terms-modal-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:#111;margin:0}
+.terms-modal-close{background:transparent;border:none;color:#6b7280;padding:.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:.5rem;transition:all .2s}
+.terms-modal-close:hover{background:#f3f4f6;color:#111}
+.terms-modal-body{flex:1;overflow-y:auto;padding:2rem;line-height:1.7;color:#374151;font-size:.95rem}
+.terms-modal-body p{margin-bottom:1rem}
+.terms-modal-body p:last-child{margin-bottom:0}
+.terms-modal-footer{padding:1.5rem;border-top:1px solid #e5e7eb;flex-shrink:0;text-align:center}
+.btn-accept{background:#111;color:#fff;border:none;border-radius:9px;padding:.9rem 2.5rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-accept:hover{background:#000;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
 @media(max-width:768px){
-  .terms-box{padding:.85rem 1rem;gap:.75rem}
-  .terms-label{flex:1 1 100%;min-width:100%}
-  .terms-label span{font-size:.875rem}
-  .terms-link{flex:1 1 100%;width:100%;justify-content:center;font-size:.8rem}
+  .terms-modal{padding:.5rem}
+  .terms-modal-content{max-height:95vh;border-radius:12px}
+  .terms-modal-header{padding:1rem}
+  .terms-modal-header h2{font-size:1.25rem}
+  .terms-modal-body{padding:1.5rem;font-size:.875rem;line-height:1.6}
+  .terms-modal-footer{padding:1rem}
+  .btn-accept{width:100%;justify-content:center;padding:.85rem 1.5rem;font-size:.9rem}
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .4s ease forwards}
@@ -556,25 +565,13 @@ if (!empty($songScripts)) {
       <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
     </div>
 
-    <!-- Terms & Conditions Checkbox -->
-    <div class="terms-box">
-      <label class="terms-label">
-        <input type="checkbox" x-model="termsAccepted">
-        <span><?= strip_tags($termsText) ?></span>
-      </label>
-      <a href="/legal" target="_blank" class="terms-link">
-        <svg style="width:16px;height:16px" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-        Click here to Read terms
-      </a>
-    </div>
-
     <!-- Errors -->
     <div x-show="errors.length" style="display:none" class="err-dark">
       <ul style="list-style:none"><template x-for="e in errors" :key="e"><li x-text="'• '+e"></li></template></ul>
     </div>
 
-    <!-- Submit -->
-    <button type="button" class="btn-go" @click="submit()" :disabled="loading">
+    <!-- Submit (opens terms modal first) -->
+    <button type="button" class="btn-go" @click="openTermsModal()" :disabled="loading">
       Submit Both Auditions →
     </button>
   </div>
@@ -582,6 +579,36 @@ if (!empty($songScripts)) {
 
 <!-- FOOTER -->
 <?php require_once __DIR__ . '/partials/footer-frontend.php'; ?>
+
+<!-- TERMS & CONDITIONS MODAL -->
+<div id="termsModal" class="terms-modal" style="display:none">
+  <div class="terms-modal-overlay"></div>
+  <div class="terms-modal-content">
+    <div class="terms-modal-header">
+      <h2>Terms & Conditions</h2>
+      <button class="terms-modal-close" onclick="closeTermsModal()" aria-label="Close">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="terms-modal-body">
+      <?php
+      $legalContent = $settingsModel->get('legal_content', '');
+      if ($legalContent) {
+        echo nl2br(htmlspecialchars($legalContent));
+      } else {
+        echo '<p>No terms and conditions have been set yet.</p>';
+      }
+      ?>
+    </div>
+    <div class="terms-modal-footer">
+      <button class="btn-accept" onclick="acceptTermsAndSubmit()">
+        I Accept & Submit
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- SONG SLIDER MODAL -->
 <div id="tuneModal">
@@ -716,19 +743,22 @@ function actorSubmit(){
         dialogFile:null,songFile:null,
         loading:false,progress:0,errors:[],
         dragD:false,dragS:false,
-        termsAccepted:false,
         form:{name:'',email:'',phone:''},
         dropD(e){this.dragD=false;var f=e.dataTransfer.files[0];if(f)this.dialogFile=f;},
         dropS(e){this.dragS=false;var f=e.dataTransfer.files[0];if(f)this.songFile=f;},
-        submit(){
+        openTermsModal(){
             this.errors=[];
             if(!this.form.name.trim()) this.errors.push('Name is required.');
             if(!this.form.email.trim()) this.errors.push('Email is required.');
             if(!this.form.phone.trim()) this.errors.push('Phone is required.');
             if(!this.dialogFile) this.errors.push('Dialog audition video is required.');
             if(!this.songFile)   this.errors.push('Song audition video is required.');
-            if(!this.termsAccepted) this.errors.push('You must accept the terms and conditions.');
             if(this.errors.length) return;
+            // Show terms modal
+            document.getElementById('termsModal').style.display='flex';
+            document.body.style.overflow='hidden';
+        },
+        submit(){
             this.loading=true; this.progress=0;
             var fd=new FormData();
             fd.append('role','actor');
@@ -758,6 +788,33 @@ function actorSubmit(){
         }
     };
 }
+
+// Terms modal functions
+function closeTermsModal() {
+    document.getElementById('termsModal').style.display='none';
+    document.body.style.overflow='';
+}
+
+function acceptTermsAndSubmit() {
+    closeTermsModal();
+    // Get the Alpine component instance and call submit
+    var submitCard = document.getElementById('submit-form');
+    if (submitCard && submitCard.__x) {
+        submitCard.__x.$data.submit();
+    }
+}
+
+// Close modal when clicking overlay
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('termsModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal || e.target.classList.contains('terms-modal-overlay')) {
+                closeTermsModal();
+            }
+        });
+    }
+});
 </script>
 <!-- IMAGE LIGHTBOX -->
 <div id="imgLightbox" role="dialog" aria-modal="true" aria-label="Script image viewer">
