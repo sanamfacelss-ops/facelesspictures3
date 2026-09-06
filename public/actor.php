@@ -799,8 +799,20 @@ function acceptTermsAndSubmit() {
     closeTermsModal();
     // Get the Alpine component instance and call submit
     var submitCard = document.getElementById('submit-form');
-    if (submitCard && submitCard.__x) {
-        submitCard.__x.$data.submit();
+    if (submitCard) {
+        // Try multiple ways to access Alpine data
+        if (submitCard._x_dataStack && submitCard._x_dataStack.length > 0) {
+            // Alpine 3.x
+            submitCard._x_dataStack[0].submit();
+        } else if (submitCard.__x && submitCard.__x.$data) {
+            // Older Alpine
+            submitCard.__x.$data.submit();
+        } else if (window.Alpine) {
+            // Direct Alpine access
+            Alpine.$data(submitCard).submit();
+        } else {
+            console.error('Could not access Alpine component');
+        }
     }
 }
 
