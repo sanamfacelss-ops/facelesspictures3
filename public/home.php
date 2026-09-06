@@ -735,7 +735,26 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
                   <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:.08em;color:#fff;margin-bottom:.35rem;font-weight:700;line-height:1.1;text-transform:uppercase"><?= htmlspecialchars($p['title']) ?></h3>
                   <?php endif; ?>
                   <?php if (!empty($p['subtitle'])): ?>
-                  <p style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;font-weight:600"><?= htmlspecialchars($p['subtitle']) ?></p>
+                    <?php 
+                    // Split by $ delimiter - mobile shows as separate lines
+                    $subtitleItems = array_filter(array_map('trim', explode('$', $p['subtitle'])));
+                    ?>
+                    <?php if (count($subtitleItems) > 1): ?>
+                      <!-- Multiple items: Desktop single line, Mobile separate lines -->
+                      <div class="poster-subtitle-wrapper">
+                        <!-- Desktop: Show as single line with spaces -->
+                        <p class="poster-subtitle poster-subtitle-desktop" style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;font-weight:600"><?= implode(' ', array_map('htmlspecialchars', $subtitleItems)) ?></p>
+                        <!-- Mobile: Show as separate lines -->
+                        <div class="poster-subtitle poster-subtitle-mobile" style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;font-weight:600;line-height:1.5;display:none">
+                          <?php foreach ($subtitleItems as $item): ?>
+                            <div><?= htmlspecialchars($item) ?></div>
+                          <?php endforeach; ?>
+                        </div>
+                      </div>
+                    <?php else: ?>
+                      <!-- Single item: Show as normal -->
+                      <p class="poster-subtitle" style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em;font-weight:600"><?= htmlspecialchars($p['subtitle']) ?></p>
+                    <?php endif; ?>
                   <?php endif; ?>
                 </div>
                 <?php endif; ?>
@@ -810,6 +829,13 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .rasas-section{padding:2.5rem 0 !important}
       .rasas-section > div{padding:0 1rem !important}
       .rasa-poster-image{border-radius:8px !important}
+      /* Show mobile poster subtitle, hide desktop */
+      .poster-subtitle-desktop{display:none !important}
+      .poster-subtitle-mobile{display:block !important}
+    }
+    /* Desktop - hide mobile poster subtitle */
+    @media(min-width:641px){
+      .poster-subtitle-mobile{display:none !important}
     }
     </style>
     

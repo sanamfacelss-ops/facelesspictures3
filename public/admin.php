@@ -4182,6 +4182,7 @@ if (file_exists($errorLogFile)) {
                                             <label class="block text-[11px] text-dark/40 mb-1">Film Subtitle <span class="text-dark/25">(e.g., WONDER, PEACE, PARENTAL)</span></label>
                                             <input type="text" x-model="form.<?= $p[3] ?>" placeholder="Subtitle or category..."
                                                 class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                            <p class="text-[10px] text-dark/25 mt-1">Use $ to separate items for line breaks on mobile</p>
                                         </div>
 
                                         <!-- Button label -->
