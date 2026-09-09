@@ -224,6 +224,7 @@ if (file_exists($errorLogFile)) {
     <!-- Plyr Video Player -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -254,6 +255,24 @@ if (file_exists($errorLogFile)) {
         .sidebar-link:hover { background: #FEF2F2; }
         .sidebar-link.active { background: #FEF2F2; border-left: 3px solid #D92B3A; color: #D92B3A; }
         .stat-card { background: #F1EFE8; }
+        
+        /* Sortable drag-and-drop styles */
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #f3f4f6;
+        }
+        .sortable-drag {
+            opacity: 1;
+            cursor: grabbing !important;
+        }
+        .drag-handle {
+            cursor: grab;
+            user-select: none;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
         /* Custom Plyr colors */
         :root {
             --plyr-color-main: #D92B3A;
@@ -4610,19 +4629,25 @@ The page will automatically format headings and paragraphs."
                                 <!-- Description Lines (Dynamic) -->
                                 <div class="mb-3">
                                     <div class="flex items-center justify-between mb-2">
-                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines</label>
+                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines <span class="text-dark/30">(Drag to reorder)</span></label>
                                         <button type="button" @click="addStatsLine()" class="text-[11px] bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center gap-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                             Add Line
                                         </button>
                                     </div>
-                                    <div class="space-y-2">
+                                    <div class="space-y-2" x-ref="statsLinesList">
                                         <template x-for="(line, index) in statsLines" :key="index">
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 group stats-line-item" :data-index="index">
+                                                <!-- Drag Handle -->
+                                                <div class="drag-handle flex-shrink-0 w-6 h-8 flex items-center justify-center cursor-move text-dark/20 hover:text-dark/50 transition">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+                                                    </svg>
+                                                </div>
                                                 <input type="text" 
                                                     x-model="statsLines[index]" 
                                                     @input="syncStatsLinesToForm()"
-                                                    :placeholder="'Description line ' + (index + 1)"
+                                                    :placeholder="'Line ' + (index + 1) + ' (leave empty for spacing)'"
                                                     class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                                 <button type="button" 
                                                     @click="removeStatsLine(index)" 
@@ -4633,6 +4658,7 @@ The page will automatically format headings and paragraphs."
                                             </div>
                                         </template>
                                     </div>
+                                    <p class="text-[10px] text-dark/30 mt-2">💡 Drag lines to reorder. Leave empty for spacing between lines.</p>
                                 </div>
                                 
                                 <!-- Tagline -->
@@ -9120,6 +9146,24 @@ The page will automatically format headings and paragraphs."
                 // Initialize stats lines from JSON or fallback to individual fields
                 this.initStatsLines();
                 
+                // Initialize drag-and-drop for stats lines
+                this.$nextTick(() => {
+                    if (this.$refs.statsLinesList && window.Sortable) {
+                        new Sortable(this.$refs.statsLinesList, {
+                            animation: 150,
+                            handle: '.drag-handle',
+                            ghostClass: 'sortable-ghost',
+                            dragClass: 'sortable-drag',
+                            onEnd: (evt) => {
+                                // Reorder the statsLines array
+                                const movedItem = this.statsLines.splice(evt.oldIndex, 1)[0];
+                                this.statsLines.splice(evt.newIndex, 0, movedItem);
+                                this.syncStatsLinesToForm();
+                            }
+                        });
+                    }
+                });
+                
                 // Sync uploaded image URLs back into the form
                 document.addEventListener('image-uploaded', e => {
                     if (this.form.hasOwnProperty(e.detail.field)) {
@@ -9141,7 +9185,8 @@ The page will automatically format headings and paragraphs."
                 if (this.form.stats_lines_json) {
                     try {
                         const parsed = JSON.parse(this.form.stats_lines_json);
-                        this.statsLines = Array.isArray(parsed) ? parsed.filter(l => l) : [''];
+                        // Keep ALL lines including empty ones
+                        this.statsLines = Array.isArray(parsed) ? parsed : [''];
                     } catch(e) {
                         // Fallback to old format
                         this.statsLines = [
@@ -9149,7 +9194,7 @@ The page will automatically format headings and paragraphs."
                             this.form.stats_line_2 || '',
                             this.form.stats_line_3 || '',
                             this.form.stats_line_4 || ''
-                        ].filter(line => line !== '');
+                        ];
                     }
                 } else {
                     // Fallback to old format
@@ -9158,11 +9203,12 @@ The page will automatically format headings and paragraphs."
                         this.form.stats_line_2 || '',
                         this.form.stats_line_3 || '',
                         this.form.stats_line_4 || ''
-                    ].filter(line => line !== '');
+                    ];
                 }
                 if (this.statsLines.length === 0) {
                     this.statsLines = [''];
                 }
+                this.syncStatsLinesToForm();
             },
             addStatsLine() {
                 this.statsLines.push('');
@@ -9186,7 +9232,8 @@ The page will automatically format headings and paragraphs."
                 
                 // Compile stats lines from dynamic array into JSON before saving
                 if (this.statsLines) {
-                    this.form.stats_lines_json = JSON.stringify(this.statsLines.filter(line => line.trim() !== ''));
+                    // Keep ALL lines including empty ones for spacing
+                    this.form.stats_lines_json = JSON.stringify(this.statsLines);
                 }
                 
                 // Send all settings in ONE batch request
