@@ -9146,23 +9146,17 @@ The page will automatically format headings and paragraphs."
                 // Initialize stats lines from JSON or fallback to individual fields
                 this.initStatsLines();
                 
-                // Initialize drag-and-drop for stats lines
-                this.$nextTick(() => {
-                    if (this.$refs.statsLinesList && window.Sortable) {
-                        new Sortable(this.$refs.statsLinesList, {
-                            animation: 150,
-                            handle: '.drag-handle',
-                            ghostClass: 'sortable-ghost',
-                            dragClass: 'sortable-drag',
-                            onEnd: (evt) => {
-                                // Reorder the statsLines array
-                                const movedItem = this.statsLines.splice(evt.oldIndex, 1)[0];
-                                this.statsLines.splice(evt.newIndex, 0, movedItem);
-                                this.syncStatsLinesToForm();
-                            }
-                        });
+                // Watch for when Home section opens and initialize Sortable
+                this.$watch('showHome', (value) => {
+                    if (value) {
+                        this.initSortable();
                     }
                 });
+                
+                // Initialize immediately if section is already open
+                if (this.showHome) {
+                    this.$nextTick(() => this.initSortable());
+                }
                 
                 // Sync uploaded image URLs back into the form
                 document.addEventListener('image-uploaded', e => {
@@ -9209,6 +9203,41 @@ The page will automatically format headings and paragraphs."
                     this.statsLines = [''];
                 }
                 this.syncStatsLinesToForm();
+            },
+            initSortable() {
+                // Wait for Alpine to render the list
+                setTimeout(() => {
+                    const container = this.$refs.statsLinesList;
+                    if (!container) {
+                        console.log('Stats lines container not found yet');
+                        return;
+                    }
+                    
+                    if (!window.Sortable) {
+                        console.error('Sortable library not loaded');
+                        return;
+                    }
+                    
+                    // Destroy existing instance if any
+                    if (container.sortableInstance) {
+                        container.sortableInstance.destroy();
+                    }
+                    
+                    // Create new Sortable instance
+                    container.sortableInstance = new Sortable(container, {
+                        animation: 150,
+                        handle: '.drag-handle',
+                        ghostClass: 'sortable-ghost',
+                        dragClass: 'sortable-drag',
+                        onEnd: (evt) => {
+                            // Reorder the statsLines array
+                            const movedItem = this.statsLines.splice(evt.oldIndex, 1)[0];
+                            this.statsLines.splice(evt.newIndex, 0, movedItem);
+                            this.syncStatsLinesToForm();
+                        }
+                    });
+                    console.log('✅ Sortable initialized for stats lines');
+                }, 300);
             },
             addStatsLine() {
                 this.statsLines.push('');
