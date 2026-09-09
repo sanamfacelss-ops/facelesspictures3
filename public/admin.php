@@ -4636,8 +4636,8 @@ The page will automatically format headings and paragraphs."
                                         </button>
                                     </div>
                                     <div class="space-y-2" x-ref="statsLinesList">
-                                        <template x-for="(line, index) in statsLines" :key="index">
-                                            <div class="flex items-center gap-2 group stats-line-item" :data-index="index">
+                                        <template x-for="(line, index) in statsLines" :key="'stats-line-' + index + '-' + line.substring(0, 10)">
+                                            <div class="flex items-center gap-2 group stats-line-item">
                                                 <!-- Drag Handle -->
                                                 <div class="drag-handle flex-shrink-0 w-6 h-8 flex items-center justify-center cursor-move text-dark/20 hover:text-dark/50 transition">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -9229,11 +9229,22 @@ The page will automatically format headings and paragraphs."
                         handle: '.drag-handle',
                         ghostClass: 'sortable-ghost',
                         dragClass: 'sortable-drag',
+                        forceFallback: false,
                         onEnd: (evt) => {
-                            // Reorder the statsLines array
-                            const movedItem = this.statsLines.splice(evt.oldIndex, 1)[0];
-                            this.statsLines.splice(evt.newIndex, 0, movedItem);
+                            // Prevent Alpine from re-rendering during the update
+                            const oldIndex = evt.oldIndex;
+                            const newIndex = evt.newIndex;
+                            
+                            // Update the array without triggering Alpine reactivity first
+                            const newArray = [...this.statsLines];
+                            const movedItem = newArray.splice(oldIndex, 1)[0];
+                            newArray.splice(newIndex, 0, movedItem);
+                            
+                            // Now update with new array
+                            this.statsLines = newArray;
                             this.syncStatsLinesToForm();
+                            
+                            console.log('Reordered:', oldIndex, '→', newIndex);
                         }
                     });
                     console.log('✅ Sortable initialized for stats lines');
