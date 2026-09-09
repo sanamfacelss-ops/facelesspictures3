@@ -4629,20 +4629,35 @@ The page will automatically format headings and paragraphs."
                                 <!-- Description Lines (Dynamic) -->
                                 <div class="mb-3">
                                     <div class="flex items-center justify-between mb-2">
-                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines <span class="text-dark/30">(Drag to reorder)</span></label>
+                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines <span class="text-dark/30">(Use ↑↓ to reorder)</span></label>
                                         <button type="button" @click="addStatsLine()" class="text-[11px] bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center gap-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                             Add Line
                                         </button>
                                     </div>
-                                    <div class="space-y-2" x-ref="statsLinesList">
-                                        <template x-for="(line, index) in statsLines" :key="'stats-line-' + index + '-' + line.substring(0, 10)">
+                                    <div class="space-y-2">
+                                        <template x-for="(line, index) in statsLines" :key="'stats-line-' + index">
                                             <div class="flex items-center gap-2 group stats-line-item">
-                                                <!-- Drag Handle -->
-                                                <div class="drag-handle flex-shrink-0 w-6 h-8 flex items-center justify-center cursor-move text-dark/20 hover:text-dark/50 transition">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
-                                                    </svg>
+                                                <!-- Up/Down Arrows -->
+                                                <div class="flex flex-col gap-1">
+                                                    <button type="button" 
+                                                        @click="moveStatsLineUp(index)" 
+                                                        x-show="index > 0"
+                                                        class="w-6 h-6 flex items-center justify-center text-dark/30 hover:text-dark hover:bg-dark/5 rounded transition"
+                                                        title="Move up">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" 
+                                                        @click="moveStatsLineDown(index)" 
+                                                        x-show="index < statsLines.length - 1"
+                                                        class="w-6 h-6 flex items-center justify-center text-dark/30 hover:text-dark hover:bg-dark/5 rounded transition"
+                                                        title="Move down">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <input type="text" 
                                                     x-model="statsLines[index]" 
@@ -4658,7 +4673,7 @@ The page will automatically format headings and paragraphs."
                                             </div>
                                         </template>
                                     </div>
-                                    <p class="text-[10px] text-dark/30 mt-2">💡 Drag lines to reorder. Leave empty for spacing between lines.</p>
+                                    <p class="text-[10px] text-dark/30 mt-2">💡 Use ↑↓ arrows to reorder lines. Leave empty for spacing between lines.</p>
                                 </div>
                                 
                                 <!-- Tagline -->
@@ -9146,18 +9161,6 @@ The page will automatically format headings and paragraphs."
                 // Initialize stats lines from JSON or fallback to individual fields
                 this.initStatsLines();
                 
-                // Watch for when Home section opens and initialize Sortable
-                this.$watch('showHome', (value) => {
-                    if (value) {
-                        this.initSortable();
-                    }
-                });
-                
-                // Initialize immediately if section is already open
-                if (this.showHome) {
-                    this.$nextTick(() => this.initSortable());
-                }
-                
                 // Sync uploaded image URLs back into the form
                 document.addEventListener('image-uploaded', e => {
                     if (this.form.hasOwnProperty(e.detail.field)) {
@@ -9204,51 +9207,21 @@ The page will automatically format headings and paragraphs."
                 }
                 this.syncStatsLinesToForm();
             },
-            initSortable() {
-                // Wait for Alpine to render the list
-                setTimeout(() => {
-                    const container = this.$refs.statsLinesList;
-                    if (!container) {
-                        console.log('Stats lines container not found yet');
-                        return;
-                    }
-                    
-                    if (!window.Sortable) {
-                        console.error('Sortable library not loaded');
-                        return;
-                    }
-                    
-                    // Destroy existing instance if any
-                    if (container.sortableInstance) {
-                        container.sortableInstance.destroy();
-                    }
-                    
-                    // Create new Sortable instance
-                    container.sortableInstance = new Sortable(container, {
-                        animation: 150,
-                        handle: '.drag-handle',
-                        ghostClass: 'sortable-ghost',
-                        dragClass: 'sortable-drag',
-                        forceFallback: false,
-                        onEnd: (evt) => {
-                            // Prevent Alpine from re-rendering during the update
-                            const oldIndex = evt.oldIndex;
-                            const newIndex = evt.newIndex;
-                            
-                            // Update the array without triggering Alpine reactivity first
-                            const newArray = [...this.statsLines];
-                            const movedItem = newArray.splice(oldIndex, 1)[0];
-                            newArray.splice(newIndex, 0, movedItem);
-                            
-                            // Now update with new array
-                            this.statsLines = newArray;
-                            this.syncStatsLinesToForm();
-                            
-                            console.log('Reordered:', oldIndex, '→', newIndex);
-                        }
-                    });
-                    console.log('✅ Sortable initialized for stats lines');
-                }, 300);
+            moveStatsLineUp(index) {
+                if (index > 0) {
+                    const newArray = [...this.statsLines];
+                    [newArray[index - 1], newArray[index]] = [newArray[index], newArray[index - 1]];
+                    this.statsLines = newArray;
+                    this.syncStatsLinesToForm();
+                }
+            },
+            moveStatsLineDown(index) {
+                if (index < this.statsLines.length - 1) {
+                    const newArray = [...this.statsLines];
+                    [newArray[index], newArray[index + 1]] = [newArray[index + 1], newArray[index]];
+                    this.statsLines = newArray;
+                    this.syncStatsLinesToForm();
+                }
             },
             addStatsLine() {
                 this.statsLines.push('');
