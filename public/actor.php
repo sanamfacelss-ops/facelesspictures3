@@ -502,20 +502,22 @@ if (!empty($songScripts)) {
 <?php $filmSongDownloadsJson = htmlspecialchars(json_encode($allSongDownloads), ENT_QUOTES); ?>
 <!-- FILM SONG CARD -->
 <style>
-.film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.film-song-btn{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 2.5rem;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;flex-shrink:0;min-width:200px}
+.film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.film-song-btn{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
 .film-song-btn:hover{background:#e5e7eb}
-@media(max-width:640px){
-  .film-song-inner{flex-direction:column;align-items:center;text-align:center;padding:1.25rem 1.25rem}
-  .film-song-btn{width:100%;min-width:0;padding:.85rem 1rem}
+.film-song-btn:disabled{opacity:0.5;cursor:not-allowed}
+@media(max-width:768px){
+  .film-song-inner{flex-direction:column;align-items:stretch;text-align:center;padding:1.25rem}
+  .film-song-btn{width:100%;padding:.85rem 1rem}
 }
 </style>
+<div style="max-width:1280px;margin:0 auto 3rem;padding:0 1.5rem">
   <div class="film-song-inner">
-    <div>
+    <div style="flex:1;min-width:0">
       <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem"><?= htmlspecialchars($filmSongHeading) ?></p>
       <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45"><?= htmlspecialchars($filmSongSubtitle) ?></p>
     </div>
-    <div style="display:flex;gap:.75rem;align-items:center">
+    <div style="display:flex;gap:.75rem;align-items:center;flex-shrink:0;flex-wrap:wrap">
       <button type="button" class="film-song-btn"
         onclick="openSongSlider(<?= $filmSongJson ?>)">
         <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -523,12 +525,11 @@ if (!empty($songScripts)) {
       </button>
       <button type="button" class="film-song-btn"
         onclick="downloadSong(<?= $filmSongDownloadsJson ?>)"
-        <?= empty($allSongDownloads) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : '' ?>>
+        <?= empty($allSongDownloads) ? 'disabled' : '' ?>>
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         Download Song
       </button>
     </div>
-  </div>tton>
   </div>
 </div>
 <?php endif; ?>
