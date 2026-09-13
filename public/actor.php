@@ -992,13 +992,45 @@ function downloadSong(songs) {
     
     if (songs.length === 1) {
         // Single song - direct download
-        const song = songs[0];
-        const downloadUrl = song.url;
-        window.open(downloadUrl, '_blank');
+        triggerDownload(songs[0].url, songs[0].label || 'song');
     } else {
         // Multiple songs - show popup
         showDownloadPopup(songs);
     }
+}
+
+// Trigger actual file download instead of opening in browser
+function triggerDownload(url, filename) {
+    // Extract file extension from URL
+    const urlParts = url.split('.');
+    const ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
+    const safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
+    
+    // Fetch and download the file to force download instead of opening
+    fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = safeFilename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(err => {
+            // Fallback: try direct download link
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = safeFilename;
+            a.target = '_blank';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
 }
 
 function showDownloadPopup(songs) {
@@ -1015,15 +1047,15 @@ function showDownloadPopup(songs) {
         
         const title = document.createElement('span');
         title.textContent = song.label || 'Song ' + (index + 1);
-        title.style.cssText = 'font-size:.95rem;font-weight:600;color:#111';
+        title.style.cssText = 'font-size:.95rem;font-weight:600;color:#111;flex:1';
         
         const btn = document.createElement('button');
-        btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3"/></svg>';
-        btn.style.cssText = 'background:#111;color:#fff;border:none;border-radius:6px;padding:.5rem .75rem;cursor:pointer;display:flex;align-items:center;gap:.25rem;font-size:.85rem;font-weight:600;transition:background .2s';
+        btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Download</span>';
+        btn.style.cssText = 'background:#111;color:#fff;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap';
         btn.onclick = function() {
-            window.open(song.url, '_blank');
+            triggerDownload(song.url, song.label || 'song_' + (index + 1));
         };
-        btn.onmouseover = function() { this.style.background = '#000'; };
+        btn.onmouseover = function() { this.style.background = '#dc2626'; };
         btn.onmouseout = function() { this.style.background = '#111'; };
         
         item.appendChild(title);
