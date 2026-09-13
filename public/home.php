@@ -591,13 +591,39 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   var drawer = document.getElementById('mmv2-drawer');
   var back = document.getElementById('mmv2-back');
   if (!drawer || !back) return;
+  var currentPath = window.location.pathname;
+  var isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
+  
   var links = drawer.querySelectorAll('a');
   for (var i = 0; i < links.length; i++) {
-    links[i].addEventListener('click', function(){
+    links[i].addEventListener('click', function(e){
+      var href = this.getAttribute('href') || '';
+      
+      // Close menu first
       drawer.classList.remove('open');
       back.classList.remove('open');
+      
+      // Handle hash links (like /#about)
+      if (href.indexOf('#') !== -1) {
+        var hashIdx = href.indexOf('#');
+        var linkPath = href.substring(0, hashIdx) || '/';
+        var hash = href.substring(hashIdx); // includes '#'
+        
+        // If we're on the same page as the link, scroll smoothly
+        if (isHomePage && (linkPath === '/' || linkPath === '/home.php' || linkPath === '')) {
+          e.preventDefault();
+          var target = document.querySelector(hash);
+          if (target) {
+            setTimeout(function(){
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              history.replaceState(null, '', hash);
+            }, 300);
+          }
+        }
+      }
     });
   }
+  
   window.addEventListener('pageshow', function(){
     drawer.classList.remove('open');
     back.classList.remove('open');
