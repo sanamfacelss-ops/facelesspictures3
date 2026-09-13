@@ -1928,41 +1928,19 @@ if (file_exists($errorLogFile)) {
                                                             </div>
                                                             <div>
                                                                 <label class="block text-[10px] text-dark/50 mb-1">Downloadable MP3/Audio File</label>
-                                                                <div x-data="songFileUploader(idx)">
-                                                                    <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm" @change="onFile($event)">
-                                                                    
-                                                                    <!-- Upload Button (default state) -->
-                                                                    <template x-if="!preview && !uploading">
-                                                                        <button type="button" @click="$refs.songFileInput.click()" 
-                                                                            class="w-full border border-dashed border-gray-300 rounded-lg px-3 py-2.5 text-xs text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition flex items-center justify-center gap-2">
-                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                                                            <span>Click to upload audio/video file</span>
-                                                                        </button>
-                                                                    </template>
-                                                                    
-                                                                    <!-- Uploading state -->
-                                                                    <template x-if="uploading">
-                                                                        <div class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
-                                                                            <div class="flex items-center gap-2 mb-1">
-                                                                                <div class="flex-1 bg-gray-200 rounded-full h-1.5">
-                                                                                    <div class="h-full bg-blue-600 rounded-full transition-all" :style="'width:'+progress+'%'"></div>
-                                                                                </div>
-                                                                                <span class="text-[10px] text-gray-600 font-medium" x-text="progress+'%'"></span>
-                                                                            </div>
-                                                                            <p class="text-[10px] text-gray-500">Uploading...</p>
-                                                                        </div>
-                                                                    </template>
-                                                                    
-                                                                    <!-- Uploaded state -->
-                                                                    <template x-if="preview && !uploading">
-                                                                        <div class="w-full border border-green-200 rounded-lg px-3 py-2 bg-green-50 flex items-center gap-2">
-                                                                            <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                                            <span class="text-xs text-gray-700 flex-1 truncate" x-text="filename"></span>
-                                                                            <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 flex-shrink-0">
-                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                            </button>
-                                                                        </div>
-                                                                    </template>
+                                                                <div x-show="!entry.downloadUrl">
+                                                                    <label class="w-full border border-dashed border-gray-300 rounded-lg px-3 py-2.5 text-xs text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition flex items-center justify-center gap-2 cursor-pointer">
+                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                                                        <span>Click to upload audio/video file</span>
+                                                                        <input type="file" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm" @change="uploadSongFile(idx, $event)">
+                                                                    </label>
+                                                                </div>
+                                                                <div x-show="entry.downloadUrl" x-cloak class="w-full border border-green-200 rounded-lg px-3 py-2 bg-green-50 flex items-center gap-2">
+                                                                    <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                    <span class="text-xs text-gray-700 flex-1 truncate" x-text="entry.downloadUrl ? entry.downloadUrl.split('/').pop() : ''"></span>
+                                                                    <button type="button" @click="updateSongDownloadUrl(idx, '')" class="text-red-500 hover:text-red-700 flex-shrink-0">
+                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -7653,6 +7631,48 @@ The page will automatically format headings and paragraphs."
             updateSongDownloadUrl(idx, val) {
                 this.songEntries[idx].downloadUrl = val;
                 this._syncSongEntriesToForm();
+            },
+            uploadSongFile(idx, event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Validate file type
+                if (!file.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4|mov|avi|mkv|webm|mpeg|mpg)$/i)) {
+                    this.showToast('Please upload a valid audio or video file', 'error');
+                    return;
+                }
+                
+                // Max 500MB
+                if (file.size > 500 * 1024 * 1024) {
+                    this.showToast('File must be under 500 MB', 'error');
+                    return;
+                }
+                
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('type', 'media');
+                
+                this.showToast('Uploading ' + file.name + '...', 'success');
+                
+                fetch('/api/admin/media/upload-script-file', {
+                    method: 'POST',
+                    body: fd
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && res.url) {
+                        this.updateSongDownloadUrl(idx, res.url);
+                        this.showToast('File uploaded successfully');
+                    } else {
+                        this.showToast(res.error || 'Upload failed', 'error');
+                    }
+                })
+                .catch(err => {
+                    this.showToast('Upload error: ' + err.message, 'error');
+                });
+                
+                // Reset input so same file can be selected again
+                event.target.value = '';
             },
             addSongUrl() {
                 this.songEntries.push({ label: '', url: '', downloadUrl: '' });
