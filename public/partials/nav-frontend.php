@@ -200,8 +200,10 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   justify-content: center;
   border-radius: 0.5rem;
   transition: background 0.2s;
-  z-index: 60;
+  z-index: 100;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: auto !important;
+  touch-action: manipulation;
 }
 
 .hamburger-btn:hover,
@@ -225,6 +227,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   background: rgba(0, 0, 0, 0.5);
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: opacity 0.3s, visibility 0.3s;
   z-index: 998;
 }
@@ -232,6 +235,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 .sidebar-overlay.active {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 /* Mobile Sidebar */

@@ -1027,6 +1027,9 @@ function showDownloadPopup(songs) {
     const modal = document.getElementById('downloadSongModal');
     const list = document.getElementById('downloadSongList');
     
+    // Enable pointer events when showing
+    modal.style.pointerEvents = 'auto';
+    
     // Clear existing list
     list.innerHTML = '';
     
@@ -1055,7 +1058,9 @@ function showDownloadPopup(songs) {
 }
 
 function closeDownloadPopup() {
-    document.getElementById('downloadSongModal').style.display = 'none';
+    const modal = document.getElementById('downloadSongModal');
+    modal.style.display = 'none';
+    modal.style.pointerEvents = 'none';
     document.body.style.overflow = '';
 }
 </script>
@@ -1067,7 +1072,7 @@ function closeDownloadPopup() {
 </style>
 
 <!-- Download Song Modal -->
-<div id="downloadSongModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center;padding:1.5rem" onclick="if(event.target===this) closeDownloadPopup()">
+<div id="downloadSongModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center;padding:1.5rem;pointer-events:none" onclick="if(event.target===this) closeDownloadPopup()">
     <div style="background:#fff;border-radius:16px;max-width:500px;width:100%;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
         <div style="padding:1.5rem 1.75rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between">
             <p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.06em;color:#111">Download Song</p>
