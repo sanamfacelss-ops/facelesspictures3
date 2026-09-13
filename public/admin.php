@@ -1928,7 +1928,7 @@ if (file_exists($errorLogFile)) {
                                                             </div>
                                                             <div>
                                                                 <label class="block text-[10px] text-dark/50 mb-1">Downloadable MP3/Audio File</label>
-                                                                <div x-data="songFileUploader(idx)" class="border border-dashed border-dark/10 rounded-lg p-3 hover:border-dark/20 transition cursor-pointer text-center bg-gray-50" 
+                                                                <div x-data="songFileUploader(idx)" class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition cursor-pointer text-center bg-gray-50" 
                                                                     @click="$refs['songFile'+idx].click()"
                                                                     @dragover.prevent="dragging = true"
                                                                     @dragleave.prevent="dragging = false"
@@ -1936,26 +1936,31 @@ if (file_exists($errorLogFile)) {
                                                                     :class="{'border-crimson bg-crimson/5': dragging}">
                                                                     <input type="file" :x-ref="'songFile'+idx" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
                                                                     
-                                                                    <!-- Default: Upload prompt -->
                                                                     <div x-show="!preview && !uploading">
-                                                                        <p class="text-[12px] text-gray-600 font-medium">📁 Upload MP3 file for actor's song</p>
-                                                                        <p class="text-[10px] text-gray-400 mt-1">Click to browse or drag & drop</p>
+                                                                        <div class="text-3xl mb-2">📁</div>
+                                                                        <p class="text-sm text-gray-700 font-semibold mb-1">Upload MP3 file for actor's song</p>
+                                                                        <p class="text-xs text-gray-500">Click here or drag & drop audio file</p>
                                                                     </div>
                                                                     
-                                                                    <!-- Uploading -->
-                                                                    <div x-show="uploading" x-cloak>
-                                                                        <div class="w-full bg-dark/10 rounded-full h-2 mb-2">
+                                                                    <div x-show="uploading" x-cloak class="py-2">
+                                                                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
                                                                             <div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div>
                                                                         </div>
-                                                                        <p class="text-[11px] text-gray-500" x-text="'Uploading '+progress+'%'"></p>
+                                                                        <p class="text-sm text-gray-600" x-text="'Uploading '+progress+'%'"></p>
                                                                     </div>
                                                                     
-                                                                    <!-- Uploaded -->
-                                                                    <div x-show="preview && !uploading" x-cloak class="flex items-center gap-2 justify-center">
-                                                                        <span class="text-green-600 text-lg">✓</span>
-                                                                        <p class="text-[11px] font-medium text-gray-700 truncate" x-text="filename"></p>
-                                                                        <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 text-lg ml-2">×</button>
+                                                                    <div x-show="preview && !uploading" x-cloak class="flex items-center gap-3 justify-center">
+                                                                        <span class="text-green-600 text-2xl">✓</span>
+                                                                        <p class="text-sm font-medium text-gray-700 truncate flex-1" x-text="filename"></p>
+                                                                        <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 text-2xl font-bold">×</button>
                                                                     </div>
+                                                                    
+                                                                    <!-- Fallback for non-Alpine (always visible) -->
+                                                                    <noscript>
+                                                                        <div class="text-3xl mb-2">📁</div>
+                                                                        <p class="text-sm text-gray-700 font-semibold mb-1">Upload MP3 file for actor's song</p>
+                                                                        <p class="text-xs text-gray-500">Click here to upload</p>
+                                                                    </noscript>
                                                                 </div>
                                                             </div>
                                                         </div>
