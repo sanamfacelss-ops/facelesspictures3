@@ -9394,9 +9394,8 @@ The page will automatically format headings and paragraphs."
         }
     });
     </script>
-</body>
-</html>>
 
+<script>
     // Song File Uploader for downloadable audio files (per song)
     function songFileUploader(songIndex) {
         return {
@@ -9495,3 +9494,7 @@ The page will automatically format headings and paragraphs."
             }
         };
     }
+
+</script>
+</body>
+</html>
