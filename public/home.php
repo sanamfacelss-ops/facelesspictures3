@@ -530,10 +530,10 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 #mmv2-open {
   position: fixed; top: 10px; left: 12px; z-index: 99996;
   width: 44px; height: 44px;
-  background: rgba(255,255,255,0.95); border: 1px solid #e5e7eb; border-radius: 8px;
+  background: transparent; border: none; border-radius: 8px;
   cursor: pointer; padding: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: none;
   -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   transition: opacity 0.2s;
 }
@@ -541,7 +541,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   display: block; width: 20px; height: 2px; background: #111; border-radius: 2px;
   pointer-events: none;
 }
-#mmv2-open:active { background: #f3f4f6; }
+#mmv2-open:active { opacity: 0.6; }
 
 #mmv2-back {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99997;

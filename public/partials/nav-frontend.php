@@ -185,8 +185,8 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   z-index: 99996;
   width: 44px;
   height: 44px;
-  background: rgba(255,255,255,0.95);
-  border: 1px solid #e5e7eb;
+  background: transparent;
+  border: none;
   border-radius: 8px;
   cursor: pointer;
   padding: 0;
@@ -195,7 +195,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   align-items: center;
   justify-content: center;
   gap: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   transition: opacity 0.2s;
@@ -212,7 +212,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
 }
 
 #mmv2-open:active {
-  background: #f3f4f6;
+  opacity: 0.6;
 }
 
 /* Back overlay */
