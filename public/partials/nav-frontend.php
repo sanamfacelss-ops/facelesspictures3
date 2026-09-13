@@ -78,11 +78,20 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
     </div>
     
     <div id="mmv2-links">
-      <?php foreach ($allMenuItems as $item): 
-        $itemPath = parse_url($item['url'], PHP_URL_PATH) ?? '/';
-        $isActive = ($itemPath === $currentPath) || ($currentPath === '/home.php' && $itemPath === '/');
+      <?php 
+      $navCurrentPath = parse_url($currentPath, PHP_URL_PATH) ?? '/';
+      foreach ($allMenuItems as $item): 
+        $itemUrl = $item['url'];
+        $itemPath = parse_url($itemUrl, PHP_URL_PATH) ?? '/';
+        $itemHash = parse_url($itemUrl, PHP_URL_FRAGMENT);
+        // Only mark active for non-hash links matching current path
+        $isActive = !$itemHash && (
+          $itemPath === $navCurrentPath || 
+          ($navCurrentPath === '/home.php' && $itemPath === '/') ||
+          ($navCurrentPath === '/' && $itemPath === '/home.php')
+        );
       ?>
-        <a href="<?= htmlspecialchars($item['url']) ?>"<?= $isActive ? ' class="active"' : '' ?>>
+        <a href="<?= htmlspecialchars($itemUrl) ?>"<?= $isActive ? ' class="active"' : '' ?>>
           <?= htmlspecialchars($item['text']) ?>
         </a>
       <?php endforeach; ?>

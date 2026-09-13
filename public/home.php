@@ -510,12 +510,20 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     <div id="mmv2-links">
       <?php 
-      $mmCurrentPath = $_SERVER['REQUEST_URI'] ?? '/';
+      $mmCurrentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
       foreach ($allMenuItems as $item): 
-        $itemPath = parse_url($item['url'], PHP_URL_PATH) ?? '/';
-        $isActive = ($itemPath === $mmCurrentPath) || ($mmCurrentPath === '/home.php' && $itemPath === '/');
+        $itemUrl = $item['url'];
+        $itemPath = parse_url($itemUrl, PHP_URL_PATH) ?? '/';
+        $itemHash = parse_url($itemUrl, PHP_URL_FRAGMENT);
+        // Only mark active for non-hash links matching current path
+        // Hash links (like /#about) are handled by JS based on scroll position
+        $isActive = !$itemHash && (
+          $itemPath === $mmCurrentPath || 
+          ($mmCurrentPath === '/home.php' && $itemPath === '/') ||
+          ($mmCurrentPath === '/' && $itemPath === '/home.php')
+        );
       ?>
-        <a href="<?= htmlspecialchars($item['url']) ?>"<?= $isActive ? ' class="active"' : '' ?>>
+        <a href="<?= htmlspecialchars($itemUrl) ?>"<?= $isActive ? ' class="active"' : '' ?>>
           <?= htmlspecialchars($item['text']) ?>
         </a>
       <?php endforeach; ?>
@@ -599,17 +607,14 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     links[i].addEventListener('click', function(e){
       var href = this.getAttribute('href') || '';
       
-      // Close menu first
       drawer.classList.remove('open');
       back.classList.remove('open');
       
-      // Handle hash links (like /#about)
       if (href.indexOf('#') !== -1) {
         var hashIdx = href.indexOf('#');
         var linkPath = href.substring(0, hashIdx) || '/';
-        var hash = href.substring(hashIdx); // includes '#'
+        var hash = href.substring(hashIdx);
         
-        // If we're on the same page as the link, scroll smoothly
         if (isHomePage && (linkPath === '/' || linkPath === '/home.php' || linkPath === '')) {
           e.preventDefault();
           var target = document.querySelector(hash);
@@ -622,6 +627,63 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         }
       }
     });
+  }
+  
+  // Auto-scroll to hash on page load (for /#about from another page)
+  if (window.location.hash) {
+    var target = document.querySelector(window.location.hash);
+    if (target) {
+      setTimeout(function(){
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+  
+  // Update active state on scroll (home page only)
+  if (isHomePage) {
+    var hashLinks = drawer.querySelectorAll('a[href*="#"]');
+    var nonHashLinks = drawer.querySelectorAll('a:not([href*="#"])');
+    
+    function updateActive() {
+      var scrollY = window.pageYOffset;
+      var viewportMid = scrollY + window.innerHeight / 2;
+      var activeHashHref = null;
+      
+      // Find which hash section is currently in view
+      for (var j = 0; j < hashLinks.length; j++) {
+        var href = hashLinks[j].getAttribute('href') || '';
+        var hashIdx = href.indexOf('#');
+        var hash = href.substring(hashIdx);
+        var target = document.querySelector(hash);
+        if (target) {
+          var rect = target.getBoundingClientRect();
+          var top = rect.top + scrollY;
+          var bottom = top + rect.height;
+          if (viewportMid >= top && viewportMid <= bottom) {
+            activeHashHref = href;
+            break;
+          }
+        }
+      }
+      
+      // Update active class on all links
+      for (var k = 0; k < hashLinks.length; k++) {
+        if (hashLinks[k].getAttribute('href') === activeHashHref) {
+          hashLinks[k].classList.add('active');
+        } else {
+          hashLinks[k].classList.remove('active');
+        }
+      }
+    }
+    
+    var scrollTimer;
+    window.addEventListener('scroll', function(){
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(updateActive, 50);
+    }, { passive: true });
+    
+    // Run once on load
+    setTimeout(updateActive, 200);
   }
   
   window.addEventListener('pageshow', function(){
