@@ -1062,7 +1062,7 @@ function closeDownloadPopup() {
 
 <style>
 .download-song-btn{background:#111;color:#fff !important;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap;text-decoration:none;font-family:'DM Sans',sans-serif}
-.download-song-btn:hover{background:#dc2626 !important;color:#fff !important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(220,38,38,.3)}
+.download-song-btn:hover{background:#374151 !important;color:#fff !important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .download-song-btn svg{stroke:#fff !important}
 </style>
 
