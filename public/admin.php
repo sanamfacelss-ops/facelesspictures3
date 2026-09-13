@@ -1929,12 +1929,12 @@ if (file_exists($errorLogFile)) {
                                                             <div>
                                                                 <label class="block text-[10px] text-dark/50 mb-1">Downloadable MP3/Audio File</label>
                                                                 <div x-data="songFileUploader(idx)" class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition cursor-pointer text-center bg-gray-50" 
-                                                                    @click="$refs['songFile'+idx].click()"
+                                                                    @click="$refs.songFileInput.click()"
                                                                     @dragover.prevent="dragging = true"
                                                                     @dragleave.prevent="dragging = false"
                                                                     @drop.prevent="onDrop($event)"
                                                                     :class="{'border-crimson bg-crimson/5': dragging}">
-                                                                    <input type="file" :x-ref="'songFile'+idx" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
+                                                                    <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
                                                                     
                                                                     <div :class="(preview || uploading) ? 'hidden' : ''">
                                                                         <div class="text-3xl mb-2">📁</div>
