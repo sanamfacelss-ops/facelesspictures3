@@ -985,6 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // Download Song Function
 function downloadSong(songs) {
+    console.log('downloadSong called with:', songs);
     if (!songs || songs.length === 0) {
         alert('No songs available for download');
         return;
@@ -999,38 +1000,27 @@ function downloadSong(songs) {
     }
 }
 
-// Trigger actual file download instead of opening in browser
+// Trigger actual file download using anchor tag with download attribute
 function triggerDownload(url, filename) {
+    console.log('Downloading:', url);
+    if (!url) {
+        alert('Download URL is missing');
+        return;
+    }
+    
     // Extract file extension from URL
     const urlParts = url.split('.');
     const ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
     const safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
     
-    // Fetch and download the file to force download instead of opening
-    fetch(url)
-        .then(response => response.blob())
-        .then(blob => {
-            const blobUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = safeFilename;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(blobUrl);
-        })
-        .catch(err => {
-            // Fallback: try direct download link
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = safeFilename;
-            a.target = '_blank';
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        });
+    // Create download link with download attribute (forces download for same-origin files)
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = safeFilename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 100);
 }
 
 function showDownloadPopup(songs) {
@@ -1049,14 +1039,11 @@ function showDownloadPopup(songs) {
         title.textContent = song.label || 'Song ' + (index + 1);
         title.style.cssText = 'font-size:.95rem;font-weight:600;color:#111;flex:1';
         
-        const btn = document.createElement('button');
+        const btn = document.createElement('a');
+        btn.href = song.url;
+        btn.download = (song.label || 'song_' + (index + 1)).replace(/[^a-z0-9]/gi, '_');
+        btn.className = 'download-song-btn';
         btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Download</span>';
-        btn.style.cssText = 'background:#111;color:#fff;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap';
-        btn.onclick = function() {
-            triggerDownload(song.url, song.label || 'song_' + (index + 1));
-        };
-        btn.onmouseover = function() { this.style.background = '#dc2626'; };
-        btn.onmouseout = function() { this.style.background = '#111'; };
         
         item.appendChild(title);
         item.appendChild(btn);
@@ -1072,6 +1059,12 @@ function closeDownloadPopup() {
     document.body.style.overflow = '';
 }
 </script>
+
+<style>
+.download-song-btn{background:#111;color:#fff !important;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap;text-decoration:none;font-family:'DM Sans',sans-serif}
+.download-song-btn:hover{background:#dc2626 !important;color:#fff !important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(220,38,38,.3)}
+.download-song-btn svg{stroke:#fff !important}
+</style>
 
 <!-- Download Song Modal -->
 <div id="downloadSongModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center;padding:1.5rem" onclick="if(event.target===this) closeDownloadPopup()">
