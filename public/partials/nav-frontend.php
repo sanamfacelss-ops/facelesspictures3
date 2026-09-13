@@ -34,8 +34,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <div class="fp-nav-container">
     
     <!-- Mobile: Hamburger Button -->
-    <button id="hamburger-btn" class="hamburger-btn" aria-label="Open menu">
-      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" onclick="window.fpOpenMenu && window.fpOpenMenu()">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="pointer-events:none">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
@@ -71,7 +71,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 </nav>
 
 <!-- Mobile Sidebar Overlay -->
-<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="window.fpCloseMenu && window.fpCloseMenu()"></div>
 
 <!-- Mobile Sidebar -->
 <div id="mobile-sidebar" class="mobile-sidebar">
@@ -84,8 +84,8 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         <span class="nav-badge">3</span>
       <?php endif; ?>
     </a>
-    <button id="close-btn" class="close-btn" aria-label="Close menu">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <button id="close-btn" type="button" class="close-btn" aria-label="Close menu" onclick="window.fpCloseMenu && window.fpCloseMenu()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="pointer-events:none">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
       </svg>
     </button>
@@ -354,140 +354,75 @@ body.menu-open {
 </style>
 
 <script>
-// Mobile menu functions - run immediately, before Alpine loads
+// Mobile menu - defined globally, immediately available for inline onclick handlers
+window.fpOpenMenu = function() {
+  console.log('[Menu] Opening');
+  var sidebar = document.getElementById('mobile-sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.add('active');
+  if (overlay) overlay.classList.add('active');
+  document.body.classList.add('menu-open');
+};
+
+window.fpCloseMenu = function() {
+  console.log('[Menu] Closing');
+  var sidebar = document.getElementById('mobile-sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  document.body.classList.remove('menu-open');
+};
+
+// Active state and link handlers - run when DOM ready
 (function() {
-  'use strict';
-  
-  function openMenu() {
-    console.log('[Menu] Opening');
-    const sidebar = document.getElementById('mobile-sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    if (sidebar && overlay) {
-      sidebar.classList.add('active');
-      overlay.classList.add('active');
-      document.body.classList.add('menu-open');
-      console.log('[Menu] Opened successfully');
-    } else {
-      console.error('[Menu] Elements not found:', { sidebar: !!sidebar, overlay: !!overlay });
-    }
-  }
-  
-  function closeMenu() {
-    console.log('[Menu] Closing');
-    const sidebar = document.getElementById('mobile-sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    if (sidebar && overlay) {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.classList.remove('menu-open');
-      console.log('[Menu] Closed successfully');
-    }
-  }
-  
-  // Expose globally
-  window.fpOpenMenu = openMenu;
-  window.fpCloseMenu = closeMenu;
-  
-  // Wait for DOM
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-  
   function init() {
-    console.log('[Menu] Initializing');
+    var currentPath = window.location.pathname;
+    var isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
     
-    const hamburger = document.getElementById('hamburger-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const overlay = document.getElementById('sidebar-overlay');
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    
-    console.log('[Menu] Elements found:', {
-      hamburger: !!hamburger,
-      closeBtn: !!closeBtn,
-      overlay: !!overlay,
-      links: sidebarLinks.length
-    });
-    
-    // Attach event listeners
-    if (hamburger) {
-      hamburger.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('[Menu] Hamburger clicked');
-        openMenu();
-      }, { passive: false });
+    // Sidebar links - close menu on click, handle #about
+    var sidebarLinks = document.querySelectorAll('.sidebar-link');
+    sidebarLinks.forEach(function(link) {
+      var linkHref = link.getAttribute('href') || '';
+      try {
+        var linkUrl = new URL(link.href, window.location.origin);
+        if (!(!isHomePage && linkHref.indexOf('#about') !== -1) && currentPath === linkUrl.pathname) {
+          link.classList.add('active');
+        }
+      } catch(e) {}
       
-      // Also try touch events for mobile
-      hamburger.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('[Menu] Hamburger touched');
-        openMenu();
-      }, { passive: false });
-    }
-    
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeMenu();
-      });
-    }
-    
-    if (overlay) {
-      overlay.addEventListener('click', closeMenu);
-    }
-    
-    // Close when clicking sidebar links
-    const currentPath = window.location.pathname;
-    const isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
-    
-    sidebarLinks.forEach(link => {
-      const linkHref = link.getAttribute('href');
-      const linkUrl = new URL(link.href, window.location.origin);
-      const linkPath = linkUrl.pathname;
-      
-      // Set active
-      if (!isHomePage && linkHref.includes('#about')) {
-        // Skip
-      } else if (currentPath === linkPath) {
-        link.classList.add('active');
-      }
-      
-      // Click handler
       link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (!isHomePage && href.includes('#about')) {
+        var href = this.getAttribute('href') || '';
+        if (!isHomePage && href.indexOf('#about') !== -1) {
           e.preventDefault();
           window.location.href = '/#about';
           return;
         }
-        closeMenu();
+        window.fpCloseMenu();
       });
     });
     
-    // Desktop nav
-    const desktopLinks = document.querySelectorAll('.desktop-menu .nav-link');
-    desktopLinks.forEach(link => {
+    // Desktop links
+    var desktopLinks = document.querySelectorAll('.desktop-menu .nav-link');
+    desktopLinks.forEach(function(link) {
       link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (!isHomePage && href.includes('#about')) {
+        var href = this.getAttribute('href') || '';
+        if (!isHomePage && href.indexOf('#about') !== -1) {
           e.preventDefault();
           window.location.href = '/#about';
         }
       });
     });
     
-    // Escape key
+    // Escape key closes menu
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeMenu();
-      }
+      if (e.key === 'Escape') window.fpCloseMenu();
     });
-    
-    console.log('[Menu] Initialization complete');
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();
 </script>
