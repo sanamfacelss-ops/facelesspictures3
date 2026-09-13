@@ -1922,6 +1922,42 @@ if (file_exists($errorLogFile)) {
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                                 Add song link
                                             </button>
+                                            
+                                            <!-- Downloadable Song File Upload -->
+                                            <div class="mt-4 pt-4 border-t border-dark/5">
+                                                <label class="block text-[11px] font-medium text-dark/70 mb-2">Downloadable Song File (MP3/Audio)</label>
+                                                <div x-data="songFileUploader()" x-init="init()" class="border-2 border-dashed border-dark/15 rounded-lg p-4 hover:border-dark/30 transition cursor-pointer" 
+                                                    @click="$refs.songFileInput.click()"
+                                                    @dragover.prevent="dragging = true"
+                                                    @dragleave.prevent="dragging = false"
+                                                    @drop.prevent="onDrop($event)"
+                                                    :class="{'border-crimson bg-crimson/5': dragging}">
+                                                    <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
+                                                    <div x-show="!preview && !uploading" class="text-center">
+                                                        <svg class="w-8 h-8 text-dark/20 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                                        <p class="text-[11px] text-dark/40">Drop audio file or click to upload</p>
+                                                        <p class="text-[10px] text-dark/25 mt-1">MP3, WAV, M4A, AAC accepted</p>
+                                                    </div>
+                                                    <div x-show="uploading" class="text-center">
+                                                        <div class="w-full bg-dark/10 rounded-full h-1.5 mb-2">
+                                                            <div class="h-full bg-crimson rounded-full transition-all" :style="'width:'+progress+'%'"></div>
+                                                        </div>
+                                                        <p class="text-[11px] text-dark/40" x-text="'Uploading... '+progress+'%'"></p>
+                                                    </div>
+                                                    <div x-show="preview && !uploading" class="flex items-center gap-3">
+                                                        <svg class="w-6 h-6 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-[11px] font-medium text-dark truncate" x-text="filename"></p>
+                                                            <a :href="preview" target="_blank" class="text-[10px] text-blue-600 hover:underline">Open file</a>
+                                                        </div>
+                                                        <button type="button" @click.stop="clearFile()" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                        </button>
+                                                    </div>
+                                                    <p x-show="uploadError" class="text-[10px] text-red-500 mt-2" x-text="uploadError"></p>
+                                                </div>
+                                                <p class="text-[10px] text-dark/30 mt-1.5">Upload an MP3 or audio file that users can download</p>
+                                            </div>
                                         </div>
 
                                         <!-- SECTION: Rules & Guidelines -->
@@ -6626,7 +6662,7 @@ The page will automatically format headings and paragraphs."
             newSeason: { title: '', brief: '', start_date: '', end_date: '', status: 'active' },
             
             // Scripts
-            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', tune_youtube_url_1: '', tune_youtube_url_2: '', tune_youtube_url_3: '', rules: '' },
+            scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', song_download_url: '', rules: '' },
             songEntries: [{ label: '', url: '' }],
             editingScript: null,
             
@@ -7551,6 +7587,7 @@ The page will automatically format headings and paragraphs."
                     preview_video_url: sc.preview_video_url  || '',
                     script_pdf_url:    sc.script_pdf_url     || '',
                     tune_youtube_url:  sc.tune_youtube_url   || '',
+                    song_download_url: sc.song_download_url  || '',
                     rules:             sc.rules              || '',
                 };
                 this._loadSongEntriesFromForm();
@@ -7637,6 +7674,7 @@ The page will automatically format headings and paragraphs."
                             preview_video_url: this.scriptForm.preview_video_url,
                             script_pdf_url:    this.scriptForm.script_pdf_url,
                             tune_youtube_url:  this.scriptForm.tune_youtube_url,
+                            song_download_url: this.scriptForm.song_download_url,
                             rules:             this.scriptForm.rules,
                             is_active:         1,
                         };
@@ -9345,3 +9383,98 @@ The page will automatically format headings and paragraphs."
     </script>
 </body>
 </html>>
+
+    // Song File Uploader for downloadable audio files
+    function songFileUploader() {
+        return {
+            preview: null,
+            filename: '',
+            dragging: false,
+            uploading: false,
+            progress: 0,
+            uploadError: '',
+            init() {
+                // Load existing file URL if any
+                if (window._adminDashboard && window._adminDashboard.scriptForm.song_download_url) {
+                    this.preview = window._adminDashboard.scriptForm.song_download_url;
+                    this.filename = this.preview.split('/').pop();
+                }
+            },
+            onDrop(e) {
+                this.dragging = false;
+                const file = e.dataTransfer.files[0];
+                if (file) this.uploadFile(file);
+            },
+            onFile(e) {
+                const file = e.target.files[0];
+                if (file) this.uploadFile(file);
+            },
+            uploadFile(file) {
+                // Validate file type
+                const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'audio/x-m4a', 'audio/aac', 'audio/ogg'];
+                if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a|aac|ogg)$/i)) {
+                    this.uploadError = 'Please upload a valid audio file (MP3, WAV, M4A, AAC, OGG)';
+                    return;
+                }
+                
+                // Max 50MB for audio files
+                if (file.size > 50 * 1024 * 1024) {
+                    this.uploadError = 'Audio file must be under 50 MB';
+                    return;
+                }
+                
+                this.uploading = true;
+                this.progress = 0;
+                this.uploadError = '';
+                
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('type', 'audio'); // Mark as audio file
+                
+                const xhr = new XMLHttpRequest();
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        this.progress = Math.round((e.loaded / e.total) * 100);
+                    }
+                };
+                
+                xhr.onload = () => {
+                    this.uploading = false;
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.success && res.url) {
+                                this.preview = res.url;
+                                this.filename = file.name;
+                                // Update scriptForm
+                                if (window._adminDashboard) {
+                                    window._adminDashboard.scriptForm.song_download_url = res.url;
+                                }
+                            } else {
+                                this.uploadError = res.error || 'Upload failed';
+                            }
+                        } catch (e) {
+                            this.uploadError = 'Server error';
+                        }
+                    } else {
+                        this.uploadError = 'Upload failed: ' + xhr.status;
+                    }
+                };
+                
+                xhr.onerror = () => {
+                    this.uploading = false;
+                    this.uploadError = 'Network error';
+                };
+                
+                xhr.open('POST', '/api/admin/media/upload-script-file');
+                xhr.send(fd);
+            },
+            clearFile() {
+                this.preview = null;
+                this.filename = '';
+                if (window._adminDashboard) {
+                    window._adminDashboard.scriptForm.song_download_url = '';
+                }
+            }
+        };
+    }

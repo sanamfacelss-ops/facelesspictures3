@@ -66,9 +66,17 @@ if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
 if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you record your audition';
 if (empty($filmSongBtnLabel)) $filmSongBtnLabel = 'Get Song';
 
-// Collect all tune URLs across all song scripts for the Film Song card
+// Collect all song download URLs and tune URLs from song scripts
+$allSongDownloads = [];
 $allTuneUrls = [];
 foreach ($songScripts as $sc) {
+    // Download URL (MP3/audio file)
+    if (!empty($sc['song_download_url'])) {
+        $label = !empty($sc['title']) ? $sc['title'] : 'Song Audio';
+        $allSongDownloads[] = ['label' => $label, 'url' => $sc['song_download_url']];
+    }
+    
+    // YouTube play URLs
     $raw = $sc['tune_youtube_url'] ?? '';
     foreach (array_filter(array_map('trim', explode("\n", $raw))) as $line) {
         $sep = strpos($line, '|');
@@ -79,6 +87,7 @@ foreach ($songScripts as $sc) {
         }
     }
 }
+$allSongDownloads = array_values(array_filter($allSongDownloads, fn($t) => !empty($t['url'])));
 $allTuneUrls = array_values(array_filter($allTuneUrls, fn($t) => !empty($t['url'])));
 ?>
 <!DOCTYPE html>
@@ -490,6 +499,7 @@ if (!empty($songScripts)) {
 
 <?php if (!empty($allTuneUrls)): ?>
 <?php $filmSongJson = htmlspecialchars(json_encode($allTuneUrls), ENT_QUOTES); ?>
+<?php $filmSongDownloadsJson = htmlspecialchars(json_encode($allSongDownloads), ENT_QUOTES); ?>
 <!-- FILM SONG CARD -->
 <style>
 .film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
@@ -512,7 +522,8 @@ if (!empty($songScripts)) {
         Play Song
       </button>
       <button type="button" class="film-song-btn"
-        onclick="downloadSong(<?= $filmSongJson ?>)">
+        onclick="downloadSong(<?= $filmSongDownloadsJson ?>)"
+        <?= empty($allSongDownloads) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : '' ?>>
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         Download Song
       </button>
