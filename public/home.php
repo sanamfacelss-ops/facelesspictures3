@@ -488,8 +488,9 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 <!-- ═══════════════════════════════════════════════════════════
      MOBILE MENU v2 - Same as nav-frontend.php
      ═══════════════════════════════════════════════════════════ -->
+<?php $mmv2ButtonTop = max(8, intval(($navHeight - 44) / 2)); ?>
 <div id="mmv2-wrap">
-  <button id="mmv2-open" type="button" aria-label="Open menu" onclick="document.getElementById('mmv2-drawer').classList.add('open');document.getElementById('mmv2-back').classList.add('open');">
+  <button id="mmv2-open" type="button" aria-label="Open menu" style="top:<?= $mmv2ButtonTop ?>px" onclick="document.getElementById('mmv2-drawer').classList.add('open');document.getElementById('mmv2-back').classList.add('open');">
     <span></span><span></span><span></span>
   </button>
   
@@ -527,7 +528,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 @media (max-width: 1023px) { #mmv2-wrap { display: block; } }
 
 #mmv2-open {
-  position: fixed; top: 10px; left: 10px; z-index: 99996;
+  position: fixed; top: 10px; left: 12px; z-index: 99996;
   width: 44px; height: 44px;
   background: rgba(255,255,255,0.95); border: 1px solid #e5e7eb; border-radius: 8px;
   cursor: pointer; padding: 0;

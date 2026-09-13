@@ -57,8 +57,9 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
 <!-- ═══════════════════════════════════════════════════════════
      MOBILE MENU v2 - Brand new, super simple, uses native <details>
      ═══════════════════════════════════════════════════════════ -->
+<?php $mmv2ButtonTop = max(8, intval(($headerHeight - 44) / 2)); ?>
 <div id="mmv2-wrap">
-  <button id="mmv2-open" type="button" aria-label="Open menu" onclick="document.getElementById('mmv2-drawer').classList.add('open');document.getElementById('mmv2-back').classList.add('open');">
+  <button id="mmv2-open" type="button" aria-label="Open menu" style="top:<?= $mmv2ButtonTop ?>px" onclick="document.getElementById('mmv2-drawer').classList.add('open');document.getElementById('mmv2-back').classList.add('open');">
     <span></span><span></span><span></span>
   </button>
   
@@ -180,7 +181,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
 #mmv2-open {
   position: fixed;
   top: 10px;
-  left: 10px;
+  left: 12px;
   z-index: 99996;
   width: 44px;
   height: 44px;
