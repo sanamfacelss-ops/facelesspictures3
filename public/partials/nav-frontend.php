@@ -1,13 +1,10 @@
 <?php
-// Frontend Navigation - Used across home, actor, director, writer pages
+// Frontend Navigation - Desktop menu + Mobile hamburger (v2 - clean rewrite)
 $settingsModel = $settingsModel ?? new App\Models\Settings();
 $logoUrl = $logoUrl ?? $settingsModel->get('site_logo_url', '');
 $logoHeight = $logoHeight ?? $settingsModel->get('site_logo_height', '44');
-
-// Calculate header height with padding (logo height + 16px padding top/bottom)
 $headerHeight = (int)$logoHeight + 16;
 
-// Get customizable header menu items (grouped by left/right position)
 try {
     $headerMenuItems = $settingsModel->getHeaderMenuItemsGrouped();
 } catch (\Exception $e) {
@@ -23,7 +20,6 @@ try {
     ];
 }
 
-// Merge all menu items for mobile
 $allMenuItems = array_merge($headerMenuItems['left'], $headerMenuItems['right']);
 usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 
@@ -31,21 +27,16 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
 ?>
 
 <!-- ═══════════════════════════════════════════════════════════
-     DESKTOP NAVIGATION (unchanged)
+     DESKTOP NAVIGATION BAR (unchanged from before)
      ═══════════════════════════════════════════════════════════ -->
 <nav class="fp-nav" style="height:<?= $headerHeight ?>px">
   <div class="fp-nav-container">
-    
-    <!-- LEFT MENU ITEMS (Desktop) -->
     <div class="desktop-menu desktop-menu-left">
       <?php foreach ($headerMenuItems['left'] as $item): ?>
-        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link">
-          <?= htmlspecialchars($item['text']) ?>
-        </a>
+        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link"><?= htmlspecialchars($item['text']) ?></a>
       <?php endforeach; ?>
     </div>
     
-    <!-- CENTERED LOGO -->
     <a href="/" class="nav-logo">
       <?php if ($logoUrl): ?>
         <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= (int)$logoHeight ?>px;width:auto">
@@ -55,56 +46,48 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
       <?php endif; ?>
     </a>
     
-    <!-- RIGHT MENU ITEMS (Desktop) -->
     <div class="desktop-menu desktop-menu-right">
       <?php foreach ($headerMenuItems['right'] as $item): ?>
-        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link">
-          <?= htmlspecialchars($item['text']) ?>
-        </a>
+        <a href="<?= htmlspecialchars($item['url']) ?>" class="nav-link"><?= htmlspecialchars($item['text']) ?></a>
       <?php endforeach; ?>
     </div>
   </div>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════
-     MOBILE MENU (CSS-only, uses checkbox trick - ALWAYS WORKS)
+     MOBILE MENU v2 - Brand new, super simple, uses native <details>
      ═══════════════════════════════════════════════════════════ -->
-<input type="checkbox" id="fp-menu-toggle" class="fp-menu-toggle-input">
-
-<!-- Hamburger button (label) -->
-<label for="fp-menu-toggle" class="fp-hamburger" aria-label="Open menu">
-  <span class="fp-hamburger-line"></span>
-  <span class="fp-hamburger-line"></span>
-  <span class="fp-hamburger-line"></span>
-</label>
-
-<!-- Overlay (label that closes menu) -->
-<label for="fp-menu-toggle" class="fp-mobile-overlay" aria-label="Close menu"></label>
-
-<!-- Mobile menu drawer -->
-<aside class="fp-mobile-menu">
-  <div class="fp-mobile-header">
-    <a href="/" class="fp-mobile-logo">
-      <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3">
-      <?php else: ?>
-        <span>FACELESS PICTURES</span><span class="nav-badge">3</span>
-      <?php endif; ?>
-    </a>
-    <label for="fp-menu-toggle" class="fp-mobile-close" aria-label="Close menu">×</label>
-  </div>
+<div id="mmv2-wrap">
+  <button id="mmv2-open" type="button" aria-label="Open menu" onclick="document.getElementById('mmv2-drawer').classList.add('open');document.getElementById('mmv2-back').classList.add('open');">
+    <span></span><span></span><span></span>
+  </button>
   
-  <nav class="fp-mobile-nav">
-    <?php foreach ($allMenuItems as $item): 
-      $itemPath = parse_url($item['url'], PHP_URL_PATH) ?? '/';
-      $isActive = ($itemPath === $currentPath) || ($currentPath === '/home.php' && $itemPath === '/');
-    ?>
-      <a href="<?= htmlspecialchars($item['url']) ?>" class="fp-mobile-link<?= $isActive ? ' active' : '' ?>">
-        <?= htmlspecialchars($item['text']) ?>
+  <div id="mmv2-back" onclick="this.classList.remove('open');document.getElementById('mmv2-drawer').classList.remove('open');"></div>
+  
+  <div id="mmv2-drawer">
+    <div id="mmv2-head">
+      <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
+        <?php if ($logoUrl): ?>
+          <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Logo" style="height:32px;width:auto">
+        <?php else: ?>
+          FACELESS PICTURES<span class="nav-badge">3</span>
+        <?php endif; ?>
       </a>
-    <?php endforeach; ?>
-  </nav>
-</aside>
+      <button type="button" aria-label="Close menu" onclick="document.getElementById('mmv2-drawer').classList.remove('open');document.getElementById('mmv2-back').classList.remove('open');" style="background:transparent;border:none;font-size:28px;color:#111;cursor:pointer;padding:4px 8px;line-height:1">×</button>
+    </div>
+    
+    <div id="mmv2-links">
+      <?php foreach ($allMenuItems as $item): 
+        $itemPath = parse_url($item['url'], PHP_URL_PATH) ?? '/';
+        $isActive = ($itemPath === $currentPath) || ($currentPath === '/home.php' && $itemPath === '/');
+      ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>"<?= $isActive ? ' class="active"' : '' ?>>
+          <?= htmlspecialchars($item['text']) ?>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</div>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
@@ -120,7 +103,6 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   right: 0;
   z-index: 50;
 }
-
 .fp-nav-container {
   max-width: 1280px;
   margin: 0 auto;
@@ -132,7 +114,6 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   gap: 2rem;
   position: relative;
 }
-
 .nav-logo {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 19px;
@@ -144,14 +125,12 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   gap: 6px;
   flex-shrink: 0;
 }
-
 .logo-text {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 20px;
   letter-spacing: 0.06em;
   color: #111;
 }
-
 .nav-badge {
   background: #111;
   color: #fff;
@@ -165,7 +144,6 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   justify-content: center;
   flex-shrink: 0;
 }
-
 .nav-link {
   font-size: 11px;
   font-weight: 600;
@@ -176,84 +154,83 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   transition: color 0.2s;
   white-space: nowrap;
 }
-
-.nav-link:hover {
-  color: #111;
-}
-
+.nav-link:hover { color: #111; }
 .desktop-menu {
   display: none;
   align-items: center;
   gap: 1.25rem;
 }
-
 @media (min-width: 1024px) {
-  .desktop-menu {
-    display: flex;
-  }
+  .desktop-menu { display: flex; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MOBILE MENU (CSS-only, checkbox toggle)
+   MOBILE MENU v2 - Isolated, unique IDs, simple JS onclick
    ═══════════════════════════════════════════════════════════ */
 
-/* Hide checkbox */
-.fp-menu-toggle-input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-  width: 0;
-  height: 0;
+/* Hide everything mobile on desktop */
+#mmv2-wrap { display: none; }
+
+/* Only show on mobile */
+@media (max-width: 1023px) {
+  #mmv2-wrap { display: block; }
 }
 
-/* Hamburger button - fixed top-left */
-.fp-hamburger {
-  display: none;
+/* Open button (hamburger) - floating fixed position, above everything */
+#mmv2-open {
   position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 60;
+  top: 10px;
+  left: 10px;
+  z-index: 99999;
   width: 44px;
   height: 44px;
-  cursor: pointer;
-  background: transparent;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-.fp-hamburger-line {
+#mmv2-open span {
   display: block;
-  width: 22px;
+  width: 20px;
   height: 2px;
   background: #111;
   border-radius: 2px;
-  transition: transform 0.25s ease, opacity 0.2s ease;
+  transition: transform 0.2s;
+  pointer-events: none;
 }
 
-.fp-hamburger:hover {
-  background: rgba(0, 0, 0, 0.05);
+#mmv2-open:active {
+  background: #f3f4f6;
 }
 
-/* Mobile overlay - hidden by default */
-.fp-mobile-overlay {
-  display: none;
+/* Back overlay */
+#mmv2-back {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
-  cursor: pointer;
+  background: rgba(0,0,0,0.5);
+  z-index: 99997;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  pointer-events: none;
+  transition: opacity 0.25s;
 }
 
-/* Mobile menu drawer - hidden by default */
-.fp-mobile-menu {
-  display: none;
+#mmv2-back.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Drawer */
+#mmv2-drawer {
   position: fixed;
   top: 0;
   left: 0;
@@ -261,169 +238,83 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   width: 280px;
   max-width: 85vw;
   background: #fff;
-  z-index: 999;
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 99998;
   transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.25s;
+  display: flex;
   flex-direction: column;
+  box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+  pointer-events: none;
 }
 
-.fp-mobile-header {
+#mmv2-drawer.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+#mmv2-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.fp-mobile-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 0.06em;
-  color: #111;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.fp-mobile-logo img {
-  height: 36px;
-  width: auto;
-}
-
-.fp-mobile-close {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: #111;
-  cursor: pointer;
-  border-radius: 8px;
-  line-height: 1;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.fp-mobile-close:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.fp-mobile-nav {
+#mmv2-links {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 0;
+  padding: 12px 0;
 }
 
-.fp-mobile-link {
+#mmv2-links a {
   display: block;
-  padding: 0.9rem 1.5rem;
+  padding: 14px 20px;
   color: #374151;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 14px;
   font-weight: 500;
   border-left: 3px solid transparent;
-  transition: all 0.2s;
+  transition: background 0.15s, color 0.15s;
 }
 
-.fp-mobile-link:hover {
-  background: rgba(0, 0, 0, 0.05);
+#mmv2-links a:hover {
+  background: rgba(0,0,0,0.05);
   color: #111;
-  border-left-color: #d92b3a;
 }
 
-.fp-mobile-link.active {
+#mmv2-links a.active {
   background: #111;
   color: #fff;
   font-weight: 600;
   border-left-color: #d92b3a;
 }
 
-/* Show mobile menu only on mobile (< 1024px) */
-@media (max-width: 1023px) {
-  .fp-hamburger {
-    display: flex;
-  }
-  
-  .fp-mobile-overlay {
-    display: block;
-    visibility: hidden;
-  }
-  
-  .fp-mobile-menu {
-    display: flex;
-  }
-  
-  /* When checkbox is CHECKED, show menu and overlay */
-  .fp-menu-toggle-input:checked ~ .fp-mobile-overlay {
-    visibility: visible;
-    opacity: 1;
-  }
-  
-  .fp-menu-toggle-input:checked ~ .fp-mobile-menu {
-    transform: translateX(0);
-  }
-  
-  /* Animate hamburger to X when checked */
-  .fp-menu-toggle-input:checked ~ .fp-hamburger .fp-hamburger-line:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
-  }
-  
-  .fp-menu-toggle-input:checked ~ .fp-hamburger .fp-hamburger-line:nth-child(2) {
-    opacity: 0;
-  }
-  
-  .fp-menu-toggle-input:checked ~ .fp-hamburger .fp-hamburger-line:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
-  }
-  
-  /* Prevent body scroll when menu open */
-  .fp-menu-toggle-input:checked ~ * {
-    /* This is a hack - body scroll lock via JS instead */
-  }
-}
-
-/* On desktop, hide everything mobile */
+/* Hide on desktop */
 @media (min-width: 1024px) {
-  .fp-hamburger,
-  .fp-mobile-overlay,
-  .fp-mobile-menu {
-    display: none !important;
-  }
+  #mmv2-open, #mmv2-back, #mmv2-drawer { display: none !important; }
 }
 </style>
 
 <script>
-// Minimal JS: only for closing menu on link click and body scroll lock
-(function() {
-  var toggle = document.getElementById('fp-menu-toggle');
-  if (!toggle) return;
+// Only script needed: close menu on link click + BFCache reset
+(function(){
+  var drawer = document.getElementById('mmv2-drawer');
+  var back = document.getElementById('mmv2-back');
+  if (!drawer || !back) return;
   
-  // Body scroll lock when menu is open
-  toggle.addEventListener('change', function() {
-    if (this.checked) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-  });
-  
-  // Close menu when clicking any menu link
-  var links = document.querySelectorAll('.fp-mobile-link');
+  // Close on any link click inside drawer
+  var links = drawer.querySelectorAll('a');
   for (var i = 0; i < links.length; i++) {
-    links[i].addEventListener('click', function() {
-      toggle.checked = false;
-      document.body.style.overflow = '';
+    links[i].addEventListener('click', function(){
+      drawer.classList.remove('open');
+      back.classList.remove('open');
     });
   }
   
-  // Reset on page show (BFCache safety)
-  window.addEventListener('pageshow', function() {
-    toggle.checked = false;
-    document.body.style.overflow = '';
+  // Reset on page show
+  window.addEventListener('pageshow', function(){
+    drawer.classList.remove('open');
+    back.classList.remove('open');
   });
 })();
 </script>
