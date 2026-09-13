@@ -34,7 +34,9 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   <div class="fp-nav-container">
     
     <!-- Mobile: Hamburger Button -->
-    <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" onclick="window.fpOpenMenu && window.fpOpenMenu()">
+    <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" 
+            onclick="if(window.fpOpenMenu){window.fpOpenMenu();}else{console.error('fpOpenMenu not defined!');}"
+            ontouchend="event.preventDefault();if(window.fpOpenMenu){window.fpOpenMenu();}">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="pointer-events:none">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
@@ -372,6 +374,24 @@ window.fpCloseMenu = function() {
   if (overlay) overlay.classList.remove('active');
   document.body.classList.remove('menu-open');
 };
+
+// Reset menu state on every page load/show (including BFCache restore)
+window.addEventListener('pageshow', function(e) {
+  console.log('[Menu] Page shown, resetting state. Persisted:', e.persisted);
+  var sidebar = document.getElementById('mobile-sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
+  if (sidebar) sidebar.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  document.body.classList.remove('menu-open');
+  document.body.style.overflow = '';
+  
+  // Force reset any stuck modals from other scripts
+  var downloadModal = document.getElementById('downloadSongModal');
+  if (downloadModal) {
+    downloadModal.style.display = 'none';
+    downloadModal.style.pointerEvents = 'none';
+  }
+});
 
 // Active state and link handlers - run when DOM ready
 (function() {
