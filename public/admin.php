@@ -1928,31 +1928,35 @@ if (file_exists($errorLogFile)) {
                                                             </div>
                                                             <div>
                                                                 <label class="block text-[10px] text-dark/50 mb-1">Downloadable MP3/Audio File</label>
-                                                                <div x-data="songFileUploader(idx)" class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition cursor-pointer text-center bg-gray-50" 
-                                                                    @click="$refs.songFileInput.click()"
-                                                                    @dragover.prevent="dragging = true"
-                                                                    @dragleave.prevent="dragging = false"
-                                                                    @drop.prevent="onDrop($event)"
-                                                                    :class="{'border-crimson bg-crimson/5': dragging}">
+                                                                <div x-data="songFileUploader(idx)" class="relative">
                                                                     <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm" @change="onFile($event)">
                                                                     
-                                                                    <div :class="(preview || uploading) ? 'hidden' : ''">
-                                                                        <div class="text-3xl mb-2">📁</div>
-                                                                        <p class="text-sm text-gray-700 font-semibold mb-1">Upload audio or video file for download</p>
-                                                                        <p class="text-xs text-gray-500">Click here or drag & drop (audio/video files)</p>
-                                                                    </div>
+                                                                    <!-- Upload Button (default state) -->
+                                                                    <button type="button" @click="$refs.songFileInput.click()" 
+                                                                        x-show="!preview && !uploading"
+                                                                        class="w-full border border-dashed border-gray-300 rounded-lg px-3 py-2 text-xs text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                                                        <span>Click to upload audio/video</span>
+                                                                    </button>
                                                                     
-                                                                    <div :class="uploading ? '' : 'hidden'" class="py-2">
-                                                                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                                                                            <div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div>
+                                                                    <!-- Uploading state -->
+                                                                    <div x-show="uploading" x-cloak class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50">
+                                                                        <div class="flex items-center gap-2 mb-1">
+                                                                            <div class="flex-1 bg-gray-200 rounded-full h-1.5">
+                                                                                <div class="h-full bg-blue-600 rounded-full transition-all" :style="'width:'+progress+'%'"></div>
+                                                                            </div>
+                                                                            <span class="text-[10px] text-gray-600 font-medium" x-text="progress+'%'"></span>
                                                                         </div>
-                                                                        <p class="text-sm text-gray-600" x-text="'Uploading '+progress+'%'"></p>
+                                                                        <p class="text-[10px] text-gray-500">Uploading...</p>
                                                                     </div>
                                                                     
-                                                                    <div :class="(preview && !uploading) ? '' : 'hidden'" class="flex items-center gap-3 justify-center">
-                                                                        <span class="text-green-600 text-2xl">✓</span>
-                                                                        <p class="text-sm font-medium text-gray-700 truncate flex-1" x-text="filename"></p>
-                                                                        <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 text-2xl font-bold">×</button>
+                                                                    <!-- Uploaded state -->
+                                                                    <div x-show="preview && !uploading" x-cloak class="w-full border border-green-200 rounded-lg px-3 py-2 bg-green-50 flex items-center gap-2">
+                                                                        <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                        <span class="text-xs text-gray-700 flex-1 truncate" x-text="filename"></span>
+                                                                        <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 flex-shrink-0">
+                                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
