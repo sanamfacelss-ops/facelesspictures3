@@ -251,14 +251,18 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   background: #ffffff;
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
   transform: translateX(-100%);
-  transition: transform 0.3s;
+  transition: transform 0.3s, visibility 0.3s;
   z-index: 999;
   display: flex;
   flex-direction: column;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .mobile-sidebar.active {
   transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
 }
 
 @media (min-width: 1024px) {
