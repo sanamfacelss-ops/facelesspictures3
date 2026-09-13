@@ -455,14 +455,6 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 ?>
 <nav class="fp-nav" style="height:<?= $navHeight ?>px">
   <div class="fp-nav-container">
-    
-    <!-- Mobile: Hamburger Button -->
-    <button id="hamburger-btn" class="hamburger-btn" aria-label="Open menu">
-      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-      </svg>
-    </button>
-    
     <!-- LEFT MENU ITEMS (Desktop) -->
     <div class="desktop-menu desktop-menu-left">
       <?php foreach ($headerMenuItems['left'] as $item): ?>
@@ -493,35 +485,120 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
   </div>
 </nav>
 
-<!-- Mobile Sidebar Overlay -->
-<div id="sidebar-overlay" class="sidebar-overlay"></div>
-
-<!-- Mobile Sidebar -->
-<div id="mobile-sidebar" class="mobile-sidebar">
-  <div class="sidebar-header">
-    <a href="/" class="nav-logo">
-      <?php if ($logoUrl): ?>
-        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Faceless Pictures 3" style="height:<?= max(32, (int)$logoHeight * 0.75) ?>px;width:auto">
-      <?php else: ?>
-        <span class="logo-text" style="font-size:18px">FACELESS PICTURES</span>
-        <span class="nav-badge">3</span>
-      <?php endif; ?>
-    </a>
-    <button id="close-btn" class="close-btn" aria-label="Close menu">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-  </div>
+<!-- ═══════════════════════════════════════════════════════════
+     MOBILE MENU v2 - Same as nav-frontend.php
+     ═══════════════════════════════════════════════════════════ -->
+<div id="mmv2-wrap">
+  <button id="mmv2-open" type="button" aria-label="Open menu" onclick="document.getElementById('mmv2-drawer').classList.add('open');document.getElementById('mmv2-back').classList.add('open');">
+    <span></span><span></span><span></span>
+  </button>
   
-  <div class="sidebar-menu">
-    <?php foreach ($allMenuItems as $item): ?>
-      <a href="<?= htmlspecialchars($item['url']) ?>" class="sidebar-link">
-        <?= htmlspecialchars($item['text']) ?>
+  <div id="mmv2-back" onclick="this.classList.remove('open');document.getElementById('mmv2-drawer').classList.remove('open');"></div>
+  
+  <div id="mmv2-drawer">
+    <div id="mmv2-head">
+      <a href="/" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:#111;text-decoration:none;display:flex;align-items:center;gap:6px">
+        <?php if ($logoUrl): ?>
+          <img src="<?= htmlspecialchars($logoUrl) ?>" alt="Logo" style="height:32px;width:auto">
+        <?php else: ?>
+          FACELESS PICTURES<span class="nav-badge">3</span>
+        <?php endif; ?>
       </a>
-    <?php endforeach; ?>
+      <button type="button" aria-label="Close menu" onclick="document.getElementById('mmv2-drawer').classList.remove('open');document.getElementById('mmv2-back').classList.remove('open');" style="background:transparent;border:none;font-size:28px;color:#111;cursor:pointer;padding:4px 8px;line-height:1">×</button>
+    </div>
+    
+    <div id="mmv2-links">
+      <?php 
+      $mmCurrentPath = $_SERVER['REQUEST_URI'] ?? '/';
+      foreach ($allMenuItems as $item): 
+        $itemPath = parse_url($item['url'], PHP_URL_PATH) ?? '/';
+        $isActive = ($itemPath === $mmCurrentPath) || ($mmCurrentPath === '/home.php' && $itemPath === '/');
+      ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>"<?= $isActive ? ' class="active"' : '' ?>>
+          <?= htmlspecialchars($item['text']) ?>
+        </a>
+      <?php endforeach; ?>
+    </div>
   </div>
 </div>
+
+<style>
+#mmv2-wrap { display: none; }
+@media (max-width: 1023px) { #mmv2-wrap { display: block; } }
+
+#mmv2-open {
+  position: fixed; top: 10px; left: 10px; z-index: 99999;
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.95); border: 1px solid #e5e7eb; border-radius: 8px;
+  cursor: pointer; padding: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+#mmv2-open span {
+  display: block; width: 20px; height: 2px; background: #111; border-radius: 2px;
+  pointer-events: none;
+}
+#mmv2-open:active { background: #f3f4f6; }
+
+#mmv2-back {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99997;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+#mmv2-back.open { opacity: 1; pointer-events: auto; }
+
+#mmv2-drawer {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: 280px; max-width: 85vw;
+  background: #fff; z-index: 99998;
+  transform: translateX(-100%); transition: transform 0.25s;
+  display: flex; flex-direction: column;
+  box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+#mmv2-drawer.open { transform: translateX(0); pointer-events: auto; }
+
+#mmv2-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid #e5e7eb;
+}
+
+#mmv2-links { flex: 1; overflow-y: auto; padding: 12px 0; }
+#mmv2-links a {
+  display: block; padding: 14px 20px;
+  color: #374151; text-decoration: none;
+  font-size: 14px; font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s;
+}
+#mmv2-links a:hover { background: rgba(0,0,0,0.05); color: #111; }
+#mmv2-links a.active {
+  background: #111; color: #fff; font-weight: 600; border-left-color: #d92b3a;
+}
+
+@media (min-width: 1024px) {
+  #mmv2-open, #mmv2-back, #mmv2-drawer { display: none !important; }
+}
+</style>
+
+<script>
+(function(){
+  var drawer = document.getElementById('mmv2-drawer');
+  var back = document.getElementById('mmv2-back');
+  if (!drawer || !back) return;
+  var links = drawer.querySelectorAll('a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener('click', function(){
+      drawer.classList.remove('open');
+      back.classList.remove('open');
+    });
+  }
+  window.addEventListener('pageshow', function(){
+    drawer.classList.remove('open');
+    back.classList.remove('open');
+  });
+})();
+</script>
 
 <!-- ── MAIN CONTENT ── -->
 <main style="padding-top:<?= $navHeight ?>px">
@@ -1759,91 +1836,4 @@ ob_end_flush();
 ?>
 
 
-<!-- Hamburger Menu Script -->
-<script>
-(function() {
-  const hamburgerBtn = document.getElementById('hamburger-btn');
-  const closeBtn = document.getElementById('close-btn');
-  const sidebar = document.getElementById('mobile-sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  
-  // Set active link based on current page and scroll position
-  const currentPath = window.location.pathname;
-  const currentHash = window.location.hash;
-  const isHomePage = currentPath === '/' || currentPath === '/home.php' || currentPath === '/index.php';
-  
-  function updateActiveLinks() {
-    sidebarLinks.forEach(link => {
-      const linkHref = link.getAttribute('href');
-      const linkUrl = new URL(link.href, window.location.origin);
-      const linkPath = linkUrl.pathname;
-      const linkHash = linkUrl.hash;
-      
-      // Remove active class first
-      link.classList.remove('active');
-      
-      // For hash links like /#about - check if we're on home page AND in that section
-      if (linkHash && (linkHref.includes('/#') || linkHref.startsWith('#'))) {
-        if (isHomePage) {
-          const sectionId = linkHash.substring(1); // Remove #
-          const section = document.getElementById(sectionId);
-          
-          if (section) {
-            const rect = section.getBoundingClientRect();
-            const windowHeight = window.innerHeight;
-            // Section is visible if its middle is in viewport
-            if (rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2) {
-              link.classList.add('active');
-            }
-          }
-        }
-        // Never active on non-home pages - already handled by skip
-      }
-      // For other pages - exact match
-      else if (!linkHash && currentPath === linkPath) {
-        link.classList.add('active');
-      }
-    });
-  }
-  
-  // Initial update
-  updateActiveLinks();
-  
-  // Update on scroll (only on home page)
-  if (isHomePage) {
-    let scrollTimeout;
-    window.addEventListener('scroll', function() {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(updateActiveLinks, 100);
-    }, { passive: true });
-  }
-  
-  // Update on hash change
-  window.addEventListener('hashchange', updateActiveLinks);
-  
-  function openMenu() {
-    sidebar.classList.add('active');
-    overlay.classList.add('active');
-    document.body.classList.add('menu-open');
-  }
-  
-  function closeMenu() {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-    document.body.classList.remove('menu-open');
-  }
-  
-  if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMenu);
-  if (closeBtn) closeBtn.addEventListener('click', closeMenu);
-  if (overlay) overlay.addEventListener('click', closeMenu);
-  
-  sidebarLinks.forEach(link => {
-    link.addEventListener('click', closeMenu);
-  });
-  
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeMenu();
-  });
-})();
-</script>
+<!-- Old hamburger script removed - now using mmv2 menu inline above -->
