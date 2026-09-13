@@ -1928,31 +1928,43 @@ if (file_exists($errorLogFile)) {
                                                             </div>
                                                             <div>
                                                                 <label class="block text-[10px] text-dark/50 mb-1">Downloadable MP3/Audio File</label>
-                                                                <div x-data="songFileUploader(idx)" x-init="init()" class="border border-dashed border-dark/10 rounded-lg p-2 hover:border-dark/20 transition cursor-pointer text-center" 
+                                                                <div x-data="songFileUploader(idx)" class="border border-dashed border-dark/10 rounded-lg p-2 hover:border-dark/20 transition cursor-pointer text-center" 
                                                                     @click="$refs['songFile'+idx].click()"
                                                                     @dragover.prevent="dragging = true"
                                                                     @dragleave.prevent="dragging = false"
                                                                     @drop.prevent="onDrop($event)"
                                                                     :class="{'border-crimson bg-crimson/5': dragging}">
                                                                     <input type="file" :x-ref="'songFile'+idx" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
-                                                                    <div x-show="!preview && !uploading" class="py-1">
-                                                                        <svg class="w-5 h-5 text-dark/20 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                                                                        <p class="text-[10px] text-dark/40 font-medium">Click to upload MP3</p>
-                                                                        <p class="text-[9px] text-dark/25 mt-0.5">or drag and drop</p>
-                                                                    </div>
-                                                                    <div x-show="uploading" class="py-1">
-                                                                        <div class="w-full bg-dark/10 rounded-full h-1 mb-1">
-                                                                            <div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div>
+                                                                    
+                                                                    <!-- Default state: show upload prompt -->
+                                                                    <template x-if="!preview && !uploading">
+                                                                        <div class="py-2">
+                                                                            <svg class="w-6 h-6 text-dark/30 mx-auto mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                                                            <p class="text-[11px] text-dark/50 font-semibold mb-0.5">Click here to upload</p>
+                                                                            <p class="text-[9px] text-dark/30">MP3, WAV, M4A, AAC (max 50MB)</p>
                                                                         </div>
-                                                                        <p class="text-[10px] text-dark/30" x-text="progress+'%'"></p>
-                                                                    </div>
-                                                                    <div x-show="preview && !uploading" class="flex items-center gap-2 py-1">
-                                                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                                        <p class="text-[10px] font-medium text-dark truncate flex-1" x-text="filename"></p>
-                                                                        <button type="button" @click.stop="clearFile()" class="w-4 h-4 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500">
-                                                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                        </button>
-                                                                    </div>
+                                                                    </template>
+                                                                    
+                                                                    <!-- Uploading state -->
+                                                                    <template x-if="uploading">
+                                                                        <div class="py-2">
+                                                                            <div class="w-full bg-dark/10 rounded-full h-1.5 mb-2">
+                                                                                <div class="h-full bg-crimson rounded-full transition-all" :style="'width:'+progress+'%'"></div>
+                                                                            </div>
+                                                                            <p class="text-[11px] text-dark/40 font-medium" x-text="'Uploading '+progress+'%'"></p>
+                                                                        </div>
+                                                                    </template>
+                                                                    
+                                                                    <!-- Uploaded state -->
+                                                                    <template x-if="preview && !uploading">
+                                                                        <div class="flex items-center gap-2 py-2">
+                                                                            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                            <p class="text-[11px] font-medium text-dark truncate flex-1" x-text="filename"></p>
+                                                                            <button type="button" @click.stop="clearFile()" class="w-5 h-5 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 flex-shrink-0">
+                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                            </button>
+                                                                        </div>
+                                                                    </template>
                                                                 </div>
                                                             </div>
                                                         </div>
