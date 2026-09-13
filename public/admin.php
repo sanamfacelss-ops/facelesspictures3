@@ -7649,6 +7649,7 @@ The page will automatically format headings and paragraphs."
                 }
                 
                 const fd = new FormData();
+                fd.append('csrf_token', this.csrf);
                 fd.append('file', file);
                 fd.append('type', 'media');
                 
@@ -7656,7 +7657,10 @@ The page will automatically format headings and paragraphs."
                 
                 fetch('/api/admin/media/upload-script-file', {
                     method: 'POST',
-                    body: fd
+                    body: fd,
+                    headers: {
+                        'X-CSRF-Token': this.csrf
+                    }
                 })
                 .then(r => r.json())
                 .then(res => {
