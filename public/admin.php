@@ -1905,59 +1905,63 @@ if (file_exists($errorLogFile)) {
                                         <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak class="pb-4 border-b border-dark/10">
                                             <h4 class="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
                                                 <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                                                Song Links
+                                                Song Links & Downloads
                                             </h4>
-                                            <div class="space-y-2">
+                                            <p class="text-[10px] text-dark/40 mb-3">Add YouTube URL (to play), downloadable MP3 file, and title for each song</p>
+                                            <div class="space-y-3">
                                                 <template x-for="(entry, idx) in songEntries" :key="idx">
-                                                    <div class="flex gap-2 items-center">
-                                                        <input type="text" :value="entry.label" @input="updateSongLabel(idx, $event.target.value)" class="w-24 flex-shrink-0 border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] focus:outline-none focus:border-crimson" placeholder="Label">
-                                                        <input type="url" :value="entry.url" @input="updateSongUrl(idx, $event.target.value)" class="flex-1 border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] focus:outline-none focus:border-crimson" placeholder="YouTube URL">
-                                                        <button type="button" @click="removeSongUrl(idx)" x-show="songEntries.length > 1" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                        </button>
+                                                    <div class="border border-dark/10 rounded-lg p-3 bg-dark/[.02]">
+                                                        <div class="flex items-center justify-between mb-2">
+                                                            <span class="text-[11px] font-semibold text-dark/60">Song #<span x-text="idx + 1"></span></span>
+                                                            <button type="button" @click="removeSongUrl(idx)" x-show="songEntries.length > 1" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                            </button>
+                                                        </div>
+                                                        <div class="space-y-2">
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Song Title</label>
+                                                                <input type="text" :value="entry.label" @input="updateSongLabel(idx, $event.target.value)" class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] focus:outline-none focus:border-crimson" placeholder="e.g. Aey Dil Song">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">YouTube URL (for playing)</label>
+                                                                <input type="url" :value="entry.url" @input="updateSongUrl(idx, $event.target.value)" class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] focus:outline-none focus:border-crimson" placeholder="https://youtube.com/watch?v=...">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Downloadable MP3/Audio File</label>
+                                                                <div x-data="songFileUploader(idx)" x-init="init()" class="border border-dashed border-dark/10 rounded-lg p-2 hover:border-dark/20 transition cursor-pointer text-center" 
+                                                                    @click="$refs['songFile'+idx].click()"
+                                                                    @dragover.prevent="dragging = true"
+                                                                    @dragleave.prevent="dragging = false"
+                                                                    @drop.prevent="onDrop($event)"
+                                                                    :class="{'border-crimson bg-crimson/5': dragging}">
+                                                                    <input type="file" :x-ref="'songFile'+idx" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
+                                                                    <div x-show="!preview && !uploading" class="py-1">
+                                                                        <svg class="w-5 h-5 text-dark/20 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                                                        <p class="text-[10px] text-dark/30">Drop MP3 or click</p>
+                                                                    </div>
+                                                                    <div x-show="uploading" class="py-1">
+                                                                        <div class="w-full bg-dark/10 rounded-full h-1 mb-1">
+                                                                            <div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div>
+                                                                        </div>
+                                                                        <p class="text-[10px] text-dark/30" x-text="progress+'%'"></p>
+                                                                    </div>
+                                                                    <div x-show="preview && !uploading" class="flex items-center gap-2 py-1">
+                                                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                                        <p class="text-[10px] font-medium text-dark truncate flex-1" x-text="filename"></p>
+                                                                        <button type="button" @click.stop="clearFile()" class="w-4 h-4 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500">
+                                                                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </template>
                                             </div>
-                                            <button type="button" @click="addSongUrl()" class="mt-2 flex items-center gap-1 text-[11px] text-dark/50 hover:text-dark transition">
+                                            <button type="button" @click="addSongUrl()" class="mt-3 flex items-center gap-1 text-[11px] text-dark/50 hover:text-dark transition">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                                Add song link
+                                                Add another song
                                             </button>
-                                            
-                                            <!-- Downloadable Song File Upload -->
-                                            <div class="mt-4 pt-4 border-t border-dark/5">
-                                                <label class="block text-[11px] font-medium text-dark/70 mb-2">Downloadable Song File (MP3/Audio)</label>
-                                                <div x-data="songFileUploader()" x-init="init()" class="border-2 border-dashed border-dark/15 rounded-lg p-4 hover:border-dark/30 transition cursor-pointer" 
-                                                    @click="$refs.songFileInput.click()"
-                                                    @dragover.prevent="dragging = true"
-                                                    @dragleave.prevent="dragging = false"
-                                                    @drop.prevent="onDrop($event)"
-                                                    :class="{'border-crimson bg-crimson/5': dragging}">
-                                                    <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
-                                                    <div x-show="!preview && !uploading" class="text-center">
-                                                        <svg class="w-8 h-8 text-dark/20 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                                                        <p class="text-[11px] text-dark/40">Drop audio file or click to upload</p>
-                                                        <p class="text-[10px] text-dark/25 mt-1">MP3, WAV, M4A, AAC accepted</p>
-                                                    </div>
-                                                    <div x-show="uploading" class="text-center">
-                                                        <div class="w-full bg-dark/10 rounded-full h-1.5 mb-2">
-                                                            <div class="h-full bg-crimson rounded-full transition-all" :style="'width:'+progress+'%'"></div>
-                                                        </div>
-                                                        <p class="text-[11px] text-dark/40" x-text="'Uploading... '+progress+'%'"></p>
-                                                    </div>
-                                                    <div x-show="preview && !uploading" class="flex items-center gap-3">
-                                                        <svg class="w-6 h-6 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                        <div class="flex-1 min-w-0">
-                                                            <p class="text-[11px] font-medium text-dark truncate" x-text="filename"></p>
-                                                            <a :href="preview" target="_blank" class="text-[10px] text-blue-600 hover:underline">Open file</a>
-                                                        </div>
-                                                        <button type="button" @click.stop="clearFile()" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition flex-shrink-0">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                        </button>
-                                                    </div>
-                                                    <p x-show="uploadError" class="text-[10px] text-red-500 mt-2" x-text="uploadError"></p>
-                                                </div>
-                                                <p class="text-[10px] text-dark/30 mt-1.5">Upload an MP3 or audio file that users can download</p>
-                                            </div>
                                         </div>
 
                                         <!-- SECTION: Rules & Guidelines -->
@@ -6663,7 +6667,7 @@ The page will automatically format headings and paragraphs."
             
             // Scripts
             scriptForm: { title: '', content: '', category: 'actor', difficulty: 'beginner', duration_hint: '', audition_type: 'Dialog Audition', image_url: '', preview_video_url: '', script_pdf_url: '', tune_youtube_url: '', song_download_url: '', rules: '' },
-            songEntries: [{ label: '', url: '' }],
+            songEntries: [{ label: '', url: '', downloadUrl: '' }],
             editingScript: null,
             
             // Guides
@@ -7608,8 +7612,8 @@ The page will automatically format headings and paragraphs."
             // Song URL list helpers — use reactive songEntries array directly
             _syncSongEntriesToForm() {
                 this.scriptForm.tune_youtube_url = this.songEntries
-                    .map(e => (e.label.trim() ? e.label.trim() + '|' : '') + e.url.trim())
-                    .filter(s => s.replace('|','').trim().length > 0)
+                    .map(e => (e.label.trim() ? e.label.trim() + '|' : '') + e.url.trim() + '|' + (e.downloadUrl || '').trim())
+                    .filter(s => s.replace(/\|/g,'').trim().length > 0)
                     .join('\n');
             },
             _loadSongEntriesFromForm() {
@@ -7617,11 +7621,14 @@ The page will automatically format headings and paragraphs."
                 const lines = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
                 this.songEntries = lines.length > 0
                     ? lines.map(line => {
-                        const sep = line.indexOf('|');
-                        if (sep === -1) return { label: '', url: line };
-                        return { label: line.substring(0, sep), url: line.substring(sep + 1) };
+                        const parts = line.split('|').map(p => p.trim());
+                        return { 
+                            label: parts[0] || '', 
+                            url: parts[1] || '', 
+                            downloadUrl: parts[2] || '' 
+                        };
                       })
-                    : [{ label: '', url: '' }];
+                    : [{ label: '', url: '', downloadUrl: '' }];
             },
             songUrlList() { return this.songEntries; },
             updateSongUrl(idx, val) {
@@ -7632,13 +7639,17 @@ The page will automatically format headings and paragraphs."
                 this.songEntries[idx].label = val;
                 this._syncSongEntriesToForm();
             },
+            updateSongDownloadUrl(idx, val) {
+                this.songEntries[idx].downloadUrl = val;
+                this._syncSongEntriesToForm();
+            },
             addSongUrl() {
-                this.songEntries.push({ label: '', url: '' });
+                this.songEntries.push({ label: '', url: '', downloadUrl: '' });
                 this._syncSongEntriesToForm();
             },
             removeSongUrl(idx) {
                 this.songEntries.splice(idx, 1);
-                if (this.songEntries.length === 0) this.songEntries.push({ label: '', url: '' });
+                if (this.songEntries.length === 0) this.songEntries.push({ label: '', url: '', downloadUrl: '' });
                 this._syncSongEntriesToForm();
             },
             
@@ -9384,8 +9395,8 @@ The page will automatically format headings and paragraphs."
 </body>
 </html>>
 
-    // Song File Uploader for downloadable audio files
-    function songFileUploader() {
+    // Song File Uploader for downloadable audio files (per song)
+    function songFileUploader(songIndex) {
         return {
             preview: null,
             filename: '',
@@ -9393,11 +9404,15 @@ The page will automatically format headings and paragraphs."
             uploading: false,
             progress: 0,
             uploadError: '',
+            songIdx: songIndex,
             init() {
-                // Load existing file URL if any
-                if (window._adminDashboard && window._adminDashboard.scriptForm.song_download_url) {
-                    this.preview = window._adminDashboard.scriptForm.song_download_url;
-                    this.filename = this.preview.split('/').pop();
+                // Load existing file URL if any from songEntries[songIdx]
+                if (window._adminDashboard && window._adminDashboard.songEntries[this.songIdx]) {
+                    const downloadUrl = window._adminDashboard.songEntries[this.songIdx].downloadUrl;
+                    if (downloadUrl) {
+                        this.preview = downloadUrl;
+                        this.filename = downloadUrl.split('/').pop();
+                    }
                 }
             },
             onDrop(e) {
@@ -9446,9 +9461,9 @@ The page will automatically format headings and paragraphs."
                             if (res.success && res.url) {
                                 this.preview = res.url;
                                 this.filename = file.name;
-                                // Update scriptForm
+                                // Update songEntries[songIdx].downloadUrl
                                 if (window._adminDashboard) {
-                                    window._adminDashboard.scriptForm.song_download_url = res.url;
+                                    window._adminDashboard.updateSongDownloadUrl(this.songIdx, res.url);
                                 }
                             } else {
                                 this.uploadError = res.error || 'Upload failed';
@@ -9473,7 +9488,7 @@ The page will automatically format headings and paragraphs."
                 this.preview = null;
                 this.filename = '';
                 if (window._adminDashboard) {
-                    window._adminDashboard.scriptForm.song_download_url = '';
+                    window._adminDashboard.updateSongDownloadUrl(this.songIdx, '');
                 }
             }
         };

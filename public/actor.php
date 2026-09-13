@@ -76,14 +76,23 @@ foreach ($songScripts as $sc) {
         $allSongDownloads[] = ['label' => $label, 'url' => $sc['song_download_url']];
     }
     
-    // YouTube play URLs
+    // Parse YouTube URLs and Download URLs from tune_youtube_url
+    // Format: Label|YouTubeURL|DownloadURL
     $raw = $sc['tune_youtube_url'] ?? '';
     foreach (array_filter(array_map('trim', explode("\n", $raw))) as $line) {
-        $sep = strpos($line, '|');
-        if ($sep !== false) {
-            $allTuneUrls[] = ['label' => trim(substr($line, 0, $sep)), 'url' => trim(substr($line, $sep + 1))];
-        } elseif ($line) {
-            $allTuneUrls[] = ['label' => '', 'url' => $line];
+        $parts = array_map('trim', explode('|', $line));
+        $label = $parts[0] ?? '';
+        $youtubeUrl = $parts[1] ?? '';
+        $downloadUrl = $parts[2] ?? '';
+        
+        // Add to tune URLs if YouTube URL exists
+        if ($youtubeUrl) {
+            $allTuneUrls[] = ['label' => $label, 'url' => $youtubeUrl];
+        }
+        
+        // Add to download list if download URL exists
+        if ($downloadUrl) {
+            $allSongDownloads[] = ['label' => $label, 'url' => $downloadUrl];
         }
     }
 }
@@ -523,12 +532,13 @@ if (!empty($songScripts)) {
         <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         Play Song
       </button>
+      <?php if (!empty($allSongDownloads)): ?>
       <button type="button" class="film-song-btn"
-        onclick="downloadSong(<?= $filmSongDownloadsJson ?>)"
-        <?= empty($allSongDownloads) ? 'disabled' : '' ?>>
+        onclick="downloadSong(<?= $filmSongDownloadsJson ?>)">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         Download Song
       </button>
+      <?php endif; ?>
     </div>
   </div>
 </div>
