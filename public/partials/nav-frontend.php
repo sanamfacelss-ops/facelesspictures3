@@ -181,7 +181,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   position: fixed;
   top: 10px;
   left: 10px;
-  z-index: 99999;
+  z-index: 99996;
   width: 44px;
   height: 44px;
   background: rgba(255,255,255,0.95);
@@ -197,6 +197,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  transition: opacity 0.2s;
 }
 
 #mmv2-open span {
@@ -256,8 +257,18 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid #e5e7eb;
+  min-height: 68px;
+}
+
+#mmv2-head a img {
+  height: 44px !important;
+  width: auto;
+}
+
+#mmv2-head a {
+  font-size: 22px !important;
 }
 
 #mmv2-links {
