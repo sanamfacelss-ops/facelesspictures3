@@ -1934,12 +1934,12 @@ if (file_exists($errorLogFile)) {
                                                                     @dragleave.prevent="dragging = false"
                                                                     @drop.prevent="onDrop($event)"
                                                                     :class="{'border-crimson bg-crimson/5': dragging}">
-                                                                    <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
+                                                                    <input type="file" x-ref="songFileInput" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm" @change="onFile($event)">
                                                                     
                                                                     <div :class="(preview || uploading) ? 'hidden' : ''">
                                                                         <div class="text-3xl mb-2">📁</div>
-                                                                        <p class="text-sm text-gray-700 font-semibold mb-1">Upload MP3 file for actor's song</p>
-                                                                        <p class="text-xs text-gray-500">Click here or drag & drop audio file</p>
+                                                                        <p class="text-sm text-gray-700 font-semibold mb-1">Upload audio or video file for download</p>
+                                                                        <p class="text-xs text-gray-500">Click here or drag & drop (audio/video files)</p>
                                                                     </div>
                                                                     
                                                                     <div :class="uploading ? '' : 'hidden'" class="py-2">
@@ -9426,16 +9426,22 @@ The page will automatically format headings and paragraphs."
                 if (file) this.uploadFile(file);
             },
             uploadFile(file) {
-                // Validate file type
-                const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'audio/x-m4a', 'audio/aac', 'audio/ogg'];
-                if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a|aac|ogg)$/i)) {
-                    this.uploadError = 'Please upload a valid audio file (MP3, WAV, M4A, AAC, OGG)';
+                // Validate file type - accept all audio and video formats
+                const validAudioTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'audio/x-m4a', 'audio/aac', 'audio/ogg', 'audio/flac', 'audio/webm'];
+                const validVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm', 'video/mpeg'];
+                const allValidTypes = [...validAudioTypes, ...validVideoTypes];
+                
+                const isValidType = allValidTypes.includes(file.type) || 
+                    file.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4|mov|avi|mkv|webm|mpeg|mpg)$/i);
+                
+                if (!isValidType) {
+                    this.uploadError = 'Please upload a valid audio or video file';
                     return;
                 }
                 
-                // Max 50MB for audio files
-                if (file.size > 50 * 1024 * 1024) {
-                    this.uploadError = 'Audio file must be under 50 MB';
+                // Max 500MB for media files
+                if (file.size > 500 * 1024 * 1024) {
+                    this.uploadError = 'File must be under 500 MB';
                     return;
                 }
                 
@@ -9445,7 +9451,7 @@ The page will automatically format headings and paragraphs."
                 
                 const fd = new FormData();
                 fd.append('file', file);
-                fd.append('type', 'audio'); // Mark as audio file
+                fd.append('type', 'media'); // Mark as media file (audio or video)
                 
                 const xhr = new XMLHttpRequest();
                 xhr.upload.onprogress = (e) => {
@@ -9468,6 +9474,14 @@ The page will automatically format headings and paragraphs."
                                 }
                             } else {
                                 this.uploadError = res.error || 'Upload failed';
+                            }
+                        } catch (e) {
+                            this.uploadError = 'Server error';
+                        }
+                    } else {
+                        this.uploadError = 'Upload failed: ' + xhr.status;
+                    }
+                };
                             }
                         } catch (e) {
                             this.uploadError = 'Server error';
