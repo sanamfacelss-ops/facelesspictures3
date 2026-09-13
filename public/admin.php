@@ -1937,7 +1937,8 @@ if (file_exists($errorLogFile)) {
                                                                     <input type="file" :x-ref="'songFile'+idx" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
                                                                     <div x-show="!preview && !uploading" class="py-1">
                                                                         <svg class="w-5 h-5 text-dark/20 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                                                                        <p class="text-[10px] text-dark/30">Drop MP3 or click</p>
+                                                                        <p class="text-[10px] text-dark/40 font-medium">Click to upload MP3</p>
+                                                                        <p class="text-[9px] text-dark/25 mt-0.5">or drag and drop</p>
                                                                     </div>
                                                                     <div x-show="uploading" class="py-1">
                                                                         <div class="w-full bg-dark/10 rounded-full h-1 mb-1">
