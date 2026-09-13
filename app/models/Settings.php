@@ -479,7 +479,7 @@ class Settings
             'writer' => '/writer',
             'director' => '/director',
             'actor' => '/actor',
-            'about' => '#about'
+            'about' => '/#about'
         ];
         
         return $pageMap[$page] ?? '#';
