@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/../app/config/config.php';
 require_once __DIR__ . '/../app/helpers/settings_helper.php';
@@ -499,17 +500,24 @@ if (!empty($songScripts)) {
   .film-song-btn{width:100%;min-width:0;padding:.85rem 1rem}
 }
 </style>
-<div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem">
   <div class="film-song-inner">
     <div>
       <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem"><?= htmlspecialchars($filmSongHeading) ?></p>
       <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45"><?= htmlspecialchars($filmSongSubtitle) ?></p>
     </div>
-    <button type="button" class="film-song-btn"
-      onclick="openSongSlider(<?= $filmSongJson ?>)">
-      <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      <?= htmlspecialchars($filmSongBtnLabel) ?>
-    </button>
+    <div style="display:flex;gap:.75rem;align-items:center">
+      <button type="button" class="film-song-btn"
+        onclick="openSongSlider(<?= $filmSongJson ?>)">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Play Song
+      </button>
+      <button type="button" class="film-song-btn"
+        onclick="downloadSong(<?= $filmSongJson ?>)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Download Song
+      </button>
+    </div>
+  </div>tton>
   </div>
 </div>
 <?php endif; ?>
@@ -951,6 +959,76 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 })();
 </script>
+
+<script>
+// Download Song Function
+function downloadSong(songs) {
+    if (!songs || songs.length === 0) {
+        alert('No songs available for download');
+        return;
+    }
+    
+    if (songs.length === 1) {
+        // Single song - direct download
+        const song = songs[0];
+        const downloadUrl = song.url;
+        window.open(downloadUrl, '_blank');
+    } else {
+        // Multiple songs - show popup
+        showDownloadPopup(songs);
+    }
+}
+
+function showDownloadPopup(songs) {
+    const modal = document.getElementById('downloadSongModal');
+    const list = document.getElementById('downloadSongList');
+    
+    // Clear existing list
+    list.innerHTML = '';
+    
+    // Add each song to list
+    songs.forEach((song, index) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f3f4f6;border-radius:8px;gap:1rem';
+        
+        const title = document.createElement('span');
+        title.textContent = song.label || 'Song ' + (index + 1);
+        title.style.cssText = 'font-size:.95rem;font-weight:600;color:#111';
+        
+        const btn = document.createElement('button');
+        btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3"/></svg>';
+        btn.style.cssText = 'background:#111;color:#fff;border:none;border-radius:6px;padding:.5rem .75rem;cursor:pointer;display:flex;align-items:center;gap:.25rem;font-size:.85rem;font-weight:600;transition:background .2s';
+        btn.onclick = function() {
+            window.open(song.url, '_blank');
+        };
+        btn.onmouseover = function() { this.style.background = '#000'; };
+        btn.onmouseout = function() { this.style.background = '#111'; };
+        
+        item.appendChild(title);
+        item.appendChild(btn);
+        list.appendChild(item);
+    });
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDownloadPopup() {
+    document.getElementById('downloadSongModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+</script>
+
+<!-- Download Song Modal -->
+<div id="downloadSongModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center;padding:1.5rem" onclick="if(event.target===this) closeDownloadPopup()">
+    <div style="background:#fff;border-radius:16px;max-width:500px;width:100%;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+        <div style="padding:1.5rem 1.75rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between">
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.06em;color:#111">Download Song</p>
+            <button onclick="closeDownloadPopup()" style="background:none;border:none;font-size:1.5rem;color:#6b7280;cursor:pointer;padding:.25rem .5rem;line-height:1">✕</button>
+        </div>
+        <div id="downloadSongList" style="padding:1.5rem;display:flex;flex-direction:column;gap:.75rem;max-height:60vh;overflow-y:auto"></div>
+    </div>
+</div>
 
 <?php require_once __DIR__ . '/partials/submission-shared.php'; ?>
 <?php include __DIR__ . '/partials/language-switcher.php'; ?>
