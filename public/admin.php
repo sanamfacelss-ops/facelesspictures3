@@ -1936,31 +1936,24 @@ if (file_exists($errorLogFile)) {
                                                                     :class="{'border-crimson bg-crimson/5': dragging}">
                                                                     <input type="file" :x-ref="'songFile'+idx" class="hidden" accept="audio/*,.mp3,.wav,.m4a,.aac" @change="onFile($event)">
                                                                     
-                                                                    <div x-show="!preview && !uploading">
+                                                                    <div :class="(preview || uploading) ? 'hidden' : ''">
                                                                         <div class="text-3xl mb-2">📁</div>
                                                                         <p class="text-sm text-gray-700 font-semibold mb-1">Upload MP3 file for actor's song</p>
                                                                         <p class="text-xs text-gray-500">Click here or drag & drop audio file</p>
                                                                     </div>
                                                                     
-                                                                    <div x-show="uploading" x-cloak class="py-2">
+                                                                    <div :class="uploading ? '' : 'hidden'" class="py-2">
                                                                         <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
                                                                             <div class="h-full bg-crimson rounded-full" :style="'width:'+progress+'%'"></div>
                                                                         </div>
                                                                         <p class="text-sm text-gray-600" x-text="'Uploading '+progress+'%'"></p>
                                                                     </div>
                                                                     
-                                                                    <div x-show="preview && !uploading" x-cloak class="flex items-center gap-3 justify-center">
+                                                                    <div :class="(preview && !uploading) ? '' : 'hidden'" class="flex items-center gap-3 justify-center">
                                                                         <span class="text-green-600 text-2xl">✓</span>
                                                                         <p class="text-sm font-medium text-gray-700 truncate flex-1" x-text="filename"></p>
                                                                         <button type="button" @click.stop="clearFile()" class="text-red-500 hover:text-red-700 text-2xl font-bold">×</button>
                                                                     </div>
-                                                                    
-                                                                    <!-- Fallback for non-Alpine (always visible) -->
-                                                                    <noscript>
-                                                                        <div class="text-3xl mb-2">📁</div>
-                                                                        <p class="text-sm text-gray-700 font-semibold mb-1">Upload MP3 file for actor's song</p>
-                                                                        <p class="text-xs text-gray-500">Click here to upload</p>
-                                                                    </noscript>
                                                                 </div>
                                                             </div>
                                                         </div>
