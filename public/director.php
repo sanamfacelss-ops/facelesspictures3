@@ -600,9 +600,6 @@ function downloadSong(songs){
 }
 function triggerDownload(url, filename, btnEl){
     if(!url){ alert('Download URL is missing'); return; }
-    var urlParts = url.split('.');
-    var ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
-    var safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
     
     // Show brief loader on button (visual feedback only)
     var originalContent = null;
@@ -613,22 +610,30 @@ function triggerDownload(url, filename, btnEl){
         btnEl.innerHTML = '<span class="song-spinner"></span><span>Starting...</span>';
     }
     
-    // Trigger native browser download - streams to disk, no memory buffer
+    // Build download URL - use proxy for /uploads/ files to force attachment header
+    var downloadUrl;
+    if(url.indexOf('/uploads/') === 0 || url.indexOf(window.location.origin + '/uploads/') === 0){
+        var path = url.indexOf('/uploads/') === 0 ? url : url.substring(window.location.origin.length);
+        downloadUrl = '/download.php?path=' + encodeURIComponent(path) + '&name=' + encodeURIComponent(filename || 'song');
+    } else {
+        downloadUrl = url;
+    }
+    
+    // Trigger download - Content-Disposition: attachment header forces immediate Save As
     var a = document.createElement('a');
-    a.href = url;
-    a.download = safeFilename;
+    a.href = downloadUrl;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     setTimeout(function(){ document.body.removeChild(a); }, 100);
     
-    // Restore button quickly - browser handles download in background
+    // Restore button quickly
     if(btnEl && originalContent !== null){
         setTimeout(function(){
             btnEl.disabled = false;
             btnEl.style.cursor = '';
             btnEl.innerHTML = originalContent;
-        }, 800);
+        }, 600);
     }
 }
 function showDownloadPopup(songs){

@@ -1011,17 +1011,12 @@ function downloadSong(songs) {
     }
 }
 
-// Trigger file download - uses native browser download (streams to disk, instant start)
+// Trigger file download via /download.php proxy (forces attachment header - instant Save As)
 function triggerDownload(url, filename, btnEl) {
     if (!url) {
         alert('Download URL is missing');
         return;
     }
-    
-    // Extract file extension from URL
-    const urlParts = url.split('.');
-    const ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
-    const safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
     
     // Show brief loader on button (visual feedback only)
     let originalContent = null;
@@ -1032,10 +1027,20 @@ function triggerDownload(url, filename, btnEl) {
         btnEl.innerHTML = '<span class="song-spinner"></span><span>Starting...</span>';
     }
     
-    // Trigger native browser download - streams to disk, no memory buffer
+    // Build download URL - use proxy for /uploads/ files to force attachment header
+    let downloadUrl;
+    if (url.indexOf('/uploads/') === 0 || url.indexOf(window.location.origin + '/uploads/') === 0) {
+        // Extract path
+        const path = url.indexOf('/uploads/') === 0 ? url : url.substring(window.location.origin.length);
+        downloadUrl = '/download.php?path=' + encodeURIComponent(path) + '&name=' + encodeURIComponent(filename || 'song');
+    } else {
+        // External URL - direct download attempt
+        downloadUrl = url;
+    }
+    
+    // Trigger download via hidden iframe (doesn't navigate away, no dialog delay)
     const a = document.createElement('a');
-    a.href = url;
-    a.download = safeFilename;
+    a.href = downloadUrl;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
@@ -1047,7 +1052,7 @@ function triggerDownload(url, filename, btnEl) {
             btnEl.disabled = false;
             btnEl.style.cursor = '';
             btnEl.innerHTML = originalContent;
-        }, 800);
+        }, 600);
     }
 }
 
