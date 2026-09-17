@@ -1011,7 +1011,7 @@ function downloadSong(songs) {
     }
 }
 
-// Trigger actual file download using fetch + blob (forces download even for cross-origin, shows loader)
+// Trigger file download - uses native browser download (streams to disk, instant start)
 function triggerDownload(url, filename, btnEl) {
     if (!url) {
         alert('Download URL is missing');
@@ -1023,56 +1023,32 @@ function triggerDownload(url, filename, btnEl) {
     const ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
     const safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
     
-    // Show loader on button
+    // Show brief loader on button (visual feedback only)
     let originalContent = null;
     if (btnEl) {
         originalContent = btnEl.innerHTML;
         btnEl.disabled = true;
-        btnEl.style.opacity = '0.7';
         btnEl.style.cursor = 'wait';
-        btnEl.innerHTML = '<span class="song-spinner"></span><span>Downloading...</span>';
+        btnEl.innerHTML = '<span class="song-spinner"></span><span>Starting...</span>';
     }
     
-    // Use fetch to get the file as blob, then trigger real download
-    fetch(url)
-        .then(function(response) {
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            return response.blob();
-        })
-        .then(function(blob) {
-            const blobUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = safeFilename;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(function() {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(blobUrl);
-            }, 100);
-        })
-        .catch(function(err) {
-            // Fallback: direct link if fetch fails
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = safeFilename;
-            a.target = '_blank';
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(function() { document.body.removeChild(a); }, 100);
-        })
-        .finally(function() {
-            if (btnEl && originalContent !== null) {
-                setTimeout(function() {
-                    btnEl.disabled = false;
-                    btnEl.style.opacity = '';
-                    btnEl.style.cursor = '';
-                    btnEl.innerHTML = originalContent;
-                }, 500);
-            }
-        });
+    // Trigger native browser download - streams to disk, no memory buffer
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = safeFilename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { document.body.removeChild(a); }, 100);
+    
+    // Restore button quickly - browser handles download in background
+    if (btnEl && originalContent !== null) {
+        setTimeout(function() {
+            btnEl.disabled = false;
+            btnEl.style.cursor = '';
+            btnEl.innerHTML = originalContent;
+        }, 800);
+    }
 }
 
 function showDownloadPopup(songs) {
