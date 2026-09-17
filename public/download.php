@@ -7,11 +7,12 @@
  * Usage: /download.php?path=/uploads/settings/xxx.mp3&name=song_title
  */
 
+// Load config to get UPLOAD_PATH (may be outside public/)
+require_once __DIR__ . '/../app/config/config.php';
+
 // Get parameters
 $path = $_GET['path'] ?? '';
 $name = $_GET['name'] ?? '';
-
-// Debug mode - enable via ?debug=1 to see what's happening
 $debug = isset($_GET['debug']);
 
 // Validate: must start with /uploads/
@@ -26,25 +27,43 @@ if (strpos($path, '..') !== false || strpos($path, '\\') !== false || strpos($pa
     exit('Invalid path characters');
 }
 
-// Build filesystem path
-$filePath = __DIR__ . $path;
+// Convert URL path to filesystem path.
+// URL: /uploads/settings/xxx.mp3
+// FS:  UPLOAD_PATH/settings/xxx.mp3   (UPLOAD_PATH is BASE_PATH/uploads)
+$relativePath = substr($path, strlen('/uploads/')); // "settings/xxx.mp3"
+$candidates = [
+    UPLOAD_PATH . '/' . $relativePath,     // Primary: BASE_PATH/uploads/settings/xxx.mp3
+    __DIR__ . $path,                        // Fallback: public/uploads/settings/xxx.mp3
+    dirname(__DIR__) . $path,               // Fallback: BASE_PATH/uploads/settings/xxx.mp3 alt form
+];
 
-// Debug info
+$filePath = null;
+foreach ($candidates as $cand) {
+    if (is_file($cand)) {
+        $filePath = $cand;
+        break;
+    }
+}
+
+// Debug mode
 if ($debug) {
     header('Content-Type: text/plain');
     echo "DEBUG INFO:\n";
     echo "path param: " . $path . "\n";
+    echo "relativePath: " . $relativePath . "\n";
+    echo "UPLOAD_PATH: " . UPLOAD_PATH . "\n";
     echo "__DIR__: " . __DIR__ . "\n";
-    echo "filePath: " . $filePath . "\n";
-    echo "file_exists: " . (file_exists($filePath) ? 'YES' : 'NO') . "\n";
-    echo "is_file: " . (is_file($filePath) ? 'YES' : 'NO') . "\n";
-    echo "is_readable: " . (is_readable($filePath) ? 'YES' : 'NO') . "\n";
-    echo "realpath: " . (realpath($filePath) ?: 'FALSE') . "\n";
+    echo "BASE_PATH: " . BASE_PATH . "\n\n";
+    echo "Candidates tested:\n";
+    foreach ($candidates as $i => $cand) {
+        echo "  [" . $i . "] " . $cand . "  -> " . (is_file($cand) ? 'FOUND' : 'not found') . "\n";
+    }
+    echo "\nfilePath resolved to: " . ($filePath ?: 'NULL') . "\n";
     exit;
 }
 
-// Check file exists
-if (!file_exists($filePath) || !is_file($filePath)) {
+// File not found in any candidate location
+if ($filePath === null) {
     http_response_code(404);
     exit('File not found');
 }
@@ -52,21 +71,6 @@ if (!file_exists($filePath) || !is_file($filePath)) {
 if (!is_readable($filePath)) {
     http_response_code(403);
     exit('File not readable');
-}
-
-// Extra safety: ensure resolved path is still under public/uploads/
-// (protects against symlinks pointing outside)
-$realResolved = realpath($filePath);
-if ($realResolved !== false) {
-    $normalized = str_replace('\\', '/', $realResolved);
-    // If we can determine the uploads root, verify - but don't fail if we can't
-    $publicDir = str_replace('\\', '/', __DIR__);
-    // Only enforce if the resolved path is a subpath check possible
-    // Allow if path contains /uploads/ anywhere in resolved
-    if (strpos($normalized, '/uploads/') === false) {
-        http_response_code(403);
-        exit('Access denied (symlink outside uploads)');
-    }
 }
 
 // Determine filename
