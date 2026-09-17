@@ -598,19 +598,29 @@ function downloadSong(songs){
         showDownloadPopup(songs);
     }
 }
+// HEAD prefetch pattern: keeps loader visible until server is ready to send file
 function triggerDownload(url, filename, btnEl){
     if(!url){ alert('Download URL is missing'); return; }
     
-    // Show brief loader on button (visual feedback only)
     var originalContent = null;
-    if(btnEl){
-        originalContent = btnEl.innerHTML;
-        btnEl.disabled = true;
-        btnEl.style.cursor = 'wait';
-        btnEl.innerHTML = '<span class="song-spinner"></span><span>Starting...</span>';
-    }
+    var showLoader = function(){
+        if(btnEl){
+            originalContent = btnEl.innerHTML;
+            btnEl.disabled = true;
+            btnEl.style.cursor = 'wait';
+            btnEl.innerHTML = '<span class="song-spinner"></span><span>Preparing...</span>';
+        }
+    };
+    var hideLoader = function(){
+        if(btnEl && originalContent !== null){
+            btnEl.disabled = false;
+            btnEl.style.cursor = '';
+            btnEl.innerHTML = originalContent;
+        }
+    };
     
-    // Build download URL - use proxy for /uploads/ files to force attachment header
+    showLoader();
+    
     var downloadUrl;
     if(url.indexOf('/uploads/') === 0 || url.indexOf(window.location.origin + '/uploads/') === 0){
         var path = url.indexOf('/uploads/') === 0 ? url : url.substring(window.location.origin.length);
@@ -619,22 +629,29 @@ function triggerDownload(url, filename, btnEl){
         downloadUrl = url;
     }
     
-    // Trigger download - Content-Disposition: attachment header forces immediate Save As
-    var a = document.createElement('a');
-    a.href = downloadUrl;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ document.body.removeChild(a); }, 100);
+    // HEAD prefetch warms up the server so Save As dialog appears near-instantly
+    fetch(downloadUrl, { method: 'HEAD' })
+        .then(function(){
+            var a = document.createElement('a');
+            a.href = downloadUrl;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function(){ document.body.removeChild(a); }, 100);
+            setTimeout(hideLoader, 1200);
+        })
+        .catch(function(){
+            var a = document.createElement('a');
+            a.href = downloadUrl;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function(){ document.body.removeChild(a); }, 100);
+            setTimeout(hideLoader, 1500);
+        });
     
-    // Restore button quickly
-    if(btnEl && originalContent !== null){
-        setTimeout(function(){
-            btnEl.disabled = false;
-            btnEl.style.cursor = '';
-            btnEl.innerHTML = originalContent;
-        }, 600);
-    }
+    // Safety: hide loader after max 10 seconds
+    setTimeout(hideLoader, 10000);
 }
 function showDownloadPopup(songs){
     var modal = document.getElementById('downloadSongModal');

@@ -106,7 +106,13 @@ $mime = $mimeTypes[$ext] ?? 'application/octet-stream';
 
 $fileSize = filesize($filePath);
 
-// Clean any output buffers
+// Disable all output buffering and compression (prevents server-side delays)
+@ini_set('zlib.output_compression', 'Off');
+@ini_set('output_buffering', 'Off');
+@ini_set('implicit_flush', '1');
+if (function_exists('apache_setenv')) {
+    @apache_setenv('no-gzip', '1');
+}
 while (ob_get_level()) {
     ob_end_clean();
 }
@@ -117,24 +123,26 @@ header('Content-Disposition: attachment; filename="' . str_replace('"', '', $fil
 header('Content-Length: ' . $fileSize);
 header('Content-Transfer-Encoding: binary');
 header('X-Content-Type-Options: nosniff');
-header('Cache-Control: private, no-cache, must-revalidate');
-header('Pragma: no-cache');
-header('Expires: 0');
+header('Cache-Control: private, must-revalidate, post-check=0, pre-check=0');
+header('Pragma: public');
+header('X-Accel-Buffering: no'); // disable Nginx buffering
+header('Accept-Ranges: bytes');
 
-// Disable time limit for large files
+// Disable time limit and increase memory
 @set_time_limit(0);
+@ignore_user_abort(false);
 
-// Stream file in chunks (no memory buffer for large files)
+// Handle HEAD requests (for prefetch) - send headers only, no body
+if ($_SERVER['REQUEST_METHOD'] === 'HEAD') {
+    exit;
+}
+
+// Stream file with fpassthru (fastest PHP method - no manual chunking overhead)
 $fp = fopen($filePath, 'rb');
 if ($fp === false) {
     http_response_code(500);
     exit('Cannot open file');
 }
-
-while (!feof($fp)) {
-    echo fread($fp, 8192);
-    if (connection_status() !== CONNECTION_NORMAL) break;
-    flush();
-}
+fpassthru($fp);
 fclose($fp);
 exit;

@@ -1011,49 +1011,72 @@ function downloadSong(songs) {
     }
 }
 
-// Trigger file download via /download.php proxy (forces attachment header - instant Save As)
+// Trigger file download via /download.php proxy (forces attachment header)
+// Uses HEAD prefetch to keep loader visible until Save As dialog appears
 function triggerDownload(url, filename, btnEl) {
     if (!url) {
         alert('Download URL is missing');
         return;
     }
     
-    // Show brief loader on button (visual feedback only)
+    // Show loader on button
     let originalContent = null;
-    if (btnEl) {
-        originalContent = btnEl.innerHTML;
-        btnEl.disabled = true;
-        btnEl.style.cursor = 'wait';
-        btnEl.innerHTML = '<span class="song-spinner"></span><span>Starting...</span>';
-    }
-    
-    // Build download URL - use proxy for /uploads/ files to force attachment header
-    let downloadUrl;
-    if (url.indexOf('/uploads/') === 0 || url.indexOf(window.location.origin + '/uploads/') === 0) {
-        // Extract path
-        const path = url.indexOf('/uploads/') === 0 ? url : url.substring(window.location.origin.length);
-        downloadUrl = '/download.php?path=' + encodeURIComponent(path) + '&name=' + encodeURIComponent(filename || 'song');
-    } else {
-        // External URL - direct download attempt
-        downloadUrl = url;
-    }
-    
-    // Trigger download via hidden iframe (doesn't navigate away, no dialog delay)
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function() { document.body.removeChild(a); }, 100);
-    
-    // Restore button quickly - browser handles download in background
-    if (btnEl && originalContent !== null) {
-        setTimeout(function() {
+    const showLoader = function() {
+        if (btnEl) {
+            originalContent = btnEl.innerHTML;
+            btnEl.disabled = true;
+            btnEl.style.cursor = 'wait';
+            btnEl.innerHTML = '<span class="song-spinner"></span><span>Preparing...</span>';
+        }
+    };
+    const hideLoader = function() {
+        if (btnEl && originalContent !== null) {
             btnEl.disabled = false;
             btnEl.style.cursor = '';
             btnEl.innerHTML = originalContent;
-        }, 600);
+        }
+    };
+    
+    showLoader();
+    
+    // Build download URL through /download.php proxy for /uploads/ files
+    let downloadUrl;
+    if (url.indexOf('/uploads/') === 0 || url.indexOf(window.location.origin + '/uploads/') === 0) {
+        const path = url.indexOf('/uploads/') === 0 ? url : url.substring(window.location.origin.length);
+        downloadUrl = '/download.php?path=' + encodeURIComponent(path) + '&name=' + encodeURIComponent(filename || 'song');
+    } else {
+        downloadUrl = url;
     }
+    
+    // Warm server with HEAD request first - browser/server prepares the file
+    // Once HEAD responds, we know the server is ready, so we trigger the actual download
+    // The Save As dialog will appear near-instantly after this
+    fetch(downloadUrl, { method: 'HEAD' })
+        .then(function() {
+            // Server is ready - trigger download
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() { document.body.removeChild(a); }, 100);
+            
+            // Keep loader briefly so user sees Save As appear
+            setTimeout(hideLoader, 1200);
+        })
+        .catch(function() {
+            // HEAD failed - try direct download anyway
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() { document.body.removeChild(a); }, 100);
+            setTimeout(hideLoader, 1500);
+        });
+    
+    // Safety: hide loader after max 10 seconds no matter what
+    setTimeout(hideLoader, 10000);
 }
 
 function showDownloadPopup(songs) {
