@@ -121,8 +121,27 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50}
 .brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1280px;margin:0 auto;padding:0 1.5rem 1.75rem}
 .brief-grid>.brief-card:last-child:nth-child(odd){grid-column:1/-1}
-@media(max-width:768px){.brief-grid{grid-template-columns:1fr;padding:0 1rem 1.5rem}
-.brief-grid>.brief-card:last-child:nth-child(odd){grid-column:auto}}
+/* Film song bar positioning inside brief-grid */
+.brief-grid>.film-song-wrap{grid-column:1/-1;order:99}
+.brief-grid>.brief-card-dialog{order:1}
+.brief-grid>.brief-card-song{order:2}
+@media(max-width:768px){
+  .brief-grid{grid-template-columns:1fr;padding:0 1rem 1.5rem}
+  .brief-grid>.brief-card:last-child:nth-child(odd){grid-column:auto}
+  /* Mobile: film-song bar goes BETWEEN dialog and song cards */
+  .brief-grid>.brief-card-dialog{order:1}
+  .brief-grid>.film-song-wrap{order:2;grid-column:auto}
+  .brief-grid>.brief-card-song{order:3}
+}
+/* Film Song Bar styles */
+.film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.film-song-btn{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+.film-song-btn:hover{background:#e5e7eb}
+.film-song-btn:disabled{opacity:0.5;cursor:not-allowed}
+@media(max-width:768px){
+  .film-song-inner{flex-direction:column;align-items:stretch;text-align:center;padding:1.25rem}
+  .film-song-btn{width:100%;padding:.85rem 1rem}
+}
 .brief-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column}
 .card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
 .card-sec:last-child{border-bottom:none}
@@ -403,7 +422,7 @@ function renderActorBriefCard(array $sc, string $fallbackBrief, bool $isSong = f
     $cardHeading    = !empty($sc['title'])   ? strtoupper($sc['title'])   : ($isSong ? 'SONG AUDITION'     : 'DIALOGUE AUDITION');
     $cardSubheading = !empty($sc['content']) ? $sc['content']             : ($isSong ? $fallbackBrief       : $fallbackBrief);
 ?>
-  <div class="brief-card">
+  <div class="brief-card <?= $isSong ? 'brief-card-song' : 'brief-card-dialog' ?>">
     <!-- Card heading + subheading — both admin-editable via Scripts tab -->
     <div class="card-sec brief-card-header" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb;padding:1.25rem 1.25rem 1rem;text-align:center">
       <p style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:#111;line-height:1;margin-bottom:.45rem"><?= htmlspecialchars($cardHeading) ?></p>
@@ -504,23 +523,11 @@ if (!empty($songScripts)) {
 }
 ?>
 
-</div><!-- /brief-grid -->
-
 <?php if (!empty($allTuneUrls)): ?>
 <?php $filmSongJson = htmlspecialchars(json_encode($allTuneUrls), ENT_QUOTES); ?>
 <?php $filmSongDownloadsJson = htmlspecialchars(json_encode($allSongDownloads), ENT_QUOTES); ?>
-<!-- FILM SONG CARD -->
-<style>
-.film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.film-song-btn{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
-.film-song-btn:hover{background:#e5e7eb}
-.film-song-btn:disabled{opacity:0.5;cursor:not-allowed}
-@media(max-width:768px){
-  .film-song-inner{flex-direction:column;align-items:stretch;text-align:center;padding:1.25rem}
-  .film-song-btn{width:100%;padding:.85rem 1rem}
-}
-</style>
-<div style="max-width:1280px;margin:0 auto 3rem;padding:0 1.5rem">
+<!-- FILM SONG CARD (inside brief-grid: desktop=bottom full-width, mobile=between cards) -->
+<div class="film-song-wrap">
   <div class="film-song-inner">
     <div style="flex:1;min-width:0">
       <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem"><?= htmlspecialchars($filmSongHeading) ?></p>
@@ -543,6 +550,8 @@ if (!empty($songScripts)) {
   </div>
 </div>
 <?php endif; ?>
+
+</div><!-- /brief-grid -->
 
 <!-- SUBMISSION CARD (full width, dark) -->
 <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem">

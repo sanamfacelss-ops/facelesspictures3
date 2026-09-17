@@ -1901,13 +1901,13 @@ if (file_exists($errorLogFile)) {
                                             </div>
                                         </div>
 
-                                        <!-- SECTION: Song Links (for Song Auditions) -->
-                                        <div x-show="scriptForm.audition_type === 'Song Audition'" x-cloak class="pb-4 border-b border-dark/10">
+                                        <!-- SECTION: Song Links (for Song Auditions and Director) -->
+                                        <div x-show="scriptForm.audition_type === 'Song Audition' || scriptForm.category === 'director'" x-cloak class="pb-4 border-b border-dark/10">
                                             <h4 class="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
                                                 <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
                                                 Song Links & Downloads
                                             </h4>
-                                            <p class="text-[10px] text-dark/40 mb-3">Add YouTube URL (to play), downloadable MP3 file, and title for each song</p>
+                                            <p class="text-[10px] text-dark/40 mb-3">Add YouTube URL (to play), downloadable MP3/audio file, and title for each song</p>
                                             <div class="space-y-3">
                                                 <template x-for="(entry, idx) in songEntries" :key="idx">
                                                     <div class="border border-dark/10 rounded-lg p-3 bg-dark/[.02]">

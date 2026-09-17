@@ -8,6 +8,35 @@ $directorBrief   = setting('director_brief', 'You have one actor, one phone came
 $directorScripts = $scriptModel->byCategory('director');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
 
+// Film Song card text (admin-editable, shared with actor page)
+$filmSongHeading  = setting('film_song_heading',  'FILM SONG');
+$filmSongSubtitle = setting('film_song_subtitle', 'Listen to the song before you shoot your scene');
+if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
+if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you shoot your scene';
+
+// Collect all song download URLs and tune URLs from director scripts
+$allSongDownloads = [];
+$allTuneUrls = [];
+foreach ($directorScripts as $sc) {
+    // Parse YouTube URLs and Download URLs from tune_youtube_url
+    // Format: Label|YouTubeURL|DownloadURL
+    $raw = $sc['tune_youtube_url'] ?? '';
+    foreach (array_filter(array_map('trim', explode("\n", $raw))) as $line) {
+        $parts = array_map('trim', explode('|', $line));
+        $label = $parts[0] ?? '';
+        $youtubeUrl = $parts[1] ?? '';
+        $downloadUrl = $parts[2] ?? '';
+        if ($youtubeUrl) {
+            $allTuneUrls[] = ['label' => $label, 'url' => $youtubeUrl];
+        }
+        if ($downloadUrl) {
+            $allSongDownloads[] = ['label' => $label, 'url' => $downloadUrl];
+        }
+    }
+}
+$allSongDownloads = array_values(array_filter($allSongDownloads, fn($t) => !empty($t['url'])));
+$allTuneUrls = array_values(array_filter($allTuneUrls, fn($t) => !empty($t['url'])));
+
 // Get cache version for asset cache-busting
 $cacheVersion = '1';
 $versionFile = __DIR__ . '/../cache/.version';
@@ -61,9 +90,14 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .fp-nav{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;position:fixed;top:0;left:0;right:0;z-index:50}
 .brief-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:640px;margin:0 auto;padding:0 1.5rem 1.75rem}
 @media(max-width:768px){.brief-grid{padding:0 1rem 1.5rem}}
-/* Side-by-side layout responsive */
-.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:stretch}
-@media(max-width:860px){.side-by-side{grid-template-columns:1fr}}
+/* Side-by-side layout responsive with grid areas */
+.side-by-side{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"brief submit" "songbar songbar";gap:1.5rem;align-items:stretch}
+.side-by-side > .brief-card{grid-area:brief}
+.side-by-side > .submit-card{grid-area:submit}
+.side-by-side > .film-song-wrap{grid-area:songbar}
+@media(max-width:860px){
+  .side-by-side{grid-template-columns:1fr;grid-template-areas:"brief" "songbar" "submit"}
+}
 .brief-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column}
 .card-sec{padding:1rem 1.125rem;border-bottom:1px solid #f0f0f0}
 .card-sec:last-child{border-bottom:none}
@@ -130,6 +164,33 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .4s ease forwards}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Film Song Bar */
+.film-song-inner{background:#111;border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.film-song-btn{display:flex;align-items:center;justify-content:center;gap:.55rem;background:#fff;color:#111;border:none;border-radius:9px;padding:.75rem 1.5rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+.film-song-btn:hover{background:#e5e7eb}
+.film-song-btn:disabled{opacity:0.5;cursor:not-allowed}
+@media(max-width:768px){
+  .film-song-inner{flex-direction:column;align-items:stretch;text-align:center;padding:1.25rem}
+  .film-song-btn{width:100%;padding:.85rem 1rem}
+}
+
+/* Song slider modal */
+#tuneModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:1.5rem}
+#tuneModal.open{display:flex}
+.tune-box{background:#161C2D;border:1px solid #1F2840;border-radius:16px;width:100%;max-width:720px;padding:1.25rem;position:relative}
+.tune-close{position:absolute;top:.75rem;right:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.tune-close:hover{background:rgba(255,255,255,.18)}
+.tune-wrap{position:relative;width:100%;padding-bottom:56.25%;margin-top:.5rem;border-radius:8px;overflow:hidden;background:#000}
+.tune-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.song-tab{display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:999px;font-size:.75rem;color:#fff;text-decoration:none;font-weight:600;background:rgba(255,255,255,.05);transition:all .2s;white-space:nowrap;cursor:pointer}
+.song-tab:hover{background:rgba(255,255,255,.15)}
+.song-tab.active{background:#fff;color:#111;border-color:#fff}
+
+/* Download button in modal */
+.download-song-btn{background:#111;color:#fff !important;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap;text-decoration:none;font-family:'DM Sans',sans-serif}
+.download-song-btn:hover{background:#374151 !important;color:#fff !important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.download-song-btn svg{stroke:#fff !important}
 </style>
 </head>
 <body>
@@ -323,6 +384,33 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
       <?= htmlspecialchars($settingsModel->get('director_submit_button_text', 'Submit Director Scene →')) ?>
     </button>
   </div><!-- /submit-card -->
+
+<?php if (!empty($allTuneUrls)): ?>
+  <?php $filmSongJson = htmlspecialchars(json_encode($allTuneUrls), ENT_QUOTES); ?>
+  <?php $filmSongDownloadsJson = htmlspecialchars(json_encode($allSongDownloads), ENT_QUOTES); ?>
+  <!-- FILM SONG BAR (positioned via grid: desktop=below, mobile=between) -->
+  <div class="film-song-wrap">
+    <div class="film-song-inner">
+      <div style="flex:1;min-width:0">
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;color:#fff;line-height:1;margin-bottom:.3rem"><?= htmlspecialchars($filmSongHeading) ?></p>
+        <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45"><?= htmlspecialchars($filmSongSubtitle) ?></p>
+      </div>
+      <div style="display:flex;gap:.75rem;align-items:center;flex-shrink:0;flex-wrap:wrap">
+        <button type="button" class="film-song-btn" onclick="openSongSlider(<?= $filmSongJson ?>)">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          Play Song
+        </button>
+        <?php if (!empty($allSongDownloads)): ?>
+        <button type="button" class="film-song-btn" onclick="downloadSong(<?= $filmSongDownloadsJson ?>)">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Download Song
+        </button>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+<?php endif; ?>
+
 </div><!-- /side-by-side grid -->
 
 <!-- FOOTER -->
@@ -437,7 +525,140 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ═══════════════════════════════════════════════════════════
+// SONG SLIDER + DOWNLOAD FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+function _embedUrl(u){
+    if(!u) return '';
+    var m=u.match(/youtu\.be\/([^?&#]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
+    m=u.match(/[?&]v=([^&#]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
+    m=u.match(/\/shorts\/([^?&#]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
+    return u;
+}
+
+var _songSliderTunes = [];
+var _songSliderActive = -1;
+function openSongSlider(tunes){
+    _songSliderTunes = (tunes||[]).filter(function(t){return t.url;});
+    if(!_songSliderTunes.length) return;
+    var tabs = document.getElementById('songTabs');
+    tabs.innerHTML = '';
+    _songSliderTunes.forEach(function(t, i){
+        var btn = document.createElement('button');
+        btn.className = 'song-tab' + (i===0?' active':'');
+        btn.textContent = t.label || ('Song ' + (i+1));
+        btn.onclick = function(){ songSliderPlay(i); };
+        tabs.appendChild(btn);
+    });
+    songSliderPlay(0);
+    document.getElementById('tuneModal').classList.add('open');
+    document.body.style.overflow='hidden';
+}
+function songSliderPlay(idx){
+    if(idx < 0 || idx >= _songSliderTunes.length) return;
+    _songSliderActive = idx;
+    var tune = _songSliderTunes[idx];
+    document.getElementById('tuneIframe').src = _embedUrl(tune.url) + '?autoplay=1&rel=0&modestbranding=1';
+    document.getElementById('songLabel').textContent = tune.label || '';
+    var tabs = document.querySelectorAll('#songTabs .song-tab');
+    tabs.forEach(function(t, i){ t.classList.toggle('active', i===idx); });
+}
+function closeTuneModal(){
+    document.getElementById('tuneIframe').src = '';
+    document.getElementById('tuneModal').classList.remove('open');
+    document.body.style.overflow = '';
+    _songSliderActive = -1;
+}
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeTuneModal(); });
+document.addEventListener('DOMContentLoaded', function(){
+    var tm = document.getElementById('tuneModal');
+    if(tm) tm.addEventListener('click', function(e){ if(e.target===tm) closeTuneModal(); });
+});
+
+// Download Song Function
+function downloadSong(songs){
+    if(!songs || songs.length === 0){ alert('No songs available for download'); return; }
+    if(songs.length === 1){
+        triggerDownload(songs[0].url, songs[0].label || 'song');
+    } else {
+        showDownloadPopup(songs);
+    }
+}
+function triggerDownload(url, filename){
+    if(!url){ alert('Download URL is missing'); return; }
+    var urlParts = url.split('.');
+    var ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
+    var safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = safeFilename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ document.body.removeChild(a); }, 100);
+}
+function showDownloadPopup(songs){
+    var modal = document.getElementById('downloadSongModal');
+    var list = document.getElementById('downloadSongList');
+    modal.style.pointerEvents = 'auto';
+    list.innerHTML = '';
+    songs.forEach(function(song, index){
+        var item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f3f4f6;border-radius:8px;gap:1rem';
+        var title = document.createElement('span');
+        title.textContent = song.label || 'Song ' + (index + 1);
+        title.style.cssText = 'font-size:.95rem;font-weight:600;color:#111;flex:1';
+        var btn = document.createElement('a');
+        btn.href = song.url;
+        btn.download = (song.label || 'song_' + (index + 1)).replace(/[^a-z0-9]/gi, '_');
+        btn.className = 'download-song-btn';
+        btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Download</span>';
+        item.appendChild(title);
+        item.appendChild(btn);
+        list.appendChild(item);
+    });
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeDownloadPopup(){
+    var modal = document.getElementById('downloadSongModal');
+    modal.style.display = 'none';
+    modal.style.pointerEvents = 'none';
+    document.body.style.overflow = '';
+}
 </script>
+
+<!-- SONG SLIDER MODAL -->
+<div id="tuneModal">
+  <div class="tune-box">
+    <button class="tune-close" onclick="closeTuneModal()" aria-label="Close">✕</button>
+    <p style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.06em;color:#fff;margin-bottom:.85rem">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><path d="M8 5v14l11-7z"/></svg>
+      Choose &amp; Play Song
+    </p>
+    <div id="songTabs" style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.85rem"></div>
+    <div class="tune-wrap">
+      <iframe id="tuneIframe" src="" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen title="Song tune"></iframe>
+    </div>
+    <p id="songLabel" style="margin-top:.65rem;font-size:.78rem;color:rgba(255,255,255,.55);text-align:center;min-height:1.1em"></p>
+  </div>
+</div>
+
+<!-- Download Song Modal -->
+<div id="downloadSongModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center;padding:1.5rem;pointer-events:none" onclick="if(event.target===this) closeDownloadPopup()">
+    <div style="background:#fff;border-radius:16px;max-width:500px;width:100%;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+        <div style="padding:1.5rem 1.75rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between">
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.06em;color:#111">Download Song</p>
+            <button onclick="closeDownloadPopup()" style="background:none;border:none;font-size:1.5rem;color:#6b7280;cursor:pointer;padding:.25rem .5rem;line-height:1">✕</button>
+        </div>
+        <div id="downloadSongList" style="padding:1.5rem;display:flex;flex-direction:column;gap:.75rem;max-height:60vh;overflow-y:auto"></div>
+    </div>
+</div>
+
 <?php require_once __DIR__ . '/partials/submission-shared.php'; ?>
 <?php include __DIR__ . '/partials/language-switcher.php'; ?>
 </body>
