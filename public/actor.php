@@ -994,24 +994,25 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // Download Song Function
 function downloadSong(songs) {
-    console.log('downloadSong called with:', songs);
     if (!songs || songs.length === 0) {
         alert('No songs available for download');
         return;
     }
     
     if (songs.length === 1) {
-        // Single song - direct download
-        triggerDownload(songs[0].url, songs[0].label || 'song');
+        // Single song - find the film-song "Download Song" button and use it as loader target
+        const btns = document.querySelectorAll('.film-song-btn');
+        let targetBtn = null;
+        btns.forEach(b => { if (b.textContent.trim().indexOf('Download') !== -1) targetBtn = b; });
+        triggerDownload(songs[0].url, songs[0].label || 'song', targetBtn);
     } else {
         // Multiple songs - show popup
         showDownloadPopup(songs);
     }
 }
 
-// Trigger actual file download using anchor tag with download attribute
-function triggerDownload(url, filename) {
-    console.log('Downloading:', url);
+// Trigger actual file download using fetch + blob (forces download even for cross-origin, shows loader)
+function triggerDownload(url, filename, btnEl) {
     if (!url) {
         alert('Download URL is missing');
         return;
@@ -1022,14 +1023,56 @@ function triggerDownload(url, filename) {
     const ext = urlParts[urlParts.length - 1].split('?')[0].toLowerCase();
     const safeFilename = (filename || 'download').replace(/[^a-z0-9]/gi, '_') + '.' + ext;
     
-    // Create download link with download attribute (forces download for same-origin files)
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = safeFilename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => document.body.removeChild(a), 100);
+    // Show loader on button
+    let originalContent = null;
+    if (btnEl) {
+        originalContent = btnEl.innerHTML;
+        btnEl.disabled = true;
+        btnEl.style.opacity = '0.7';
+        btnEl.style.cursor = 'wait';
+        btnEl.innerHTML = '<span class="song-spinner"></span><span>Downloading...</span>';
+    }
+    
+    // Use fetch to get the file as blob, then trigger real download
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.blob();
+        })
+        .then(function(blob) {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = safeFilename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(blobUrl);
+            }, 100);
+        })
+        .catch(function(err) {
+            // Fallback: direct link if fetch fails
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = safeFilename;
+            a.target = '_blank';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() { document.body.removeChild(a); }, 100);
+        })
+        .finally(function() {
+            if (btnEl && originalContent !== null) {
+                setTimeout(function() {
+                    btnEl.disabled = false;
+                    btnEl.style.opacity = '';
+                    btnEl.style.cursor = '';
+                    btnEl.innerHTML = originalContent;
+                }, 500);
+            }
+        });
 }
 
 function showDownloadPopup(songs) {
@@ -1043,7 +1086,7 @@ function showDownloadPopup(songs) {
     list.innerHTML = '';
     
     // Add each song to list
-    songs.forEach((song, index) => {
+    songs.forEach(function(song, index) {
         const item = document.createElement('div');
         item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f3f4f6;border-radius:8px;gap:1rem';
         
@@ -1051,11 +1094,13 @@ function showDownloadPopup(songs) {
         title.textContent = song.label || 'Song ' + (index + 1);
         title.style.cssText = 'font-size:.95rem;font-weight:600;color:#111;flex:1';
         
-        const btn = document.createElement('a');
-        btn.href = song.url;
-        btn.download = (song.label || 'song_' + (index + 1)).replace(/[^a-z0-9]/gi, '_');
+        const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'download-song-btn';
         btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Download</span>';
+        btn.onclick = function() {
+            triggerDownload(song.url, song.label || 'song_' + (index + 1), btn);
+        };
         
         item.appendChild(title);
         item.appendChild(btn);
@@ -1076,8 +1121,14 @@ function closeDownloadPopup() {
 
 <style>
 .download-song-btn{background:#111;color:#fff !important;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap;text-decoration:none;font-family:'DM Sans',sans-serif}
-.download-song-btn:hover{background:#374151 !important;color:#fff !important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.download-song-btn:hover:not(:disabled){background:#374151 !important;color:#fff !important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.download-song-btn:disabled{cursor:wait}
 .download-song-btn svg{stroke:#fff !important}
+
+/* Spinner for download loader */
+.song-spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:song-spin 0.6s linear infinite}
+@keyframes song-spin{to{transform:rotate(360deg)}}
+.film-song-btn:disabled{opacity:0.7;cursor:wait}
 </style>
 
 <!-- Download Song Modal -->
