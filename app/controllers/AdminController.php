@@ -1840,40 +1840,94 @@ class AdminController
         $file = $_FILES['file'];
         $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-        $videoTypes = ['video/mp4','video/quicktime','video/webm','video/x-msvideo','video/mpeg'];
-        $videoExts  = ['mp4','mov','webm','avi','mpeg'];
-        $isPdf      = ($file['type'] === 'application/pdf' || $ext === 'pdf');
-        $isVideo    = (in_array($file['type'], $videoTypes) || in_array($ext, $videoExts));
+        $videoTypes = ['video/mp4','video/quicktime','video/webm','video/x-msvideo','video/mpeg','video/x-matroska'];
+        $videoExts  = ['mp4','mov','webm','avi','mpeg','mkv'];
+        $audioTypes = ['audio/mpeg','audio/mp3','audio/wav','audio/m4a','audio/x-m4a','audio/aac','audio/ogg','audio/flac','audio/webm'];
+        $audioExts  = ['mp3','wav','m4a','aac','ogg','flac'];
+        
+        $isPdf   = ($file['type'] === 'application/pdf' || $ext === 'pdf');
+        $isVideo = (in_array($file['type'], $videoTypes) || in_array($ext, $videoExts));
+        $isAudio = (in_array($file['type'], $audioTypes) || in_array($ext, $audioExts));
 
-        if (!$isPdf && !$isVideo) {
+        if (!$isPdf && !$isVideo && !$isAudio) {
             http_response_code(422);
-            echo json_encode(['error' => 'Only MP4/MOV/WEBM video or PDF accepted.']);
+            echo json_encode(['error' => 'Only audio (MP3/WAV/M4A/etc), video (MP4/MOV/WEBM/etc), or PDF accepted.']);
             return;
         }
 
-        $maxBytes = $isVideo ? 500 * 1024 * 1024 : 20 * 1024 * 1024;
+        // Size limits
+        if ($isVideo)      $maxBytes = 500 * 1024 * 1024;
+        elseif ($isAudio)  $maxBytes = 100 * 1024 * 1024;
+        else               $maxBytes = 20 * 1024 * 1024;
+        
         if ($file['size'] > $maxBytes) {
+            $maxMB = $maxBytes / (1024 * 1024);
             http_response_code(422);
-            echo json_encode(['error' => $isVideo ? 'Video must be under 500 MB.' : 'PDF must be under 20 MB.']);
+            echo json_encode(['error' => 'File too large. Max ' . $maxMB . ' MB for ' . ($isVideo ? 'video' : ($isAudio ? 'audio' : 'PDF')) . '.']);
             return;
         }
 
         $settingsDir = UPLOAD_PATH . '/settings';
         if (!is_dir($settingsDir)) mkdir($settingsDir, 0755, true);
 
-        $prefix   = $isVideo ? 'script_video_' : 'script_pdf_';
-        $filename = $prefix . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-        $dest     = $settingsDir . '/' . $filename;
+        // Save uploaded file with temp name first
+        $prefix = $isVideo ? 'script_video_' : ($isAudio ? 'script_audio_' : 'script_pdf_');
+        $tempName = $prefix . time() . '_' . bin2hex(random_bytes(4));
+        $tempFile = $settingsDir . '/' . $tempName . '.' . $ext;
 
-        if (!move_uploaded_file($file['tmp_name'], $dest)) {
+        if (!move_uploaded_file($file['tmp_name'], $tempFile)) {
             http_response_code(500);
             echo json_encode(['error' => 'Failed to save file.']);
             return;
         }
 
+        // Compress audio/video files for faster downloads
+        $finalFile = $tempFile;
+        $finalExt = $ext;
+        
+        if ($isAudio || $isVideo) {
+            $ffmpegPath = $_ENV['FFMPEG_PATH'] ?? getenv('FFMPEG_PATH') ?: 'ffmpeg';
+            
+            if ($isAudio) {
+                // Compress audio to 128kbps MP3 (typical size: 1MB per minute)
+                $compressedFile = $settingsDir . '/' . $tempName . '.mp3';
+                $cmd = sprintf(
+                    '%s -i %s -codec:a libmp3lame -b:a 128k -ar 44100 -y %s 2>&1',
+                    escapeshellcmd($ffmpegPath),
+                    escapeshellarg($tempFile),
+                    escapeshellarg($compressedFile)
+                );
+                exec($cmd, $out, $code);
+                if ($code === 0 && file_exists($compressedFile) && filesize($compressedFile) > 0) {
+                    if ($tempFile !== $compressedFile) @unlink($tempFile);
+                    $finalFile = $compressedFile;
+                    $finalExt = 'mp3';
+                    debug_log("Compressed audio: " . filesize($tempFile) . " -> " . filesize($compressedFile) . " bytes", 'ADMIN');
+                }
+            } elseif ($isVideo) {
+                // Compress video: 720p max, CRF 28 (good quality, smaller file), 128kbps audio
+                $compressedFile = $settingsDir . '/' . $tempName . '.mp4';
+                $cmd = sprintf(
+                    '%s -i %s -vcodec libx264 -crf 28 -preset fast -vf "scale=-2:min(720\,ih)" -acodec aac -b:a 128k -movflags +faststart -y %s 2>&1',
+                    escapeshellcmd($ffmpegPath),
+                    escapeshellarg($tempFile),
+                    escapeshellarg($compressedFile)
+                );
+                exec($cmd, $out, $code);
+                if ($code === 0 && file_exists($compressedFile) && filesize($compressedFile) > 0) {
+                    if ($tempFile !== $compressedFile) @unlink($tempFile);
+                    $finalFile = $compressedFile;
+                    $finalExt = 'mp4';
+                    debug_log("Compressed video: " . filesize($tempFile) . " -> " . filesize($compressedFile) . " bytes", 'ADMIN');
+                }
+            }
+        }
+
+        $filename = basename($finalFile);
         $url = '/uploads/settings/' . $filename;
-        debug_log("Admin uploaded script " . ($isVideo ? 'video' : 'pdf') . ": {$url}", 'ADMIN');
-        echo json_encode(['success' => true, 'url' => $url, 'type' => $isVideo ? 'video' : 'pdf']);
+        $fileType = $isVideo ? 'video' : ($isAudio ? 'audio' : 'pdf');
+        debug_log("Admin uploaded script {$fileType}: {$url}", 'ADMIN');
+        echo json_encode(['success' => true, 'url' => $url, 'type' => $fileType, 'size' => filesize($finalFile)]);
     }
 
     /**
