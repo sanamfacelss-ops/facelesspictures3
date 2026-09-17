@@ -598,25 +598,36 @@ function downloadSong(songs){
         showDownloadPopup(songs);
     }
 }
-// HEAD prefetch pattern: keeps loader visible until server is ready to send file
+// Download with loader that stays visible until Save As dialog appears
+// Detection: window 'blur' event fires when Save As dialog steals focus
 function triggerDownload(url, filename, btnEl){
     if(!url){ alert('Download URL is missing'); return; }
     
     var originalContent = null;
+    var hidden = false;
+    var blurHandler = null;
+    var visibilityHandler = null;
+    var safetyTimer = null;
+    
     var showLoader = function(){
         if(btnEl){
             originalContent = btnEl.innerHTML;
             btnEl.disabled = true;
             btnEl.style.cursor = 'wait';
-            btnEl.innerHTML = '<span class="song-spinner"></span><span>Preparing...</span>';
+            btnEl.innerHTML = '<span class="song-spinner"></span><span>Preparing download...</span>';
         }
     };
     var hideLoader = function(){
+        if(hidden) return;
+        hidden = true;
         if(btnEl && originalContent !== null){
             btnEl.disabled = false;
             btnEl.style.cursor = '';
             btnEl.innerHTML = originalContent;
         }
+        if(blurHandler) window.removeEventListener('blur', blurHandler);
+        if(visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler);
+        if(safetyTimer) clearTimeout(safetyTimer);
     };
     
     showLoader();
@@ -629,7 +640,15 @@ function triggerDownload(url, filename, btnEl){
         downloadUrl = url;
     }
     
-    // HEAD prefetch warms up the server so Save As dialog appears near-instantly
+    // Detect when Save As dialog opens (steals focus from window)
+    blurHandler = function(){ setTimeout(hideLoader, 300); };
+    visibilityHandler = function(){
+        if(document.visibilityState === 'hidden') setTimeout(hideLoader, 300);
+    };
+    window.addEventListener('blur', blurHandler);
+    document.addEventListener('visibilitychange', visibilityHandler);
+    
+    // Warm server with HEAD first, then trigger download
     fetch(downloadUrl, { method: 'HEAD' })
         .then(function(){
             var a = document.createElement('a');
@@ -638,7 +657,6 @@ function triggerDownload(url, filename, btnEl){
             document.body.appendChild(a);
             a.click();
             setTimeout(function(){ document.body.removeChild(a); }, 100);
-            setTimeout(hideLoader, 1200);
         })
         .catch(function(){
             var a = document.createElement('a');
@@ -647,11 +665,10 @@ function triggerDownload(url, filename, btnEl){
             document.body.appendChild(a);
             a.click();
             setTimeout(function(){ document.body.removeChild(a); }, 100);
-            setTimeout(hideLoader, 1500);
         });
     
-    // Safety: hide loader after max 10 seconds
-    setTimeout(hideLoader, 10000);
+    // Safety: max 20 seconds
+    safetyTimer = setTimeout(hideLoader, 20000);
 }
 function showDownloadPopup(songs){
     var modal = document.getElementById('downloadSongModal');

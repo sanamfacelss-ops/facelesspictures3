@@ -1011,30 +1011,40 @@ function downloadSong(songs) {
     }
 }
 
-// Trigger file download via /download.php proxy (forces attachment header)
-// Uses HEAD prefetch to keep loader visible until Save As dialog appears
+// Download with loader that stays visible until Save As dialog appears
+// Detection: window 'blur' event fires when Save As dialog steals focus
 function triggerDownload(url, filename, btnEl) {
     if (!url) {
         alert('Download URL is missing');
         return;
     }
     
-    // Show loader on button
     let originalContent = null;
+    let hidden = false;
+    let blurHandler = null;
+    let visibilityHandler = null;
+    let safetyTimer = null;
+    
     const showLoader = function() {
         if (btnEl) {
             originalContent = btnEl.innerHTML;
             btnEl.disabled = true;
             btnEl.style.cursor = 'wait';
-            btnEl.innerHTML = '<span class="song-spinner"></span><span>Preparing...</span>';
+            btnEl.innerHTML = '<span class="song-spinner"></span><span>Preparing download...</span>';
         }
     };
     const hideLoader = function() {
+        if (hidden) return;
+        hidden = true;
         if (btnEl && originalContent !== null) {
             btnEl.disabled = false;
             btnEl.style.cursor = '';
             btnEl.innerHTML = originalContent;
         }
+        // Cleanup listeners
+        if (blurHandler) window.removeEventListener('blur', blurHandler);
+        if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler);
+        if (safetyTimer) clearTimeout(safetyTimer);
     };
     
     showLoader();
@@ -1048,35 +1058,40 @@ function triggerDownload(url, filename, btnEl) {
         downloadUrl = url;
     }
     
-    // Warm server with HEAD request first - browser/server prepares the file
-    // Once HEAD responds, we know the server is ready, so we trigger the actual download
-    // The Save As dialog will appear near-instantly after this
+    // Set up detection: Save As dialog opening causes window blur / visibility change
+    blurHandler = function() {
+        // Small delay to let dialog fully appear before removing loader
+        setTimeout(hideLoader, 300);
+    };
+    visibilityHandler = function() {
+        if (document.visibilityState === 'hidden') {
+            setTimeout(hideLoader, 300);
+        }
+    };
+    window.addEventListener('blur', blurHandler);
+    document.addEventListener('visibilitychange', visibilityHandler);
+    
+    // Warm server with HEAD first, then trigger download
     fetch(downloadUrl, { method: 'HEAD' })
         .then(function() {
-            // Server is ready - trigger download
             const a = document.createElement('a');
             a.href = downloadUrl;
             a.style.display = 'none';
             document.body.appendChild(a);
             a.click();
             setTimeout(function() { document.body.removeChild(a); }, 100);
-            
-            // Keep loader briefly so user sees Save As appear
-            setTimeout(hideLoader, 1200);
         })
         .catch(function() {
-            // HEAD failed - try direct download anyway
             const a = document.createElement('a');
             a.href = downloadUrl;
             a.style.display = 'none';
             document.body.appendChild(a);
             a.click();
             setTimeout(function() { document.body.removeChild(a); }, 100);
-            setTimeout(hideLoader, 1500);
         });
     
-    // Safety: hide loader after max 10 seconds no matter what
-    setTimeout(hideLoader, 10000);
+    // Safety: hide loader after max 20 seconds (very slow connections)
+    safetyTimer = setTimeout(hideLoader, 20000);
 }
 
 function showDownloadPopup(songs) {
