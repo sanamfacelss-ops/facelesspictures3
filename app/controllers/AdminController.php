@@ -1982,7 +1982,13 @@ class AdminController
         $pdfFields = [
             'actor_script_pdf_url', 'song_lyrics_pdf_url',
             'director_script_pdf_url', 'writer_script_pdf_url',
+            // Script Doctrine cards (home page)
+            'doctrine_actor_pdf_url', 'doctrine_director_pdf_url', 'doctrine_writer_pdf_url',
         ];
+        // Script Doctrine card videos (home page)
+        $videoFields[] = 'doctrine_actor_video_url';
+        $videoFields[] = 'doctrine_director_video_url';
+        $videoFields[] = 'doctrine_writer_video_url';
         $isVideo = in_array($field, $videoFields);
         $isImage = in_array($field, $imageFields);
         $isPdf   = in_array($field, $pdfFields);
@@ -2234,6 +2240,11 @@ class AdminController
             'social_youtube', 'social_facebook', 'social_instagram', 'social_x', 'social_linkedin',
             // Footer
             'footer_tagline',
+            // Script Doctrine section (home page)
+            'doctrine_section_heading', 'doctrine_section_subheading',
+            'doctrine_actor_title', 'doctrine_actor_description', 'doctrine_actor_cta_text', 'doctrine_actor_cta_type', 'doctrine_actor_pdf_url', 'doctrine_actor_video_url',
+            'doctrine_director_title', 'doctrine_director_description', 'doctrine_director_cta_text', 'doctrine_director_cta_type', 'doctrine_director_pdf_url', 'doctrine_director_video_url',
+            'doctrine_writer_title', 'doctrine_writer_description', 'doctrine_writer_cta_text', 'doctrine_writer_cta_type', 'doctrine_writer_pdf_url', 'doctrine_writer_video_url',
         ];
 
         if (!in_array($key, $allowed)) {
@@ -2370,6 +2381,11 @@ class AdminController
             'social_youtube', 'social_facebook', 'social_instagram', 'social_x', 'social_linkedin',
             // Footer
             'footer_tagline',
+            // Script Doctrine section (home page)
+            'doctrine_section_heading', 'doctrine_section_subheading',
+            'doctrine_actor_title', 'doctrine_actor_description', 'doctrine_actor_cta_text', 'doctrine_actor_cta_type', 'doctrine_actor_pdf_url', 'doctrine_actor_video_url',
+            'doctrine_director_title', 'doctrine_director_description', 'doctrine_director_cta_text', 'doctrine_director_cta_type', 'doctrine_director_pdf_url', 'doctrine_director_video_url',
+            'doctrine_writer_title', 'doctrine_writer_description', 'doctrine_writer_cta_text', 'doctrine_writer_cta_type', 'doctrine_writer_pdf_url', 'doctrine_writer_video_url',
         ];
 
         try {

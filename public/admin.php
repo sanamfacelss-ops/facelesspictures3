@@ -3574,7 +3574,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div x-data="{showHome: false, showRoleCards: true, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
+                            <div x-data="{showHome: false, showRoleCards: true, showDoctrine: false, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
                             <div class="mt-6 mb-6">
@@ -4889,6 +4889,154 @@ The page will automatically format headings and paragraphs."
                                     </div><!-- End Role Cards Content -->
                                 </div><!-- End Role Cards Collapse -->
                             </div><!-- End Role Cards Section -->
+
+                            <!-- ========== SCRIPT DOCTRINE (shown on home page) ========== -->
+                            <div class="mt-6 mb-6">
+                                <div @click="showDoctrine = !showDoctrine"
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg cursor-pointer hover:from-amber-100 hover:to-amber-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">📜</span>
+                                        <h4 class="font-semibold text-dark text-sm">SCRIPT DOCTRINE</h4>
+                                        <span class="text-xs text-dark/40">(Actor, Director, Writer cards on home page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showDoctrine}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showDoctrine" x-transition>
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
+                                        <p class="text-[11px] text-dark/40 mb-4">A card shows only when it has a title or description. The whole section hides when all three cards are empty. Each card can have one button: open a PDF in a new tab, or play a video in a popup.</p>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Section Heading <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.doctrine_section_heading" placeholder="SCRIPT DOCTRINE"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] text-dark/50 mb-1">Section Subheading <span class="text-dark/30">(blank to hide)</span></label>
+                                                <input type="text" x-model="form.doctrine_section_subheading" placeholder="How we approach every role"
+                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-6">
+                                        <?php foreach (['actor' => '🎭 ACTOR', 'director' => '🎬 DIRECTOR', 'writer' => '✍️ WRITER'] as $dr => $drLabel):
+                                            $drPdf   = $settingsModel->get("doctrine_{$dr}_pdf_url", '');
+                                            $drVideo = $settingsModel->get("doctrine_{$dr}_video_url", '');
+                                        ?>
+                                            <div class="p-4 bg-gray-50 rounded-lg">
+                                                <p class="text-xs font-bold text-dark/70 mb-3"><?= $drLabel ?></p>
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Card Title</label>
+                                                        <input type="text" x-model="form.doctrine_<?= $dr ?>_title" placeholder="e.g. Actor Doctrine"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(paragraphs and/or bullets: start a line with "- " or "• " for a bullet point; blank line = new paragraph)</span></label>
+                                                        <textarea x-model="form.doctrine_<?= $dr ?>_description" rows="5" placeholder="Write a short paragraph here.&#10;&#10;- First bullet point&#10;- Second bullet point"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20 resize-y"></textarea>
+                                                    </div>
+
+                                                    <!-- CTA: one at a time -->
+                                                    <div class="pt-2 border-t border-dark/5">
+                                                        <label class="block text-[10px] text-dark/50 mb-1.5">Button Action <span class="text-dark/30">(only one at a time)</span></label>
+                                                        <div class="flex flex-wrap gap-1 mb-3">
+                                                            <?php foreach (['none' => 'No Button', 'pdf' => 'Open PDF (new tab)', 'video' => 'Play Video (popup)'] as $ctaVal => $ctaLbl): ?>
+                                                            <button type="button" @click="form.doctrine_<?= $dr ?>_cta_type = '<?= $ctaVal ?>'"
+                                                                :class="(form.doctrine_<?= $dr ?>_cta_type || 'none') === '<?= $ctaVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $ctaLbl ?></button>
+                                                            <?php endforeach; ?>
+                                                        </div>
+
+                                                        <div x-show="(form.doctrine_<?= $dr ?>_cta_type || 'none') !== 'none'" x-cloak class="mb-3">
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_cta_text" placeholder="Learn More"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+
+                                                        <!-- PDF upload -->
+                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'pdf'" x-cloak
+                                                            x-data="pdfUploader('doctrine_<?= $dr ?>_pdf_url', '<?= addslashes(htmlspecialchars($drPdf)) ?>')">
+                                                            <div class="relative border-2 rounded-xl transition-all bg-white"
+                                                                :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                                style="cursor:pointer"
+                                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                                @click="$refs.pdfIn.click()">
+                                                                <input type="file" x-ref="pdfIn" class="hidden" accept="application/pdf,.pdf" @change="onFile($event)">
+                                                                <template x-if="!preview && !uploading">
+                                                                    <p class="text-[12px] text-dark/40 text-center p-4">Drop PDF or <span class="underline">click to browse</span> · max 20 MB</p>
+                                                                </template>
+                                                                <template x-if="uploading">
+                                                                    <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
+                                                                </template>
+                                                                <template x-if="preview && !uploading">
+                                                                    <div class="flex items-center gap-3 px-4 py-3">
+                                                                        <span class="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 rounded px-1.5 py-0.5">PDF</span>
+                                                                        <a :href="preview" target="_blank" rel="noopener" @click.stop class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate underline" x-text="filename || 'PDF uploaded'"></a>
+                                                                        <button type="button" @click.stop="clearPdf()" aria-label="Remove PDF"
+                                                                            class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                                            <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        </button>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                        </div>
+
+                                                        <!-- Video: upload OR YouTube -->
+                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'video'" x-cloak
+                                                            x-data="videoUploader('doctrine_<?= $dr ?>_video_url', '<?= addslashes(htmlspecialchars($drVideo)) ?>')">
+                                                            <div class="flex gap-1 mb-2">
+                                                                <button type="button" @click="trailerTab='upload'"
+                                                                    :class="trailerTab==='upload' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">Upload Video File</button>
+                                                                <button type="button" @click="trailerTab='yt'"
+                                                                    :class="trailerTab==='yt' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">YouTube URL</button>
+                                                            </div>
+                                                            <div x-show="trailerTab==='upload'">
+                                                                <div class="relative border-2 rounded-xl transition-all bg-white"
+                                                                    :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                                    style="cursor:pointer"
+                                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                                    @click="$refs.vidIn.click()">
+                                                                    <input type="file" x-ref="vidIn" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo" @change="onFile($event)">
+                                                                    <template x-if="!preview && !uploading">
+                                                                        <p class="text-[12px] text-dark/40 text-center p-4">Drop video or <span class="underline">click to browse</span> · MP4 · MOV · WEBM · max 500 MB</p>
+                                                                    </template>
+                                                                    <template x-if="uploading">
+                                                                        <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
+                                                                    </template>
+                                                                    <template x-if="preview && !uploading">
+                                                                        <div class="flex items-center gap-3 px-4 py-3">
+                                                                            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                                            <p class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate" x-text="filename || 'Video uploaded'"></p>
+                                                                            <button type="button" @click.stop="clearVideo()" aria-label="Remove video"
+                                                                                class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                                                <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                            </button>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                            <div x-show="trailerTab==='yt'">
+                                                                <input type="url" x-model="ytUrl" @input="syncYtToForm()"
+                                                                    placeholder="https://youtu.be/... or youtube.com/watch?v=..."
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                <p class="text-[10px] text-dark/30 mt-1">Saved with "Save All Settings"</p>
+                                                            </div>
+                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- End Script Doctrine Section -->
 
                             <!-- ========== WRITER PAGE TEXT ========== -->
                             <div class="mt-6 mb-6">
@@ -9150,6 +9298,18 @@ The page will automatically format headings and paragraphs."
                 role_actor_badge2:      <?= json_encode($settingsModel->get('role_actor_badge2','Song')) ?>,
                 role_actor_button_text: <?= json_encode($settingsModel->get('role_actor_button_text','Click Here →')) ?>,
                 role_actor_button_url:  <?= json_encode($settingsModel->get('role_actor_button_url','/actor')) ?>,
+                
+                // Script Doctrine section (home page)
+                doctrine_section_heading:    <?= json_encode($settingsModel->get('doctrine_section_heading','SCRIPT DOCTRINE')) ?>,
+                doctrine_section_subheading: <?= json_encode($settingsModel->get('doctrine_section_subheading','')) ?>,
+                <?php foreach (['actor', 'director', 'writer'] as $dr): ?>
+                doctrine_<?= $dr ?>_title:       <?= json_encode($settingsModel->get("doctrine_{$dr}_title", '')) ?>,
+                doctrine_<?= $dr ?>_description: <?= json_encode($settingsModel->get("doctrine_{$dr}_description", '')) ?>,
+                doctrine_<?= $dr ?>_cta_text:    <?= json_encode($settingsModel->get("doctrine_{$dr}_cta_text", 'Learn More')) ?>,
+                doctrine_<?= $dr ?>_cta_type:    <?= json_encode($settingsModel->get("doctrine_{$dr}_cta_type", 'none') ?: 'none') ?>,
+                doctrine_<?= $dr ?>_pdf_url:     <?= json_encode($settingsModel->get("doctrine_{$dr}_pdf_url", '')) ?>,
+                doctrine_<?= $dr ?>_video_url:   <?= json_encode($settingsModel->get("doctrine_{$dr}_video_url", '')) ?>,
+                <?php endforeach; ?>
                 
                 // Marquee items
                 marquee_item1:  <?= json_encode($settingsModel->get('marquee_item1','ACTORS')) ?>,
