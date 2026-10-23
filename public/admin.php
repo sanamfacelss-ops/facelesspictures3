@@ -1907,13 +1907,18 @@ if (file_exists($errorLogFile)) {
                                                 <svg class="w-4 h-4 text-crimson" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
                                                 Song Links & Downloads
                                             </h4>
-                                            <p class="text-[10px] text-dark/40 mb-3">Add YouTube URL (to play), downloadable MP3/audio file, and title for each song</p>
+                                            <p class="text-[10px] text-dark/40 mb-3">Add YouTube URL (to play), downloadable MP3/audio file, and title for each song. Male and female songs show as separate buttons on the page.</p>
+                                            <div class="space-y-5">
+                                            <template x-for="g in ['male', 'female']" :key="g">
+                                            <div>
+                                            <p class="text-[12px] font-semibold text-dark mb-2" x-text="g === 'male' ? 'Male Songs' : 'Female Songs'"></p>
+                                            <p x-show="songCount(g) === 0" class="text-[11px] text-dark/40 mb-2" x-text="g === 'male' ? 'No male songs added yet.' : 'No female songs added yet.'"></p>
                                             <div class="space-y-3">
                                                 <template x-for="(entry, idx) in songEntries" :key="idx">
-                                                    <div class="border border-dark/10 rounded-lg p-3 bg-dark/[.02]">
+                                                    <div x-show="(entry.gender || 'male') === g" class="border border-dark/10 rounded-lg p-3 bg-dark/[.02]">
                                                         <div class="flex items-center justify-between mb-2">
-                                                            <span class="text-[11px] font-semibold text-dark/60">Song #<span x-text="idx + 1"></span></span>
-                                                            <button type="button" @click="removeSongUrl(idx)" x-show="songEntries.length > 1" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition">
+                                                            <span class="text-[11px] font-semibold text-dark/60" x-text="g === 'male' ? 'Male Song' : 'Female Song'"></span>
+                                                            <button type="button" @click="removeSongUrl(idx)" class="w-6 h-6 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition">
                                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                                             </button>
                                                         </div>
@@ -1947,10 +1952,13 @@ if (file_exists($errorLogFile)) {
                                                     </div>
                                                 </template>
                                             </div>
-                                            <button type="button" @click="addSongUrl()" class="mt-3 flex items-center gap-1 text-[11px] text-dark/50 hover:text-dark transition">
+                                            <button type="button" @click="addSongUrl(g)" class="mt-3 flex items-center gap-1 text-[11px] text-dark/50 hover:text-dark transition">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                                Add another song
+                                                <span x-text="g === 'male' ? 'Add male song' : 'Add female song'"></span>
                                             </button>
+                                            </div>
+                                            </template>
+                                            </div>
                                         </div>
 
                                         <!-- SECTION: Rules & Guidelines -->
@@ -7600,9 +7608,15 @@ The page will automatically format headings and paragraphs."
 
             // Song URL list helpers — use reactive songEntries array directly
             _syncSongEntriesToForm() {
+                // Format per line: Label|YouTubeURL|DownloadURL|gender (gender = male|female)
                 this.scriptForm.tune_youtube_url = this.songEntries
-                    .map(e => (e.label.trim() ? e.label.trim() + '|' : '') + e.url.trim() + '|' + (e.downloadUrl || '').trim())
-                    .filter(s => s.replace(/\|/g,'').trim().length > 0)
+                    .filter(e => ((e.label || '') + (e.url || '') + (e.downloadUrl || '')).trim().length > 0)
+                    .map(e => [
+                        (e.label || '').replace(/\|/g, ' ').trim(),
+                        (e.url || '').trim(),
+                        (e.downloadUrl || '').trim(),
+                        e.gender === 'female' ? 'female' : 'male'
+                    ].join('|'))
                     .join('\n');
             },
             _loadSongEntriesFromForm() {
@@ -7614,10 +7628,11 @@ The page will automatically format headings and paragraphs."
                         return { 
                             label: parts[0] || '', 
                             url: parts[1] || '', 
-                            downloadUrl: parts[2] || '' 
+                            downloadUrl: parts[2] || '',
+                            gender: (parts[3] || '').toLowerCase() === 'female' ? 'female' : 'male'
                         };
                       })
-                    : [{ label: '', url: '', downloadUrl: '' }];
+                    : [{ label: '', url: '', downloadUrl: '', gender: 'male' }];
             },
             songUrlList() { return this.songEntries; },
             updateSongUrl(idx, val) {
@@ -7678,14 +7693,16 @@ The page will automatically format headings and paragraphs."
                 // Reset input so same file can be selected again
                 event.target.value = '';
             },
-            addSongUrl() {
-                this.songEntries.push({ label: '', url: '', downloadUrl: '' });
+            addSongUrl(gender) {
+                this.songEntries.push({ label: '', url: '', downloadUrl: '', gender: gender === 'female' ? 'female' : 'male' });
                 this._syncSongEntriesToForm();
             },
             removeSongUrl(idx) {
                 this.songEntries.splice(idx, 1);
-                if (this.songEntries.length === 0) this.songEntries.push({ label: '', url: '', downloadUrl: '' });
                 this._syncSongEntriesToForm();
+            },
+            songCount(gender) {
+                return this.songEntries.filter(e => (e.gender || 'male') === gender).length;
             },
             
             async createScript() {

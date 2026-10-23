@@ -14,28 +14,28 @@ $filmSongSubtitle = setting('film_song_subtitle', 'Listen to the song before you
 if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
 if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you shoot your scene';
 
-// Collect all song download URLs and tune URLs from director scripts
-$allSongDownloads = [];
-$allTuneUrls = [];
+// Collect song tune URLs and download URLs from director scripts, split by male/female
+// tune_youtube_url format per line: Label|YouTubeURL|DownloadURL|gender (gender optional, defaults to male)
+$tunesByGender     = ['male' => [], 'female' => []];
+$downloadsByGender = ['male' => [], 'female' => []];
 foreach ($directorScripts as $sc) {
-    // Parse YouTube URLs and Download URLs from tune_youtube_url
-    // Format: Label|YouTubeURL|DownloadURL
     $raw = $sc['tune_youtube_url'] ?? '';
     foreach (array_filter(array_map('trim', explode("\n", $raw))) as $line) {
         $parts = array_map('trim', explode('|', $line));
         $label = $parts[0] ?? '';
         $youtubeUrl = $parts[1] ?? '';
         $downloadUrl = $parts[2] ?? '';
+        $gender = strtolower($parts[3] ?? '') === 'female' ? 'female' : 'male';
         if ($youtubeUrl) {
-            $allTuneUrls[] = ['label' => $label, 'url' => $youtubeUrl];
+            $tunesByGender[$gender][] = ['label' => $label, 'url' => $youtubeUrl];
         }
         if ($downloadUrl) {
-            $allSongDownloads[] = ['label' => $label, 'url' => $downloadUrl];
+            $downloadsByGender[$gender][] = ['label' => $label, 'url' => $downloadUrl];
         }
     }
 }
-$allSongDownloads = array_values(array_filter($allSongDownloads, fn($t) => !empty($t['url'])));
-$allTuneUrls = array_values(array_filter($allTuneUrls, fn($t) => !empty($t['url'])));
+$hasAnySongTunes     = !empty($tunesByGender['male']) || !empty($tunesByGender['female']);
+$hasAnySongDownloads = !empty($downloadsByGender['male']) || !empty($downloadsByGender['female']);
 
 // Get cache version for asset cache-busting
 $cacheVersion = '1';
@@ -197,6 +197,11 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .song-spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:song-spin 0.6s linear infinite}
 @keyframes song-spin{to{transform:rotate(360deg)}}
 .film-song-btn:disabled{opacity:0.7;cursor:wait}
+
+/* Male / Female tabs in Download Song popup */
+.dl-tab{flex:1;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:8px;padding:.6rem .75rem;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s}
+.dl-tab:hover{background:#e5e7eb}
+.dl-tab.active{background:#111;color:#fff;border-color:#111}
 </style>
 </head>
 <body>
@@ -391,9 +396,8 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
     </button>
   </div><!-- /submit-card -->
 
-<?php if (!empty($allTuneUrls)): ?>
-  <?php $filmSongJson = htmlspecialchars(json_encode($allTuneUrls), ENT_QUOTES); ?>
-  <?php $filmSongDownloadsJson = htmlspecialchars(json_encode($allSongDownloads), ENT_QUOTES); ?>
+<?php if ($hasAnySongTunes || $hasAnySongDownloads): ?>
+  <?php $filmSongDownloadsJson = htmlspecialchars(json_encode($downloadsByGender), ENT_QUOTES); ?>
   <!-- FILM SONG BAR (positioned via grid: desktop=below, mobile=between) -->
   <div class="film-song-wrap">
     <div class="film-song-inner">
@@ -402,11 +406,15 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45"><?= htmlspecialchars($filmSongSubtitle) ?></p>
       </div>
       <div style="display:flex;gap:.75rem;align-items:center;flex-shrink:0;flex-wrap:wrap">
-        <button type="button" class="film-song-btn" onclick="openSongSlider(<?= $filmSongJson ?>)">
+        <?php foreach (['male' => 'Male Songs', 'female' => 'Female Songs'] as $g => $gLabel): ?>
+        <?php if (!empty($tunesByGender[$g])): ?>
+        <button type="button" class="film-song-btn" onclick="openSongSlider(<?= htmlspecialchars(json_encode($tunesByGender[$g]), ENT_QUOTES) ?>)">
           <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          Play Song
+          <?= $gLabel ?>
         </button>
-        <?php if (!empty($allSongDownloads)): ?>
+        <?php endif; ?>
+        <?php endforeach; ?>
+        <?php if ($hasAnySongDownloads): ?>
         <button type="button" class="film-song-btn" onclick="downloadSong(<?= $filmSongDownloadsJson ?>)">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           Download Song
@@ -586,16 +594,21 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 // Download Song Function
+// Accepts {male:[...], female:[...]} (or a plain array, treated as male)
 function downloadSong(songs){
-    if(!songs || songs.length === 0){ alert('No songs available for download'); return; }
-    if(songs.length === 1){
+    var groups = Array.isArray(songs)
+        ? { male: songs, female: [] }
+        : { male: (songs && songs.male) || [], female: (songs && songs.female) || [] };
+    var all = groups.male.concat(groups.female);
+    if(all.length === 0){ alert('No songs available for download'); return; }
+    if(all.length === 1){
         // Find the film-song "Download Song" button for loader
         var btns = document.querySelectorAll('.film-song-btn');
         var targetBtn = null;
         btns.forEach(function(b){ if(b.textContent.trim().indexOf('Download') !== -1) targetBtn = b; });
-        triggerDownload(songs[0].url, songs[0].label || 'song', targetBtn);
+        triggerDownload(all[0].url, all[0].label || 'song', targetBtn);
     } else {
-        showDownloadPopup(songs);
+        showDownloadPopup(groups);
     }
 }
 // Download with loader that stays visible until Save As dialog appears
@@ -670,11 +683,38 @@ function triggerDownload(url, filename, btnEl){
     // Safety: max 20 seconds
     safetyTimer = setTimeout(hideLoader, 20000);
 }
-function showDownloadPopup(songs){
+function showDownloadPopup(groups){
     var modal = document.getElementById('downloadSongModal');
-    var list = document.getElementById('downloadSongList');
     modal.style.pointerEvents = 'auto';
+    renderDownloadTabs(groups, groups.male.length ? 'male' : 'female');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function renderDownloadTabs(groups, active){
+    var tabsEl = document.getElementById('downloadSongTabs');
+    tabsEl.innerHTML = '';
+    [['male', 'Male Songs'], ['female', 'Female Songs']].forEach(function(t){
+        var tab = document.createElement('button');
+        tab.type = 'button';
+        tab.className = 'dl-tab' + (t[0] === active ? ' active' : '');
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-selected', t[0] === active ? 'true' : 'false');
+        tab.textContent = t[1] + ' (' + groups[t[0]].length + ')';
+        tab.onclick = function(){ renderDownloadTabs(groups, t[0]); };
+        tabsEl.appendChild(tab);
+    });
+    renderDownloadList(groups[active]);
+}
+function renderDownloadList(songs){
+    var list = document.getElementById('downloadSongList');
     list.innerHTML = '';
+    if(!songs.length){
+        var empty = document.createElement('p');
+        empty.textContent = 'No songs available yet.';
+        empty.style.cssText = 'font-size:.9rem;color:#6b7280;text-align:center;padding:1rem 0';
+        list.appendChild(empty);
+        return;
+    }
     songs.forEach(function(song, index){
         var item = document.createElement('div');
         item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f3f4f6;border-radius:8px;gap:1rem';
@@ -692,8 +732,6 @@ function showDownloadPopup(songs){
         item.appendChild(btn);
         list.appendChild(item);
     });
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
 }
 function closeDownloadPopup(){
     var modal = document.getElementById('downloadSongModal');
@@ -726,7 +764,8 @@ function closeDownloadPopup(){
             <p style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.06em;color:#111">Download Song</p>
             <button onclick="closeDownloadPopup()" style="background:none;border:none;font-size:1.5rem;color:#6b7280;cursor:pointer;padding:.25rem .5rem;line-height:1">✕</button>
         </div>
-        <div id="downloadSongList" style="padding:1.5rem;display:flex;flex-direction:column;gap:.75rem;max-height:60vh;overflow-y:auto"></div>
+        <div id="downloadSongTabs" role="tablist" style="display:flex;gap:.5rem;padding:1.25rem 1.5rem 0"></div>
+        <div id="downloadSongList" style="padding:1.25rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;max-height:55vh;overflow-y:auto"></div>
     </div>
 </div>
 
