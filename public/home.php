@@ -696,7 +696,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 <!-- ── MAIN CONTENT ── -->
 <main style="padding-top:<?= $navHeight ?>px">
   <!-- Hero Section with White Background -->
-  <section style="background:#fff;padding:3rem 0 3rem">
+  <section style="background:#fff;padding:1rem 0 0">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
 
       <!-- ══ NEW HERO LAYOUT: Optional Text Above Video, Video, Then Text Below ══ -->
@@ -708,7 +708,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     
     // Show text ABOVE video if set
     if (!empty($heroPreVideoText)): ?>
-    <div class="hero-pre-video-text" style="text-align:center;padding:1.5rem 1.5rem 1rem;max-width:900px;margin:0 auto">
+    <div class="hero-pre-video-text" style="text-align:center;padding:0 1.5rem 1rem;max-width:900px;margin:0 auto">
         <p style="font-size:.9rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#111"><?= htmlspecialchars($heroPreVideoText) ?></p>
     </div>
     <?php endif;
@@ -777,7 +777,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     </div>
     
     <!-- Hero Text Section - Below Video -->
-    <div class="hero-text-section" style="text-align:center;padding:2.5rem 1.5rem 3rem;max-width:900px;margin:0 auto">
+    <div class="hero-text-section" style="text-align:center;padding:2.5rem 1.5rem 2rem;max-width:900px;margin:0 auto">
         <!-- Small uppercase text below video (replaces old subheading) -->
         <?php if (!empty($heroTopText)): ?>
         <p class="hero-subheading" style="font-size:.85rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#111;margin-bottom:1rem"><?= htmlspecialchars($heroTopText) ?></p>
@@ -818,9 +818,9 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
     <style>
     /* Hero Mobile Responsive */
     @media(max-width:768px){
-      .hero-pre-video-text{padding:1.25rem 1rem .75rem !important}
+      .hero-pre-video-text{padding:0 1rem .75rem !important}
       .hero-pre-video-text p{font-size:.78rem !important;letter-spacing:.12em !important}
-      .hero-text-section{padding:2rem 1.25rem 2.5rem !important}
+      .hero-text-section{padding:2rem 1.25rem 1.5rem !important}
       .hero-subheading{font-size:.75rem !important;letter-spacing:.16em !important;margin-bottom:.85rem !important}
       .hero-main-heading{font-size:clamp(26px,6vw,36px) !important;line-height:1.3 !important;margin-bottom:.6rem !important}
       .hero-tagline{font-size:.82rem !important;letter-spacing:.06em !important}
@@ -829,9 +829,9 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
       .hero-tagline-mobile{display:block !important}
     }
     @media(max-width:480px){
-      .hero-pre-video-text{padding:1rem .85rem .6rem !important}
+      .hero-pre-video-text{padding:0 .85rem .6rem !important}
       .hero-pre-video-text p{font-size:.72rem !important;letter-spacing:.1em !important}
-      .hero-text-section{padding:1.75rem 1rem 2rem !important}
+      .hero-text-section{padding:1.75rem 1rem 1.25rem !important}
       .hero-subheading{font-size:.7rem !important;letter-spacing:.14em !important;margin-bottom:.75rem !important}
       .hero-main-heading{font-size:clamp(22px,6.5vw,30px) !important;line-height:1.35 !important;margin-bottom:.55rem !important}
       .hero-tagline{font-size:.75rem !important;letter-spacing:.05em !important;line-height:1.8 !important}
@@ -849,7 +849,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
 
   <!-- ══ RASAS REVEALED - POSTER SECTION ══ -->
     <?php if (count($posters) > 0): ?>
-    <section class="rasas-section" style="background:#f5f5f5;padding:4rem 0;width:100%">
+    <section class="rasas-section" style="background:#f5f5f5;padding:2.5rem 0 4rem;width:100%">
       <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
         
         <!-- Section Heading -->
@@ -1006,7 +1006,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         max-width:calc(50% - 1rem);
       }
       .rasas-poster-grid{gap:1.75rem}
-      .rasas-section{padding:3rem 0 !important}
+      .rasas-section{padding:2rem 0 3rem !important}
     }
     /* Mobile - 1 column */
     @media(max-width:640px){
@@ -1015,7 +1015,7 @@ usort($allMenuItems, fn($a, $b) => $a['order'] <=> $b['order']);
         max-width:100%;
       }
       .rasas-poster-grid{gap:1.5rem}
-      .rasas-section{padding:2.5rem 0 !important}
+      .rasas-section{padding:1.75rem 0 2.5rem !important}
       .rasas-section > div{padding:0 1rem !important}
       .rasa-poster-image{border-radius:8px !important}
       /* Show mobile poster subtitle, hide desktop */
