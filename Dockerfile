@@ -1,7 +1,15 @@
+# Prebuilt static ffmpeg/ffprobe (includes libmp3lame). Pinned version.
+# Much faster than apt-get install ffmpeg, which pulls hundreds of MB of packages.
+FROM mwader/static-ffmpeg:7.1 AS ffmpeg
+
 FROM php:8.2-apache
 
+# ffmpeg + ffprobe in /usr/bin so both "ffmpeg" and "/usr/bin/ffmpeg" keep working
+COPY --from=ffmpeg /ffmpeg /usr/bin/ffmpeg
+COPY --from=ffmpeg /ffprobe /usr/bin/ffprobe
+
 # Install system dependencies (cached layer)
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -10,9 +18,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     curl \
-    ffmpeg \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

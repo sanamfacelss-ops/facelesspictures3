@@ -1,0 +1,5 @@
+# Keep the build context small (not needed inside the image)
+.git
+.vscode
+logs/*.log
+cache/pages/*.html
