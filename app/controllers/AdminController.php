@@ -1969,6 +1969,7 @@ class AdminController
             'landing_poster10_url',
             'actor_script_image_url', 'song_lyrics_image_url',
             'director_script_image_url', 'writer_script_image_url',
+            'scripts_page_hero_image',
         ];
         $videoFields = [
             'landing_trailer_url',  'landing_trailer2_url', 'landing_trailer3_url',
@@ -2242,6 +2243,11 @@ class AdminController
             'footer_tagline',
             // Script Doctrine section (home page)
             'doctrine_section_heading', 'doctrine_section_subheading',
+            // Scripts page (/scripts)
+            'scripts_page_heading', 'scripts_page_tagline', 'scripts_page_hero_image',
+            'doctrine_actor_price', 'doctrine_actor_align',
+            'doctrine_director_price', 'doctrine_director_align',
+            'doctrine_writer_price', 'doctrine_writer_align',
             'doctrine_actor_title', 'doctrine_actor_description', 'doctrine_actor_cta_text', 'doctrine_actor_cta_type', 'doctrine_actor_pdf_url', 'doctrine_actor_video_url',
             'doctrine_director_title', 'doctrine_director_description', 'doctrine_director_cta_text', 'doctrine_director_cta_type', 'doctrine_director_pdf_url', 'doctrine_director_video_url',
             'doctrine_writer_title', 'doctrine_writer_description', 'doctrine_writer_cta_text', 'doctrine_writer_cta_type', 'doctrine_writer_pdf_url', 'doctrine_writer_video_url',
@@ -2383,6 +2389,11 @@ class AdminController
             'footer_tagline',
             // Script Doctrine section (home page)
             'doctrine_section_heading', 'doctrine_section_subheading',
+            // Scripts page (/scripts)
+            'scripts_page_heading', 'scripts_page_tagline', 'scripts_page_hero_image',
+            'doctrine_actor_price', 'doctrine_actor_align',
+            'doctrine_director_price', 'doctrine_director_align',
+            'doctrine_writer_price', 'doctrine_writer_align',
             'doctrine_actor_title', 'doctrine_actor_description', 'doctrine_actor_cta_text', 'doctrine_actor_cta_type', 'doctrine_actor_pdf_url', 'doctrine_actor_video_url',
             'doctrine_director_title', 'doctrine_director_description', 'doctrine_director_cta_text', 'doctrine_director_cta_type', 'doctrine_director_pdf_url', 'doctrine_director_video_url',
             'doctrine_writer_title', 'doctrine_writer_description', 'doctrine_writer_cta_text', 'doctrine_writer_cta_type', 'doctrine_writer_pdf_url', 'doctrine_writer_video_url',

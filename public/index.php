@@ -270,6 +270,7 @@ $pageRoutes = [
     'director' => 'director.php',
     'writer'   => 'writer.php',
     'legal'    => 'legal.php',
+    'scripts'  => 'scripts.php',
 ];
 
 if (isset($pageRoutes[$uri])) {

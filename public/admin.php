@@ -12,6 +12,7 @@ function getAvailablePageRoutes() {
         '/actor' => 'Actor Submission Page',
         '/director' => 'Director Submission Page',
         '/writer' => 'Writer Submission Page',
+        '/scripts' => 'Scripts Page',
     ];
 }
 
@@ -3574,7 +3575,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div x-data="{showHome: false, showRoleCards: true, showDoctrine: false, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
+                            <div x-data="{showHome: false, showRoleCards: true, showDoctrine: false, showScripts: false, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
                             <div class="mt-6 mb-6">
@@ -3641,6 +3642,7 @@ if (file_exists($errorLogFile)) {
                                                             <option value="director">Directors</option>
                                                             <option value="actor">Actors</option>
                                                             <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                         </select>
                                                     </div>
                                                     <div>
@@ -3669,6 +3671,7 @@ if (file_exists($errorLogFile)) {
                                                             <option value="director">Directors</option>
                                                             <option value="actor">Actors</option>
                                                             <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                         </select>
                                                     </div>
                                                     <div>
@@ -3706,6 +3709,7 @@ if (file_exists($errorLogFile)) {
                                                             <option value="director">Directors</option>
                                                             <option value="actor">Actors</option>
                                                             <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                         </select>
                                                     </div>
                                                     <div>
@@ -3734,6 +3738,7 @@ if (file_exists($errorLogFile)) {
                                                             <option value="director">Directors</option>
                                                             <option value="actor">Actors</option>
                                                             <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                         </select>
                                                     </div>
                                                     <div>
@@ -3781,6 +3786,7 @@ if (file_exists($errorLogFile)) {
                                                         <option value="director">Directors</option>
                                                         <option value="actor">Actors</option>
                                                         <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                     </select>
                                                 </div>
                                                 <div>
@@ -3809,6 +3815,7 @@ if (file_exists($errorLogFile)) {
                                                         <option value="director">Directors</option>
                                                         <option value="actor">Actors</option>
                                                         <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                     </select>
                                                 </div>
                                                 <div>
@@ -3837,6 +3844,7 @@ if (file_exists($errorLogFile)) {
                                                         <option value="director">Directors</option>
                                                         <option value="actor">Actors</option>
                                                         <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                     </select>
                                                 </div>
                                                 <div>
@@ -3865,6 +3873,7 @@ if (file_exists($errorLogFile)) {
                                                         <option value="director">Directors</option>
                                                         <option value="actor">Actors</option>
                                                         <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
                                                     </select>
                                                 </div>
                                                 <div>
@@ -4489,143 +4498,6 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
-                            <!-- ========== SECTION: Script Doctrine ========== -->
-                            <div class="mb-6 pb-6 border-b-2 border-dark/10">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <span class="text-lg" aria-hidden="true">📜</span>
-                                    <h5 class="text-[14px] font-bold text-dark">Script Doctrine Section</h5>
-                                </div>
-                                        <p class="text-[11px] text-dark/40 mb-4">A card shows only when it has a title or description. The whole section hides when all three cards are empty. Each card can have one button: open a PDF in a new tab, or play a video in a popup.</p>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                                            <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Section Heading <span class="text-dark/30">(blank to hide)</span></label>
-                                                <input type="text" x-model="form.doctrine_section_heading" placeholder="SCRIPT DOCTRINE"
-                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                            </div>
-                                            <div>
-                                                <label class="block text-[10px] text-dark/50 mb-1">Section Subheading <span class="text-dark/30">(blank to hide)</span></label>
-                                                <input type="text" x-model="form.doctrine_section_subheading" placeholder="How we approach every role"
-                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-6">
-                                        <?php foreach (['actor' => '🎭 ACTOR', 'director' => '🎬 DIRECTOR', 'writer' => '✍️ WRITER'] as $dr => $drLabel):
-                                            $drPdf   = $settingsModel->get("doctrine_{$dr}_pdf_url", '');
-                                            $drVideo = $settingsModel->get("doctrine_{$dr}_video_url", '');
-                                        ?>
-                                            <div class="p-4 bg-gray-50 rounded-lg">
-                                                <p class="text-xs font-bold text-dark/70 mb-3"><?= $drLabel ?></p>
-                                                <div class="space-y-3">
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Card Title</label>
-                                                        <input type="text" x-model="form.doctrine_<?= $dr ?>_title" placeholder="e.g. Actor Doctrine"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(paragraphs and/or bullets: start a line with "- " or "• " for a bullet point; blank line = new paragraph)</span></label>
-                                                        <textarea x-model="form.doctrine_<?= $dr ?>_description" rows="5" placeholder="Write a short paragraph here.&#10;&#10;- First bullet point&#10;- Second bullet point"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20 resize-y"></textarea>
-                                                    </div>
-
-                                                    <!-- CTA: one at a time -->
-                                                    <div class="pt-2 border-t border-dark/5">
-                                                        <label class="block text-[10px] text-dark/50 mb-1.5">Button Action <span class="text-dark/30">(only one at a time)</span></label>
-                                                        <div class="flex flex-wrap gap-1 mb-3">
-                                                            <?php foreach (['none' => 'No Button', 'pdf' => 'Open PDF (new tab)', 'video' => 'Play Video (popup)'] as $ctaVal => $ctaLbl): ?>
-                                                            <button type="button" @click="form.doctrine_<?= $dr ?>_cta_type = '<?= $ctaVal ?>'"
-                                                                :class="(form.doctrine_<?= $dr ?>_cta_type || 'none') === '<?= $ctaVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $ctaLbl ?></button>
-                                                            <?php endforeach; ?>
-                                                        </div>
-
-                                                        <div x-show="(form.doctrine_<?= $dr ?>_cta_type || 'none') !== 'none'" x-cloak class="mb-3">
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
-                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_cta_text" placeholder="Learn More"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-
-                                                        <!-- PDF upload -->
-                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'pdf'" x-cloak
-                                                            x-data="pdfUploader('doctrine_<?= $dr ?>_pdf_url', '<?= addslashes(htmlspecialchars($drPdf)) ?>')">
-                                                            <div class="relative border-2 rounded-xl transition-all bg-white"
-                                                                :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
-                                                                style="cursor:pointer"
-                                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
-                                                                @click="$refs.pdfIn.click()">
-                                                                <input type="file" x-ref="pdfIn" class="hidden" accept="application/pdf,.pdf" @change="onFile($event)">
-                                                                <template x-if="!preview && !uploading">
-                                                                    <p class="text-[12px] text-dark/40 text-center p-4">Drop PDF or <span class="underline">click to browse</span> · max 20 MB</p>
-                                                                </template>
-                                                                <template x-if="uploading">
-                                                                    <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
-                                                                </template>
-                                                                <template x-if="preview && !uploading">
-                                                                    <div class="flex items-center gap-3 px-4 py-3">
-                                                                        <span class="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 rounded px-1.5 py-0.5">PDF</span>
-                                                                        <a :href="preview" target="_blank" rel="noopener" @click.stop class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate underline" x-text="filename || 'PDF uploaded'"></a>
-                                                                        <button type="button" @click.stop="clearPdf()" aria-label="Remove PDF"
-                                                                            class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
-                                                                            <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                        </button>
-                                                                    </div>
-                                                                </template>
-                                                            </div>
-                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                                        </div>
-
-                                                        <!-- Video: upload OR YouTube -->
-                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'video'" x-cloak
-                                                            x-data="videoUploader('doctrine_<?= $dr ?>_video_url', '<?= addslashes(htmlspecialchars($drVideo)) ?>')">
-                                                            <div class="flex gap-1 mb-2">
-                                                                <button type="button" @click="trailerTab='upload'"
-                                                                    :class="trailerTab==='upload' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">Upload Video File</button>
-                                                                <button type="button" @click="trailerTab='yt'"
-                                                                    :class="trailerTab==='yt' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">YouTube URL</button>
-                                                            </div>
-                                                            <div x-show="trailerTab==='upload'">
-                                                                <div class="relative border-2 rounded-xl transition-all bg-white"
-                                                                    :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
-                                                                    style="cursor:pointer"
-                                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
-                                                                    @click="$refs.vidIn.click()">
-                                                                    <input type="file" x-ref="vidIn" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo" @change="onFile($event)">
-                                                                    <template x-if="!preview && !uploading">
-                                                                        <p class="text-[12px] text-dark/40 text-center p-4">Drop video or <span class="underline">click to browse</span> · MP4 · MOV · WEBM · max 500 MB</p>
-                                                                    </template>
-                                                                    <template x-if="uploading">
-                                                                        <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
-                                                                    </template>
-                                                                    <template x-if="preview && !uploading">
-                                                                        <div class="flex items-center gap-3 px-4 py-3">
-                                                                            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                                                            <p class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate" x-text="filename || 'Video uploaded'"></p>
-                                                                            <button type="button" @click.stop="clearVideo()" aria-label="Remove video"
-                                                                                class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
-                                                                                <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                            </button>
-                                                                        </div>
-                                                                    </template>
-                                                                </div>
-                                                            </div>
-                                                            <div x-show="trailerTab==='yt'">
-                                                                <input type="url" x-model="ytUrl" @input="syncYtToForm()"
-                                                                    placeholder="https://youtu.be/... or youtube.com/watch?v=..."
-                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                                <p class="text-[10px] text-dark/30 mt-1">Saved with "Save All Settings"</p>
-                                                            </div>
-                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                        </div>
-                            </div>
-
                             <!-- ========== SECTION: Kya Banoge (Role Cards) ========== -->
                             <div class="mb-4">
                                 <div class="flex items-center gap-2 mb-3">
@@ -5006,6 +4878,210 @@ The page will automatically format headings and paragraphs."
                                     </div><!-- End Home Page Content -->
                                 </div><!-- End Home Page Collapse -->
                             </div><!-- End Home Page Section -->
+
+                            <!-- ========== SCRIPTS PAGE (/scripts) ========== -->
+                            <div class="mt-6 mb-6">
+                                <div @click="showScripts = !showScripts"
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg cursor-pointer hover:from-amber-100 hover:to-amber-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg" aria-hidden="true">📜</span>
+                                        <h4 class="font-semibold text-dark text-sm">SCRIPTS PAGE</h4>
+                                        <span class="text-xs text-dark/40">(Hero & service cards on <a href="/scripts" target="_blank" class="underline" @click.stop>/scripts</a> page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showScripts}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showScripts" x-transition>
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
+
+                                        <!-- Hero -->
+                                        <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                            <h5 class="text-[14px] font-bold text-dark mb-1">Hero</h5>
+                                            <p class="text-[11px] text-dark/40 mb-4">Big heading, small tagline and wide image at the top of the page. Leave any field blank to hide it. To show the page in the header menu, pick "Scripts" in Header Section → menu items.</p>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/50 mb-1">Page Heading</label>
+                                                    <input type="text" x-model="form.scripts_page_heading" placeholder="SCRIPTS"
+                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/50 mb-1">Tagline <span class="text-dark/30">(use $ between items, shown with · dots)</span></label>
+                                                    <input type="text" x-model="form.scripts_page_tagline" placeholder="WRITER'S ROOM $ TESTED $ SHOOT-READY"
+                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                </div>
+                                            </div>
+                                            <div x-data="imageUploader('scripts_page_hero_image', '<?= addslashes(htmlspecialchars($settingsModel->get('scripts_page_hero_image', ''))) ?>')">
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Image <span class="text-dark/30">(wide image, e.g. 1600×450; max 5 MB)</span></label>
+                                                <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-white"
+                                                    :class="dragging ? 'border-dark' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                    style="aspect-ratio:32/9;max-height:220px"
+                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                    @click="$refs.heroImgIn.click()">
+                                                    <input type="file" x-ref="heroImgIn" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                                    <template x-if="!preview && !uploading">
+                                                        <div class="absolute inset-0 flex items-center justify-center p-3 text-center">
+                                                            <p class="text-[12px] text-dark/40">Drop image or <span class="underline">click to browse</span></p>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="uploading">
+                                                        <div class="absolute inset-0 flex items-center justify-center bg-white">
+                                                            <p class="text-[12px] text-dark/50" x-text="progress + '% — uploading...'"></p>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="preview && !uploading">
+                                                        <div class="absolute inset-0">
+                                                            <img :src="preview" alt="Scripts hero" style="width:100%;height:100%;object-fit:cover">
+                                                            <button type="button" @click.stop="clearImage()" aria-label="Remove image"
+                                                                class="absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition">
+                                                                <svg class="w-3.5 h-3.5 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                                <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cards -->
+                                        <h5 class="text-[14px] font-bold text-dark mb-1">Cards</h5>
+                                        <p class="text-[11px] text-dark/40 mb-4">A card shows only when it has a title, description or price. Each card can have one button: open a PDF in a new tab, or play a video in a popup.</p>
+
+                                        <div class="space-y-6">
+                                        <?php foreach (['actor' => 'CARD 1', 'director' => 'CARD 2', 'writer' => 'CARD 3'] as $dr => $drLabel):
+                                            $drPdf   = $settingsModel->get("doctrine_{$dr}_pdf_url", '');
+                                            $drVideo = $settingsModel->get("doctrine_{$dr}_video_url", '');
+                                        ?>
+                                            <div class="p-4 bg-gray-50 rounded-lg">
+                                                <p class="text-xs font-bold text-dark/70 mb-3"><?= $drLabel ?></p>
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Card Title</label>
+                                                        <input type="text" x-model="form.doctrine_<?= $dr ?>_title" placeholder="e.g. Script Analysis"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(each line shows on its own line; start a line with "- " or "• " for a bullet point; blank line = new paragraph)</span></label>
+                                                        <textarea x-model="form.doctrine_<?= $dr ?>_description" rows="6" placeholder="For Actors. Writers. Producers.&#10;3 Honest Reads.&#10;&#10;- First bullet point&#10;- Second bullet point"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20 resize-y"></textarea>
+                                                    </div>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Price <span class="text-dark/30">(blank to hide)</span></label>
+                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_price" placeholder="Charges: ₹50,000"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Text Alignment</label>
+                                                            <div class="flex gap-1">
+                                                                <?php foreach (['left' => 'Left', 'center' => 'Center', 'right' => 'Right'] as $alVal => $alLbl): ?>
+                                                                <button type="button" @click="form.doctrine_<?= $dr ?>_align = '<?= $alVal ?>'"
+                                                                    :class="(form.doctrine_<?= $dr ?>_align || 'center') === '<?= $alVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $alLbl ?></button>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- CTA: one at a time -->
+                                                    <div class="pt-2 border-t border-dark/5">
+                                                        <label class="block text-[10px] text-dark/50 mb-1.5">Button Action <span class="text-dark/30">(only one at a time)</span></label>
+                                                        <div class="flex flex-wrap gap-1 mb-3">
+                                                            <?php foreach (['none' => 'No Button', 'pdf' => 'Open PDF (new tab)', 'video' => 'Play Video (popup)'] as $ctaVal => $ctaLbl): ?>
+                                                            <button type="button" @click="form.doctrine_<?= $dr ?>_cta_type = '<?= $ctaVal ?>'"
+                                                                :class="(form.doctrine_<?= $dr ?>_cta_type || 'none') === '<?= $ctaVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $ctaLbl ?></button>
+                                                            <?php endforeach; ?>
+                                                        </div>
+
+                                                        <div x-show="(form.doctrine_<?= $dr ?>_cta_type || 'none') !== 'none'" x-cloak class="mb-3">
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_cta_text" placeholder="Learn More"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+
+                                                        <!-- PDF upload -->
+                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'pdf'" x-cloak
+                                                            x-data="pdfUploader('doctrine_<?= $dr ?>_pdf_url', '<?= addslashes(htmlspecialchars($drPdf)) ?>')">
+                                                            <div class="relative border-2 rounded-xl transition-all bg-white"
+                                                                :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                                style="cursor:pointer"
+                                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                                @click="$refs.pdfIn.click()">
+                                                                <input type="file" x-ref="pdfIn" class="hidden" accept="application/pdf,.pdf" @change="onFile($event)">
+                                                                <template x-if="!preview && !uploading">
+                                                                    <p class="text-[12px] text-dark/40 text-center p-4">Drop PDF or <span class="underline">click to browse</span> · max 20 MB</p>
+                                                                </template>
+                                                                <template x-if="uploading">
+                                                                    <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
+                                                                </template>
+                                                                <template x-if="preview && !uploading">
+                                                                    <div class="flex items-center gap-3 px-4 py-3">
+                                                                        <span class="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 rounded px-1.5 py-0.5">PDF</span>
+                                                                        <a :href="preview" target="_blank" rel="noopener" @click.stop class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate underline" x-text="filename || 'PDF uploaded'"></a>
+                                                                        <button type="button" @click.stop="clearPdf()" aria-label="Remove PDF"
+                                                                            class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                                            <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        </button>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                        </div>
+
+                                                        <!-- Video: upload OR YouTube -->
+                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'video'" x-cloak
+                                                            x-data="videoUploader('doctrine_<?= $dr ?>_video_url', '<?= addslashes(htmlspecialchars($drVideo)) ?>')">
+                                                            <div class="flex gap-1 mb-2">
+                                                                <button type="button" @click="trailerTab='upload'"
+                                                                    :class="trailerTab==='upload' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">Upload Video File</button>
+                                                                <button type="button" @click="trailerTab='yt'"
+                                                                    :class="trailerTab==='yt' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">YouTube URL</button>
+                                                            </div>
+                                                            <div x-show="trailerTab==='upload'">
+                                                                <div class="relative border-2 rounded-xl transition-all bg-white"
+                                                                    :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                                    style="cursor:pointer"
+                                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                                    @click="$refs.vidIn.click()">
+                                                                    <input type="file" x-ref="vidIn" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo" @change="onFile($event)">
+                                                                    <template x-if="!preview && !uploading">
+                                                                        <p class="text-[12px] text-dark/40 text-center p-4">Drop video or <span class="underline">click to browse</span> · MP4 · MOV · WEBM · max 500 MB</p>
+                                                                    </template>
+                                                                    <template x-if="uploading">
+                                                                        <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
+                                                                    </template>
+                                                                    <template x-if="preview && !uploading">
+                                                                        <div class="flex items-center gap-3 px-4 py-3">
+                                                                            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                                            <p class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate" x-text="filename || 'Video uploaded'"></p>
+                                                                            <button type="button" @click.stop="clearVideo()" aria-label="Remove video"
+                                                                                class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                                                <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                            </button>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                            <div x-show="trailerTab==='yt'">
+                                                                <input type="url" x-model="ytUrl" @input="syncYtToForm()"
+                                                                    placeholder="https://youtu.be/... or youtube.com/watch?v=..."
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                <p class="text-[10px] text-dark/30 mt-1">Saved with "Save All Settings"</p>
+                                                            </div>
+                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- END SCRIPTS PAGE BLOCK -->
+
 
                             <!-- ========== WRITER PAGE TEXT ========== -->
                             <div class="mt-6 mb-6">
@@ -9268,10 +9344,13 @@ The page will automatically format headings and paragraphs."
                 role_actor_button_text: <?= json_encode($settingsModel->get('role_actor_button_text','Click Here →')) ?>,
                 role_actor_button_url:  <?= json_encode($settingsModel->get('role_actor_button_url','/actor')) ?>,
                 
-                // Script Doctrine section (home page)
-                doctrine_section_heading:    <?= json_encode($settingsModel->get('doctrine_section_heading','SCRIPT DOCTRINE')) ?>,
-                doctrine_section_subheading: <?= json_encode($settingsModel->get('doctrine_section_subheading','')) ?>,
+                // Scripts page (/scripts): hero + cards
+                scripts_page_heading:    <?= json_encode($settingsModel->get('scripts_page_heading','SCRIPTS')) ?>,
+                scripts_page_tagline:    <?= json_encode($settingsModel->get('scripts_page_tagline','')) ?>,
+                scripts_page_hero_image: <?= json_encode($settingsModel->get('scripts_page_hero_image','')) ?>,
                 <?php foreach (['actor', 'director', 'writer'] as $dr): ?>
+                doctrine_<?= $dr ?>_price:       <?= json_encode($settingsModel->get("doctrine_{$dr}_price", '')) ?>,
+                doctrine_<?= $dr ?>_align:       <?= json_encode($settingsModel->get("doctrine_{$dr}_align", 'center') ?: 'center') ?>,
                 doctrine_<?= $dr ?>_title:       <?= json_encode($settingsModel->get("doctrine_{$dr}_title", '')) ?>,
                 doctrine_<?= $dr ?>_description: <?= json_encode($settingsModel->get("doctrine_{$dr}_description", '')) ?>,
                 doctrine_<?= $dr ?>_cta_text:    <?= json_encode($settingsModel->get("doctrine_{$dr}_cta_text", 'Learn More')) ?>,
