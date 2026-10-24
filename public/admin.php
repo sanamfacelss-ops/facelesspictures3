@@ -3748,13 +3748,55 @@ if (file_exists($errorLogFile)) {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Menu Item 5 -->
+                                            <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                                <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 5</p>
+                                                <div class="space-y-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link Text <span class="text-dark/30">(blank to hide)</span></label>
+                                                        <input type="text" x-model="form.header_menu_item_5_text" placeholder="Scripts"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                        <select x-model="form.header_menu_item_5_page"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                            <option value="home">Home</option>
+                                                            <option value="writer">Writers</option>
+                                                            <option value="director">Directors</option>
+                                                            <option value="actor">Actors</option>
+                                                            <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Side of Logo</label>
+                                                        <div class="flex gap-1" role="group" aria-label="Menu item 5 side">
+                                                            <button type="button" @click="form.header_menu_item_5_side = 'left'"
+                                                                :aria-pressed="form.header_menu_item_5_side === 'left'"
+                                                                :class="form.header_menu_item_5_side === 'left' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">← Left</button>
+                                                            <button type="button" @click="form.header_menu_item_5_side = 'right'"
+                                                                :aria-pressed="form.header_menu_item_5_side !== 'left'"
+                                                                :class="form.header_menu_item_5_side !== 'left' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">Right →</button>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/40 mb-1">Position Order <span class="text-dark/30">(lower = first; e.g. 0 = before item 1, 5 = after item 4)</span></label>
+                                                        <input type="number" x-model="form.header_menu_item_5_order" min="0" max="5" placeholder="5"
+                                                            class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
                                     <div class="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                                         <p class="text-[10px] text-blue-800 flex items-start gap-2">
                                             <svg class="w-3 h-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
-                                            <span><strong>Layout:</strong> Items 1-2 appear on the left of centered logo, Items 3-4 appear on the right. Order determines exact position.</span>
+                                            <span><strong>Layout:</strong> Order 1-2 appears on the left of the centered logo, order 3-5 on the right. Order determines exact position. Leave Link Text blank to hide an item.</span>
                                         </p>
                                     </div>
                                 </div>
@@ -9195,6 +9237,10 @@ The page will automatically format headings and paragraphs."
                 header_menu_item_4_text: <?= json_encode($settingsModel->get('header_menu_item_4_text','Actors')) ?>,
                 header_menu_item_4_page:  <?= json_encode($settingsModel->get('header_menu_item_4_page','actor')) ?>,
                 header_menu_item_4_order: <?= json_encode($settingsModel->get('header_menu_item_4_order','4')) ?>,
+                header_menu_item_5_text: <?= json_encode($settingsModel->get('header_menu_item_5_text','Scripts')) ?>,
+                header_menu_item_5_page:  <?= json_encode($settingsModel->get('header_menu_item_5_page','scripts')) ?>,
+                header_menu_item_5_order: <?= json_encode($settingsModel->get('header_menu_item_5_order','5')) ?>,
+                header_menu_item_5_side:  <?= json_encode($settingsModel->get('header_menu_item_5_side','right') === 'left' ? 'left' : 'right') ?>,
                 footer_menu_item_1_text: <?= json_encode($settingsModel->get('footer_menu_item_1_text','About')) ?>,
                 footer_menu_item_1_page:  <?= json_encode($settingsModel->get('footer_menu_item_1_page','about')) ?>,
                 footer_menu_item_1_order: <?= json_encode($settingsModel->get('footer_menu_item_1_order','1')) ?>,

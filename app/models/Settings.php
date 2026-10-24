@@ -425,20 +425,24 @@ class Settings
     public function getHeaderMenuItems(): array
     {
         $items = [];
-        for ($i = 1; $i <= 4; $i++) {
-            $page = $this->get("header_menu_item_{$i}_page", '');
+        // Item 5 defaults to the Scripts page until the admin changes or clears it
+        $defaults5 = ['text' => 'Scripts', 'page' => 'scripts'];
+        for ($i = 1; $i <= 5; $i++) {
+            $page = $this->get("header_menu_item_{$i}_page", $i === 5 ? $defaults5['page'] : '');
             $items[] = [
-                'text' => $this->get("header_menu_item_{$i}_text", ''),
+                'text' => $this->get("header_menu_item_{$i}_text", $i === 5 ? $defaults5['text'] : ''),
                 'page' => $page,
                 'url' => $this->getPageUrl($page),
                 'order' => (int) $this->get("header_menu_item_{$i}_order", (string) $i),
-                'number' => $i
+                'number' => $i,
+                // Only item 5 has an explicit left/right choice; items 1-4 keep the order-based rule
+                'side' => $i === 5 ? ($this->get('header_menu_item_5_side', 'right') === 'left' ? 'left' : 'right') : ''
             ];
         }
         
-        // Sort by order
+        // Sort by order (ties keep item number order)
         usort($items, function($a, $b) {
-            return $a['order'] - $b['order'];
+            return ($a['order'] <=> $b['order']) ?: ($a['number'] <=> $b['number']);
         });
         
         return $items;
@@ -507,7 +511,12 @@ class Settings
         foreach ($items as $item) {
             if (empty($item['text'])) continue; // Skip empty items
             
-            if ($item['order'] <= 2) {
+            // Explicit side choice (item 5) wins; otherwise order 1-2 = left, 3+ = right
+            if (($item['side'] ?? '') === 'left') {
+                $left[] = $item;
+            } elseif (($item['side'] ?? '') === 'right') {
+                $right[] = $item;
+            } elseif ($item['order'] <= 2) {
                 $left[] = $item;
             } else {
                 $right[] = $item;
