@@ -72,8 +72,9 @@ html,body{width:100%;overflow-x:hidden}
 body{font-family:'DM Sans','Noto Sans Devanagari',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased}
 
 .sp-hero{text-align:center;padding:<?= $headerHeight + 40 ?>px 1.5rem 2rem}
-.sp-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,10vw,6.5rem);line-height:1;letter-spacing:.06em;color:#000;text-transform:uppercase;font-weight:400}
-.sp-tagline{margin-top:1rem;font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#111}
+/* All DM Sans. Heading + tagline match the home page hero ("FACELESS TO STAR") */
+.sp-heading{font-family:'DM Sans',sans-serif;font-size:clamp(32px,5vw,52px);line-height:1.25;color:#111;text-transform:uppercase;font-weight:700}
+.sp-tagline{margin-top:.75rem;font-size:.95rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;line-height:1.6}
 .sp-tagline .dot{margin:0 .75rem;color:#6b7280}
 .sp-hero-img{max-width:1100px;margin:2rem auto 0;padding:0 1.5rem}
 .sp-hero-img img{width:100%;height:auto;max-height:420px;object-fit:cover;display:block}
@@ -81,7 +82,7 @@ body{font-family:'DM Sans','Noto Sans Devanagari',sans-serif;background:#fff;col
 .sp-cards{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem 5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.75rem}
 .sp-card{background:#fff;border:1px solid #eceef1;border-radius:4px;box-shadow:0 2px 14px rgba(0,0,0,.06);padding:2.25rem 1.75rem;display:flex;flex-direction:column}
 .sp-card.al-left{text-align:left}.sp-card.al-center{text-align:center}.sp-card.al-right{text-align:right}
-.sp-card-title{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:1.6rem;letter-spacing:.06em;line-height:1.1;text-transform:uppercase;color:#111;margin-bottom:1.25rem}
+.sp-card-title{font-family:'DM Sans',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:.14em;line-height:1.4;text-transform:uppercase;color:#111;margin-bottom:1.25rem}
 .sp-card-desc{flex:1}
 .sp-card-desc p{font-size:.88rem;line-height:2.15;color:#1f2937;margin-bottom:.5rem}
 .sp-card-desc ul{list-style:disc;padding-left:1.25rem;margin-bottom:.5rem;font-size:.88rem;line-height:1.9;color:#1f2937}
@@ -94,7 +95,8 @@ body{font-family:'DM Sans','Noto Sans Devanagari',sans-serif;background:#fff;col
 
 @media(max-width:768px){
   .sp-hero{padding:<?= $headerHeight + 28 ?>px 1rem 1.5rem}
-  .sp-tagline{font-size:.62rem;letter-spacing:.16em}
+  .sp-heading{font-size:clamp(26px,6vw,36px);line-height:1.3}
+  .sp-tagline{font-size:.82rem;letter-spacing:.06em}
   .sp-tagline .dot{margin:0 .4rem}
   .sp-hero-img{padding:0 1rem;margin-top:1.5rem}
   .sp-cards{padding:2rem 1rem 4rem;gap:1.25rem}
