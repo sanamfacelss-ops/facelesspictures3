@@ -3575,7 +3575,7 @@ if (file_exists($errorLogFile)) {
                             </div>
 
                             <!-- Collapsible Sections Wrapper -->
-                            <div x-data="{showHome: false, showRoleCards: true, showDoctrine: false, showScripts: false, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
+                            <div x-data="{showHome: false, showRoleCards: true, showDoctrine: false, showScripts: false, showAbout: false, showWriter: false, showDirector: false, showActor: false, showLegal: false, showSocial: false}">
 
                             <!-- ========== HOME PAGE CONTENT ========== -->
                             <div class="mt-6 mb-6">
@@ -3584,7 +3584,7 @@ if (file_exists($errorLogFile)) {
                                     <div class="flex items-center gap-2">
                                         <span class="text-lg">🏠</span>
                                         <h4 class="font-semibold text-dark text-sm">HOME PAGE CONTENT</h4>
-                                        <span class="text-xs text-dark/40">(Header, Hero, Posters, Manifesto, Script Doctrine, Kya Banoge, Stats, Footer)</span>
+                                        <span class="text-xs text-dark/40">(Header, Hero, Posters, Manifesto, Kya Banoge, Footer, Social, Legal)</span>
                                     </div>
                                     <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showHome}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -3801,133 +3801,6 @@ if (file_exists($errorLogFile)) {
                                     </div>
                                 </div>
 
-                                <!-- Footer Navigation Menu -->
-                                <div class="bg-gold/5 rounded-xl p-4 border border-gold/20">
-                                    <h6 class="text-[12px] font-bold text-dark mb-3 flex items-center gap-2">
-                                        <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                                        Footer Navigation Menu
-                                    </h6>
-                                    <p class="text-[11px] text-dark/40 mb-3">Four customizable footer menu items with ordering.</p>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <!-- Footer Menu Item 1 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 1</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.footer_menu_item_1_text" placeholder="About"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.footer_menu_item_1_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                            <option value="scripts">Scripts</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.footer_menu_item_1_order" min="1" max="4" placeholder="1"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Footer Menu Item 2 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 2</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.footer_menu_item_2_text" placeholder="Writers"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.footer_menu_item_2_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                            <option value="scripts">Scripts</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.footer_menu_item_2_order" min="1" max="4" placeholder="2"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Footer Menu Item 3 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 3</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.footer_menu_item_3_text" placeholder="Directors"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.footer_menu_item_3_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                            <option value="scripts">Scripts</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.footer_menu_item_3_order" min="1" max="4" placeholder="3"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Footer Menu Item 4 -->
-                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
-                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 4</p>
-                                            <div class="space-y-2">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
-                                                    <input type="text" x-model="form.footer_menu_item_4_text" placeholder="Actors"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
-                                                    <select x-model="form.footer_menu_item_4_page"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                        <option value="home">Home</option>
-                                                        <option value="writer">Writers</option>
-                                                        <option value="director">Directors</option>
-                                                        <option value="actor">Actors</option>
-                                                        <option value="about">About</option>
-                                                            <option value="scripts">Scripts</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
-                                                    <input type="number" x-model="form.footer_menu_item_4_order" min="1" max="4" placeholder="4"
-                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <!-- Logo uploader -->
                                     <div x-data="imageUploader('site_logo_url', '<?= addslashes(htmlspecialchars($settingsModel->get('site_logo_url',''))) ?>')">
@@ -4081,13 +3954,6 @@ if (file_exists($errorLogFile)) {
                                     <h5 class="text-[14px] font-bold text-dark">Hero Section</h5>
                                 </div>
                                 <p class="text-[11px] text-dark/40 mb-4">Main headline and tagline displayed prominently on homepage</p>
-                                <div>
-                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Main Headline</label>
-                                    <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
-                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Large centered text displayed at the top of the homepage.</p>
-                                </div>
-                                
                                 <!-- Hero Pre-Video Text (ABOVE VIDEO) - NEW -->
                                 <div>
                                     <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Pre-Video Text (Above Video)</label>
@@ -4096,27 +3962,10 @@ if (file_exists($errorLogFile)) {
                                     <p class="text-[11px] text-dark/30 mt-1">Optional text displayed ABOVE the hero video</p>
                                 </div>
                                 
-                                <!-- Hero Top Text (BELOW VIDEO) -->
-                                <div>
-                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Top Text (Below Video)</label>
-                                    <input type="text" x-model="form.landing_hero_top_text" placeholder="KHAFAA — OFFICIAL TEASER | AUDITION FOR KHAFAA OPENS SOON"
-                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Small uppercase text displayed below the video, above the main heading</p>
-                                </div>
-                                
-                                <!-- Hero Tagline (NEW) -->
-                                <div>
-                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Tagline (Gray Text Below Main Heading)</label>
-                                    <input type="text" x-model="form.landing_hero_tagline" placeholder="YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR"
-                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text. Use $ to separate items - mobile shows as separate lines, desktop shows as single line</p>
-                                </div>
-                            </div>
-
                             <!-- SECTION: Horizontal Auto-Play Trailer -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Horizontal Auto-Play Trailer</h5>
-                                <p class="text-[11px] text-dark/40 mb-3">Full-width horizontal video player displayed below the three posters. Auto-plays on page load.</p>
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Hero Video (Auto-Play)</h5>
+                                <p class="text-[11px] text-dark/40 mb-3">Hero video at the top of the homepage. Auto-plays on page load.</p>
                                 
                                 <div class="bg-dark/[.025] rounded-xl p-4" x-data="videoUploader('landing_hero_trailer_url', '<?= addslashes(htmlspecialchars($settingsModel->get('landing_hero_trailer_url', ''))) ?>')">
                                     
@@ -4218,6 +4067,30 @@ if (file_exists($errorLogFile)) {
                                         <p class="text-[11px] text-red-500 mt-2" x-text="uploadError"></p>
                                     </template>
                                 </div>
+                                <!-- Hero Top Text (BELOW VIDEO) -->
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Top Text (Below Video)</label>
+                                    <input type="text" x-model="form.landing_hero_top_text" placeholder="KHAFAA — OFFICIAL TEASER | AUDITION FOR KHAFAA OPENS SOON"
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Small uppercase text displayed below the video, above the main heading</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Main Headline</label>
+                                    <input type="text" x-model="form.landing_headline" placeholder="NO FACE. NO CONNECTIONS. JUST TALENT."
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Large centered text displayed at the top of the homepage.</p>
+                                </div>
+                                
+                                <!-- Hero Tagline (NEW) -->
+                                <div>
+                                    <label class="block text-[12px] font-semibold text-dark mb-1.5">Hero Tagline (Gray Text Below Main Heading)</label>
+                                    <input type="text" x-model="form.landing_hero_tagline" placeholder="YOUR AUDITION $ YOUTUBE LIKES $ AUDIENCE DECIDES THE STAR"
+                                        class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                    <p class="text-[11px] text-dark/30 mt-1">Gray uppercase text. Use $ to separate items - mobile shows as separate lines, desktop shows as single line</p>
+                                </div>
+                            </div>
+
                             </div>
 
                             <!-- ========== SECTION: Film Posters ========== -->
@@ -4701,97 +4574,6 @@ if (file_exists($errorLogFile)) {
                                 </div>
                             </div>
 
-                            <!-- SECTION: About -->
-                            <div class="mb-6 pb-6 border-b border-dark/5">
-                                <h5 class="text-[13px] font-bold text-dark mb-1">Stats Section (Replaces About)</h5>
-                                <p class="text-[11px] text-dark/40 mb-4">Numbers, labels, description lines and tagline</p>
-                                
-                                <!-- Stats Numbers & Labels -->
-                                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
-                                    <div>
-                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 1</label>
-                                        <input type="text" x-model="form.stats_number_1" placeholder="10" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <input type="text" x-model="form.stats_label_1" placeholder="FILMS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 2</label>
-                                        <input type="text" x-model="form.stats_number_2" placeholder="100" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <input type="text" x-model="form.stats_label_2" placeholder="SCENES" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 3</label>
-                                        <input type="text" x-model="form.stats_number_3" placeholder="30" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <input type="text" x-model="form.stats_label_3" placeholder="DAYS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 4</label>
-                                        <input type="text" x-model="form.stats_number_4" placeholder="20" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <input type="text" x-model="form.stats_label_4" placeholder="ARTISTS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 5</label>
-                                        <input type="text" x-model="form.stats_number_5" placeholder="150" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                        <input type="text" x-model="form.stats_label_5" placeholder="LIVES" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
-                                    </div>
-                                </div>
-                                
-                                <!-- Description Lines (Dynamic) -->
-                                <div class="mb-3">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines <span class="text-dark/30">(Use ↑↓ to reorder)</span></label>
-                                        <button type="button" @click="addStatsLine()" class="text-[11px] bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                            Add Line
-                                        </button>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <template x-for="(line, index) in statsLines" :key="'stats-line-' + index">
-                                            <div class="flex items-center gap-2 group stats-line-item">
-                                                <!-- Up/Down Arrows -->
-                                                <div class="flex flex-col gap-1">
-                                                    <button type="button" 
-                                                        @click="moveStatsLineUp(index)" 
-                                                        x-show="index > 0"
-                                                        class="w-6 h-6 flex items-center justify-center text-dark/30 hover:text-dark hover:bg-dark/5 rounded transition"
-                                                        title="Move up">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
-                                                        </svg>
-                                                    </button>
-                                                    <button type="button" 
-                                                        @click="moveStatsLineDown(index)" 
-                                                        x-show="index < statsLines.length - 1"
-                                                        class="w-6 h-6 flex items-center justify-center text-dark/30 hover:text-dark hover:bg-dark/5 rounded transition"
-                                                        title="Move down">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                                <input type="text" 
-                                                    x-model="statsLines[index]" 
-                                                    @input="syncStatsLinesToForm()"
-                                                    :placeholder="'Line ' + (index + 1) + ' (leave empty for spacing)'"
-                                                    class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                                <button type="button" 
-                                                    @click="removeStatsLine(index)" 
-                                                    x-show="statsLines.length > 1"
-                                                    class="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center justify-center">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                </button>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <p class="text-[10px] text-dark/30 mt-2">💡 Use ↑↓ arrows to reorder lines. Leave empty for spacing between lines.</p>
-                                </div>
-                                
-                                <!-- Tagline -->
-                                <div>
-                                    <label class="block text-[11px] font-medium text-dark/60 mb-1">Orange Tagline</label>
-                                    <input type="text" x-model="form.stats_tagline" placeholder="FACELESS TO STAR." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
-                                </div>
-                            </div>
-
                             <!-- SECTION: Marquee Text -->
                             <div class="mb-6 pb-6 border-b border-dark/5">
                                 <h5 class="text-[13px] font-bold text-dark mb-1">Scrolling Marquee Text</h5>
@@ -4826,6 +4608,136 @@ if (file_exists($errorLogFile)) {
                                     <input type="text" x-model="form.footer_tagline" placeholder="No face. Just talent."
                                         class="w-full border border-dark/10 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
                                     <p class="text-[11px] text-dark/30 mt-1">Small tagline shown at bottom of Actor/Director/Writer pages.</p>
+                                </div>
+
+                                <div class="mt-4">
+                                <!-- Footer Navigation Menu -->
+                                <div class="bg-gold/5 rounded-xl p-4 border border-gold/20">
+                                    <h6 class="text-[12px] font-bold text-dark mb-3 flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                        Footer Navigation Menu
+                                    </h6>
+                                    <p class="text-[11px] text-dark/40 mb-3">Four customizable footer menu items with ordering.</p>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <!-- Footer Menu Item 1 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 1</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.footer_menu_item_1_text" placeholder="About"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                    <select x-model="form.footer_menu_item_1_page"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                        <option value="home">Home</option>
+                                                        <option value="writer">Writers</option>
+                                                        <option value="director">Directors</option>
+                                                        <option value="actor">Actors</option>
+                                                        <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.footer_menu_item_1_order" min="1" max="4" placeholder="1"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Footer Menu Item 2 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 2</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.footer_menu_item_2_text" placeholder="Writers"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                    <select x-model="form.footer_menu_item_2_page"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                        <option value="home">Home</option>
+                                                        <option value="writer">Writers</option>
+                                                        <option value="director">Directors</option>
+                                                        <option value="actor">Actors</option>
+                                                        <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.footer_menu_item_2_order" min="1" max="4" placeholder="2"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Footer Menu Item 3 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 3</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.footer_menu_item_3_text" placeholder="Directors"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                    <select x-model="form.footer_menu_item_3_page"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                        <option value="home">Home</option>
+                                                        <option value="writer">Writers</option>
+                                                        <option value="director">Directors</option>
+                                                        <option value="actor">Actors</option>
+                                                        <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.footer_menu_item_3_order" min="1" max="4" placeholder="3"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Footer Menu Item 4 -->
+                                        <div class="bg-white rounded-lg p-3 border border-dark/10">
+                                            <p class="text-[11px] font-semibold text-dark/50 mb-2">Menu Item 4</p>
+                                            <div class="space-y-2">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link Text</label>
+                                                    <input type="text" x-model="form.footer_menu_item_4_text" placeholder="Actors"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Link To Page</label>
+                                                    <select x-model="form.footer_menu_item_4_page"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                        <option value="home">Home</option>
+                                                        <option value="writer">Writers</option>
+                                                        <option value="director">Directors</option>
+                                                        <option value="actor">Actors</option>
+                                                        <option value="about">About</option>
+                                                            <option value="scripts">Scripts</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/40 mb-1">Display Order (1-4)</label>
+                                                    <input type="number" x-model="form.footer_menu_item_4_order" min="1" max="4" placeholder="4"
+                                                        class="w-full border border-dark/10 rounded-lg px-2 py-1.5 text-[12px] bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 </div>
                             </div>
 
@@ -4921,208 +4833,115 @@ The page will automatically format headings and paragraphs."
                                 </div><!-- End Home Page Collapse -->
                             </div><!-- End Home Page Section -->
 
-                            <!-- ========== SCRIPTS PAGE (/scripts) ========== -->
+                            <!-- ========== ABOUT (stats section, /#about) ========== -->
                             <div class="mt-6 mb-6">
-                                <div @click="showScripts = !showScripts"
-                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg cursor-pointer hover:from-amber-100 hover:to-amber-150 transition-all">
+                                <div @click="showAbout = !showAbout"
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-stone-50 to-stone-100 border border-stone-200 rounded-lg cursor-pointer hover:from-stone-100 hover:to-stone-150 transition-all">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-lg" aria-hidden="true">📜</span>
-                                        <h4 class="font-semibold text-dark text-sm">SCRIPTS PAGE</h4>
-                                        <span class="text-xs text-dark/40">(Hero & service cards on <a href="/scripts" target="_blank" class="underline" @click.stop>/scripts</a> page)</span>
+                                        <span class="text-lg" aria-hidden="true">ℹ️</span>
+                                        <h4 class="font-semibold text-dark text-sm">ABOUT</h4>
+                                        <span class="text-xs text-dark/40">(Stats section the About menu link opens: numbers, lines, tagline)</span>
                                     </div>
-                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showScripts}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showAbout}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </div>
-                                <div x-show="showScripts" x-transition>
+                                <div x-show="showAbout" x-transition>
                                     <div class="mt-3 pl-4 pr-4 pb-4">
-
-                                        <!-- Hero -->
-                                        <div class="mb-6 pb-6 border-b-2 border-dark/10">
-                                            <h5 class="text-[14px] font-bold text-dark mb-1">Hero</h5>
-                                            <p class="text-[11px] text-dark/40 mb-4">Big heading, small tagline and wide image at the top of the page. Leave any field blank to hide it. To show the page in the header menu, pick "Scripts" in Header Section → menu items.</p>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/50 mb-1">Page Heading</label>
-                                                    <input type="text" x-model="form.scripts_page_heading" placeholder="SCRIPTS"
-                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] text-dark/50 mb-1">Tagline <span class="text-dark/30">(use $ between items, shown with · dots)</span></label>
-                                                    <input type="text" x-model="form.scripts_page_tagline" placeholder="WRITER'S ROOM $ TESTED $ SHOOT-READY"
-                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                </div>
-                                            </div>
-                                            <div x-data="imageUploader('scripts_page_hero_image', '<?= addslashes(htmlspecialchars($settingsModel->get('scripts_page_hero_image', ''))) ?>')">
-                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Image <span class="text-dark/30">(wide image, e.g. 1600×450; max 5 MB)</span></label>
-                                                <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-white"
-                                                    :class="dragging ? 'border-dark' : 'border-dashed border-dark/15 hover:border-dark/30'"
-                                                    style="aspect-ratio:32/9;max-height:220px"
-                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
-                                                    @click="$refs.heroImgIn.click()">
-                                                    <input type="file" x-ref="heroImgIn" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" @change="onFile($event)">
-                                                    <template x-if="!preview && !uploading">
-                                                        <div class="absolute inset-0 flex items-center justify-center p-3 text-center">
-                                                            <p class="text-[12px] text-dark/40">Drop image or <span class="underline">click to browse</span></p>
-                                                        </div>
-                                                    </template>
-                                                    <template x-if="uploading">
-                                                        <div class="absolute inset-0 flex items-center justify-center bg-white">
-                                                            <p class="text-[12px] text-dark/50" x-text="progress + '% — uploading...'"></p>
-                                                        </div>
-                                                    </template>
-                                                    <template x-if="preview && !uploading">
-                                                        <div class="absolute inset-0">
-                                                            <img :src="preview" alt="Scripts hero" style="width:100%;height:100%;object-fit:cover">
-                                                            <button type="button" @click.stop="clearImage()" aria-label="Remove image"
-                                                                class="absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition">
-                                                                <svg class="w-3.5 h-3.5 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                            </button>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                                <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                            </div>
-                                        </div>
-
-                                        <!-- Cards -->
-                                        <h5 class="text-[14px] font-bold text-dark mb-1">Cards</h5>
-                                        <p class="text-[11px] text-dark/40 mb-4">A card shows only when it has a title, description or price. Each card can have one button: open a PDF in a new tab, or play a video in a popup.</p>
-
-                                        <div class="space-y-6">
-                                        <?php foreach (['actor' => 'CARD 1', 'director' => 'CARD 2', 'writer' => 'CARD 3'] as $dr => $drLabel):
-                                            $drPdf   = $settingsModel->get("doctrine_{$dr}_pdf_url", '');
-                                            $drVideo = $settingsModel->get("doctrine_{$dr}_video_url", '');
-                                        ?>
-                                            <div class="p-4 bg-gray-50 rounded-lg">
-                                                <p class="text-xs font-bold text-dark/70 mb-3"><?= $drLabel ?></p>
-                                                <div class="space-y-3">
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Card Title</label>
-                                                        <input type="text" x-model="form.doctrine_<?= $dr ?>_title" placeholder="e.g. Script Analysis"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(each line shows on its own line; start a line with "- " or "• " for a bullet point; blank line = new paragraph)</span></label>
-                                                        <textarea x-model="form.doctrine_<?= $dr ?>_description" rows="6" placeholder="For Actors. Writers. Producers.&#10;3 Honest Reads.&#10;&#10;- First bullet point&#10;- Second bullet point"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20 resize-y"></textarea>
-                                                    </div>
-                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Price <span class="text-dark/30">(blank to hide)</span></label>
-                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_price" placeholder="Charges: ₹50,000"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Text Alignment</label>
-                                                            <div class="flex gap-1">
-                                                                <?php foreach (['left' => 'Left', 'center' => 'Center', 'right' => 'Right'] as $alVal => $alLbl): ?>
-                                                                <button type="button" @click="form.doctrine_<?= $dr ?>_align = '<?= $alVal ?>'"
-                                                                    :class="(form.doctrine_<?= $dr ?>_align || 'center') === '<?= $alVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                    class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $alLbl ?></button>
-                                                                <?php endforeach; ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- CTA: one at a time -->
-                                                    <div class="pt-2 border-t border-dark/5">
-                                                        <label class="block text-[10px] text-dark/50 mb-1.5">Button Action <span class="text-dark/30">(only one at a time)</span></label>
-                                                        <div class="flex flex-wrap gap-1 mb-3">
-                                                            <?php foreach (['none' => 'No Button', 'pdf' => 'Open PDF (new tab)', 'video' => 'Play Video (popup)'] as $ctaVal => $ctaLbl): ?>
-                                                            <button type="button" @click="form.doctrine_<?= $dr ?>_cta_type = '<?= $ctaVal ?>'"
-                                                                :class="(form.doctrine_<?= $dr ?>_cta_type || 'none') === '<?= $ctaVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $ctaLbl ?></button>
-                                                            <?php endforeach; ?>
-                                                        </div>
-
-                                                        <div x-show="(form.doctrine_<?= $dr ?>_cta_type || 'none') !== 'none'" x-cloak class="mb-3">
-                                                            <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
-                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_cta_text" placeholder="Learn More"
-                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        </div>
-
-                                                        <!-- PDF upload -->
-                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'pdf'" x-cloak
-                                                            x-data="pdfUploader('doctrine_<?= $dr ?>_pdf_url', '<?= addslashes(htmlspecialchars($drPdf)) ?>')">
-                                                            <div class="relative border-2 rounded-xl transition-all bg-white"
-                                                                :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
-                                                                style="cursor:pointer"
-                                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
-                                                                @click="$refs.pdfIn.click()">
-                                                                <input type="file" x-ref="pdfIn" class="hidden" accept="application/pdf,.pdf" @change="onFile($event)">
-                                                                <template x-if="!preview && !uploading">
-                                                                    <p class="text-[12px] text-dark/40 text-center p-4">Drop PDF or <span class="underline">click to browse</span> · max 20 MB</p>
-                                                                </template>
-                                                                <template x-if="uploading">
-                                                                    <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
-                                                                </template>
-                                                                <template x-if="preview && !uploading">
-                                                                    <div class="flex items-center gap-3 px-4 py-3">
-                                                                        <span class="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 rounded px-1.5 py-0.5">PDF</span>
-                                                                        <a :href="preview" target="_blank" rel="noopener" @click.stop class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate underline" x-text="filename || 'PDF uploaded'"></a>
-                                                                        <button type="button" @click.stop="clearPdf()" aria-label="Remove PDF"
-                                                                            class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
-                                                                            <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                        </button>
-                                                                    </div>
-                                                                </template>
-                                                            </div>
-                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                                        </div>
-
-                                                        <!-- Video: upload OR YouTube -->
-                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'video'" x-cloak
-                                                            x-data="videoUploader('doctrine_<?= $dr ?>_video_url', '<?= addslashes(htmlspecialchars($drVideo)) ?>')">
-                                                            <div class="flex gap-1 mb-2">
-                                                                <button type="button" @click="trailerTab='upload'"
-                                                                    :class="trailerTab==='upload' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">Upload Video File</button>
-                                                                <button type="button" @click="trailerTab='yt'"
-                                                                    :class="trailerTab==='yt' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
-                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">YouTube URL</button>
-                                                            </div>
-                                                            <div x-show="trailerTab==='upload'">
-                                                                <div class="relative border-2 rounded-xl transition-all bg-white"
-                                                                    :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
-                                                                    style="cursor:pointer"
-                                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
-                                                                    @click="$refs.vidIn.click()">
-                                                                    <input type="file" x-ref="vidIn" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo" @change="onFile($event)">
-                                                                    <template x-if="!preview && !uploading">
-                                                                        <p class="text-[12px] text-dark/40 text-center p-4">Drop video or <span class="underline">click to browse</span> · MP4 · MOV · WEBM · max 500 MB</p>
-                                                                    </template>
-                                                                    <template x-if="uploading">
-                                                                        <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
-                                                                    </template>
-                                                                    <template x-if="preview && !uploading">
-                                                                        <div class="flex items-center gap-3 px-4 py-3">
-                                                                            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                                                            <p class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate" x-text="filename || 'Video uploaded'"></p>
-                                                                            <button type="button" @click.stop="clearVideo()" aria-label="Remove video"
-                                                                                class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
-                                                                                <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                            </button>
-                                                                        </div>
-                                                                    </template>
-                                                                </div>
-                                                            </div>
-                                                            <div x-show="trailerTab==='yt'">
-                                                                <input type="url" x-model="ytUrl" @input="syncYtToForm()"
-                                                                    placeholder="https://youtu.be/... or youtube.com/watch?v=..."
-                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                                <p class="text-[10px] text-dark/30 mt-1">Saved with "Save All Settings"</p>
-                                                            </div>
-                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                        </div>
+                            <!-- SECTION: About -->
+                            <div class="mb-6 pb-6 border-b border-dark/5">
+                                <h5 class="text-[13px] font-bold text-dark mb-1">Stats Section (Replaces About)</h5>
+                                <p class="text-[11px] text-dark/40 mb-4">Numbers, labels, description lines and tagline</p>
+                                
+                                <!-- Stats Numbers & Labels -->
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 1</label>
+                                        <input type="text" x-model="form.stats_number_1" placeholder="10" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_1" placeholder="FILMS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 2</label>
+                                        <input type="text" x-model="form.stats_number_2" placeholder="100" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_2" placeholder="SCENES" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 3</label>
+                                        <input type="text" x-model="form.stats_number_3" placeholder="30" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_3" placeholder="DAYS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 4</label>
+                                        <input type="text" x-model="form.stats_number_4" placeholder="20" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_4" placeholder="ARTISTS" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-dark/60 mb-1">Number 5</label>
+                                        <input type="text" x-model="form.stats_number_5" placeholder="150" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                        <input type="text" x-model="form.stats_label_5" placeholder="LIVES" class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition mt-2">
                                     </div>
                                 </div>
-                            </div><!-- END SCRIPTS PAGE BLOCK -->
+                                
+                                <!-- Description Lines (Dynamic) -->
+                                <div class="mb-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-[11px] font-medium text-dark/60">Description Lines <span class="text-dark/30">(Use ↑↓ to reorder)</span></label>
+                                        <button type="button" @click="addStatsLine()" class="text-[11px] bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                            Add Line
+                                        </button>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <template x-for="(line, index) in statsLines" :key="'stats-line-' + index">
+                                            <div class="flex items-center gap-2 group stats-line-item">
+                                                <!-- Up/Down Arrows -->
+                                                <div class="flex flex-col gap-1">
+                                                    <button type="button" 
+                                                        @click="moveStatsLineUp(index)" 
+                                                        x-show="index > 0"
+                                                        class="w-6 h-6 flex items-center justify-center text-dark/30 hover:text-dark hover:bg-dark/5 rounded transition"
+                                                        title="Move up">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" 
+                                                        @click="moveStatsLineDown(index)" 
+                                                        x-show="index < statsLines.length - 1"
+                                                        class="w-6 h-6 flex items-center justify-center text-dark/30 hover:text-dark hover:bg-dark/5 rounded transition"
+                                                        title="Move down">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <input type="text" 
+                                                    x-model="statsLines[index]" 
+                                                    @input="syncStatsLinesToForm()"
+                                                    :placeholder="'Line ' + (index + 1) + ' (leave empty for spacing)'"
+                                                    class="flex-1 border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                                <button type="button" 
+                                                    @click="removeStatsLine(index)" 
+                                                    x-show="statsLines.length > 1"
+                                                    class="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center justify-center">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <p class="text-[10px] text-dark/30 mt-2">💡 Use ↑↓ arrows to reorder lines. Leave empty for spacing between lines.</p>
+                                </div>
+                                
+                                <!-- Tagline -->
+                                <div>
+                                    <label class="block text-[11px] font-medium text-dark/60 mb-1">Orange Tagline</label>
+                                    <input type="text" x-model="form.stats_tagline" placeholder="FACELESS TO STAR." class="w-full border border-dark/10 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-dark/20 transition">
+                                </div>
+                            </div>
+
+                                    </div>
+                                </div>
+                            </div><!-- End About Section -->
 
 
                             <!-- ========== WRITER PAGE TEXT ========== -->
@@ -5683,6 +5502,36 @@ The page will automatically format headings and paragraphs."
                                                 </div>
                                             </div>
                                             <div class="border-t border-dark/10 pt-3 mt-3">
+                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Film Song Card (shown between audition cards and submit form)</p>
+                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Heading</label>
+                                                        <input type="text" x-model="form.film_song_heading" placeholder="FILM SONG"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Subtitle</label>
+                                                        <input type="text" x-model="form.film_song_subtitle" placeholder="Listen to the song before you record"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Male Songs Button</label>
+                                                        <input type="text" x-model="form.actor_song_btn_male" placeholder="Male Songs"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Female Songs Button</label>
+                                                        <input type="text" x-model="form.actor_song_btn_female" placeholder="Female Songs"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Download Button</label>
+                                                        <input type="text" x-model="form.actor_song_btn_download" placeholder="Download Song"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="border-t border-dark/10 pt-3 mt-3">
                                                 <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Form</p>
                                                 <div class="space-y-3">
                                                     <!-- 1. Form Heading -->
@@ -5767,15 +5616,7 @@ The page will automatically format headings and paragraphs."
                                                         </div>
                                                     </div>
                                                     
-                                                    <!-- 4. Terms & Conditions -->
-                                                    <div class="border-t border-dark/5 pt-3 mt-3">
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
-                                                        <textarea x-model="form.actor_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
-                                                        <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
-                                                    </div>
-                                                    
-                                                    <!-- 5. Submission Category -->
+                                                    <!-- 4. Submission Category -->
                                                     <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Category (Dialogue Only / Dialogue + Lip Sync)</p>
                                                         <p class="text-[10px] text-dark/40 mb-2">Applicants pick a category. "Dialogue Only" hides the lip sync upload. Blank fields use the grey default text.</p>
@@ -5819,6 +5660,14 @@ The page will automatically format headings and paragraphs."
                                                         </div>
                                                     </div>
 
+                                                    <!-- 5. Terms & Conditions -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Terms & Conditions Text</label>
+                                                        <textarea x-model="form.actor_terms_text" rows="3" placeholder='I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate'
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20"></textarea>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
+                                                    </div>
+                                                    
                                                     <!-- 6. Submit Button Text -->
                                                     <div class="border-t border-dark/5 pt-3 mt-3">
                                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -5895,36 +5744,6 @@ The page will automatically format headings and paragraphs."
                                                 </div>
                                             </div>
 
-                                            <div class="border-t border-dark/10 pt-3 mt-3">
-                                                <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Film Song Card (shown between audition cards and submit form)</p>
-                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Heading</label>
-                                                        <input type="text" x-model="form.film_song_heading" placeholder="FILM SONG"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Subtitle</label>
-                                                        <input type="text" x-model="form.film_song_subtitle" placeholder="Listen to the song before you record"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Male Songs Button</label>
-                                                        <input type="text" x-model="form.actor_song_btn_male" placeholder="Male Songs"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Female Songs Button</label>
-                                                        <input type="text" x-model="form.actor_song_btn_female" placeholder="Female Songs"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Download Button</label>
-                                                        <input type="text" x-model="form.actor_song_btn_download" placeholder="Download Song"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -5933,6 +5752,210 @@ The page will automatically format headings and paragraphs."
                                     </div><!-- End Actor Page Content -->
                                 </div><!-- End Actor Page Collapse -->
                             </div><!-- End Actor Page Section -->
+
+                            <!-- ========== SCRIPTS PAGE (/scripts) ========== -->
+                            <div class="mt-6 mb-6">
+                                <div @click="showScripts = !showScripts"
+                                    class="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-lg cursor-pointer hover:from-amber-100 hover:to-amber-150 transition-all">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg" aria-hidden="true">📜</span>
+                                        <h4 class="font-semibold text-dark text-sm">SCRIPTS PAGE</h4>
+                                        <span class="text-xs text-dark/40">(Hero & service cards on <a href="/scripts" target="_blank" class="underline" @click.stop>/scripts</a> page)</span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-dark/40 transition-transform" :class="{'rotate-180': showScripts}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                                <div x-show="showScripts" x-transition>
+                                    <div class="mt-3 pl-4 pr-4 pb-4">
+
+                                        <!-- Hero -->
+                                        <div class="mb-6 pb-6 border-b-2 border-dark/10">
+                                            <h5 class="text-[14px] font-bold text-dark mb-1">Hero</h5>
+                                            <p class="text-[11px] text-dark/40 mb-4">Big heading, small tagline and wide image at the top of the page. Leave any field blank to hide it. To show the page in the header menu, pick "Scripts" in Header Section → menu items.</p>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/50 mb-1">Page Heading</label>
+                                                    <input type="text" x-model="form.scripts_page_heading" placeholder="SCRIPTS"
+                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[10px] text-dark/50 mb-1">Tagline <span class="text-dark/30">(use $ between items, shown with · dots)</span></label>
+                                                    <input type="text" x-model="form.scripts_page_tagline" placeholder="WRITER'S ROOM $ TESTED $ SHOOT-READY"
+                                                        class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                </div>
+                                            </div>
+                                            <div x-data="imageUploader('scripts_page_hero_image', '<?= addslashes(htmlspecialchars($settingsModel->get('scripts_page_hero_image', ''))) ?>')">
+                                                <label class="block text-[10px] text-dark/50 mb-1">Hero Image <span class="text-dark/30">(wide image, e.g. 1600×450; max 5 MB)</span></label>
+                                                <div class="relative border-2 rounded-xl transition-all cursor-pointer overflow-hidden bg-white"
+                                                    :class="dragging ? 'border-dark' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                    style="aspect-ratio:32/9;max-height:220px"
+                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                    @click="$refs.heroImgIn.click()">
+                                                    <input type="file" x-ref="heroImgIn" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" @change="onFile($event)">
+                                                    <template x-if="!preview && !uploading">
+                                                        <div class="absolute inset-0 flex items-center justify-center p-3 text-center">
+                                                            <p class="text-[12px] text-dark/40">Drop image or <span class="underline">click to browse</span></p>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="uploading">
+                                                        <div class="absolute inset-0 flex items-center justify-center bg-white">
+                                                            <p class="text-[12px] text-dark/50" x-text="progress + '% — uploading...'"></p>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="preview && !uploading">
+                                                        <div class="absolute inset-0">
+                                                            <img :src="preview" alt="Scripts hero" style="width:100%;height:100%;object-fit:cover">
+                                                            <button type="button" @click.stop="clearImage()" aria-label="Remove image"
+                                                                class="absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition">
+                                                                <svg class="w-3.5 h-3.5 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                                <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cards -->
+                                        <h5 class="text-[14px] font-bold text-dark mb-1">Cards</h5>
+                                        <p class="text-[11px] text-dark/40 mb-4">A card shows only when it has a title, description or price. Each card can have one button: open a PDF in a new tab, or play a video in a popup.</p>
+
+                                        <div class="space-y-6">
+                                        <?php foreach (['actor' => 'CARD 1', 'director' => 'CARD 2', 'writer' => 'CARD 3'] as $dr => $drLabel):
+                                            $drPdf   = $settingsModel->get("doctrine_{$dr}_pdf_url", '');
+                                            $drVideo = $settingsModel->get("doctrine_{$dr}_video_url", '');
+                                        ?>
+                                            <div class="p-4 bg-gray-50 rounded-lg">
+                                                <p class="text-xs font-bold text-dark/70 mb-3"><?= $drLabel ?></p>
+                                                <div class="space-y-3">
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Card Title</label>
+                                                        <input type="text" x-model="form.doctrine_<?= $dr ?>_title" placeholder="e.g. Script Analysis"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Description <span class="text-dark/30">(each line shows on its own line; start a line with "- " or "• " for a bullet point; blank line = new paragraph)</span></label>
+                                                        <textarea x-model="form.doctrine_<?= $dr ?>_description" rows="6" placeholder="For Actors. Writers. Producers.&#10;3 Honest Reads.&#10;&#10;- First bullet point&#10;- Second bullet point"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20 resize-y"></textarea>
+                                                    </div>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Price <span class="text-dark/30">(blank to hide)</span></label>
+                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_price" placeholder="Charges: ₹50,000"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Text Alignment</label>
+                                                            <div class="flex gap-1">
+                                                                <?php foreach (['left' => 'Left', 'center' => 'Center', 'right' => 'Right'] as $alVal => $alLbl): ?>
+                                                                <button type="button" @click="form.doctrine_<?= $dr ?>_align = '<?= $alVal ?>'"
+                                                                    :class="(form.doctrine_<?= $dr ?>_align || 'center') === '<?= $alVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $alLbl ?></button>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- CTA: one at a time -->
+                                                    <div class="pt-2 border-t border-dark/5">
+                                                        <label class="block text-[10px] text-dark/50 mb-1.5">Button Action <span class="text-dark/30">(only one at a time)</span></label>
+                                                        <div class="flex flex-wrap gap-1 mb-3">
+                                                            <?php foreach (['none' => 'No Button', 'pdf' => 'Open PDF (new tab)', 'video' => 'Play Video (popup)'] as $ctaVal => $ctaLbl): ?>
+                                                            <button type="button" @click="form.doctrine_<?= $dr ?>_cta_type = '<?= $ctaVal ?>'"
+                                                                :class="(form.doctrine_<?= $dr ?>_cta_type || 'none') === '<?= $ctaVal ?>' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition"><?= $ctaLbl ?></button>
+                                                            <?php endforeach; ?>
+                                                        </div>
+
+                                                        <div x-show="(form.doctrine_<?= $dr ?>_cta_type || 'none') !== 'none'" x-cloak class="mb-3">
+                                                            <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
+                                                            <input type="text" x-model="form.doctrine_<?= $dr ?>_cta_text" placeholder="Learn More"
+                                                                class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                        </div>
+
+                                                        <!-- PDF upload -->
+                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'pdf'" x-cloak
+                                                            x-data="pdfUploader('doctrine_<?= $dr ?>_pdf_url', '<?= addslashes(htmlspecialchars($drPdf)) ?>')">
+                                                            <div class="relative border-2 rounded-xl transition-all bg-white"
+                                                                :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                                style="cursor:pointer"
+                                                                @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                                @click="$refs.pdfIn.click()">
+                                                                <input type="file" x-ref="pdfIn" class="hidden" accept="application/pdf,.pdf" @change="onFile($event)">
+                                                                <template x-if="!preview && !uploading">
+                                                                    <p class="text-[12px] text-dark/40 text-center p-4">Drop PDF or <span class="underline">click to browse</span> · max 20 MB</p>
+                                                                </template>
+                                                                <template x-if="uploading">
+                                                                    <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
+                                                                </template>
+                                                                <template x-if="preview && !uploading">
+                                                                    <div class="flex items-center gap-3 px-4 py-3">
+                                                                        <span class="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 rounded px-1.5 py-0.5">PDF</span>
+                                                                        <a :href="preview" target="_blank" rel="noopener" @click.stop class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate underline" x-text="filename || 'PDF uploaded'"></a>
+                                                                        <button type="button" @click.stop="clearPdf()" aria-label="Remove PDF"
+                                                                            class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                                            <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        </button>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                        </div>
+
+                                                        <!-- Video: upload OR YouTube -->
+                                                        <div x-show="form.doctrine_<?= $dr ?>_cta_type === 'video'" x-cloak
+                                                            x-data="videoUploader('doctrine_<?= $dr ?>_video_url', '<?= addslashes(htmlspecialchars($drVideo)) ?>')">
+                                                            <div class="flex gap-1 mb-2">
+                                                                <button type="button" @click="trailerTab='upload'"
+                                                                    :class="trailerTab==='upload' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">Upload Video File</button>
+                                                                <button type="button" @click="trailerTab='yt'"
+                                                                    :class="trailerTab==='yt' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                    class="px-3 py-1 rounded-lg text-[11px] font-semibold transition">YouTube URL</button>
+                                                            </div>
+                                                            <div x-show="trailerTab==='upload'">
+                                                                <div class="relative border-2 rounded-xl transition-all bg-white"
+                                                                    :class="dragging ? 'border-dark bg-dark/5' : 'border-dashed border-dark/15 hover:border-dark/30'"
+                                                                    style="cursor:pointer"
+                                                                    @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop($event)"
+                                                                    @click="$refs.vidIn.click()">
+                                                                    <input type="file" x-ref="vidIn" class="hidden" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo" @change="onFile($event)">
+                                                                    <template x-if="!preview && !uploading">
+                                                                        <p class="text-[12px] text-dark/40 text-center p-4">Drop video or <span class="underline">click to browse</span> · MP4 · MOV · WEBM · max 500 MB</p>
+                                                                    </template>
+                                                                    <template x-if="uploading">
+                                                                        <p class="text-[12px] text-dark/50 text-center p-4" x-text="progress + '% — uploading...'"></p>
+                                                                    </template>
+                                                                    <template x-if="preview && !uploading">
+                                                                        <div class="flex items-center gap-3 px-4 py-3">
+                                                                            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                                            <p class="flex-1 min-w-0 text-[13px] font-semibold text-dark truncate" x-text="filename || 'Video uploaded'"></p>
+                                                                            <button type="button" @click.stop="clearVideo()" aria-label="Remove video"
+                                                                                class="w-7 h-7 rounded-full bg-dark/5 hover:bg-dark/10 flex items-center justify-center flex-shrink-0 transition">
+                                                                                <svg class="w-4 h-4 text-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                            </button>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                            <div x-show="trailerTab==='yt'">
+                                                                <input type="url" x-model="ytUrl" @input="syncYtToForm()"
+                                                                    placeholder="https://youtu.be/... or youtube.com/watch?v=..."
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                                <p class="text-[10px] text-dark/30 mt-1">Saved with "Save All Settings"</p>
+                                                            </div>
+                                                            <template x-if="uploadError"><p class="text-[11px] text-red-500 mt-1" x-text="uploadError"></p></template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- END SCRIPTS PAGE BLOCK -->
+
 
                             </div><!-- End Collapsible Sections Wrapper -->
 
