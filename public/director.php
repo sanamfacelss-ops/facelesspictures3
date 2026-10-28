@@ -11,6 +11,10 @@ $pageTitle = 'Director Auditions — Faceless Pictures 3';
 // Film Song strip text: director-specific first, falls back to the actor page's text
 $filmSongHeading  = trim(setting('director_film_song_heading', '')) ?: setting('film_song_heading',  'FILM SONG');
 $filmSongSubtitle = trim(setting('director_film_song_subtitle', '')) ?: setting('film_song_subtitle', 'Listen to the song before you shoot your scene');
+// Song strip button texts (blank = default)
+$songBtnMale     = trim(setting('director_song_btn_male', ''))     ?: 'Male Songs';
+$songBtnFemale   = trim(setting('director_song_btn_female', ''))   ?: 'Female Songs';
+$songBtnDownload = trim(setting('director_song_btn_download', '')) ?: 'Download Song';
 if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
 if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you shoot your scene';
 
@@ -406,18 +410,18 @@ $ruleList    = array_filter(array_map('trim', explode("\n", $rulesTxt)));
         <p style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.45"><?= htmlspecialchars($filmSongSubtitle) ?></p>
       </div>
       <div style="display:flex;gap:.75rem;align-items:center;flex-shrink:0;flex-wrap:wrap">
-        <?php foreach (['male' => 'Male Songs', 'female' => 'Female Songs'] as $g => $gLabel): ?>
+        <?php foreach (['male' => $songBtnMale, 'female' => $songBtnFemale] as $g => $gLabel): ?>
         <?php if (!empty($tunesByGender[$g])): ?>
         <button type="button" class="film-song-btn" onclick="openSongSlider(<?= htmlspecialchars(json_encode($tunesByGender[$g]), ENT_QUOTES) ?>)">
           <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <?= $gLabel ?>
+          <?= htmlspecialchars($gLabel) ?>
         </button>
         <?php endif; ?>
         <?php endforeach; ?>
         <?php if ($hasAnySongDownloads): ?>
-        <button type="button" class="film-song-btn" onclick="downloadSong(<?= $filmSongDownloadsJson ?>)">
+        <button type="button" class="film-song-btn" data-song-download onclick="downloadSong(<?= $filmSongDownloadsJson ?>)">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Download Song
+          <?= htmlspecialchars($songBtnDownload) ?>
         </button>
         <?php endif; ?>
       </div>
@@ -603,9 +607,7 @@ function downloadSong(songs){
     if(all.length === 0){ alert('No songs available for download'); return; }
     if(all.length === 1){
         // Find the film-song "Download Song" button for loader
-        var btns = document.querySelectorAll('.film-song-btn');
-        var targetBtn = null;
-        btns.forEach(function(b){ if(b.textContent.trim().indexOf('Download') !== -1) targetBtn = b; });
+        var targetBtn = document.querySelector('.film-song-btn[data-song-download]');
         triggerDownload(all[0].url, all[0].label || 'song', targetBtn);
     } else {
         showDownloadPopup(groups);
@@ -693,7 +695,7 @@ function showDownloadPopup(groups){
 function renderDownloadTabs(groups, active){
     var tabsEl = document.getElementById('downloadSongTabs');
     tabsEl.innerHTML = '';
-    [['male', 'Male Songs'], ['female', 'Female Songs']].forEach(function(t){
+    [['male', <?= json_encode($songBtnMale) ?>], ['female', <?= json_encode($songBtnFemale) ?>]].forEach(function(t){
         var tab = document.createElement('button');
         tab.type = 'button';
         tab.className = 'dl-tab' + (t[0] === active ? ' active' : '');

@@ -5530,7 +5530,24 @@ The page will automatically format headings and paragraphs."
                                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                             </div>
                                                         </div>
-                                                        <p class="text-[9px] text-dark/30 mt-1">Director page only. Leave blank to use the Actor page's Film Song text.</p>
+                                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Male Songs Button</label>
+                                                                <input type="text" x-model="form.director_song_btn_male" placeholder="Male Songs"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Female Songs Button</label>
+                                                                <input type="text" x-model="form.director_song_btn_female" placeholder="Female Songs"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Download Button</label>
+                                                                <input type="text" x-model="form.director_song_btn_download" placeholder="Download Song"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                        </div>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Director page only. Blank heading/subtitle uses the Actor page's text; blank buttons use the default text shown in grey.</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -5834,8 +5851,18 @@ The page will automatically format headings and paragraphs."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
                                                     <div>
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Button Text</label>
-                                                        <input type="text" x-model="form.film_song_btn_label" placeholder="Get Song"
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Male Songs Button</label>
+                                                        <input type="text" x-model="form.actor_song_btn_male" placeholder="Male Songs"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Female Songs Button</label>
+                                                        <input type="text" x-model="form.actor_song_btn_female" placeholder="Female Songs"
+                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] text-dark/50 mb-1">Download Button</label>
+                                                        <input type="text" x-model="form.actor_song_btn_download" placeholder="Download Song"
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                     </div>
                                                 </div>
@@ -9532,6 +9559,10 @@ The page will automatically format headings and paragraphs."
                 // Film Song strip (director page only; blank = use actor text)
                 director_film_song_heading:  <?= json_encode($settingsModel->get('director_film_song_heading','')) ?>,
                 director_film_song_subtitle: <?= json_encode($settingsModel->get('director_film_song_subtitle','')) ?>,
+                // Song strip button texts (blank = default)
+                <?php foreach (['actor', 'director'] as $sbRole): foreach (['male', 'female', 'download'] as $sbKey): ?>
+                <?= $sbRole ?>_song_btn_<?= $sbKey ?>: <?= json_encode($settingsModel->get("{$sbRole}_song_btn_{$sbKey}", '')) ?>,
+                <?php endforeach; endforeach; ?>
             },
             init() {
                 // Initialize stats lines from JSON or fallback to individual fields

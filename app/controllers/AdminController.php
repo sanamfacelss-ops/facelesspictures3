@@ -2167,6 +2167,8 @@ class AdminController
             'director_brief', 'writer_brief',
             'film_song_heading', 'film_song_subtitle', 'film_song_btn_label',
             'director_film_song_heading', 'director_film_song_subtitle',
+            'actor_song_btn_male', 'actor_song_btn_female', 'actor_song_btn_download',
+            'director_song_btn_male', 'director_song_btn_female', 'director_song_btn_download',
             // Actor page media
             'actor_preview_video_url', 'song_preview_video_url',
             'actor_script_image_url',  'song_lyrics_image_url',
@@ -2322,6 +2324,8 @@ class AdminController
             'director_brief', 'writer_brief',
             'film_song_heading', 'film_song_subtitle', 'film_song_btn_label',
             'director_film_song_heading', 'director_film_song_subtitle',
+            'actor_song_btn_male', 'actor_song_btn_female', 'actor_song_btn_download',
+            'director_song_btn_male', 'director_song_btn_female', 'director_song_btn_download',
             'actor_preview_video_url', 'song_preview_video_url',
             'actor_script_image_url',  'song_lyrics_image_url',
             'song_tune_youtube_url',   'actor_script_pdf_url', 'song_lyrics_pdf_url',
