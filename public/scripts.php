@@ -62,18 +62,18 @@ $headerHeight = (int)setting('site_logo_height', '44') + 16;
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
 <script defer src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;overflow-x:hidden}
-body{font-family:'Archivo','DM Sans','Noto Sans Devanagari',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased}
+body{font-family:'DM Sans','Noto Sans Devanagari',sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased}
 
 .sp-hero{text-align:center;padding:<?= $headerHeight + 40 ?>px 1.5rem 2rem}
-.sp-heading{font-family:'Archivo Black','Archivo',sans-serif;font-size:clamp(3rem,9vw,5.5rem);line-height:1;letter-spacing:.01em;color:#000;text-transform:uppercase}
-.sp-tagline{margin-top:1.1rem;font-size:.72rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#111}
+.sp-heading{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,10vw,6.5rem);line-height:1;letter-spacing:.06em;color:#000;text-transform:uppercase;font-weight:400}
+.sp-tagline{margin-top:1rem;font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#111}
 .sp-tagline .dot{margin:0 .75rem;color:#6b7280}
 .sp-hero-img{max-width:1100px;margin:2rem auto 0;padding:0 1.5rem}
 .sp-hero-img img{width:100%;height:auto;max-height:420px;object-fit:cover;display:block}
@@ -81,12 +81,12 @@ body{font-family:'Archivo','DM Sans','Noto Sans Devanagari',sans-serif;backgroun
 .sp-cards{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem 5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.75rem}
 .sp-card{background:#fff;border:1px solid #eceef1;border-radius:4px;box-shadow:0 2px 14px rgba(0,0,0,.06);padding:2.25rem 1.75rem;display:flex;flex-direction:column}
 .sp-card.al-left{text-align:left}.sp-card.al-center{text-align:center}.sp-card.al-right{text-align:right}
-.sp-card-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.16em;text-transform:uppercase;color:#111;margin-bottom:1.5rem}
+.sp-card-title{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:1.6rem;letter-spacing:.06em;line-height:1.1;text-transform:uppercase;color:#111;margin-bottom:1.25rem}
 .sp-card-desc{flex:1}
 .sp-card-desc p{font-size:.88rem;line-height:2.15;color:#1f2937;margin-bottom:.5rem}
 .sp-card-desc ul{list-style:disc;padding-left:1.25rem;margin-bottom:.5rem;font-size:.88rem;line-height:1.9;color:#1f2937}
 .sp-card.al-center .sp-card-desc ul,.sp-card.al-right .sp-card-desc ul{list-style-position:inside;padding-left:0}
-.sp-card-price{font-weight:800;font-size:.9rem;color:#111;margin-top:.5rem}
+.sp-card-price{font-weight:700;font-size:.95rem;color:#111;margin-top:.5rem}
 .sp-cta{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;margin-top:1.5rem;padding:.8rem 1.4rem;background:#111;color:#fff;border:none;border-radius:6px;font-family:inherit;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background .2s,transform .2s}
 .sp-cta:hover{background:#374151;transform:translateY(-1px)}
 .sp-cta:focus-visible{outline:2px solid #111;outline-offset:3px}
