@@ -8,9 +8,9 @@ $directorBrief   = setting('director_brief', 'You have one actor, one phone came
 $directorScripts = $scriptModel->byCategory('director');
 $pageTitle = 'Director Auditions — Faceless Pictures 3';
 
-// Film Song card text (admin-editable, shared with actor page)
-$filmSongHeading  = setting('film_song_heading',  'FILM SONG');
-$filmSongSubtitle = setting('film_song_subtitle', 'Listen to the song before you shoot your scene');
+// Film Song strip text: director-specific first, falls back to the actor page's text
+$filmSongHeading  = trim(setting('director_film_song_heading', '')) ?: setting('film_song_heading',  'FILM SONG');
+$filmSongSubtitle = trim(setting('director_film_song_subtitle', '')) ?: setting('film_song_subtitle', 'Listen to the song before you shoot your scene');
 if (empty($filmSongHeading))  $filmSongHeading  = 'FILM SONG';
 if (empty($filmSongSubtitle)) $filmSongSubtitle = 'Listen to the song before you shoot your scene';
 

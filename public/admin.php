@@ -5514,6 +5514,24 @@ The page will automatically format headings and paragraphs."
                                                             class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
                                                         <p class="text-[9px] text-dark/30 mt-1">Text shown on the main submit button</p>
                                                     </div>
+
+                                                    <!-- 6. Film Song Strip (black bar) -->
+                                                    <div class="border-t border-dark/10 pt-3 mt-3">
+                                                        <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Film Song Strip (black bar with song buttons)</p>
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Heading</label>
+                                                                <input type="text" x-model="form.director_film_song_heading" placeholder="FILM SONG"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Subtitle</label>
+                                                                <input type="text" x-model="form.director_film_song_subtitle" placeholder="Listen to the song before you shoot your scene"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                        </div>
+                                                        <p class="text-[9px] text-dark/30 mt-1">Director page only. Leave blank to use the Actor page's Film Song text.</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -9511,6 +9529,9 @@ The page will automatically format headings and paragraphs."
                 film_song_heading:   <?= json_encode($settingsModel->get('film_song_heading','FILM SONG')) ?>,
                 film_song_subtitle:  <?= json_encode($settingsModel->get('film_song_subtitle','Listen to the song before you record your audition')) ?>,
                 film_song_btn_label: <?= json_encode($settingsModel->get('film_song_btn_label','Get Song')) ?>,
+                // Film Song strip (director page only; blank = use actor text)
+                director_film_song_heading:  <?= json_encode($settingsModel->get('director_film_song_heading','')) ?>,
+                director_film_song_subtitle: <?= json_encode($settingsModel->get('director_film_song_subtitle','')) ?>,
             },
             init() {
                 // Initialize stats lines from JSON or fallback to individual fields
