@@ -278,9 +278,12 @@ class VideoProcessingService
                     // Check if Whisper detected non-English language
                     $nonEnglishLanguages = ['hindi', 'punjabi', 'panjabi', 'tamil', 'telugu', 'bengali', 
                                            'marathi', 'gujarati', 'kannada', 'malayalam', 'urdu', 'hinglish'];
+                    // Trust the text-based detection; only fall back to Whisper's guess when unknown.
+                    // (Whisper's own label is often wrong, e.g. "hindi" for clear English speech.)
+                    $langForCheck = (stripos($detectedLanguage, 'unknown') !== false) ? $whisperLanguage : $detectedLanguage;
                     $isNonEnglish = false;
                     foreach ($nonEnglishLanguages as $lang) {
-                        if (stripos($detectedLanguage, $lang) !== false || stripos($whisperLanguage, $lang) !== false) {
+                        if (stripos($langForCheck, $lang) !== false) {
                             $isNonEnglish = true;
                             break;
                         }
@@ -309,7 +312,8 @@ class VideoProcessingService
                     if (!$textResult['safe'] && $textResult['score'] >= $this->profanityFlagThreshold) {
                         $score -= 30;
                         $flags[] = 'profanity_warning';
-                        $feedback[] = "Audio content flagged for review. Categories: " . implode(', ', $textResult['categories']);
+                        $cats = !empty($textResult['categories']) ? implode(', ', $textResult['categories']) : 'unspecified';
+                        $feedback[] = "Speech content flagged by " . ($textResult['provider'] ?? 'AI') . ": {$cats} (" . round(($textResult['score'] ?? 0) * 100) . "%)";
                     }
                 } else {
                     // For Non-English OR Unreliable transcript:
@@ -340,7 +344,8 @@ class VideoProcessingService
                         if (!empty($nonSexualCategories) || $textResult['score'] >= 0.5) {
                             $score -= 20;
                             $flags[] = 'content_warning';
-                            $feedback[] = "Content flagged by AI: " . implode(', ', $textResult['categories']);
+                            $cats = !empty($textResult['categories']) ? implode(', ', $textResult['categories']) : 'unspecified';
+                            $feedback[] = "Speech content flagged by " . ($textResult['provider'] ?? 'AI') . ": {$cats} (" . round(($textResult['score'] ?? 0) * 100) . "%)";
                         } else {
                             // Only sexual at low score - just note it, don't flag
                             $feedback[] = "Note: Romantic/mild content detected (" . round($textResult['score'] * 100) . "%) - within acceptable range";
@@ -609,13 +614,37 @@ class VideoProcessingService
     }
 
     /**
+     * Plain-language reasons a video was flagged (shown to admins).
+     * A video is flagged when ANY flag is raised, even if the score passes.
+     */
+    private function flagReasons(float $score, array $feedback, array $flags): array
+    {
+        $reasons = [];
+        foreach ($feedback as $f) {
+            // Skip informational lines that never cause a flag
+            if (stripos($f, 'Language detected') === 0 || stripos($f, 'Note:') === 0) continue;
+            if (stripos($f, 'exceeds recommended length') !== false) continue; // only lowers score
+            $reasons[] = $f;
+        }
+        if ($score < $this->approveThreshold) {
+            $reasons[] = "Score " . round($score) . " is below the auto-approve score of " . round($this->approveThreshold);
+        }
+        if (empty($reasons) && !empty($flags)) {
+            $reasons[] = 'Raised flags: ' . implode(', ', $flags);
+        }
+        return $reasons ?: ['Needs a human check'];
+    }
+
+    /**
      * Flag video for manual review
      */
     private function flag(int $videoId, float $score, array $feedback, array $flags, string $transcript, array $nsfwResult, int $processingTimeMs): array
     {
+        $reasons = $this->flagReasons($score, $feedback, $flags);
         $this->videoModel->updateAiStatus($videoId, 'flagged', $score, [
             'score' => $score,
-            'summary' => 'Video flagged for manual review',
+            'summary' => 'Flagged for manual review: ' . implode('; ', $reasons),
+            'reasons' => $reasons,
             'feedback' => $feedback,
             'flags' => $flags,
             'transcript' => substr($transcript, 0, 5000),

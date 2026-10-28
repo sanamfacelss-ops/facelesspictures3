@@ -398,9 +398,13 @@ class ContentModerationService
             // Telugu profanity  
             'lanja', 'lanjakodaka', 'pooka', 'modda', 'dengey', 'gudda',
             
-            // Violence/hate
-            'kill', 'murder', 'terrorist', 'bomb', 'attack', 'rape', 'suicide'
+            // Sexual violence (violence words like kill/attack/bomb are normal in film scenes;
+            // Azure/OpenAI judge those with context, so they are not in this local list)
+            'rape',
         ];
+        // Normal English words that collided with the list above — never treated as profanity
+        $englishFalsePositives = ['sale', 'rand', 'damn', 'mc', 'bc', 'gand', 'chut', 'otha', 'gadha', 'ullu', 'jhat'];
+        $bannedWords = array_values(array_diff($bannedWords, $englishFalsePositives));
         
         // Phonetic/fuzzy patterns - common mistranscriptions of Hindi profanity
         $phoneticPatterns = [
@@ -413,9 +417,9 @@ class ContentModerationService
             '/\bmadrc+h/i' => 'madarchod',
             '/\bmadc+h/i' => 'madarchod',
             '/\bmacdr/i' => 'madarchod',
-            '/\bm[ae]c?dr/i' => 'madarchod',  // catches "macdr", "madr", "mecdr"
-            // "le madarchod" often transcribed with "la" or "lay" or "let"
-            '/\b(le|la|lay|let)[\'s]?\s*(ma|mo).*ch[aou]+[dt]?\b/i' => 'le madarchod',
+            '/\bm[ae]c?dr(?!id|as|e)/i' => 'madarchod',  // "macdr", "madr", "mecdr" — not Madrid/Madras/madre
+            // "le madarchod" often transcribed with "la" or "lay" or "let" (kept within one short word)
+            '/\b(le|la|lay|let)[\'s]?\s*(ma|mo)[a-z]{0,4}ch[aou]+[dt]\b/i' => 'le madarchod',
             // "bhenchod" patterns
             '/\bben\s*ch[aou]+[dt]?\b/i' => 'bhenchod',
             '/\bbhen\s*ch/i' => 'bhenchod',
@@ -434,11 +438,9 @@ class ContentModerationService
             '/\bbosri/i' => 'bhosdike',  // common mistranscription
             // "randi" patterns
             '/\br[au]n?di\b/i' => 'randi',
-            // "lund/lauda" patterns
-            '/\bl[au]+n?d[a]?\b/i' => 'lund',
-            '/\bl[ao]+d[a]+\b/i' => 'lauda',
-            // "pakad" (grab) - often used with profanity
-            '/\bpakad\b/i' => 'pakad (grab)',
+            // "lund/lauda" patterns (old pattern also matched the English words "land" and "lad")
+            '/\b(lund|loond|lunda|laund[ae]?|lauda|lawda|lavda)\b/i' => 'lund',
+            '/\bl[o]+d[a]+\b/i' => 'lauda',
         ];
         
         // Common Whisper hallucinations/mistranscriptions for Hindi profanity
@@ -454,16 +456,18 @@ class ContentModerationService
         ];
 
         $lower = strtolower($text);
-        // Remove common separators that might be used to evade detection
-        $normalized = preg_replace('/[\s\-_\.]+/', '', $lower);
         
         $found = [];
         $suspiciousHallucination = false;
 
-        // Direct word matching
+        // Whole-word matching only. The old code matched substrings AND a copy of the whole
+        // transcript with all spaces removed, so normal English produced fake hits
+        // (e.g. "skill" → kill, "brand" → rand, "this alert" → sale). That flagged clean videos.
+        // Separators inside a single word are still caught: "f.u.c.k" / "f-u-c-k" → fuck.
+        $collapsed = preg_replace_callback('/\b\w(?:[\-_\.\*]\w)+\b/', fn($m) => str_replace(['-', '_', '.', '*'], '', $m[0]), $lower) ?? $lower;
         foreach ($bannedWords as $word) {
-            // Check both original text and normalized version
-            if (str_contains($lower, $word) || str_contains($normalized, $word)) {
+            $re = '/(?<![a-z])' . preg_quote($word, '/') . '(?![a-z])/i';
+            if (preg_match($re, $lower) || preg_match($re, $collapsed)) {
                 $found[] = $word;
             }
         }

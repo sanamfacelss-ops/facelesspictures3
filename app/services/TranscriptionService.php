@@ -185,8 +185,8 @@ class TranscriptionService
             $postFields['language'] = $language;
         }
         
-        // Prompt helps with context but doesn't force language
-        $postFields['prompt'] = 'Transcribe exactly what is said. Include any profanity, slang, or gaali words accurately without censoring.';
+        // No instruction prompt: Whisper treats the prompt as "previous text" and often echoes it
+        // into the transcript (that echo then tripped the profanity check on clean videos).
 
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
@@ -220,7 +220,7 @@ class TranscriptionService
         }
         
         $detectedLanguage = $data['language'] ?? 'unknown';
-        $transcribedText = trim($data['text']);
+        $transcribedText = $this->stripPromptEcho(trim($data['text']));
         
         log_message('info', "Groq transcription (model={$model}): detected_lang={$detectedLanguage}, text=" . substr($transcribedText, 0, 200));
 
@@ -298,64 +298,58 @@ class TranscriptionService
         // Text is in Latin script - could be English or Romanized Hindi (Hinglish)
         $lower = strtolower($text);
         
-        // Check for common Hindi words written in Roman script (Hinglish indicators)
+        // Latin script: English, or Romanized Hindi (Hinglish). Count WHOLE words only.
+        // (Old code used substring matching, so English words like "are", "main", "her", "the"
+        //  counted as Hindi and English videos were labelled Hindi.)
         $hindiIndicators = [
-            'kya', 'hai', 'hain', 'nahi', 'nahin', 'aur', 'mein', 'main', 'tum', 'aap',
-            'kaise', 'kaisa', 'kaisi', 'kyun', 'kyon', 'kab', 'kahan', 'kahaan',
-            'accha', 'achha', 'theek', 'thik', 'bahut', 'bohot', 'bhai', 'yaar',
-            'abhi', 'phir', 'lekin', 'matlab', 'samajh', 'dekh', 'dekho', 'suno',
-            'chalo', 'chal', 'karo', 'kar', 'bolo', 'bol', 'jao', 'aao',
-            'pakad', 'pakdo', 'ruk', 'ruko', 'haan', 'ji', 'are', 'arre',
-            // Profanity indicators (if these appear, it's likely Hindi)
-            'madarchod', 'bhenchod', 'chutiya', 'gaand', 'lund', 'randi', 'bhosdike',
-            'madar', 'behen', 'chod', 'gandu', 'harami', 'kamina', 'saala', 'sala'
+            'kya', 'hai', 'hain', 'nahi', 'nahin', 'aur', 'mein', 'tum', 'aap',
+            'kaise', 'kaisa', 'kaisi', 'kyun', 'kyon', 'kahan', 'kahaan',
+            'accha', 'achha', 'acha', 'theek', 'thik', 'bahut', 'bohot', 'bhai', 'yaar',
+            'abhi', 'phir', 'lekin', 'matlab', 'samajh', 'dekho', 'suno',
+            'chalo', 'karo', 'bolo', 'jao', 'aao', 'pakdo', 'ruko', 'haan', 'arre',
+            'mujhe', 'tujhe', 'humko', 'tumko', 'kuch', 'koi', 'woh', 'yeh', 'kaun', 'kitna',
+            'raha', 'rahi', 'rahe', 'gaya', 'gayi', 'tha', 'thi', 'hoga', 'karna', 'karke',
         ];
-        
-        $hindiWordCount = 0;
-        $words = preg_split('/\s+/', $lower);
+        $englishStopwords = [
+            'the', 'is', 'are', 'was', 'were', 'have', 'has', 'had', 'will', 'would', 'could',
+            'should', 'can', 'this', 'that', 'these', 'those', 'what', 'which', 'who', 'how',
+            'why', 'when', 'where', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your',
+            'his', 'her', 'our', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'not', 'but',
+            'if', 'so', 'do', 'go', 'get', 'just', 'there', 'here', 'me', 'be', 'a', 'an',
+        ];
+
+        $words = preg_split('/[^a-z\']+/', $lower, -1, PREG_SPLIT_NO_EMPTY);
         $totalWords = count($words);
-        
-        foreach ($hindiIndicators as $indicator) {
-            if (str_contains($lower, $indicator)) {
-                $hindiWordCount++;
-            }
+        if ($totalWords === 0) {
+            return $this->normalizeLanguageName($whisperLanguage);
         }
-        
-        // If more than 20% Hindi indicators, classify as Hinglish
-        if ($totalWords > 0 && ($hindiWordCount / $totalWords) > 0.1) {
+        $hindiSet = array_flip($hindiIndicators);
+        $englishSet = array_flip($englishStopwords);
+        $hindiHits = 0;
+        $englishHits = 0;
+        foreach ($words as $w) {
+            if (isset($hindiSet[$w])) $hindiHits++;
+            if (isset($englishSet[$w])) $englishHits++;
+        }
+        $hindiRatio = $hindiHits / $totalWords;
+        $englishRatio = $englishHits / $totalWords;
+
+        // Normal English speech is ~35-50% stopwords; Hinglish has many Hindi function words
+        if ($hindiRatio >= 0.08 && $englishRatio >= 0.15) {
             return 'Hinglish (Hindi-English)';
         }
-        
-        // Check if it looks like garbage (hallucination) - mark as Unknown
+        if ($hindiRatio >= 0.08) {
+            return 'Hindi (Romanized)';
+        }
+        if ($englishRatio >= 0.2) {
+            return 'English';
+        }
+
         if ($this->isGarbageTranscription($text)) {
             return 'Unknown (transcription unreliable)';
         }
-        
-        // Default to Whisper's detection for English text, but validate it
-        $normalizedWhisper = $this->normalizeLanguageName($whisperLanguage);
-        
-        // If Whisper says Hindi/Punjabi but text is all English letters with no Hindi words,
-        // it's probably actually English
-        if (in_array($normalizedWhisper, ['Hindi', 'Punjabi', 'Panjabi', 'Urdu']) && $hindiWordCount === 0) {
-            // Check if text looks like proper English
-            $englishWords = ['the', 'is', 'are', 'was', 'were', 'have', 'has', 'had', 'will', 'would', 
-                           'could', 'should', 'can', 'may', 'might', 'must', 'this', 'that', 'these',
-                           'those', 'what', 'which', 'who', 'how', 'why', 'when', 'where', 'i', 'you',
-                           'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our'];
-            
-            $englishCount = 0;
-            foreach ($englishWords as $word) {
-                if (preg_match('/\b' . $word . '\b/i', $text)) {
-                    $englishCount++;
-                }
-            }
-            
-            if ($englishCount >= 3) {
-                return 'English';
-            }
-        }
-        
-        return $normalizedWhisper;
+
+        return $this->normalizeLanguageName($whisperLanguage);
     }
     
     /**
@@ -374,17 +368,27 @@ class TranscriptionService
         // Devanagari, Gurmukhi, Tamil, etc. indicate successful transcription
         
         // Check for repetitive patterns like "the the the" or "tons of the tons of the"
-        $words = preg_split('/\s+/', $text);
+        $words = preg_split('/\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
         $wordCount = count($words);
         
-        if ($wordCount >= 3) {
-            // Check for high repetition
-            $uniqueWords = array_unique($words);
-            $repetitionRatio = count($uniqueWords) / $wordCount;
-            
-            // If less than 40% unique words, it's likely garbage
+        if ($wordCount >= 3 && $wordCount <= 40) {
+            // Short text: unique-word ratio works
+            $repetitionRatio = count(array_unique($words)) / $wordCount;
             if ($repetitionRatio < 0.4) {
                 log_message('info', "Garbage detection: high repetition ratio " . round($repetitionRatio, 2));
+                return true;
+            }
+        } elseif ($wordCount > 40) {
+            // Long text: normal speech reuses words a lot ("I", "the", "her"), so the
+            // unique-word ratio wrongly marked long real transcripts as garbage.
+            // Use repeated 4-word phrases instead — real speech rarely repeats them.
+            $grams = [];
+            for ($i = 0; $i + 3 < $wordCount; $i++) {
+                $grams[] = $words[$i] . ' ' . $words[$i + 1] . ' ' . $words[$i + 2] . ' ' . $words[$i + 3];
+            }
+            $distinctRatio = count(array_unique($grams)) / max(1, count($grams));
+            if ($distinctRatio < 0.5) {
+                log_message('info', "Garbage detection: repeated phrases, distinct 4-gram ratio " . round($distinctRatio, 2));
                 return true;
             }
         }
@@ -392,11 +396,10 @@ class TranscriptionService
         // Check for common Whisper hallucination patterns
         $hallucinations = [
             'thanks for watching',
-            'subscribe to',
             'like and subscribe',
-            'tons of the',
+            'tons of the tons of',
             'the the the',
-            'silence',
+            '[silence]',
             '[music]',
             '[applause]',
         ];
@@ -411,6 +414,21 @@ class TranscriptionService
         return false;
     }
     
+    /**
+     * Remove the old Whisper instruction prompt if it was echoed into the transcript
+     * (Whisper sometimes repeats its prompt, even with small spelling changes like "Iclude").
+     */
+    private function stripPromptEcho(string $text): string
+    {
+        $clean = preg_replace(
+            '/\s*(transcribe exactly what is said\.?\s*)?i?n?cl?ude any profanity,?\s*slang,?\s*or gaali words accurately without censoring\.?/i',
+            ' ',
+            $text
+        );
+        $clean = preg_replace('/\s*transcribe exactly what is said\.?/i', ' ', $clean ?? $text);
+        return trim(preg_replace('/\s{2,}/', ' ', $clean ?? $text) ?? $text);
+    }
+
     /**
      * Normalize language name to proper English name
      */

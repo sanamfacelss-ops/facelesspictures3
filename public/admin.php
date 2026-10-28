@@ -6594,6 +6594,18 @@ The page will automatically format headings and paragraphs."
                                         </div>
                                     </template>
 
+                                    <!-- Why the AI flagged it / score breakdown -->
+                                    <template x-if="(viewingSubmission.video1_ai_feedback?.reasons || (viewingSubmission.video1_ai_feedback?.feedback || []).filter(f => !/^(Language detected|Note:)/i.test(f))).length > 0">
+                                        <div class="mb-2 p-2 rounded bg-amber-50 border border-amber-200">
+                                            <span class="text-[10px] text-amber-800 uppercase font-semibold" x-text="(viewingSubmission.video1_ai_status || viewingSubmission.ai_status) === 'flagged' ? 'Why it was flagged' : 'AI notes'"></span>
+                                            <ul class="mt-1 space-y-0.5">
+                                                <template x-for="r in (viewingSubmission.video1_ai_feedback?.reasons || (viewingSubmission.video1_ai_feedback?.feedback || []).filter(f => !/^(Language detected|Note:)/i.test(f)))" :key="r">
+                                                    <li class="text-[11px] text-amber-900 flex gap-1.5"><span aria-hidden="true">•</span><span x-text="r"></span></li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </template>
+
                                     <!-- Transcript (from video feedback) -->
                                     <template x-if="viewingSubmission.video1_ai_feedback?.transcript">
                                         <div class="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-dark/10">
@@ -6720,6 +6732,18 @@ The page will automatically format headings and paragraphs."
                                                     <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" x-text="flag"></span>
                                                 </template>
                                             </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- Why the AI flagged it / score breakdown -->
+                                    <template x-if="(viewingSubmission.video2_ai_feedback?.reasons || (viewingSubmission.video2_ai_feedback?.feedback || []).filter(f => !/^(Language detected|Note:)/i.test(f))).length > 0">
+                                        <div class="mb-2 p-2 rounded bg-amber-50 border border-amber-200">
+                                            <span class="text-[10px] text-amber-800 uppercase font-semibold" x-text="(viewingSubmission.video2_ai_status || viewingSubmission.ai_status_2) === 'flagged' ? 'Why it was flagged' : 'AI notes'"></span>
+                                            <ul class="mt-1 space-y-0.5">
+                                                <template x-for="r in (viewingSubmission.video2_ai_feedback?.reasons || (viewingSubmission.video2_ai_feedback?.feedback || []).filter(f => !/^(Language detected|Note:)/i.test(f)))" :key="r">
+                                                    <li class="text-[11px] text-amber-900 flex gap-1.5"><span aria-hidden="true">•</span><span x-text="r"></span></li>
+                                                </template>
+                                            </ul>
                                         </div>
                                     </template>
 
