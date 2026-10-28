@@ -2168,6 +2168,10 @@ class AdminController
             'film_song_heading', 'film_song_subtitle', 'film_song_btn_label',
             'director_film_song_heading', 'director_film_song_subtitle',
             'actor_song_btn_male', 'actor_song_btn_female', 'actor_song_btn_download',
+            // Actor submission category (Dialogue Only / Dialogue + Lip Sync)
+            'actor_category_label', 'actor_category_dialogue_label', 'actor_category_dialogue_hint',
+            'actor_category_both_label', 'actor_category_both_hint', 'actor_category_default',
+            'actor_submit_button_text_dialogue', 'actor_success_message_dialogue',
             'director_song_btn_male', 'director_song_btn_female', 'director_song_btn_download',
             // Actor page media
             'actor_preview_video_url', 'song_preview_video_url',
@@ -2325,6 +2329,10 @@ class AdminController
             'film_song_heading', 'film_song_subtitle', 'film_song_btn_label',
             'director_film_song_heading', 'director_film_song_subtitle',
             'actor_song_btn_male', 'actor_song_btn_female', 'actor_song_btn_download',
+            // Actor submission category (Dialogue Only / Dialogue + Lip Sync)
+            'actor_category_label', 'actor_category_dialogue_label', 'actor_category_dialogue_hint',
+            'actor_category_both_label', 'actor_category_both_hint', 'actor_category_default',
+            'actor_submit_button_text_dialogue', 'actor_success_message_dialogue',
             'director_song_btn_male', 'director_song_btn_female', 'director_song_btn_download',
             'actor_preview_video_url', 'song_preview_video_url',
             'actor_script_image_url',  'song_lyrics_image_url',

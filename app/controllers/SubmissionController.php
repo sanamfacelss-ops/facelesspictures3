@@ -346,15 +346,30 @@ class SubmissionController
             if (!filter_var($email, FILTER_VALIDATE_EMAIL))       $errors[] = 'Valid email required.';
             if (!preg_match('/^[\d\s\+\-\(\)]{7,20}$/', $phone)) $errors[] = 'Valid phone required.';
 
-            // Both videos required
+            // Category: 'dialogue' (dialogue video only) or 'dialogue_lipsync' (both videos).
+            // Missing value = old form behaviour (both videos).
+            $category = trim($_POST['category'] ?? 'dialogue_lipsync');
+            if (!in_array($category, ['dialogue', 'dialogue_lipsync'], true)) {
+                $errors[] = 'Please choose a valid category.';
+                $category = 'dialogue_lipsync';
+            }
+            $needsSong = $category === 'dialogue_lipsync';
+
+            // Admin-editable category names (same text the form shows)
+            $settings      = new \App\Models\Settings();
+            $categoryLabel = $needsSong
+                ? (trim($settings->get('actor_category_both_label', '')) ?: 'Dialogue + Lip Sync')
+                : (trim($settings->get('actor_category_dialogue_label', '')) ?: 'Dialogue Only');
+            $auditionType  = 'Actor Audition — ' . $categoryLabel;
+
             $dialogFile = $_FILES['dialog_video'] ?? null;
-            $songFile   = $_FILES['song_video']   ?? null;
+            $songFile   = $needsSong ? ($_FILES['song_video'] ?? null) : null;
 
             if (!$dialogFile || $dialogFile['error'] !== UPLOAD_ERR_OK) {
-                $errors[] = 'Dialog audition video is required.';
+                $errors[] = 'Dialogue audition video is required.';
             }
-            if (!$songFile || $songFile['error'] !== UPLOAD_ERR_OK) {
-                $errors[] = 'Song audition video is required.';
+            if ($needsSong && (!$songFile || $songFile['error'] !== UPLOAD_ERR_OK)) {
+                $errors[] = 'Lip sync video is required.';
             }
 
             if (!empty($errors)) {
@@ -371,9 +386,10 @@ class SubmissionController
 
             if (!is_dir(UPLOAD_PATH)) mkdir(UPLOAD_PATH, 0755, true);
 
-            // Save both files
+            // Save uploaded file(s)
             $saved = [];
-            $fileMap = ['dialog_video' => $dialogFile, 'song_video' => $songFile];
+            $fileMap = ['dialog_video' => $dialogFile];
+            if ($needsSong) $fileMap['song_video'] = $songFile;
             foreach ($fileMap as $key => $file) {
                 $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
                 $name_file = 'sub_' . uniqid('', true) . '.' . $ext;
@@ -386,20 +402,21 @@ class SubmissionController
                 $saved[$key] = ['path' => $name_file, 'ext' => $ext, 'size' => $file['size']];
             }
 
-            // One submission record with both files
+            // One submission record. Tag 'actor-dual' = 2 videos, 'actor-dialogue' = dialogue only
+            // (admin dashboard and moderation treat 'actor-dialogue' as a single-video submission).
             $submissionId = $this->submissionModel->create([
                 'role'             => 'actor',
-                'audition_type'    => 'Actor Audition (Dialog + Song)',
+                'audition_type'    => $auditionType,
                 'name'             => $name,
                 'email'            => $email,
                 'phone'            => $phone,
                 'file_path'        => $saved['dialog_video']['path'],
                 'file_type'        => $saved['dialog_video']['ext'],
                 'file_size_bytes'  => $saved['dialog_video']['size'],
-                'file_path_2'      => $saved['song_video']['path'],
-                'file_type_2'      => $saved['song_video']['ext'],
-                'file_size_bytes_2'=> $saved['song_video']['size'],
-                'submission_tag'   => 'actor-dual',
+                'file_path_2'      => $saved['song_video']['path'] ?? null,
+                'file_type_2'      => $saved['song_video']['ext']  ?? null,
+                'file_size_bytes_2'=> $saved['song_video']['size'] ?? null,
+                'submission_tag'   => $needsSong ? 'actor-dual' : 'actor-dialogue',
                 'ip_address'       => $ip,
             ]);
 
@@ -426,33 +443,38 @@ class SubmissionController
                 BackgroundProcessor::queueVideoProcessing($vid1);
             } catch (\Throwable $e) { log_exception($e, 'ACTOR_DIALOG_PIPELINE'); }
 
-            // Song video
-            try {
-                $vid2 = $this->videoModel->create([
-                    'user_id'        => $guestId,
-                    'season_id'      => $season['id'],
-                    'title'          => 'Song Audition — ' . $name,
-                    'content_type'   => 'actor',
-                    'file_path'      => $saved['song_video']['path'],
-                    'recording_mode' => 'freeform',
-                    'script_content' => 'Song Audition',
-                ]);
-                $this->submissionModel->linkVideo2($submissionId, $vid2);
-                BackgroundProcessor::queueVideoProcessing($vid2);
-            } catch (\Throwable $e) { log_exception($e, 'ACTOR_SONG_PIPELINE'); }
+            // Lip sync video (only for Dialogue + Lip Sync)
+            if ($needsSong) {
+                try {
+                    $vid2 = $this->videoModel->create([
+                        'user_id'        => $guestId,
+                        'season_id'      => $season['id'],
+                        'title'          => 'Song Audition — ' . $name,
+                        'content_type'   => 'actor',
+                        'file_path'      => $saved['song_video']['path'],
+                        'recording_mode' => 'freeform',
+                        'script_content' => 'Song Audition',
+                    ]);
+                    $this->submissionModel->linkVideo2($submissionId, $vid2);
+                    BackgroundProcessor::queueVideoProcessing($vid2);
+                } catch (\Throwable $e) { log_exception($e, 'ACTOR_SONG_PIPELINE'); }
+            }
 
-            log_message('info', "Actor dual submission #{$submissionId} from {$name} <{$email}>");
+            log_message('info', "Actor submission #{$submissionId} ({$category}) from {$name} <{$email}>");
+
+            // Videos list shown in both emails (matches the chosen category)
+            $videosReceived = $needsSong ? ['Dialogue video', 'Lip sync video'] : ['Dialogue video'];
 
             // ── Send email notification to submitter ──────────────────────
             try {
                 $emailService = new \App\Services\EmailService();
                 if ($emailService->isNotificationEnabled('submit')) {
-                    $emailService->sendSubmissionReceivedEmail($name, $email, 'actor', 'Actor Audition (Dialog + Song)');
+                    $emailService->sendSubmissionReceivedEmail($name, $email, 'actor', $auditionType, $videosReceived);
                 }
                 // Admin notification
                 $adminEmail = $emailService->getAdminEmail();
                 if (!empty($adminEmail) && $emailService->isNotificationEnabled('admin_new_video')) {
-                    $emailService->sendAdminNewSubmissionEmail($adminEmail, $name, $email, 'actor', 'Actor Audition (Dialog + Song)', $submissionId);
+                    $emailService->sendAdminNewSubmissionEmail($adminEmail, $name, $email, 'actor', $auditionType, $submissionId, $videosReceived);
                 }
             } catch (\Throwable $emailErr) {
                 log_exception($emailErr, 'ACTOR_SUBMIT_EMAIL');
@@ -464,8 +486,11 @@ class SubmissionController
                 'submitter_name' => $name,
                 'submitter_email'=> $email,
                 'role'           => 'actor',
-                'audition_type'  => 'Actor Audition (Dialog + Song)',
-                'message'        => "Both auditions received! We'll be in touch at {$email}.",
+                'category'       => $category,
+                'audition_type'  => $auditionType,
+                'message'        => $needsSong
+                    ? "Both auditions received! We'll be in touch at {$email}."
+                    : "Your audition was received! We'll be in touch at {$email}.",
             ]);
 
         } catch (\PDOException $e) {

@@ -56,6 +56,16 @@ $fieldDialogueVideoLabel = setting('actor_field_dialog_video_label', 'Dialogue A
 $fieldDialogueVideoHint = setting('actor_field_dialog_video_hint', 'dialogue video');
 $fieldSongVideoLabel = setting('actor_field_song_video_label', 'Song Audition Video *');
 $fieldSongVideoHint = setting('actor_field_song_video_hint', 'song video');
+
+// Submission category (Dialogue only / Dialogue + Lip Sync) — admin-editable, blank = default
+$fieldCategoryLabel = trim(setting('actor_category_label', ''))          ?: 'Category *';
+$catDialogueLabel   = trim(setting('actor_category_dialogue_label', '')) ?: 'Dialogue Only';
+$catDialogueHint    = trim(setting('actor_category_dialogue_hint', ''));
+$catBothLabel       = trim(setting('actor_category_both_label', ''))     ?: 'Dialogue + Lip Sync';
+$catBothHint        = trim(setting('actor_category_both_hint', ''));
+$catDefault         = setting('actor_category_default', 'dialogue_lipsync') === 'dialogue' ? 'dialogue' : 'dialogue_lipsync';
+$submitBtnBoth      = trim(setting('actor_submit_button_text', ''))          ?: 'Submit Both Auditions →';
+$submitBtnDialogue  = trim(setting('actor_submit_button_text_dialogue', '')) ?: 'Submit Audition →';
 $termsText = setting('actor_terms_text', 'I agree to the <a href="/legal" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:600">Terms & Conditions</a> and confirm all information is accurate');
 
 // Film Song card text (admin-editable)
@@ -251,6 +261,22 @@ body{font-family:'DM Sans','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans
 .divider-dark{height:1px;background:#e5e7eb;margin:1.25rem 0}
 .upload2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 @media(max-width:580px){.upload2{grid-template-columns:1fr}}
+.upload2.single{grid-template-columns:1fr}
+/* Category picker */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:580px){.cat-grid{grid-template-columns:1fr}}
+.cat-opt{position:relative;display:flex;align-items:center;gap:.75rem;background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:.85rem 1rem;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.cat-opt:hover{border-color:#9ca3af}
+.cat-opt.active{border-color:#111;box-shadow:0 0 0 1px #111}
+.cat-radio{position:absolute;opacity:0;pointer-events:none}
+.cat-opt:focus-within{outline:2px solid #111;outline-offset:2px}
+.cat-dot{width:18px;height:18px;border-radius:50%;border:2px solid #d1d5db;flex-shrink:0;position:relative;transition:border-color .15s}
+.cat-opt.active .cat-dot{border-color:#111}
+.cat-opt.active .cat-dot::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#111}
+.cat-title{display:block;font-size:.9rem;font-weight:700;color:#111;line-height:1.3}
+.cat-hint{display:block;font-size:.75rem;color:#6b7280;margin-top:.15rem;line-height:1.4}
+.cat-count{flex-shrink:0;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;background:#f3f4f6;border-radius:999px;padding:.25rem .6rem}
+.cat-opt.active .cat-count{background:#111;color:#fff}
 .fp-label-dark{display:block;color:#111;font-size:.875rem;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:.01em}
 .uzone{border:2px dashed #d1d5db;border-radius:10px;cursor:pointer;background:#fff;text-align:center;padding:1.25rem 1rem;transition:border-color .2s,background .2s}
 .uzone:hover,.uzone.drag{border-color:#111;background:#f9fafb}
@@ -578,24 +604,45 @@ if (!empty($songScripts)) {
 
     <div class="divider-dark"></div>
 
-    <!-- Dual upload -->
-    <div class="upload2">
+    <!-- Category: Dialogue only / Dialogue + Lip Sync -->
+    <div style="margin-bottom:1.25rem">
+      <p class="fp-label-dark" id="cat-label" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldCategoryLabel) ?></p>
+      <div class="cat-grid" role="radiogroup" aria-labelledby="cat-label">
+        <?php foreach ([
+            'dialogue'          => [$catDialogueLabel, $catDialogueHint, '1'],
+            'dialogue_lipsync'  => [$catBothLabel, $catBothHint, '2'],
+        ] as $catVal => [$catLbl, $catHint, $catCount]): ?>
+        <label class="cat-opt" :class="form.category === '<?= $catVal ?>' ? 'active' : ''">
+          <input type="radio" name="actor_category" value="<?= $catVal ?>" x-model="form.category" class="cat-radio">
+          <span class="cat-dot" aria-hidden="true"></span>
+          <span style="flex:1;min-width:0">
+            <span class="cat-title"><?= htmlspecialchars($catLbl) ?></span>
+            <?php if ($catHint !== ''): ?><span class="cat-hint"><?= htmlspecialchars($catHint) ?></span><?php endif; ?>
+          </span>
+          <span class="cat-count"><?= $catCount ?> video<?= $catCount === '1' ? '' : 's' ?></span>
+        </label>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <!-- Upload: lip sync box only shows for Dialogue + Lip Sync -->
+    <div class="upload2" :class="needsSong ? '' : 'single'">
       <div>
         <label class="fp-label-dark" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldDialogueVideoLabel) ?></label>
         <div class="uzone" :class="[dragD?'drag':'',dialogFile?'has-file':'']" @click="$refs.dv.click()" @dragover.prevent="dragD=true" @dragleave="dragD=false" @drop.prevent="dropD($event)">
           <input type="file" x-ref="dv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="dialogFile=$event.target.files[0]">
           <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> <?= htmlspecialchars($fieldDialogVideoHint) ?></p>
+          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#111;text-decoration:underline">browse</strong> <?= htmlspecialchars($fieldDialogueVideoHint) ?></p>
           <p style="color:#9ca3af;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
           <p x-show="dialogFile" x-text="'✓ '+(dialogFile?dialogFile.name:'')" style="display:none;color:#16a34a;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
       </div>
-      <div>
+      <div x-show="needsSong" x-transition>
         <label class="fp-label-dark" style="margin-bottom:.5rem"><?= htmlspecialchars($fieldSongVideoLabel) ?></label>
         <div class="uzone" :class="[dragS?'drag':'',songFile?'has-file':'']" @click="$refs.sv.click()" @dragover.prevent="dragS=true" @dragleave="dragS=false" @drop.prevent="dropS($event)">
           <input type="file" x-ref="sv" style="display:none" accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/mpeg" @change="songFile=$event.target.files[0]">
           <svg style="width:24px;height:24px;color:#9ca3af;margin:0 auto .5rem;display:block" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#fff;text-decoration:underline">browse</strong> <?= htmlspecialchars($fieldSongVideoHint) ?></p>
+          <p style="color:#6b7280;font-size:.8rem">Drop or <strong style="color:#111;text-decoration:underline">browse</strong> <?= htmlspecialchars($fieldSongVideoHint) ?></p>
           <p style="color:#9ca3af;font-size:.7rem;margin-top:.2rem">MP4 · MOV · WEBM · max 500 MB</p>
           <p x-show="songFile" x-text="'✓ '+(songFile?songFile.name:'')" style="display:none;color:#16a34a;font-size:.75rem;font-weight:600;margin-top:.4rem"></p>
         </div>
@@ -604,7 +651,7 @@ if (!empty($songScripts)) {
 
     <!-- Progress -->
     <div x-show="loading" style="display:none;margin-top:.75rem">
-      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#9ca3af;margin-bottom:.25rem"><span>Uploading both videos…</span><span x-text="progress+'%'"></span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#9ca3af;margin-bottom:.25rem"><span x-text="needsSong ? 'Uploading both videos…' : 'Uploading video…'"></span><span x-text="progress+'%'"></span></div>
       <div class="prog-bar"><div class="prog-fill" :style="'width:'+progress+'%'"></div></div>
     </div>
 
@@ -614,8 +661,9 @@ if (!empty($songScripts)) {
     </div>
 
     <!-- Submit (opens terms modal first) -->
-    <button type="button" class="btn-go" @click="openTermsModal()" :disabled="loading">
-      <?= htmlspecialchars($settingsModel->get('actor_submit_button_text', 'Submit Both Auditions →')) ?>
+    <button type="button" class="btn-go" @click="openTermsModal()" :disabled="loading"
+      x-text="needsSong ? <?= htmlspecialchars(json_encode($submitBtnBoth), ENT_QUOTES) ?> : <?= htmlspecialchars(json_encode($submitBtnDialogue), ENT_QUOTES) ?>">
+      <?= htmlspecialchars($submitBtnBoth) ?>
     </button>
   </div>
 </div>
@@ -786,7 +834,9 @@ function actorSubmit(){
         dialogFile:null,songFile:null,
         loading:false,progress:0,errors:[],
         dragD:false,dragS:false,
-        form:{name:'',email:'',phone:''},
+        form:{name:'',email:'',phone:'',category:<?= json_encode($catDefault) ?>},
+        // Lip sync video only needed for "Dialogue + Lip Sync"
+        get needsSong(){ return this.form.category === 'dialogue_lipsync'; },
         dropD(e){this.dragD=false;var f=e.dataTransfer.files[0];if(f)this.dialogFile=f;},
         dropS(e){this.dragS=false;var f=e.dataTransfer.files[0];if(f)this.songFile=f;},
         openTermsModal(){
@@ -794,8 +844,9 @@ function actorSubmit(){
             if(!this.form.name.trim()) this.errors.push('Name is required.');
             if(!this.form.email.trim()) this.errors.push('Email is required.');
             if(!this.form.phone.trim()) this.errors.push('Phone is required.');
-            if(!this.dialogFile) this.errors.push('Dialog audition video is required.');
-            if(!this.songFile)   this.errors.push('Song audition video is required.');
+            if(this.form.category !== 'dialogue' && this.form.category !== 'dialogue_lipsync') this.errors.push('Please choose a category.');
+            if(!this.dialogFile) this.errors.push('Dialogue audition video is required.');
+            if(this.needsSong && !this.songFile) this.errors.push('Lip sync video is required.');
             if(this.errors.length) return;
             // Store submit function globally so modal can access it
             window.actorSubmitFn = this.submit.bind(this);
@@ -811,8 +862,10 @@ function actorSubmit(){
             fd.append('name',this.form.name);
             fd.append('email',this.form.email);
             fd.append('phone',this.form.phone);
+            fd.append('category',this.form.category);
             fd.append('dialog_video',this.dialogFile);
-            fd.append('song_video',this.songFile);
+            // Only send the lip sync file when that category is chosen
+            if(this.needsSong && this.songFile) fd.append('song_video',this.songFile);
             var self=this;
             var xhr=new XMLHttpRequest();
             xhr.upload.onprogress=function(e){if(e.lengthComputable)self.progress=Math.round(e.loaded/e.total*100);};
@@ -821,9 +874,15 @@ function actorSubmit(){
                 try{
                     var r=JSON.parse(xhr.responseText);
                     if(xhr.status>=200&&xhr.status<300&&r.success){
-                        self.form={name:'',email:'',phone:''};
+                        self.form={name:'',email:'',phone:'',category:self.form.category};
                         self.dialogFile=null;self.songFile=null;self.errors=[];
-                        if(typeof showSuccessModal==='function') showSuccessModal(r);
+                        if(typeof showSuccessModal==='function'){
+                            showSuccessModal(r);
+                            // Dialogue-only submissions can have their own success message
+                            var m=(window._submissionMessages||{}).actor_success_message_dialogue;
+                            var sub=document.getElementById('modalSubtitle');
+                            if(r.category==='dialogue' && m && sub) sub.textContent=m;
+                        }
                     }else{self.errors=r.errors||[r.error||'Submission failed.'];}
                 }catch(err){self.errors=['Server error. Please try again.'];}
             };
@@ -1215,6 +1274,7 @@ function closeDownloadPopup() {
 window._submissionMessages = {
     actor_success_heading: <?= json_encode($settingsModel->get('actor_success_heading', 'ACTOR SUBMISSION RECEIVED!')) ?>,
     actor_success_message: <?= json_encode($settingsModel->get('actor_success_message', "Your acting video is in the queue for AI review and will be published to YouTube once approved. We'll be in touch at your email.")) ?>,
+    actor_success_message_dialogue: <?= json_encode(trim($settingsModel->get('actor_success_message_dialogue', ''))) ?>,
     actor_success_pdf_button: <?= json_encode($settingsModel->get('actor_success_pdf_button', 'Download Actor Brief PDF')) ?>,
     actor_failure_heading: <?= json_encode($settingsModel->get('actor_failure_heading', 'SUBMISSION FAILED')) ?>,
     actor_failure_message: <?= json_encode($settingsModel->get('actor_failure_message', "We couldn't process your acting video. Please check your file and try again.")) ?>,

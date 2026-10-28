@@ -566,11 +566,34 @@ HTML;
     /**
      * Submission received confirmation email (for public submissions from /actor, /director, /writer)
      */
-    public function submissionReceivedEmail(string $name, string $role, string $auditionType): array
+    /**
+     * "Videos received" block, e.g. Dialogue video + Lip sync video. Empty when no list given.
+     */
+    private function videosReceivedHtml(array $videos, string $roleColor): string
+    {
+        $videos = array_values(array_filter(array_map('trim', $videos)));
+        if (empty($videos)) return '';
+        $rows = '';
+        foreach ($videos as $v) {
+            $rows .= '✅ ' . htmlspecialchars($v) . '<br>';
+        }
+        $count = count($videos);
+        $label = $count === 1 ? '1 Video Received' : "{$count} Videos Received";
+        return <<<HTML
+<div style="background: #F0FDF4; border-left: 4px solid {$roleColor}; border-radius: 12px; padding: 20px; margin: 25px 0;">
+    <p style="margin: 0 0 10px; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">{$label}</p>
+    <p style="margin: 0; color: #166534; font-size: 15px; line-height: 1.9;">{$rows}</p>
+</div>
+HTML;
+    }
+
+    public function submissionReceivedEmail(string $name, string $role, string $auditionType, array $videos = []): array
     {
         $roleEmoji = $role === 'actor' ? '🎭' : ($role === 'director' ? '🎬' : '✍️');
         $roleColor = $role === 'actor' ? '#DC2626' : ($role === 'director' ? '#F59E0B' : '#3B82F6');
         $appUrl = APP_URL ?? 'https://facelesspictures.com';
+        $videosHtml = $this->videosReceivedHtml($videos, $roleColor);
+        $auditionType = htmlspecialchars($auditionType);
         
         $subject = "✅ Audition Received — " . ucfirst($role) . " — Faceless Pictures 3";
         
@@ -591,7 +614,7 @@ HTML;
     <p style="margin: 0 0 10px; color: #6B7280; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Submission Type</p>
     <p style="margin: 0; color: #374151; font-size: 16px; font-weight: 600;">{$auditionType}</p>
 </div>
-
+{$videosHtml}
 <div style="background: #EEF2FF; border: 2px solid #818CF8; border-radius: 12px; padding: 20px; margin: 25px 0;">
     <h3 style="margin: 0 0 12px; color: #4338CA; font-size: 15px;">📋 What happens next?</h3>
     <div style="color: #4338CA; font-size: 14px; line-height: 2;">
@@ -616,11 +639,13 @@ HTML,
     /**
      * Admin notification for new public submission
      */
-    public function adminNewSubmissionEmail(string $name, string $email, string $role, string $auditionType, int $submissionId): array
+    public function adminNewSubmissionEmail(string $name, string $email, string $role, string $auditionType, int $submissionId, array $videos = []): array
     {
         $roleEmoji = $role === 'actor' ? '🎭' : ($role === 'director' ? '🎬' : '✍️');
         $roleColor = $role === 'actor' ? '#DC2626' : ($role === 'director' ? '#F59E0B' : '#3B82F6');
         $appUrl = APP_URL ?? 'https://facelesspictures.com';
+        $videosHtml = $this->videosReceivedHtml($videos, $roleColor);
+        $auditionType = htmlspecialchars($auditionType);
         
         $subject = "🎬 New " . ucfirst($role) . " Audition (#" . $submissionId . ") — Faceless Pictures 3";
         
@@ -657,7 +682,7 @@ HTML,
         </tr>
     </table>
 </div>
-
+{$videosHtml}
 <p style="color: #999; font-size: 13px; text-align: center; line-height: 1.6;">
     This submission will be automatically processed through AI moderation.<br>
     Log in to your admin dashboard to review and manage submissions.

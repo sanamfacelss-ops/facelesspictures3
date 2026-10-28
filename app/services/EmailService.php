@@ -487,18 +487,18 @@ class EmailService
     /**
      * Send submission received confirmation to submitter
      */
-    public function sendSubmissionReceivedEmail(string $name, string $email, string $role, string $auditionType): bool
+    public function sendSubmissionReceivedEmail(string $name, string $email, string $role, string $auditionType, array $videos = []): bool
     {
-        $emailData = $this->templateService->submissionReceivedEmail($name, $role, $auditionType);
+        $emailData = $this->templateService->submissionReceivedEmail($name, $role, $auditionType, $videos);
         return $this->sendEmail($email, $emailData['subject'], $emailData['body']);
     }
 
     /**
      * Send admin notification for new submission
      */
-    public function sendAdminNewSubmissionEmail(string $adminEmail, string $name, string $email, string $role, string $auditionType, int $submissionId): bool
+    public function sendAdminNewSubmissionEmail(string $adminEmail, string $name, string $email, string $role, string $auditionType, int $submissionId, array $videos = []): bool
     {
-        $emailData = $this->templateService->adminNewSubmissionEmail($name, $email, $role, $auditionType, $submissionId);
+        $emailData = $this->templateService->adminNewSubmissionEmail($name, $email, $role, $auditionType, $submissionId, $videos);
         return $this->sendEmail($adminEmail, $emailData['subject'], $emailData['body']);
     }
 

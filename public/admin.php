@@ -5775,12 +5775,65 @@ The page will automatically format headings and paragraphs."
                                                         <p class="text-[9px] text-dark/30 mt-1">Supports HTML. The link "Terms & Conditions" will open /legal page in new tab.</p>
                                                     </div>
                                                     
-                                                    <!-- 5. Submit Button Text -->
+                                                    <!-- 5. Submission Category -->
                                                     <div class="border-t border-dark/5 pt-3 mt-3">
-                                                        <label class="block text-[10px] text-dark/50 mb-1">Submit Button Text</label>
-                                                        <input type="text" x-model="form.actor_submit_button_text" placeholder="Submit Both Auditions →"
-                                                            class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
-                                                        <p class="text-[9px] text-dark/30 mt-1">Text shown on the main submit button</p>
+                                                        <p class="text-[9px] text-dark/40 uppercase tracking-wider mb-2">Submission Category (Dialogue Only / Dialogue + Lip Sync)</p>
+                                                        <p class="text-[10px] text-dark/40 mb-2">Applicants pick a category. "Dialogue Only" hides the lip sync upload. Blank fields use the grey default text.</p>
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                            <div class="md:col-span-2">
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Category Field Label</label>
+                                                                <input type="text" x-model="form.actor_category_label" placeholder="Category *"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Option 1 Name (1 video)</label>
+                                                                <input type="text" x-model="form.actor_category_dialogue_label" placeholder="Dialogue Only"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Option 2 Name (2 videos)</label>
+                                                                <input type="text" x-model="form.actor_category_both_label" placeholder="Dialogue + Lip Sync"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Option 1 Hint <span class="text-dark/30">(blank to hide)</span></label>
+                                                                <input type="text" x-model="form.actor_category_dialogue_hint" placeholder="Upload your dialogue scene only"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Option 2 Hint <span class="text-dark/30">(blank to hide)</span></label>
+                                                                <input type="text" x-model="form.actor_category_both_hint" placeholder="Dialogue scene + lip sync song"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div class="md:col-span-2">
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Selected by Default</label>
+                                                                <div class="flex gap-1">
+                                                                    <button type="button" @click="form.actor_category_default = 'dialogue'"
+                                                                        :class="form.actor_category_default === 'dialogue' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                        class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">Option 1</button>
+                                                                    <button type="button" @click="form.actor_category_default = 'dialogue_lipsync'"
+                                                                        :class="form.actor_category_default !== 'dialogue' ? 'bg-dark text-white' : 'bg-dark/5 text-dark/50 hover:bg-dark/10'"
+                                                                        class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">Option 2</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- 6. Submit Button Text -->
+                                                    <div class="border-t border-dark/5 pt-3 mt-3">
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Submit Button Text <span class="text-dark/30">(Dialogue + Lip Sync)</span></label>
+                                                                <input type="text" x-model="form.actor_submit_button_text" placeholder="Submit Both Auditions →"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/50 mb-1">Submit Button Text <span class="text-dark/30">(Dialogue Only)</span></label>
+                                                                <input type="text" x-model="form.actor_submit_button_text_dialogue" placeholder="Submit Audition →"
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-dark/20">
+                                                            </div>
+                                                        </div>
+                                                        <p class="text-[9px] text-dark/30 mt-1">The button text switches with the chosen category</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -5801,8 +5854,13 @@ The page will automatically format headings and paragraphs."
                                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300">
                                                             </div>
                                                             <div>
-                                                                <label class="block text-[10px] text-dark/60 mb-1">Success Message</label>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Success Message <span class="text-dark/30">(Dialogue + Lip Sync)</span></label>
                                                                 <textarea x-model="form.actor_success_message" rows="2" placeholder="Your acting video is in the queue for AI review..."
+                                                                    class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300"></textarea>
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-[10px] text-dark/60 mb-1">Success Message <span class="text-dark/30">(Dialogue Only — blank = same as above)</span></label>
+                                                                <textarea x-model="form.actor_success_message_dialogue" rows="2" placeholder="Your dialogue audition is in the queue for AI review..."
                                                                     class="w-full border border-dark/10 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-green-300"></textarea>
                                                             </div>
                                                             <div>
@@ -9535,6 +9593,15 @@ The page will automatically format headings and paragraphs."
                 actor_form_description: <?= json_encode($settingsModel->get('actor_form_description','Shoot your dialog scene and song audition, then upload both videos below.')) ?>,
                 actor_terms_text:       <?= json_encode($settingsModel->get('actor_terms_text','I agree to the terms and conditions and confirm all information provided is accurate')) ?>,
                 actor_submit_button_text: <?= json_encode($settingsModel->get('actor_submit_button_text','Submit Both Auditions →')) ?>,
+                actor_submit_button_text_dialogue: <?= json_encode($settingsModel->get('actor_submit_button_text_dialogue','')) ?>,
+                // Actor submission category
+                actor_category_label:          <?= json_encode($settingsModel->get('actor_category_label','')) ?>,
+                actor_category_dialogue_label: <?= json_encode($settingsModel->get('actor_category_dialogue_label','')) ?>,
+                actor_category_dialogue_hint:  <?= json_encode($settingsModel->get('actor_category_dialogue_hint','')) ?>,
+                actor_category_both_label:     <?= json_encode($settingsModel->get('actor_category_both_label','')) ?>,
+                actor_category_both_hint:      <?= json_encode($settingsModel->get('actor_category_both_hint','')) ?>,
+                actor_category_default:        <?= json_encode($settingsModel->get('actor_category_default','dialogue_lipsync') === 'dialogue' ? 'dialogue' : 'dialogue_lipsync') ?>,
+                actor_success_message_dialogue: <?= json_encode($settingsModel->get('actor_success_message_dialogue','')) ?>,
                 actor_field_name_label: <?= json_encode($settingsModel->get('actor_field_name_label','Name *')) ?>,
                 actor_field_name_placeholder: <?= json_encode($settingsModel->get('actor_field_name_placeholder','Your full name')) ?>,
                 actor_field_email_label: <?= json_encode($settingsModel->get('actor_field_email_label','Email *')) ?>,
